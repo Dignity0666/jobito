@@ -1,0 +1,56 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-weight: 700;
+}
+
+html,
+body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100vh;
+  background-attachment: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-color: #fff;
+}
+
+/* App container */
+.App {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Layout */
+.main-layout {
+  flex: 1;
+  height: 100vh;
+  overflow-y: auto; /* هنا السكروووول */
+  display: flex;
+  flex-direction: column;
+}
+
+/* الروابط */
+a {
+  display: block;
+  text-decoration: none; /* شيلنا الـ quotes */
+  color: #fff; /* شيلنا الـ quotes */
+  transition: 0.2s ease;
+}
+
+a:hover {
+  opacity: 0.8;
+}
+
+/* الفورم */
+button,
+input {
+  outline: none;
+  padding: 10px;
+  border: none;
+  font-weight: 600;
+}

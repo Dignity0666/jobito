@@ -1,0 +1,55 @@
+.LoginPage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  font-family: Arial, sans-serif;
+}
+
+.LoginPageLeft {
+  color: #333;
+  font-weight: 500;
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.textcenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.LoginPagefrom {
+  width: 80%;
+}
+
+.relative {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #333;
+}
+
+.relative input {
+  width: 100%;
+  background-color: transparent;
+}
+
+.authlabel {
+  color: #333;
+}
+
+.authbtn {
+  width: 100%;
+  background-color: #0f50ab;
+  border-radius: 10px;
+  color: aliceblue;
+}

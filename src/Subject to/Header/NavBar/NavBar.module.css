@@ -1,0 +1,22 @@
+.Navbar {
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0ّ;
+  justify-content: center;
+}
+.Navbar ul {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.Navbar ul li {
+  list-style: none;
+  padding: 10px;
+}
+
+.Navbar ul li a {
+  color: #0f36c2;
+
+}

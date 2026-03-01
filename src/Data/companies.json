@@ -1,0 +1,488 @@
+[
+  {
+    "name": "Stripe",
+    "desc": "Software platform for online businesses.",
+    "tags": ["Business", "Payment Gateway"],
+    "jobs": 7
+  },
+  {
+    "name": "PayPal",
+    "desc": "Global online payments system.",
+    "tags": ["Business", "Fintech"],
+    "jobs": 12
+  },
+  {
+    "name": "Square",
+    "desc": "Business tools and payment solutions.",
+    "tags": ["Business", "Blockchain"],
+    "jobs": 9
+  },
+  {
+    "name": "Coinbase",
+    "desc": "Cryptocurrency exchange platform.",
+    "tags": ["Business", "Blockchain"],
+    "jobs": 15
+  },
+  {
+    "name": "Robinhood",
+    "desc": "Commission-free trading platform.",
+    "tags": ["Business", "Fintech"],
+    "jobs": 10
+  },
+  {
+    "name": "Kraken",
+    "desc": "Global crypto exchange.",
+    "tags": ["Business", "Blockchain"],
+    "jobs": 8
+  },
+  {
+    "name": "Revolut",
+    "desc": "Digital banking alternative.",
+    "tags": ["Business", "Fintech"],
+    "jobs": 14
+  },
+  {
+    "name": "Divvy",
+    "desc": "Financial management platform.",
+    "tags": ["Business", "Fintech"],
+    "jobs": 6
+  },
+  {
+    "name": "Airbnb",
+    "desc": "Online lodging marketplace.",
+    "tags": ["Business", "Tech"],
+    "jobs": 11
+  },
+  {
+    "name": "Uber",
+    "desc": "Ride-sharing platform.",
+    "tags": ["Business", "Tech"],
+    "jobs": 18
+  },
+  {
+    "name": "Netflix",
+    "desc": "Streaming service provider.",
+    "tags": ["Entertainment", "Tech"],
+    "jobs": 20
+  },
+  {
+    "name": "Spotify",
+    "desc": "Digital music streaming service.",
+    "tags": ["Entertainment", "Tech"],
+    "jobs": 13
+  },
+  {
+    "name": "Amazon",
+    "desc": "E-commerce and cloud computing company.",
+    "tags": ["Business", "E-commerce"],
+    "jobs": 25
+  },
+  {
+    "name": "Alibaba",
+    "desc": "Multinational e-commerce company.",
+    "tags": ["Business", "E-commerce"],
+    "jobs": 19
+  },
+  {
+    "name": "Shopify",
+    "desc": "E-commerce platform for online stores.",
+    "tags": ["Business", "E-commerce"],
+    "jobs": 16
+  },
+  {
+    "name": "Tesla",
+    "desc": "Electric vehicle manufacturer.",
+    "tags": ["Technology", "Automotive"],
+    "jobs": 22
+  },
+  {
+    "name": "Google",
+    "desc": "Internet services and AI company.",
+    "tags": ["Technology", "AI"],
+    "jobs": 30
+  },
+  {
+    "name": "Microsoft",
+    "desc": "Software and cloud solutions provider.",
+    "tags": ["Technology", "Cloud"],
+    "jobs": 28
+  },
+  {
+    "name": "Meta",
+    "desc": "Social media and VR company.",
+    "tags": ["Technology", "Social"],
+    "jobs": 21
+  },
+  {
+    "name": "Apple",
+    "desc": "Consumer electronics and software company.",
+    "tags": ["Technology", "Hardware"],
+    "jobs": 24
+  },
+
+  {
+    "name": "TechCorp 1",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 8
+  },
+  {
+    "name": "TechCorp 2",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 12
+  },
+  {
+    "name": "TechCorp 3",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 15
+  },
+  {
+    "name": "TechCorp 4",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 9
+  },
+  {
+    "name": "TechCorp 5",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 11
+  },
+  {
+    "name": "TechCorp 6",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 8
+  },
+  {
+    "name": "TechCorp 7",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 12
+  },
+  {
+    "name": "TechCorp 8",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 15
+  },
+  {
+    "name": "TechCorp 9",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 9
+  },
+  {
+    "name": "TechCorp 10",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 11
+  },
+
+  {
+    "name": "TechCorp 11",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 8
+  },
+  {
+    "name": "TechCorp 12",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 12
+  },
+  {
+    "name": "TechCorp 13",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 15
+  },
+  {
+    "name": "TechCorp 14",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 9
+  },
+  {
+    "name": "TechCorp 15",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 11
+  },
+  {
+    "name": "TechCorp 16",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 8
+  },
+  {
+    "name": "TechCorp 17",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 12
+  },
+  {
+    "name": "TechCorp 18",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 15
+  },
+  {
+    "name": "TechCorp 19",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 9
+  },
+  {
+    "name": "TechCorp 20",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 11
+  },
+
+  {
+    "name": "TechCorp 21",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 8
+  },
+  {
+    "name": "TechCorp 22",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 12
+  },
+  {
+    "name": "TechCorp 23",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 15
+  },
+  {
+    "name": "TechCorp 24",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 9
+  },
+  {
+    "name": "TechCorp 25",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 11
+  },
+  {
+    "name": "TechCorp 26",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 8
+  },
+  {
+    "name": "TechCorp 27",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 12
+  },
+  {
+    "name": "TechCorp 28",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 15
+  },
+  {
+    "name": "TechCorp 29",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 9
+  },
+  {
+    "name": "TechCorp 30",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 11
+  },
+
+  {
+    "name": "TechCorp 31",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 8
+  },
+  {
+    "name": "TechCorp 32",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 12
+  },
+  {
+    "name": "TechCorp 33",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 15
+  },
+  {
+    "name": "TechCorp 34",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 9
+  },
+  {
+    "name": "TechCorp 35",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 11
+  },
+  {
+    "name": "TechCorp 36",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 8
+  },
+  {
+    "name": "TechCorp 37",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 12
+  },
+  {
+    "name": "TechCorp 38",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 15
+  },
+  {
+    "name": "TechCorp 39",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 9
+  },
+  {
+    "name": "TechCorp 40",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 11
+  },
+
+  {
+    "name": "TechCorp 41",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 8
+  },
+  {
+    "name": "TechCorp 42",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 12
+  },
+  {
+    "name": "TechCorp 43",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 15
+  },
+  {
+    "name": "TechCorp 44",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 9
+  },
+  {
+    "name": "TechCorp 45",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 11
+  },
+  {
+    "name": "TechCorp 46",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 8
+  },
+  {
+    "name": "TechCorp 47",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 12
+  },
+  {
+    "name": "TechCorp 48",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 15
+  },
+  {
+    "name": "TechCorp 49",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 9
+  },
+  {
+    "name": "TechCorp 50",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 11
+  },
+
+  {
+    "name": "TechCorp 51",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 8
+  },
+  {
+    "name": "TechCorp 52",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 12
+  },
+  {
+    "name": "TechCorp 53",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 15
+  },
+  {
+    "name": "TechCorp 54",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 9
+  },
+  {
+    "name": "TechCorp 55",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 11
+  },
+  {
+    "name": "TechCorp 56",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 8
+  },
+  {
+    "name": "TechCorp 57",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 12
+  },
+  {
+    "name": "TechCorp 58",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 15
+  },
+  {
+    "name": "TechCorp 59",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Technology", "Software"],
+    "jobs": 9
+  },
+  {
+    "name": "TechCorp 60",
+    "desc": "Digital solutions and enterprise software company.",
+    "tags": ["Business", "Startup"],
+    "jobs": 11
+  }
+]

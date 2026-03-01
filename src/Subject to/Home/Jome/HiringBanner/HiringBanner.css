@@ -1,0 +1,86 @@
+.hiring-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
+  padding: 3rem 2rem;
+  width: 1000px;
+  margin: 2rem auto;
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  transition: transform 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hiring-card:hover {
+  transform: translateY(-5px);
+}
+
+.hiring-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.hiring-title span {
+  color: #ffd966;
+  display: block;
+  font-size: 4rem;
+  margin-top: 0.2rem;
+}
+
+.hiring-subtitle {
+  font-size: 1.3rem;
+  color: #f0e6ff;
+  margin: 1.5rem 0 2.5rem;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.hiring-button {
+  background-color: #fff;
+  color: #4a3f9f;
+  border: none;
+  border-radius: 50px;
+  padding: 1rem 3rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  border: 2px solid transparent;
+}
+
+.hiring-button:hover {
+  background-color: #ffd966;
+  color: #333;
+  transform: scale(1.05);
+  box-shadow: 0 15px 20px rgba(0, 0, 0, 0.2);
+}
+
+.hiring-button:focus {
+  outline: none;
+  border-color: #fff;
+}
+
+@media (max-width: 600px) {
+  .hiring-card {
+    padding: 2rem 1.5rem;
+    margin: 1rem;
+  }
+  .hiring-title {
+    font-size: 2.5rem;
+  }
+  .hiring-title span {
+    font-size: 3rem;
+  }
+  .hiring-subtitle {
+    font-size: 1.1rem;
+  }
+  .hiring-button {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+  }
+}

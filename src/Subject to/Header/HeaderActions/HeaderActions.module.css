@@ -1,0 +1,27 @@
+.faButter {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+}
+
+.ButUserInformation {
+  border: 1px solid #054496;
+  padding: 12px;
+  box-shadow: 0 0 5px #054496;
+  background-color: transparent;
+  border-radius: 10px;
+  transition: 1s;
+  color: #222;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.ButUserInformation:hover {
+  box-shadow: 0 0 20px #054496;
+  rotate: 10deg;
+  scale: 1.1;
+}
+
+.ButUserInformation:active {
+  scale: 0.8;
+}

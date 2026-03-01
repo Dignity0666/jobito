@@ -1,0 +1,724 @@
+{
+  "jobs": [
+    {
+      "title": "DevOps Engineer",
+      "company": "CloudScale",
+      "location": "Seattle, USA",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 15,
+      "capacity": 20
+    },
+    {
+      "title": "SEO Specialist",
+      "company": "SearchFlow",
+      "location": "London, UK",
+      "type": "Remote",
+      "categories": ["Non Technical"],
+      "applied": 8,
+      "capacity": 15
+    },
+    {
+      "title": "Mobile App Developer",
+      "company": "Appify",
+      "location": "Dubai, UAE",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 20,
+      "capacity": 25
+    },
+    {
+      "title": "Event Coordinator",
+      "company": "VibeEvents",
+      "location": "Barcelona, Spain",
+      "type": "Contract",
+      "categories": ["Event"],
+      "applied": 12,
+      "capacity": 15
+    },
+    {
+      "title": "Data Scientist",
+      "company": "Insight AI",
+      "location": "San Francisco, USA",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 30,
+      "capacity": 35
+    },
+    {
+      "title": "Copywriter",
+      "company": "Ink & Quill",
+      "location": "Austin, USA",
+      "type": "Part-Time",
+      "categories": ["Non Technical"],
+      "applied": 10,
+      "capacity": 20
+    },
+    {
+      "title": "Cybersecurity Analyst",
+      "company": "Shield IT",
+      "location": "Tel Aviv, Israel",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 5,
+      "capacity": 10
+    },
+    {
+      "title": "PR Manager",
+      "company": "Glow Agency",
+      "location": "Paris, France",
+      "type": "Full-time",
+      "categories": ["Non Technical", "Event"],
+      "applied": 4,
+      "capacity": 8
+    },
+    {
+      "title": "Sales Development Rep",
+      "company": "GrowthBox",
+      "location": "Dublin, Ireland",
+      "type": "Full-time",
+      "categories": ["Non Technical"],
+      "applied": 25,
+      "capacity": 40
+    },
+    {
+      "title": "AI Research Intern",
+      "company": "DeepMind Tech",
+      "location": "London, UK",
+      "type": "Internship",
+      "categories": ["Technical"],
+      "applied": 50,
+      "capacity": 55
+    },
+    {
+      "title": "Technical Writer",
+      "company": "DocuDocs",
+      "location": "Remote",
+      "type": "Remote",
+      "categories": ["Technical", "Non Technical"],
+      "applied": 6,
+      "capacity": 12
+    },
+    {
+      "title": "Accountant",
+      "company": "FinTrust",
+      "location": "Singapore",
+      "type": "Full-time",
+      "categories": ["Non Technical"],
+      "applied": 9,
+      "capacity": 10
+    },
+    {
+      "title": "Blockchain Developer",
+      "company": "ChainLink",
+      "location": "Zug, Switzerland",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 3,
+      "capacity": 5
+    },
+    {
+      "title": "Community Manager",
+      "company": "Discord",
+      "location": "Remote",
+      "type": "Full-time",
+      "categories": ["Non Technical", "Event"],
+      "applied": 40,
+      "capacity": 50
+    },
+    {
+      "title": "UX Researcher",
+      "company": "UserFirst",
+      "location": "Stockholm, Sweden",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 12,
+      "capacity": 15
+    },
+    {
+      "title": "Stage Manager",
+      "company": "Festival Co",
+      "location": "Berlin, Germany",
+      "type": "Contract",
+      "categories": ["Event"],
+      "applied": 7,
+      "capacity": 10
+    },
+    {
+      "title": "Finance Intern",
+      "company": "Goldman Sachs",
+      "location": "New York, USA",
+      "type": "Internship",
+      "categories": ["Non Technical"],
+      "applied": 100,
+      "capacity": 110
+    },
+    {
+      "title": "Full Stack Developer",
+      "company": "WebFlow",
+      "location": "Remote",
+      "type": "Remote",
+      "categories": ["Technical"],
+      "applied": 45,
+      "capacity": 60
+    },
+    {
+      "title": "Social Media Intern",
+      "company": "TikTok",
+      "location": "Los Angeles, USA",
+      "type": "Internship",
+      "categories": ["Non Technical"],
+      "applied": 80,
+      "capacity": 100
+    },
+    {
+      "title": "Product Manager",
+      "company": "Asana",
+      "location": "San Francisco, USA",
+      "type": "Full-time",
+      "categories": ["Technical", "Non Technical"],
+      "applied": 22,
+      "capacity": 25
+    },
+    {
+      "title": "Audio Engineer",
+      "company": "Spotify",
+      "location": "Stockholm, Sweden",
+      "type": "Full-time",
+      "categories": ["Technical", "Event"],
+      "applied": 8,
+      "capacity": 12
+    },
+    {
+      "title": "Customer Success",
+      "company": "Intercom",
+      "location": "Dublin, Ireland",
+      "type": "Full-time",
+      "categories": ["Non Technical"],
+      "applied": 18,
+      "capacity": 30
+    },
+    {
+      "title": "Cloud Architect",
+      "company": "AWS",
+      "location": "Seattle, USA",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 14,
+      "capacity": 20
+    },
+    {
+      "title": "Legal Counsel",
+      "company": "Lexington",
+      "location": "London, UK",
+      "type": "Full-time",
+      "categories": ["Non Technical"],
+      "applied": 5,
+      "capacity": 5
+    },
+    {
+      "title": "Web Designer",
+      "company": "Wix",
+      "location": "Tel Aviv, Israel",
+      "type": "Part-Time",
+      "categories": ["Technical"],
+      "applied": 11,
+      "capacity": 15
+    },
+    {
+      "title": "Conference Producer",
+      "company": "TechConf",
+      "location": "Lisbon, Portugal",
+      "type": "Full-time",
+      "categories": ["Event"],
+      "applied": 6,
+      "capacity": 10
+    },
+    {
+      "title": "Operations Manager",
+      "company": "Uber",
+      "location": "Amsterdam, Netherlands",
+      "type": "Full-time",
+      "categories": ["Non Technical"],
+      "applied": 33,
+      "capacity": 40
+    },
+    {
+      "title": "Machine Learning Eng",
+      "company": "OpenAI",
+      "location": "San Francisco, USA",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 95,
+      "capacity": 100
+    },
+    {
+      "title": "Office Administrator",
+      "company": "Local Agency",
+      "location": "Cairo, Egypt",
+      "type": "Full-time",
+      "categories": ["Non Technical"],
+      "applied": 15,
+      "capacity": 20
+    },
+    {
+      "title": "Python Developer",
+      "company": "PySoft",
+      "location": "Remote",
+      "type": "Remote",
+      "categories": ["Technical"],
+      "applied": 28,
+      "capacity": 40
+    },
+    {
+      "title": "Video Editor",
+      "company": "StreamLine",
+      "location": "Seoul, South Korea",
+      "type": "Contract",
+      "categories": ["Technical"],
+      "applied": 14,
+      "capacity": 18
+    },
+    {
+      "title": "Marketing Intern",
+      "company": "Coca-Cola",
+      "location": "Atlanta, USA",
+      "type": "Internship",
+      "categories": ["Non Technical"],
+      "applied": 60,
+      "capacity": 70
+    },
+    {
+      "title": "Network Engineer",
+      "company": "Cisco",
+      "location": "San Jose, USA",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 10,
+      "capacity": 15
+    },
+    {
+      "title": "Art Director",
+      "company": "Vogue",
+      "location": "Milan, Italy",
+      "type": "Full-time",
+      "categories": ["Non Technical", "Event"],
+      "applied": 5,
+      "capacity": 8
+    },
+    {
+      "title": "Business Analyst",
+      "company": "Deloitte",
+      "location": "Toronto, Canada",
+      "type": "Full-time",
+      "categories": ["Non Technical"],
+      "applied": 25,
+      "capacity": 30
+    },
+    {
+      "title": "Game Developer",
+      "company": "Ubisoft",
+      "location": "Montreal, Canada",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 40,
+      "capacity": 50
+    },
+    {
+      "title": "Sales Executive",
+      "company": "Salesforce",
+      "location": "Chicago, USA",
+      "type": "Full-time",
+      "categories": ["Non Technical"],
+      "applied": 19,
+      "capacity": 25
+    },
+    {
+      "title": "Database Admin",
+      "company": "Oracle",
+      "location": "Austin, USA",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 7,
+      "capacity": 12
+    },
+    {
+      "title": "Talent Scout",
+      "company": "RecruitMe",
+      "location": "Berlin, Germany",
+      "type": "Part-Time",
+      "categories": ["Non Technical"],
+      "applied": 10,
+      "capacity": 15
+    },
+    {
+      "title": "Event Photographer",
+      "company": "Flash Studio",
+      "location": "Tokyo, Japan",
+      "type": "Contract",
+      "categories": ["Event"],
+      "applied": 5,
+      "capacity": 8
+    },
+    {
+      "title": "IT Support",
+      "company": "Global Connect",
+      "location": "Mumbai, India",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 50,
+      "capacity": 60
+    },
+    {
+      "title": "Chief Technology Officer",
+      "company": "StartupX",
+      "location": "Remote",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 2,
+      "capacity": 2
+    },
+    {
+      "title": "Translator",
+      "company": "Lingua",
+      "location": "Madrid, Spain",
+      "type": "Remote",
+      "categories": ["Non Technical"],
+      "applied": 12,
+      "capacity": 20
+    },
+    {
+      "title": "Ruby on Rails Dev",
+      "company": "Shopify",
+      "location": "Ottawa, Canada",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 18,
+      "capacity": 25
+    },
+    {
+      "title": "PR Intern",
+      "company": "Fashion Co",
+      "location": "Paris, France",
+      "type": "Internship",
+      "categories": ["Non Technical", "Event"],
+      "applied": 35,
+      "capacity": 40
+    },
+    {
+      "title": "Security Engineer",
+      "company": "Palantir",
+      "location": "London, UK",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 6,
+      "capacity": 10
+    },
+    {
+      "title": "Social Media Manager",
+      "company": "Nike",
+      "location": "Portland, USA",
+      "type": "Full-time",
+      "categories": ["Non Technical"],
+      "applied": 45,
+      "capacity": 50
+    },
+    {
+      "title": "System Administrator",
+      "company": "IBM",
+      "location": "New York, USA",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 15,
+      "capacity": 20
+    },
+    {
+      "title": "Logistics Manager",
+      "company": "Amazon",
+      "location": "Munich, Germany",
+      "type": "Full-time",
+      "categories": ["Non Technical"],
+      "applied": 30,
+      "capacity": 45
+    },
+    {
+      "title": "Creative Director",
+      "company": "Adobe",
+      "location": "San Jose, USA",
+      "type": "Full-time",
+      "categories": ["Technical", "Non Technical"],
+      "applied": 4,
+      "capacity": 5
+    },
+    {
+      "title": "Data Engineer",
+      "company": "Snowflake",
+      "location": "Bozeman, USA",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 13,
+      "capacity": 15
+    },
+    {
+      "title": "Growth Hacker",
+      "company": "FastTech",
+      "location": "Remote",
+      "type": "Remote",
+      "categories": ["Non Technical"],
+      "applied": 22,
+      "capacity": 30
+    },
+    {
+      "title": "Field Engineer",
+      "company": "Tesla",
+      "location": "Berlin, Germany",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 10,
+      "capacity": 15
+    },
+    {
+      "title": "Project Coordinator",
+      "company": "NGO Global",
+      "location": "Nairobi, Kenya",
+      "type": "Full-time",
+      "categories": ["Non Technical"],
+      "applied": 18,
+      "capacity": 20
+    },
+    {
+      "title": "Motion Designer",
+      "company": "Pixar",
+      "location": "Emeryville, USA",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 8,
+      "capacity": 10
+    },
+    {
+      "title": "Help Desk Tech",
+      "company": "University IT",
+      "location": "Boston, USA",
+      "type": "Part-Time",
+      "categories": ["Technical"],
+      "applied": 12,
+      "capacity": 15
+    },
+    {
+      "title": "Recruiter",
+      "company": "LinkedIn",
+      "location": "Sunnyvale, USA",
+      "type": "Full-time",
+      "categories": ["Non Technical"],
+      "applied": 25,
+      "capacity": 30
+    },
+    {
+      "title": "Mobile UI Designer",
+      "company": "Instagram",
+      "location": "Menlo Park, USA",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 35,
+      "capacity": 40
+    },
+    {
+      "title": "Inventory Manager",
+      "company": "Walmart",
+      "location": "Bentonville, USA",
+      "type": "Full-time",
+      "categories": ["Non Technical"],
+      "applied": 20,
+      "capacity": 25
+    },
+    {
+      "title": "E-commerce Manager",
+      "company": "Etsy",
+      "location": "Brooklyn, USA",
+      "type": "Remote",
+      "categories": ["Non Technical"],
+      "applied": 15,
+      "capacity": 20
+    },
+    {
+      "title": "Site Reliability Eng",
+      "company": "Google",
+      "location": "Mountain View, USA",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 40,
+      "capacity": 50
+    },
+    {
+      "title": "Catering Manager",
+      "company": "Elite Foods",
+      "location": "London, UK",
+      "type": "Contract",
+      "categories": ["Event"],
+      "applied": 5,
+      "capacity": 10
+    },
+    {
+      "title": "Strategy Consultant",
+      "company": "McKinsey",
+      "location": "Dubai, UAE",
+      "type": "Full-time",
+      "categories": ["Non Technical"],
+      "applied": 50,
+      "capacity": 55
+    },
+    {
+      "title": "IOS Developer",
+      "company": "Apple",
+      "location": "Cupertino, USA",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 60,
+      "capacity": 70
+    },
+    {
+      "title": "Brand Ambassador",
+      "company": "Red Bull",
+      "location": "Vienna, Austria",
+      "type": "Part-Time",
+      "categories": ["Event", "Non Technical"],
+      "applied": 100,
+      "capacity": 150
+    },
+    {
+      "title": "Firmware Engineer",
+      "company": "Intel",
+      "location": "Portland, USA",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 12,
+      "capacity": 15
+    },
+    {
+      "title": "Wealth Manager",
+      "company": "HSBC",
+      "location": "Hong Kong",
+      "type": "Full-time",
+      "categories": ["Non Technical"],
+      "applied": 8,
+      "capacity": 10
+    },
+    {
+      "title": "Scrum Master",
+      "company": "AgileSoft",
+      "location": "Prague, Czechia",
+      "type": "Full-time",
+      "categories": ["Technical", "Non Technical"],
+      "applied": 14,
+      "capacity": 20
+    },
+    {
+      "title": "Content Moderator",
+      "company": "Meta",
+      "location": "Remote",
+      "type": "Remote",
+      "categories": ["Non Technical"],
+      "applied": 200,
+      "capacity": 250
+    },
+    {
+      "title": "Embedded Systems Dev",
+      "company": "Samsung",
+      "location": "Suwon, South Korea",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 18,
+      "capacity": 20
+    },
+    {
+      "title": "Trade Show Host",
+      "company": "Expo Group",
+      "location": "Las Vegas, USA",
+      "type": "Contract",
+      "categories": ["Event"],
+      "applied": 10,
+      "capacity": 20
+    },
+    {
+      "title": "Data Architect",
+      "company": "Teradata",
+      "location": "San Diego, USA",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 5,
+      "capacity": 8
+    },
+    {
+      "title": "HR Business Partner",
+      "company": "Microsoft",
+      "location": "Redmond, USA",
+      "type": "Full-time",
+      "categories": ["Non Technical"],
+      "applied": 22,
+      "capacity": 25
+    },
+    {
+      "title": "Shop Manager",
+      "company": "H&M",
+      "location": "Stockholm, Sweden",
+      "type": "Full-time",
+      "categories": ["Non Technical"],
+      "applied": 30,
+      "capacity": 35
+    },
+    {
+      "title": "React Developer",
+      "company": "Vercel",
+      "location": "Remote",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 55,
+      "capacity": 70
+    },
+    {
+      "title": "Hardware Engineer",
+      "company": "Nvidia",
+      "location": "Santa Clara, USA",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 25,
+      "capacity": 30
+    },
+    {
+      "title": "Customer Ops Intern",
+      "company": "Stripe",
+      "location": "San Francisco, USA",
+      "type": "Internship",
+      "categories": ["Non Technical"],
+      "applied": 40,
+      "capacity": 50
+    },
+    {
+      "title": "Solutions Architect",
+      "company": "Databricks",
+      "location": "London, UK",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 12,
+      "capacity": 15
+    },
+    {
+      "title": "Grant Writer",
+      "company": "Charity Hub",
+      "location": "Remote",
+      "type": "Contract",
+      "categories": ["Non Technical"],
+      "applied": 8,
+      "capacity": 12
+    },
+    {
+      "title": "DevSecOps Eng",
+      "company": "Snyk",
+      "location": "Tel Aviv, Israel",
+      "type": "Full-time",
+      "categories": ["Technical"],
+      "applied": 10,
+      "capacity": 12
+    }
+  ]
+}

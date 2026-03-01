@@ -1,0 +1,879 @@
+.aboutPage {
+  overflow-x: hidden;
+}
+
+.heroSection {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.heroBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.heroOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.floatingShapes {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.shape1,
+.shape2,
+.shape3 {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.4;
+  animation: float 20s infinite;
+}
+
+.shape1 {
+  width: 300px;
+  height: 250px;
+  background: #5864ce;
+  top: 10%;
+  left: 5%;
+  animation-delay: 0s;
+  translate: 0 100px;
+}
+
+.shape2 {
+  width: 400px;
+  height: 400px;
+  background: #4265da;
+  bottom: 10%;
+  right: 5%;
+  animation-delay: -5s;
+}
+
+.shape3 {
+  width: 350px;
+  height: 350px;
+  background: #a78bfa;
+  top: 40%;
+  right: 20%;
+  animation-delay: -10s;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.content {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.visible .content {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(38, 164, 255, 0.1);
+  border-radius: 40px;
+  margin-bottom: 30px;
+  color: #26a4ff;
+  font-weight: 500;
+  animation: slideInLeft 0.6s ease-out;
+}
+
+.title {
+  font-size: clamp(3rem, 8vw, 6rem);
+  line-height: 1.1;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.servicesWord {
+  display: block;
+  font-size: 0.4em;
+  color: #666;
+  margin-bottom: 10px;
+  animation: slideInRight 0.6s ease-out 0.1s both;
+}
+
+
+.titleLine {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.purpleText {
+  color: #7c3aed;
+  animation: slideInUp 0.6s ease-out 0.2s both;
+}
+
+.blueText {
+  color: #26a4ff;
+  position: relative;
+  animation: slideInUp 0.6s ease-out 0.3s both;
+}
+
+
+.underline {
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  width: 100%;
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+  animation: drawLine 1.5s ease-out 0.8s forwards;
+}
+
+.description {
+  font-size: 1.2rem;
+  color: #4b5563;
+  margin-bottom: 40px;
+  max-width: 600px;
+  animation: fadeIn 0.6s ease-out 0.4s both;
+}
+
+
+.heroButtons {
+  display: flex;
+  gap: 20px;
+  animation: fadeIn 0.6s ease-out 0.5s both;
+}
+
+.primaryButton,
+.secondaryButton {
+  padding: 15px 30px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.primaryButton {
+  background: linear-gradient(135deg, #26a4ff, #7c3aed);
+  color: white;
+  border: none;
+  box-shadow: 0 10px 20px rgba(38, 164, 255, 0.3);
+}
+
+.primaryButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(38, 164, 255, 0.4);
+}
+
+.secondaryButton {
+  background: transparent;
+  border: 2px solid #26a4ff;
+  color: #26a4ff;
+}
+
+.secondaryButton:hover {
+  background: rgba(38, 164, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.scrollIndicator {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: #666;
+  animation: bounce 2s infinite;
+}
+
+.scrollMouse {
+  width: 30px;
+  height: 50px;
+  border: 2px solid #666;
+  border-radius: 20px;
+  position: relative;
+}
+
+.scrollWheel {
+  width: 4px;
+  height: 8px;
+  background: #666;
+  border-radius: 2px;
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: scrollWheel 1.5s infinite;
+}
+
+.servicesSection {
+  padding: 100px 0;
+  background: white;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 60px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease;
+}
+
+.sectionHeader.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.sectionHeader h2 {
+  font-size: 2.5rem;
+  color: #1f2937;
+  margin-bottom: 20px;
+}
+
+.sectionHeader h2 span {
+  color: #26a4ff;
+  position: relative;
+}
+
+.sectionHeader h2 span::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #26a4ff, #7c3aed);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.6s ease;
+}
+
+.sectionHeader.visible h2 span::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.sectionHeader p {
+  color: #6b7280;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.servicesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  padding: 20px;
+}
+
+.serviceCard {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease;
+  perspective: 1500px;
+  cursor: pointer;
+}
+
+.serviceCard.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.serviceCardInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 350px;
+  text-align: center;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.serviceCard:hover .serviceCardInner {
+  transform: rotateY(180deg);
+}
+
+.serviceFront,
+.serviceBack {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 15px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: white;
+}
+
+.serviceFront {
+  transform: rotateY(0deg);
+}
+
+.serviceBack {
+  transform: rotateY(180deg);
+  color: white;
+}
+
+.serviceBackContent {
+  max-width: 100%;
+}
+
+.serviceBackContent h4 {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: white;
+}
+
+.serviceBackContent p {
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+}
+
+.serviceBackButton {
+  background: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: transform 0.3s ease;
+  color: #333;
+}
+
+.serviceBackButton:hover {
+  transform: translateX(5px);
+}
+
+.serviceIconWrapper {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  transition: transform 0.3s ease;
+}
+
+.serviceCard:hover .serviceIconWrapper {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.serviceIconWrapper svg {
+  width: 40px;
+  height: 40px;
+  color: white;
+}
+
+.serviceFront h3 {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: #1f2937;
+}
+
+.serviceFront p {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+}
+
+.serviceHoverHint {
+  font-size: 0.8rem;
+  color: #26a4ff;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+}
+
+.serviceCard:hover .serviceHoverHint {
+  opacity: 1;
+  transform: translateY(0);
+}
+.helpoutercontainer {
+  padding: 80px 0;
+  overflow: hidden;
+}
+
+.helpbluebanner {
+  background-color: #0e3d6b;
+  color: white;
+  padding: 60px 40px;
+  position: relative;
+  border-radius: 50% 80% 10% 10% / 10% 30% 70% 50%;
+  width: 110%;
+  margin-left: -5%;
+}
+
+.helpcontentwrapper {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.helptextside {
+  flex: 1;
+  text-align: left;
+}
+
+.helptextside h2 {
+  font-size: 2.2rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.helptextside h2 span {
+  color: #70d1e5;
+}
+
+.helptextside p {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin-bottom: 25px;
+  opacity: 0.9;
+}
+
+.authorinfo {
+  font-size: 1rem;
+}
+
+.helpimageside {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.blobshape {
+  width: 350px;
+  height: 350px;
+  background: #fff;
+  overflow: hidden;
+  border-radius: 40% 60% 70% 15% / 10% 50% 60% 50%;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.blobshape img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 768px) {
+  .helpbluebanner {
+    border-radius: 20px;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .helpcontentwrapper {
+    flex-direction: column-reverse;
+    text-align: center;
+  }
+
+  .helptextside {
+    text-align: center;
+  }
+
+  .blobshape {
+    width: 250px;
+    height: 250px;
+  }
+}
+
+/* Why Choose Us Section */
+.whyUsSection {
+  padding: 100px 0;
+  background: linear-gradient(135deg, #667eea0a 0%, #764ba20a 100%);
+}
+
+.headerTop {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.subtitle {
+  display: inline-block;
+  padding: 8px 20px;
+  background: linear-gradient(135deg, #26a4ff20, #7c3aed20);
+  color: #26a4ff;
+  border-radius: 30px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.sectionTitle {
+  font-size: 2.5rem;
+  color: #1f2937;
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+}
+
+.featureCard {
+  position: relative;
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.5s ease;
+  overflow: hidden;
+  opacity: 0;
+  cursor: pointer;
+  transform: translateY(30px);
+}
+
+.featureCard.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.featureCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.featureIconWrapper {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.featureCard:hover .featureIconWrapper {
+  transform: scale(1.1) rotate(10deg);
+}
+
+.featureIconContainer svg {
+  width: 30px;
+  height: 30px;
+}
+
+.featureContent h3 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.featureContent p {
+  color: #6b7280;
+  line-height: 1.6;
+  transition: color 0.3s ease;
+}
+
+.featureHoverEffect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: linear-gradient(135deg, #26a4ff, #7c3aed);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.featureCard:hover .featureHoverEffect {
+  opacity: 1;
+}
+
+.featureCard:hover .featureContent p {
+  color: white;
+}
+
+.featureCard:hover .featureContent h3 {
+  color: white;
+}
+
+/* Help Section */
+.helpSection {
+  padding: 100px 0;
+  background: white;
+  overflow: hidden;
+}
+
+.helpContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.helpContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease;
+}
+
+.helpContent.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.helpBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #26a4ff20, #7c3aed20);
+  border-radius: 30px;
+  margin-bottom: 30px;
+  color: #26a4ff;
+  font-weight: 600;
+}
+
+.helpTextSide h2 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #1f2937;
+}
+
+.helpTextSide h2 span {
+  color: #26a4ff;
+  position: relative;
+}
+
+.helpTextSide h2 span::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #26a4ff, #7c3aed);
+}
+
+.helpTextSide p {
+  color: #6b7280;
+  line-height: 1.8;
+  margin-bottom: 40px;
+  font-size: 1.1rem;
+}
+
+.helpStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.statItem {
+  text-align: center;
+}
+
+.statNumber {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #26a4ff;
+  margin-bottom: 5px;
+}
+
+.statLabel {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.authorInfo {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.authorAvatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #26a4ff;
+}
+
+.authorAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.authorAvatar:hover img {
+  transform: scale(1.1);
+}
+
+.authorDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.authorDetails strong {
+  font-size: 1.2rem;
+  color: #1f2937;
+}
+
+.authorDetails span {
+  color: #6b7280;
+}
+
+.helpImageSide {
+  position: relative;
+}
+
+.floatingBlob {
+  position: relative;
+  animation: floatBlob 6s ease-in-out infinite;
+}
+
+.blobShape {
+  position: relative;
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  overflow: hidden;
+  box-shadow: 0 30px 40px rgba(0, 0, 0, 0.2);
+}
+
+.blobShape img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.blobShape:hover img {
+  transform: scale(1.05);
+}
+
+.experienceBadge {
+  position: absolute;
+  bottom: -20px;
+  right: -20px;
+  background: linear-gradient(135deg, #26a4ff, #7c3aed);
+  color: white;
+  padding: 20px;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: 0 10px 20px rgba(38, 164, 255, 0.3);
+  animation: pulseBadge 2s infinite;
+}
+
+.expNumber {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+@media (max-width: 968px) {
+  .helpContent {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .helpImageSide {
+    order: -1;
+  }
+
+  .experienceBadge {
+    width: 100px;
+    height: 100px;
+    padding: 15px;
+  }
+
+  .expNumber {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 2.5rem;
+  }
+
+  .heroButtons {
+    flex-direction: column;
+  }
+
+  .servicesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .featuresGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .helpStats {
+    grid-template-columns: 1fr;
+  }
+
+  .sectionHeader h2 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .titleLine {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .experienceBadge {
+    display: none;
+  }
+}
+
+.loading {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}

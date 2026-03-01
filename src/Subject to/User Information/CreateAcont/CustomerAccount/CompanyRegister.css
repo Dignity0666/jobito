@@ -1,0 +1,159 @@
+.company-container {
+  width: 100vw;
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.company-container .company-left {
+  height: 100vh;
+}
+@media (min-width: 768px) {
+  .company-container {
+    flex-direction: row;
+  }
+}
+
+.company-left {
+  flex: 1;
+  width: 100%;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+@media (min-width: 768px) {
+  .company-left {
+    border-right: 1px solid rgba(148, 163, 184, 0.2);
+  }
+}
+
+.company-right {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .company-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.company-image {
+  width: 90%;
+  max-width: 450px;
+}
+
+.welcome-box {
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.welcome-icon {
+  width: 45px;
+  height: 45px;
+  margin-bottom: 10px;
+}
+
+.welcome-box h2 {
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+}
+
+.welcome-box p {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.three-columns {
+  display: grid;
+  gap: 14px;
+}
+
+@media (min-width: 768px) {
+  .three-columns {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.auth-label {
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: #333;
+}
+
+.input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(39, 39, 40, 0.666);
+  color: #333;
+  font-size: 13px;
+  transition: 0.3s;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+}
+
+
+.submit-btn {
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  background: #38bdf8;
+  color: #0f172a;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Loader */
+
+.loader {
+  width: 18px;
+  height: 18px;
+  animation: spin 1s linear infinite;
+  margin: auto;
+}
+
+
+.switch-box {
+  text-align: center;
+  margin-top: 5px;
+}
+
+.switch-box button {
+  background: none;
+  border: none;
+  color: #38bdf8;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.switch-box button:hover {
+  text-decoration: underline;
+}

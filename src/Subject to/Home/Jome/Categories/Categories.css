@@ -1,0 +1,139 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+.page-container {
+  max-width: 1200px;
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+/* ===== Header ===== */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.section-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.section-header h2 span {
+  color: #3b82f6;
+}
+
+.show-all {
+  font-size: 14px;
+  text-decoration: none;
+  color: #3b82f6;
+}
+
+.categories-grid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  cursor: pointer;
+  margin-bottom: 60px;
+}
+
+.category-card {
+  border: 1px solid #e5e7eb;
+  width: 400px;
+  height: 200px;
+  border-radius: 8px;
+  padding: 30px;
+  transition: all 0.3s ease;
+  background: #fff;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0  10px #5b8fc8;
+}
+
+.category-card .icon {
+  font-size: 28px;
+  margin-bottom: 15px;
+  color: #3b82f6;
+}
+
+.category-card h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: #111827;
+}
+
+.category-card p {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.category-card:hover {
+  background: #5b8fc8;
+  color: #fff;
+  border: none;
+}
+
+.category-card:hover h3,
+.category-card:hover p,
+.category-card:hover .icon {
+  color: #fff;
+}
+
+/* ===== CTA Section ===== */
+.cta-section {
+  background: #5b8fc8;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 50px;
+  color: #fff;
+}
+
+.cta-text h2 {
+  font-size: 30px;
+  margin-bottom: 10px;
+}
+
+.cta-text p {
+  margin-bottom: 20px;
+  opacity: 0.9;
+}
+
+.cta-text button {
+  background: #fff;
+  color: #5b8fc8;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cta-image {
+  height: 180%;
+  scale: 1.2;
+  width: 55%;
+  translate: 100px ;
+}
+
+.fake-image {
+  background: #ffffff;
+  color: #5b8fc8;
+  height: 220px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}

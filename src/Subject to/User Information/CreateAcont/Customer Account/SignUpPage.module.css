@@ -1,0 +1,156 @@
+.signupwrapper {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  border-radius: 10px;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.signupleft {
+  padding: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.welcome {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.welcomeicon {
+  color: #333;
+}
+
+.relative {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #333;
+}
+
+.relative input {
+  width: 100%;
+  background-color: transparent;
+  border: none;
+}
+.relative .input:focus {
+  box-shadow: 0 0 0 ;
+}
+
+.textcenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px; 
+  margin-bottom: 10px;
+}
+
+.signupimage {
+  width: 90%;
+  max-width: 450px;
+}
+
+.welcome-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.welcome-icon {
+  width: 45px;
+  color: #333;
+  height: 45px;
+}
+
+.welcome-box h2 {
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+}
+
+.welcome-box p {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.relatie {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  border-radius: 10px;
+  gap: 10px;
+  border: 1px solid rgb(6, 6, 7);
+}
+
+.relatie input {
+  border: none;
+}
+.relatie .input:focus {
+  outline: none;
+  box-shadow: 0 0 0 0px rgba(56, 189, 248, 0.2);
+}
+
+.threeclumns {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: center;
+}
+
+.threeclumns div {
+  width: 220px;
+}
+
+@media (min-width: 768px) {
+  .three-columns {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ===== Input ===== */
+.authlabel {
+  font-size: 19px;
+  margin-bottom: 4px;
+  color: #333;
+}
+
+
+/* ===== Submit Button ===== */
+.authbtn{
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  background: #38bdf8;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.cenr {
+  text-align: center;
+  margin-top: 10px;
+  color: #38bdf8;
+}

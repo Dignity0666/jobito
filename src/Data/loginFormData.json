@@ -1,0 +1,11 @@
+{
+  "loginForm": {
+    "email": "mohamed.nasser@example.com",
+    "password": "12345678",
+    "rememberMe": true
+  },
+  "socialLogin": {
+    "google": true,
+    "apple": false
+  }
+}

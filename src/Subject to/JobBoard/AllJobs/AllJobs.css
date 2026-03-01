@@ -1,0 +1,197 @@
+.jobs-page {
+  display: flex;
+  max-width: 1300px;
+  margin: 40px auto;
+  gap: 30px;
+}
+
+.sidebar {
+  width: 260px;
+  background: #fff;
+}
+
+.filter {
+  margin-bottom: 30px;
+}
+
+.filter h4 {
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #111827;
+}
+
+.filter label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+/* ===== Jobs Content ===== */
+.jobs-content {
+  flex: 1;
+}
+
+.jobs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.jobs-header h2 {
+  font-size: 22px;
+}
+
+.jobs-header p {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.sort {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* ===== Job Row ===== */
+.job-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  background: #fff;
+}
+
+.job-left {
+  display: flex;
+  gap: 15px;
+}
+
+.logo-placeholder {
+  width: 48px;
+  height: 48px;
+  background: #eef2ff;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.job-row h3 {
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.job-row p {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+/* ===== Tags ===== */
+.tags {
+  display: flex;
+  gap: 8px;
+}
+
+.tag {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.fulltime {
+  background: #ecfdf5;
+  color: #10b981;
+}
+
+.marketing {
+  background: #fff7ed;
+  color: #f97316;
+}
+
+.design {
+  background: #ecfeff;
+  color: #06b6d4;
+}
+
+/* ===== Right Side ===== */
+.job-right {
+  text-align: right;
+  width: 220px;
+}
+
+.apply-btn {
+  background: #5b8fc8;
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.progress {
+  width: 100px;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-left: auto;
+  margin-right: 0;
+
+  align-self: flex-end;
+}
+
+.fabutter {
+  width: 100%;
+  display: grid;
+  align-items: center;
+  justify-content: end;
+  gap: 10px;
+}
+
+.like {
+  cursor: pointer;
+  display: grid;
+  align-items: center;
+  justify-content: end;
+}
+
+.progress-bar {
+  height: 100%;
+  background: #5b8fc8;
+}
+
+.applied-text {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+/* ===== Pagination ===== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 30px;
+}
+
+.pagination button {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  cursor: pointer;
+}
+
+.pagination .active {
+  background: #5b8fc8;
+  color: #fff;
+}
