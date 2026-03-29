@@ -14,7 +14,7 @@
   --color-coral: #ea4884;
 
   --marquee-duration: 40s;
-  --card-width: 320px;
+  --card-width: 250px;
 }
 
 .testimonial {
@@ -25,21 +25,32 @@
   width: 100%;
   overflow: hidden;
   position: relative;
-  font-family:
-    "Inter",
-    system-ui,
-    -apple-system,
-    sans-serif;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
   gap: 3rem;
-  padding: 2rem 0;
+  padding: 4rem 0;
+  background: radial-gradient(circle at top center, rgba(70, 64, 222, 0.05), transparent 70%);
 }
 
 .testimonial h2 {
-  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
   font-weight: 800;
   color: var(--color-midnight);
   text-align: center;
   letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.testimonial h2::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, #4640de, #26A4FF);
+  border-radius: 2px;
 }
 
 .marquee-container {
@@ -47,17 +58,15 @@
   flex-direction: column;
   gap: 1.5rem;
   width: 100%;
+  position: relative;
 }
 
 .marquee {
   display: flex;
-  gap: 1.5rem;
+  gap: 3rem;
   width: max-content;
   animation: marquee var(--marquee-duration) linear infinite;
-}
-
-.marquee .reverse {
-  animation-direction: reverse;
+  padding: 1rem 0;
 }
 
 .marquee:hover {
@@ -66,97 +75,104 @@
 
 @keyframes marquee {
   to {
-    transform: translateX(calc(-50% - 0.75rem));
+    transform: translateX(calc(-50% - 1.5rem));
   }
 }
 
 .reviewCard {
   width: var(--card-width);
-  padding: 1.5rem;
-  border-radius: 1.25rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.25rem 2rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  cursor: pointer;
 }
 
 .reviewCard:hover {
-  transform: translateY(-5px) scale(1.02);
+  transform: translateY(-5px);
+  background: #ffffff;
+  border-color: #4640de;
+  box-shadow: 0 20px 25px -5px rgba(70, 64, 222, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-.userinfo {
+.partnerLogo {
+  height: 32px !important;
+  width: auto !important;
+  max-width: 150px;
+  object-fit: contain;
+  filter: grayscale(1) opacity(0.7);
+  transition: all 0.3s ease;
+}
+
+.reviewCard:hover .partnerLogo {
+  filter: grayscale(0) opacity(1);
+}
+
+.partnerName {
+  display: none; /* Only show logo for premium partner look, or keep name? User's choice. Letting it be logo only for cleaner look */
+}
+
+/* For when logo fails and we show name */
+.nameOnly .partnerName {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.loading {
+  color: #4640de;
+  font-weight: 600;
+  padding: 60px;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 10px;
 }
 
-.reviewCard img {
-  width: auto;
-  height: 44px;
-  object-fit: cover;
+.loading::after {
+  content: "";
+  width: 20px;
+  height: 20px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #4640de;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
-.reviewCard figcaption {
-  color: #ffffff;
-  font-weight: 600;
-  font-size: 0.95rem;
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
-.reviewCard p {
-  color: var(--color-mint);
-  font-size: 0.8rem;
-  opacity: 0.8;
+.pause {
+  animation-play-state: paused !important;
 }
 
-.reviewCard blockquote {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.9rem;
-  line-height: 1.6;
-}
-
+/* Gradients for seamless edges */
 .testimonial::before,
 .testimonial::after {
   content: "";
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 15%;
+  width: 20%;
   z-index: 2;
   pointer-events: none;
 }
 
 .testimonial::before {
   left: 0;
-  background: linear-gradient(to right, #fff, transparent);
+  background: linear-gradient(to right, #ffffff, transparent);
 }
 
 .testimonial::after {
   right: 0;
-  background: linear-gradient(to left, #fff, transparent);
-}
-
-.partnerLogo {
-  width: 40px !important;
-  height: 40px !important;
-  border-radius: 8px;
-  object-fit: cover;
-}
-
-.partnerName {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--color-midnight);
-  white-space: nowrap;
-}
-
-.loading {
-  color: #4640de;
-  font-weight: 600;
-  padding: 40px;
-}
-
-.pause {
-  animation-play-state: paused !important;
+  background: linear-gradient(to left, #ffffff, transparent);
 }
