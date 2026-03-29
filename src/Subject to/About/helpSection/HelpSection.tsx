@@ -1,11 +1,38 @@
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import styles from "./HelpSection.module.css";
 import image from "../../../assets/Img/Gemini_Generated_Image_lk4biqlk4biqlk4b.png";
-import { CheckCircle } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { CheckCircle, Smile, Users, Award } from "lucide-react";
+
+interface MappedStat {
+  label: string;
+  value: string;
+  icon: JSX.Element;
+}
 
 export const HelpSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement | null>(null);
+  const iconMap: Record<string, JSX.Element> = useMemo(() => ({
+    "smile": <Smile size={20} />,
+    "check-circle": <CheckCircle size={20} />,
+    "users": <Users size={20} />,
+    "award": <Award size={20} />,
+  }), []);
+
+  const stats: MappedStat[] = useMemo(() => {
+    const MOCK_STATS_DATA = [
+      { label: "عميل سعيد", value: "500+", icon: "smile" },
+      { label: "وظيفة مكتملة", value: "1,200+", icon: "check-circle" },
+      { label: "مستخدم نشط", value: "10k+", icon: "users" },
+      { label: "جائزة تميز", value: "15", icon: "award" },
+    ];
+
+    return MOCK_STATS_DATA.map((s) => ({
+      label: s.label,
+      value: s.value,
+      icon: iconMap[s.icon] || <CheckCircle size={20} />,
+    }));
+  }, [iconMap]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -36,34 +63,25 @@ export const HelpSection = () => {
           <div className={styles.helpTextSide}>
             <div className={styles.helpBadge}>
               <CheckCircle size={18} />
-              <span>Expert Team</span>
+              <span>موثوق به</span>
             </div>
 
             <h2>
-              We're Here <span>To Help</span>
+              نحن نؤمن <span>بالابتكار الرقمي</span>
             </h2>
 
             <p>
-              At Freedom HR we become an invaluable resource within your
-              business, teaming up as your HR expert and freeing you to
-              concentrate on other areas of your business. We offer a scalable
-              and cost-effective solution and become your friend and trusted
-              advisor.
+              مهمتنا هي تمكين كل فرد من الوصول إلى الفرصة التي يستحقها، من خلال تقنيات حديثة وتواصل فعال يكسر الحواجز.
             </p>
 
             <div className={styles.helpStats}>
-              <div className={styles.statItem}>
-                <span className={styles.statNumber}>500+</span>
-                <span className={styles.statLabel}>Clients Served</span>
-              </div>
-              <div className={styles.statItem}>
-                <span className={styles.statNumber}>10+</span>
-                <span className={styles.statLabel}>Years Experience</span>
-              </div>
-              <div className={styles.statItem}>
-                <span className={styles.statNumber}>98%</span>
-                <span className={styles.statLabel}>Satisfaction</span>
-              </div>
+              {stats.map((stat, idx) => (
+                <div key={idx} className={styles.statItem}>
+                  <div className={styles.statIcon}>{stat.icon}</div>
+                  <span className={styles.statNumber}>{stat.value}</span>
+                  <span className={styles.statLabel}>{stat.label}</span>
+                </div>
+              ))}
             </div>
 
             <div className={styles.authorInfo}>
@@ -72,7 +90,7 @@ export const HelpSection = () => {
               </div>
               <div className={styles.authorDetails}>
                 <strong>Farah Mody</strong>
-                <span>Director</span>
+                <span>مديرة العمليات</span>
               </div>
             </div>
           </div>
@@ -84,7 +102,7 @@ export const HelpSection = () => {
               </div>
               <div className={styles.experienceBadge}>
                 <span className={styles.expNumber}>10+</span>
-                <span>Years of Excellence</span>
+                <span>سنوات من التميز</span>
               </div>
             </div>
           </div>

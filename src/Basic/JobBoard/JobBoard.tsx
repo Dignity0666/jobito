@@ -1,9 +1,9 @@
 import { MapPin, Search } from "lucide-react";
 import Styles from "./JobBoard.module.css";
 import AllJobs from "../../Subject to/JobBoard/AllJobs/AllJobs";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
+import { useState } from "react";
 
-// ✅ Hero variants — عناصر الـ hero بتظهر واحدة ورا التانية
 const heroContainer = {
   hidden: {},
   visible: {
@@ -14,7 +14,7 @@ const heroContainer = {
   },
 };
 
-const fadeUp = {
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
@@ -23,8 +23,7 @@ const fadeUp = {
   },
 };
 
-// ✅ Search bar بتيجي من تحت بعد باقي العناصر
-const searchBarVariant = {
+const searchBarVariant: Variants = {
   hidden: { opacity: 0, y: 24, scale: 0.98 },
   visible: {
     opacity: 1,
@@ -34,8 +33,7 @@ const searchBarVariant = {
   },
 };
 
-// ✅ AllJobs section بتظهر بـ fade بعد الـ hero
-const sectionVariant = {
+const sectionVariant: Variants = {
   hidden: { opacity: 0, y: 40 },
   visible: {
     opacity: 1,
@@ -45,8 +43,20 @@ const sectionVariant = {
 };
 
 export default function JobBoard() {
+  const [search, setSearch] = useState("");
+  const [location, setLocation] = useState("");
+
+  const [appliedFilters, setAppliedFilters] = useState({
+    search: "",
+    location: "",
+  });
+
+  const handleSearch = () => {
+    setAppliedFilters({ search, location });
+  };
+
   return (
-    <div className="job-board">
+    <div className={Styles.page} style={{ direction: "rtl" }}>
       {/* ── Hero Section ── */}
       <section className={Styles.heroSection}>
         <div className={Styles.container}>
@@ -58,43 +68,49 @@ export default function JobBoard() {
           >
             {/* Title */}
             <motion.h1 className={Styles.title} variants={fadeUp}>
-              Find your{" "}
+              ابحث عن{" "}
               <span className={Styles.purpleText}>
-                dream job{" "}
-                <svg className={Styles.underline} viewBox="0 0 300 20">
-                  <path
-                    d="M5 15 Q 40 5, 80 15 T 160 15 T 240 15 T 300 15"
-                    stroke="#26A4FF"
-                    fill="transparent"
-                    strokeWidth="4"
-                  />
-                </svg>
+                وظيفة أحلامك{" "}
               </span>
             </motion.h1>
 
-            {/* Description */}
             <motion.p className={Styles.description} variants={fadeUp}>
-              Find your next career at companies like HubSpot, Nike, and Dropbox
+              الآلاف من فرص العمل في انتظارك. ابدأ مسيرتك المهنية اليوم.
             </motion.p>
 
             {/* Search Bar */}
-            <motion.div className={Styles.searchBar} variants={searchBarVariant}>
+            <motion.div
+              className={Styles.searchBar}
+              variants={searchBarVariant}
+            >
               <div className={Styles.inputGroup}>
                 <Search className={Styles.icon} size={20} />
-                <input type="text" placeholder="Job title or keyword" />
+                <input
+                  type="text"
+                  placeholder="مسمى الوظيفة أو الكلمة الرئيسية..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                />
               </div>
 
               <div className={Styles.divider}></div>
 
               <div className={Styles.inputGroup}>
                 <MapPin className={Styles.icon} size={20} />
-                <select defaultValue="Florence">
-                  <option value="Florence">Florence, Italy</option>
-                  <option value="London">London, UK</option>
+                <select
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                >
+                  <option value="">أي مكان</option>
+                  <option value="Cairo">القاهرة، مصر</option>
+                  <option value="Alexandria">الإسكندرية، مصر</option>
                 </select>
               </div>
 
-              <button className={Styles.searchBtn}>Search my job</button>
+              <button className={Styles.searchBtn} onClick={handleSearch}>
+                بحث
+              </button>
             </motion.div>
           </motion.div>
         </div>
@@ -105,9 +121,13 @@ export default function JobBoard() {
         className={Styles.cardJobBoard}
         variants={sectionVariant}
         initial="hidden"
-        animate="visible"
+        whileInView="visible"
+        viewport={{ once: true }}
       >
-        <AllJobs />
+        <AllJobs
+          searchKeyword={appliedFilters.search}
+          location={appliedFilters.location}
+        />
       </motion.div>
     </div>
   );

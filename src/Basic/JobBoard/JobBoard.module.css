@@ -1,3 +1,9 @@
+.page {
+  background-color: #fafbfc;
+  min-height: 100vh;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
 .heroSection {
   width: 100%;
   display: flex;

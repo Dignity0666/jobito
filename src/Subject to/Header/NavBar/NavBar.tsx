@@ -1,27 +1,26 @@
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import styles from "./NavBar.module.css";
 
-const navLinks = [
-  { label: "Home",             path: "/" },
-  { label: "Find Jobs",        path: "/Find Jobs" },
-  { label: "Browse Companies", path: "/Browse Companies" },
-  { label: "About",            path: "/about" },
-  { label: "Contact",          path: "/contact" },
-];
+export type NavLinkType = {
+  label: string;
+  path: string;
+};
 
 type NavBarProps = {
   mobileOpen: boolean;
   setMobileOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  navLinks: NavLinkType[];
 };
 
-export function NavBar({ mobileOpen, setMobileOpen }: NavBarProps) {
+export function NavBar({ mobileOpen, setMobileOpen, navLinks }: NavBarProps) {
   const location = useLocation();
 
   return (
     <>
       {/* ── Hamburger (mobile) ── */}
       <button
-        className="hdr-burger"
+        className={styles.burger}
         onClick={() => setMobileOpen((p) => !p)}
         aria-label="Toggle menu"
       >
@@ -29,31 +28,29 @@ export function NavBar({ mobileOpen, setMobileOpen }: NavBarProps) {
       </button>
 
       {/* ── Nav links (desktop) ── */}
-      <nav className="hdr-nav">
-        {navLinks.map((link, i) => {
+      <nav className={styles.nav}>
+        {navLinks.map((link) => {
           const active = location.pathname === link.path;
           return (
-            <div className="hdr-nav-item" key={link.path}>
-              {i > 0 && <span className="hdr-sep" aria-hidden />}
+            <div className={styles.navItem} key={link.path}>
               <Link
                 to={link.path}
-                className={`hdr-link ${active ? "hdr-link--active" : ""}`}
+                className={`${styles.link} ${active ? styles.linkActive : ""}`}
               >
-                {link.label}
+                <span className={styles.navLabel}>{link.label}</span>
               </Link>
             </div>
           );
         })}
       </nav>
 
-      {/* ── Mobile nav ── */}
       {mobileOpen && (
-        <nav className="hdr-mobile-nav">
+        <nav className={styles.mobileNav}>
           {navLinks.map((link) => (
             <Link
               key={link.path}
               to={link.path}
-              className={`hdr-mobile-link ${location.pathname === link.path ? "active" : ""}`}
+              className={`${styles.mobileLink} ${location.pathname === link.path ? styles.mobileLinkActive : ""}`}
               onClick={() => setMobileOpen(false)}
             >
               {link.label}

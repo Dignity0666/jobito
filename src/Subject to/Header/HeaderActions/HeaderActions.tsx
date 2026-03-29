@@ -1,17 +1,24 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import styles from "./HeaderActions.module.css";
 
 type HeaderActionsProps = {
   isAuthenticated: boolean;
-  user?: { name?: string; avatar?: string } | null;
+  user?: { name?: string; avatar?: string; avatarUrl?: string } | null;
   onLoginClick?: () => void;
   onLogout?: () => void;
+};
+
+const getAvatarUrl = (path: string | undefined | null) => {
+  if (!path) return null;
+  if (path.startsWith("http") || path.startsWith("data:")) return path;
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+  return `${baseUrl}${path.startsWith("/") ? "" : "/"}${path}`;
 };
 
 export function HeaderActions({
   isAuthenticated,
   user,
-  onLoginClick,
   onLogout,
 }: HeaderActionsProps) {
   const navigate = useNavigate();
@@ -19,11 +26,11 @@ export function HeaderActions({
 
   const initials = user?.name
     ? user.name
-      .split(" ")
-      .map((w) => w[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase()
+        .split(" ")
+        .map((w) => w[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
     : "U";
 
   const handleLogoutClick = () => {
@@ -34,33 +41,44 @@ export function HeaderActions({
   };
 
   return (
-    <div className="hdr-right">
-      {isAuthenticated ? (
-        <div className="hdr-avatar-wrap" style={{ display: 'flex', alignItems: 'center' }}>
-          <Link to="/ProfileSettings" className="hdr-avatar" title={user?.name || "Profile Settings"}>
-            {user?.avatar && !avatarError ? (
-              <img
-                src={user.avatar}
-                alt={user.name || "avatar"}
-                onError={() => setAvatarError(true)}
-              />
-            ) : (
-              <span>{initials}</span>
-            )}
-          </Link>
-          <button className="hdr-logout-icon-btn" onClick={handleLogoutClick} title="Logout">
-            <i className="fa-solid fa-right-from-bracket"></i>
+    <>
+      <div className={styles.right}>
+        {isAuthenticated ? (
+          <div className={styles.avatarWrap}>
+            <Link
+              to="/ProfileSettings"
+              className={styles.avatar}
+              title={user?.name || "Profile Settings"}
+            >
+              { (user?.avatarUrl || user?.avatar) && !avatarError ? (
+                <img
+                  src={getAvatarUrl(user.avatarUrl || user.avatar) || ""}
+                  alt={user.name || "avatar"}
+                  onError={() => setAvatarError(true)}
+                />
+              ) : (
+                <span>{initials}</span>
+              )}
+            </Link>
+            <button
+              className={styles.logoutBtn}
+              onClick={handleLogoutClick}
+              title="Logout"
+            >
+              <i className="fa-solid fa-right-from-bracket"></i>
+            </button>
+          </div>
+        ) : (
+          <button
+            className={styles.loginBtn}
+            onClick={() => {
+              navigate("/user-information");
+            }}
+          >
+            <i className="fa-solid fa-user"></i>
           </button>
-        </div>
-      ) : (
-        <button
-          onClick={() => {
-            navigate("/user-information");
-          }}
-        >
-          <i className="fa-solid fa-user"></i>
-        </button>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 }

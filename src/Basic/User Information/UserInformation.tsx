@@ -1,17 +1,15 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import BorderAnimatedContainer from "../../Subject to/User Information/BorderAnimatedContainer";
-import "./User_Information.css";
+import styles from "./User_Information.module.css";
 
 import LoginPage from "../../Subject to/User Information/Login/Login";
 import UI from "../../Subject to/User Information/CreateAcont/Up/UP";
-
 
 export const UserInformation: React.FC = () => {
   const [showLogin, setShowLogin] = useState(true);
 
   const toggleLogin = () => setShowLogin(!showLogin);
-
 
   const pageVariants = {
     hidden: { opacity: 0, x: 50, scale: 0.95 },
@@ -28,14 +26,14 @@ export const UserInformation: React.FC = () => {
   };
 
   return (
-    <div className="user-info-wrapper">
-      <div className="user-info-container">
+    <div className={styles.page}>
+      <div className={styles.container}>
         <BorderAnimatedContainer>
           <AnimatePresence>
             {!showLogin && (
               <motion.button
                 key="signin-btn"
-                className="sign-in-btn"
+                className={styles.signInBtn}
                 onClick={toggleLogin}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -75,13 +73,11 @@ export const UserInformation: React.FC = () => {
                 initial="hidden"
                 animate="visible"
                 exit="exit"
-                className="w-full h-full"
               >
                 <motion.div
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
-                  className="w-full h-full"
                 >
                   <UI setShowLogin={setShowLogin} />
                 </motion.div>

@@ -1,490 +1,682 @@
-import "./JobDetailsPage.css";
-import image from "../../assets/Img/image.png";
-import JobDetails from "../../Subject to/Browse Companies/JobDetails/JobDetails";
-import PerksBenefits from "../../Subject to/Browse Companies/perks/PerksBenefits";
-import StripeSection from "../../Subject to/Browse Companies/StripeSection/StripeSection";
-import EJobsSection from "../../Subject to/Browse Companies/JobsSection/JobsSection";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import styles from "./JobDetailsPage.module.css";
+import { ApplyJobModal } from "./ApplyJobModal/ApplyJobModal";
+import { useJobitoAuth } from "../../context/AuthContext";
+import { useEffect, useState } from "react";
+
+const CheckIcon = () => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <circle cx="12" cy="12" r="10" stroke="#56CDAD" strokeWidth="2" />
+    <path
+      d="M8 12L11 15L16 9"
+      stroke="#56CDAD"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+
+interface Benefit {
+  emoji: string;
+  name: string;
+  desc: string;
+}
+
+interface Application {
+  applicationId: number;
+  status: string;
+}
+
+interface Job {
+  jobId: number | string;
+  isActive: boolean;
+  title: string;
+  titleEn?: string;
+  description: string;
+  descriptionEn?: string;
+  address: string;
+  jobType: string;
+  salaryMin?: number;
+  salaryMax?: number;
+  createdAt?: string;
+  expiresAt?: string;
+  slotsAvailable?: number;
+  category?: { name: string };
+  company?: {
+    name: string;
+    description: string;
+    website: string;
+    benefits: Benefit[];
+    officePhoto1Url: string;
+    officePhoto2Url: string;
+    logoUrl?: string;
+  };
+  applications?: Application[];
+}
+
 export const JobDetailsPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { apiFetch, isAuthenticated, role } = useJobitoAuth();
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+  const [job, setJob] = useState<Job | null>(null);
+  const [similarJobs, setSimilarJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [lang, setLang] = useState<"original" | "en">("original");
+  const [userApplication, setUserApplication] = useState<Application | null>(null);
+
+  const jobId = location.state?.jobId || 1;
+
+  useEffect(() => {
+    const fetchJobData = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${API_BASE_URL}/jobs/${jobId}`);
+        if (!res.ok) throw new Error("Failed to fetch");
+        const data = await res.json();
+        setJob(data);
+
+        const simRes = await fetch(`${API_BASE_URL}/jobs/similar/${jobId}`);
+        if (simRes.ok) {
+          const simData = await simRes.json();
+          setSimilarJobs(simData);
+        }
+      } catch (error) {
+        console.error("Error fetching job data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchJobData();
+
+    const fetchApplicationStatus = async () => {
+      if (isAuthenticated && role === 'student') {
+        try {
+          const res = await apiFetch(`${API_BASE_URL}/applications/status/${jobId}`);
+          if (res.ok) {
+            const data = await res.json();
+            setUserApplication(data);
+          }
+        } catch (err) {
+          console.error("Error fetching application status:", err);
+        }
+      }
+    };
+    fetchApplicationStatus();
+
+    // 📈 Record View logic
+    const recordView = async () => {
+      try {
+        let sessionId = localStorage.getItem('jobito_session_id');
+        if (!sessionId) {
+          sessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+          localStorage.setItem('jobito_session_id', sessionId);
+        }
+
+        await apiFetch(`${API_BASE_URL}/jobs/${jobId}/view`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId })
+        });
+      } catch (err) {
+        // Silent fail for view tracking
+      }
+    };
+    recordView();
+  }, [jobId, apiFetch, isAuthenticated, role]);
+
+  const handleDelete = async () => {
+    if (!window.confirm("هل أنت متأكد من حذف هذه الوظيفة؟")) return;
+    try {
+      const res = await apiFetch(`${API_BASE_URL}/jobs/${jobId}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        alert("تم حذف الوظيفة بنجاح.");
+        navigate("/JobListing");
+      } else {
+        throw new Error("Failed to delete job");
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Error deleting job:", error);
+      alert("خطأ أثناء حذف الوظيفة.");
+    }
+  };
+
+  const toggleActive = async () => {
+    try {
+      const res = await apiFetch(`${API_BASE_URL}/jobs/${jobId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ isActive: !job?.isActive }),
+      });
+      if (res.ok) {
+        const updatedJob = await res.json();
+        setJob((prev) =>
+          prev ? { ...prev, isActive: updatedJob.isActive } : null,
+        );
+        alert(updatedJob.isActive ? "تم إعادة فتح الوظيفة" : "تم إغلاق الوظيفة");
+      } else {
+        throw new Error("Failed to update status");
+      }
+    } catch (error) {
+      console.error("Error toggling job status:", error);
+      alert("خطأ أثناء تحديث حالة الوظيفة.");
+    }
+  };
+
+  const handleEdit = () => {
+    navigate("/PostJob", { state: { editJob: job } });
+  };
+
+  const handleApplyClick = () => {
+    if (!isAuthenticated) {
+      navigate("/user-information");
+    } else {
+      setIsApplyModalOpen(true);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div
+        className={styles.pageContainer}
+        style={{ padding: "40px", textAlign: "center", direction: "rtl" }}
+      >
+        جاري التحميل...
+      </div>
+    );
+  }
+
+  if (!job) {
+    return (
+      <div
+        className={styles.pageContainer}
+        style={{ padding: "40px", textAlign: "center", direction: "rtl" }}
+      >
+        الوظيفة غير موجودة.
+      </div>
+    );
+  }
+
   return (
-    <div className="BrowseCompaniesContainer">
-      <h4 className="BrowseCompaniesTitle">
-        <span className="BrowseCompaniesContent">
-          Home / Companies / Nomad /
-        </span>{" "}
-        Social Media Assistant
-      </h4>
-      <section className="BrowseCompaniesSection">
-        <div className="dataBrowseCompaniesSection">
-          <div className="BrowseCompaniesSectionimage">
-            <img src={image} alt="" />
+    <div className={styles.pageContainer} style={{ direction: "rtl" }}>
+      <div className={styles.contentWrapper}>
+        {/* Breadcrumb */}
+        <div className={styles.breadcrumb} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            الرئيسية / الشركات / {job.company?.name || "شركة"} /{" "}
+            <span className={styles.activeBreadcrumb}>{lang === 'en' && job.titleEn ? job.titleEn : job.title}</span>
           </div>
-          <div className="BrowseCompaniesSectionText">
-            <h2>Social Media Assistant</h2>
-            <h3>Stripe.Paris, France.Full-Time</h3>
+          {job.titleEn && (
+            <div className={styles.langToggle}>
+              <button 
+                className={`${styles.langBtn} ${lang === 'original' ? styles.activeLang : ''}`}
+                onClick={() => setLang('original')}
+              >
+                الأصلية
+              </button>
+              <button 
+                className={`${styles.langBtn} ${lang === 'en' ? styles.activeLang : ''}`}
+                onClick={() => setLang('en')}
+              >
+                الإنجليزية
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Header Card */}
+        <div className={styles.headerCard}>
+          <div className={styles.headerLeft}>
+            <div className={styles.companyLogo}>
+              {job.company?.logoUrl ? (
+                <img
+                  src={
+                    job.company.logoUrl.startsWith("http")
+                      ? job.company.logoUrl
+                      : `${API_BASE_URL}${job.company.logoUrl}`
+                  }
+                  alt={job.company.name}
+                  style={{ width: "100%", objectFit: "cover" }}
+                />
+              ) : (
+                <span>{job.company?.name?.[0]?.toUpperCase() || "C"}</span>
+              )}
+            </div>
+            <div className={styles.headerTitles}>
+              <h1>{lang === 'en' && job.titleEn ? job.titleEn : job.title}</h1>
+              <p>
+                {job.company?.name || "شركة"} • {job.address || "الموقع"} •{" "}
+                {job.jobType === "full-time"
+                  ? "دوام كامل"
+                  : job.jobType === "part-time"
+                    ? "دوام جزئي"
+                    : job.jobType || "دوام كامل"}
+              </p>
+            </div>
+          </div>
+          {role === "company" ? (
+            <div className={styles.headerRight}>
+              <button
+                className={styles.applyBtn}
+                title="عرض المتقدمين"
+                onClick={() => navigate(`/AllApplicants?jobId=${jobId}`)}
+                style={{ fontSize: "14px", padding: "8px 16px" }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "6px" }}>
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                المتقدمون ({job.applications?.length || 0})
+              </button>
+              <button className={styles.editBtn} title="تعديل الوظيفة" onClick={handleEdit}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+              </button>
+              <button
+                className={job.isActive ? styles.closeBtn : styles.reopenBtn}
+                title={job.isActive ? "إغلاق الوظيفة" : "فتح الوظيفة"}
+                onClick={toggleActive}
+              >
+                {job.isActive ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <line x1="9" y1="9" x2="15" y2="15" />
+                    <line x1="15" y1="9" x2="9" y2="15" />
+                  </svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                  </svg>
+                )}
+              </button>
+              <button className={styles.deleteBtn} title="حذف الوظيفة" onClick={handleDelete}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                  <line x1="10" y1="11" x2="10" y2="17" />
+                  <line x1="14" y1="11" x2="14" y2="17" />
+                </svg>
+              </button>
+            </div>
+          ) : (
+            <div className={styles.headerRight}>
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              <button className={styles.shareBtn}>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <circle cx="18" cy="5" r="3"></circle>
+                  <circle cx="6" cy="12" r="3"></circle>
+                  <circle cx="18" cy="19" r="3"></circle>
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                </svg>
+              </button>
+              {userApplication ? (
+                <div className={(styles as any).appliedStatusContainer}>
+                  <button className={(styles as any).appliedBtn} disabled>
+                    <i className="fa-solid fa-check-circle" style={{ marginLeft: '8px' }}></i>
+                    تم التقديم مسبقاً
+                  </button>
+                  <div className={`${(styles as any).statusBadge} ${(styles as any)['status-' + (userApplication.status || 'applied')]}`}>
+                    <span style={{ fontSize: '13px', opacity: 0.8 }}>حالة الطلب:</span>
+                    <strong style={{ marginLeft: '4px' }}>
+                      {
+                        (userApplication.status === 'applied' || userApplication.status === 'reviewing') ? 'تحت المراجعة ⏳' :
+                        (userApplication.status === 'shortlisted' || userApplication.status === 'interviewed' || userApplication.status === 'hired') ? 'تم القبول (تواصل معنا) ✅' : 
+                        (userApplication.status === 'declined') ? 'نأسف، تم الرفض ❌' : 'تحت المراجعة ⏳'
+                      }
+                    </strong>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  className={job.isActive ? styles.applyBtn : styles.closedBtn}
+                  onClick={handleApplyClick}
+                  disabled={!job.isActive}
+                >
+                  {job.isActive ? "تقدم الآن" : "مغلق"}
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Main 2-Column Layout */}
+        <div className={styles.mainLayout}>
+          {/* Left Column */}
+          <div className={styles.leftCol}>
+            {(() => {
+              const descriptionToUse = lang === 'en' && job.descriptionEn ? job.descriptionEn : job.description;
+              if (!descriptionToUse) return null;
+
+              const sections: Record<string, string> = {};
+              let currentTitle = "الوصف";
+              let currentLines: string[] = [];
+
+              const lines = descriptionToUse.split("\n");
+              lines.forEach((line: string) => {
+                const headerMatch = line.match(/^\*\*(.*):\*\*$/);
+                if (headerMatch) {
+                  sections[currentTitle] = currentLines.join("\n").trim();
+                  currentTitle = headerMatch[1];
+                  currentLines = [];
+                } else {
+                  currentLines.push(line);
+                }
+              });
+              sections[currentTitle] = currentLines.join("\n").trim();
+
+              return Object.entries(sections).map(([title, content]) => {
+                if (!content) return null;
+
+                const isList = content.includes("•") || content.includes("- ");
+                const listItems = content
+                  .split("\n")
+                  .map((li) => li.replace(/^[•\-\s*]+/, "").trim())
+                  .filter((li) => li.length > 0);
+
+                return (
+                  <section key={title} className={styles.section}>
+                    <h2>{title}</h2>
+                    {isList ? (
+                      <ul className={styles.list}>
+                        {listItems.map((item, i) => (
+                          <li key={i}>
+                            <CheckIcon />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <div
+                        dangerouslySetInnerHTML={{ __html: content }}
+                        className={styles.descriptionText}
+                      />
+                    )}
+                  </section>
+                );
+              });
+            })()}
+          </div>
+
+          {/* Right Column */}
+          <div className={styles.rightCol}>
+            <div className={styles.widget}>
+              <h2>عن الوظيفة</h2>
+              <div className={styles.capacityBox}>
+                <div className={styles.capacityText}>
+                <span className={styles.boldText}>
+                  {job.applications?.length || 0} تم التقديم
+                </span>{" "}
+                من {job.slotsAvailable || 10} متاح
+              </div>
+                <div className={styles.progressBar}>
+                  <div
+                    className={styles.progressFill}
+                    style={{
+                      width: `${Math.min(
+                        ((job.applications?.length || 0) /
+                          (job.slotsAvailable || 10)) *
+                          100,
+                        100,
+                      )}%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
+
+              <div className={styles.roleDetails}>
+                <div className={styles.roleRow}>
+                  <span className={styles.roleLabel}>نشر في</span>
+                  <span className={styles.roleValue}>
+                    {job.createdAt
+                      ? new Date(job.createdAt).toLocaleDateString()
+                      : "غير متاح"}
+                  </span>
+                </div>
+                {job.expiresAt && (
+                  <div className={styles.roleRow}>
+                    <span className={styles.roleLabel}>تقدم قبل</span>
+                    <span
+                      className={styles.roleValue}
+                      style={{ color: "#FF6550", fontWeight: 600 }}
+                    >
+                      {new Date(job.expiresAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
+
+                <div className={styles.roleRow}>
+                  <span className={styles.roleLabel}>نوع الوظيفة</span>
+                  <span
+                    className={styles.roleValue}
+                    style={{ textTransform: "capitalize" }}
+                  >
+                    {job.jobType === "full-time" ? "دوام كامل" : job.jobType === "part-time" ? "دوام جزئي" : job.jobType || "دوام كامل"}
+                  </span>
+                </div>
+                <div className={styles.roleRow}>
+                  <span className={styles.roleLabel}>الراتب</span>
+                  <span className={styles.roleValue}>
+                    ${job.salaryMin || 0} - ${job.salaryMax || 0}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.separator}></div>
+
+            <div className={styles.widget}>
+              <h2>الأقسام</h2>
+              <div className={styles.tagsContainer}>
+                {job.category ? (
+                  <span className={styles.tagYellow}>{job.category.name}</span>
+                ) : (
+                  <span className={styles.tagYellow}>تسويق</span>
+                )}
+              </div>
+            </div>
+
+            <div className={styles.separator}></div>
+
+            <div className={styles.widget}>
+              <h2>المهارات المطلوبة</h2>
+              <div className={styles.tagsContainer}>
+                {(() => {
+                  if (!job.description) {
+                    return (
+                      <p style={{ fontSize: "14px", color: "#666" }}>
+                        سيتم تحديد المهارات لاحقاً
+                      </p>
+                    );
+                  }
+                  const skillsLine = job.description
+                    .split("\n")
+                    .find((l: string) => l.startsWith("**Required Skills:**") || l.startsWith("**المهارات المطلوبة:**"));
+                  if (skillsLine) {
+                    const skills = skillsLine
+                      .replace("**Required Skills:**", "")
+                      .replace("**المهارات المطلوبة:**", "")
+                      .split(",")
+                      .map((s: string) => s.trim())
+                      .filter((s: string) => s);                    return skills.map((skill: string, i: number) => (
+                      <span key={i} className={styles.tagOutlineBlue}>
+                        {skill}
+                      </span>
+                    ));
+                  }
+                  return (
+                    <p style={{ fontSize: "14px", color: "#666" }}>
+                      سيتم تحديد المهارات لاحقاً
+                    </p>
+                  );
+                })()}
+              </div>
+            </div>
           </div>
         </div>
-        <div className="BrowseCompaniesSectionbutten">
-          <button className="buttonshare">
-            <svg
-              width="32"
-              height="34"
-              viewBox="0 0 32 34"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <g clip-path="url(#clip0_323_15195)">
-                <path
-                  d="M8 20.7353C10.2091 20.7353 12 18.8786 12 16.5882C12 14.2979 10.2091 12.4412 8 12.4412C5.79086 12.4412 4 14.2979 4 16.5882C4 18.8786 5.79086 20.7353 8 20.7353Z"
-                  stroke="#7C8493"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M24 12.4411C26.2091 12.4411 28 10.5844 28 8.29403C28 6.00367 26.2091 4.14697 24 4.14697C21.7909 4.14697 20 6.00367 20 8.29403C20 10.5844 21.7909 12.4411 24 12.4411Z"
-                  stroke="#7C8493"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M24 29.0295C26.2091 29.0295 28 27.1728 28 24.8824C28 22.5921 26.2091 20.7354 24 20.7354C21.7909 20.7354 20 22.5921 20 24.8824C20 27.1728 21.7909 29.0295 24 29.0295Z"
-                  stroke="#7C8493"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M11.6001 14.7911L20.4001 10.0911"
-                  stroke="#7C8493"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M11.6001 18.3853L20.4001 23.0853"
-                  stroke="#7C8493"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </g>
-              <defs>
-                <clipPath id="clip0_323_15195">
-                  <rect width="32" height="33.1765" fill="white" />
-                </clipPath>
-              </defs>
-            </svg>
-          </button>
-          <button>
-            <svg
-              width="164"
-              height="57"
-              viewBox="0 0 164 57"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect width="164" height="57" fill="#578BC7" />
-              <path
-                d="M56.954 33L60.266 19.707H64.685L67.979 33H65.117L62.471 21.408H62.489L59.816 33H56.954ZM59.33 29.922V27.744H65.63V29.922H59.33ZM69.5714 36.933V23.442H72.3704V36.933H69.5714ZM75.3224 33.216C74.5664 33.216 73.8734 33.015 73.2434 32.613C72.6134 32.205 72.1094 31.659 71.7314 30.975C71.3534 30.285 71.1644 29.511 71.1644 28.653C71.1644 28.629 71.1644 28.608 71.1644 28.59C71.1644 28.566 71.1644 28.539 71.1644 28.509L72.3704 28.482C72.3704 28.5 72.3704 28.518 72.3704 28.536C72.3704 28.554 72.3704 28.572 72.3704 28.59C72.3704 29.034 72.4784 29.424 72.6944 29.76C72.9104 30.09 73.1894 30.345 73.5314 30.525C73.8734 30.705 74.2304 30.795 74.6024 30.795C75.2144 30.795 75.7454 30.585 76.1954 30.165C76.6514 29.739 76.8794 29.076 76.8794 28.176C76.8794 27.276 76.6544 26.622 76.2044 26.214C75.7544 25.8 75.2204 25.593 74.6024 25.593C74.2304 25.593 73.8734 25.683 73.5314 25.863C73.1894 26.037 72.9104 26.286 72.6944 26.61C72.4784 26.934 72.3704 27.321 72.3704 27.771L71.1644 27.699C71.1644 26.835 71.3534 26.073 71.7314 25.413C72.1094 24.747 72.6134 24.222 73.2434 23.838C73.8734 23.454 74.5664 23.262 75.3224 23.262C76.0964 23.262 76.8194 23.454 77.4914 23.838C78.1634 24.216 78.7064 24.771 79.1204 25.503C79.5404 26.235 79.7504 27.126 79.7504 28.176C79.7504 29.274 79.5464 30.198 79.1384 30.948C78.7304 31.698 78.1904 32.265 77.5184 32.649C76.8464 33.027 76.1144 33.216 75.3224 33.216ZM81.4894 36.933V23.442H84.2884V36.933H81.4894ZM87.2404 33.216C86.4844 33.216 85.7914 33.015 85.1614 32.613C84.5314 32.205 84.0274 31.659 83.6494 30.975C83.2714 30.285 83.0824 29.511 83.0824 28.653C83.0824 28.629 83.0824 28.608 83.0824 28.59C83.0824 28.566 83.0824 28.539 83.0824 28.509L84.2884 28.482C84.2884 28.5 84.2884 28.518 84.2884 28.536C84.2884 28.554 84.2884 28.572 84.2884 28.59C84.2884 29.034 84.3964 29.424 84.6124 29.76C84.8284 30.09 85.1074 30.345 85.4494 30.525C85.7914 30.705 86.1484 30.795 86.5204 30.795C87.1324 30.795 87.6634 30.585 88.1134 30.165C88.5694 29.739 88.7974 29.076 88.7974 28.176C88.7974 27.276 88.5724 26.622 88.1224 26.214C87.6724 25.8 87.1384 25.593 86.5204 25.593C86.1484 25.593 85.7914 25.683 85.4494 25.863C85.1074 26.037 84.8284 26.286 84.6124 26.61C84.3964 26.934 84.2884 27.321 84.2884 27.771L83.0824 27.699C83.0824 26.835 83.2714 26.073 83.6494 25.413C84.0274 24.747 84.5314 24.222 85.1614 23.838C85.7914 23.454 86.4844 23.262 87.2404 23.262C88.0144 23.262 88.7374 23.454 89.4094 23.838C90.0814 24.216 90.6244 24.771 91.0384 25.503C91.4584 26.235 91.6684 27.126 91.6684 28.176C91.6684 29.274 91.4644 30.198 91.0564 30.948C90.6484 31.698 90.1084 32.265 89.4364 32.649C88.7644 33.027 88.0324 33.216 87.2404 33.216ZM96.2964 18.933V33H93.5424V18.933H96.2964ZM99.3146 37.131C99.0146 37.131 98.7446 37.119 98.5046 37.095C98.2706 37.077 98.1236 37.056 98.0636 37.032V34.917C98.1416 34.953 98.2766 34.98 98.4686 34.998C98.6666 35.022 98.8766 35.034 99.0986 35.034C99.3926 35.034 99.6566 34.974 99.8906 34.854C100.131 34.74 100.335 34.575 100.503 34.359C100.677 34.149 100.812 33.9 100.908 33.612L101.07 33.126L97.7756 23.442H100.683L102.762 31.281H102.438L104.436 23.442H107.307L104.022 33.477C103.776 34.233 103.473 34.884 103.113 35.43C102.753 35.976 102.273 36.396 101.673 36.69C101.073 36.984 100.287 37.131 99.3146 37.131Z"
-                fill="white"
-              />
-            </svg>
-          </button>
-        </div>
-      </section>
-      <section className="companysection">
-        <div className="company-section-container">
-          <div className="company-section">
-            <h2>Description</h2>
-            <p>
-              Stripe is looking for Social Media Marketing expert to help manage
-              our online networks. You will be responsible for monitoring our
-              social media channels, creating content, finding effective ways to
-              engage the community and incentivize others to engage on our
-              channels.
-            </p>
+
+        {/* Perks & Benefits */}
+        <div className={styles.perksSection}>
+          <div className={styles.perksHeader}>
+            <h2>المزايا والفوائد</h2>
+            <p>نحن نقدم مزايا رائعة لموظفينا.</p>
           </div>
-          <div className="company-section">
-            <h2>Responsibilities</h2>
-            <p>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <g clip-path="url(#clip0_323_20733)">
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M9.99984 3.33341C6.31794 3.33341 3.33317 6.31818 3.33317 10.0001C3.33317 13.682 6.31794 16.6667 9.99984 16.6667C13.6817 16.6667 16.6665 13.682 16.6665 10.0001C16.6665 6.31818 13.6817 3.33341 9.99984 3.33341ZM1.6665 10.0001C1.6665 5.39771 5.39746 1.66675 9.99984 1.66675C14.6022 1.66675 18.3332 5.39771 18.3332 10.0001C18.3332 14.6025 14.6022 18.3334 9.99984 18.3334C5.39746 18.3334 1.6665 14.6025 1.6665 10.0001Z"
-                    fill="#56CDAD"
-                  />
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M13.0891 7.74408C13.4145 8.06951 13.4145 8.59715 13.0891 8.92259L9.75576 12.2559C9.43032 12.5814 8.90269 12.5814 8.57725 12.2559L6.91058 10.5893C6.58514 10.2638 6.58514 9.73618 6.91058 9.41074C7.23602 9.08531 7.76366 9.08531 8.08909 9.41074L9.1665 10.4882L11.9106 7.74408C12.236 7.41864 12.7637 7.41864 13.0891 7.74408Z"
-                    fill="#56CDAD"
-                  />
-                </g>
-                <defs>
-                  <clipPath id="clip0_323_20733">
-                    <rect width="20" height="20" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
-              Community engagement to ensure that is supported and actively
-              represented online
-            </p>
-            <p>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <g clip-path="url(#clip0_323_20733)">
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M9.99984 3.33341C6.31794 3.33341 3.33317 6.31818 3.33317 10.0001C3.33317 13.682 6.31794 16.6667 9.99984 16.6667C13.6817 16.6667 16.6665 13.682 16.6665 10.0001C16.6665 6.31818 13.6817 3.33341 9.99984 3.33341ZM1.6665 10.0001C1.6665 5.39771 5.39746 1.66675 9.99984 1.66675C14.6022 1.66675 18.3332 5.39771 18.3332 10.0001C18.3332 14.6025 14.6022 18.3334 9.99984 18.3334C5.39746 18.3334 1.6665 14.6025 1.6665 10.0001Z"
-                    fill="#56CDAD"
-                  />
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M13.0891 7.74408C13.4145 8.06951 13.4145 8.59715 13.0891 8.92259L9.75576 12.2559C9.43032 12.5814 8.90269 12.5814 8.57725 12.2559L6.91058 10.5893C6.58514 10.2638 6.58514 9.73618 6.91058 9.41074C7.23602 9.08531 7.76366 9.08531 8.08909 9.41074L9.1665 10.4882L11.9106 7.74408C12.236 7.41864 12.7637 7.41864 13.0891 7.74408Z"
-                    fill="#56CDAD"
-                  />
-                </g>
-                <defs>
-                  <clipPath id="clip0_323_20733">
-                    <rect width="20" height="20" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
-              Focus on social media content development and publication
-            </p>
-            <p>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <g clip-path="url(#clip0_323_20733)">
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M9.99984 3.33341C6.31794 3.33341 3.33317 6.31818 3.33317 10.0001C3.33317 13.682 6.31794 16.6667 9.99984 16.6667C13.6817 16.6667 16.6665 13.682 16.6665 10.0001C16.6665 6.31818 13.6817 3.33341 9.99984 3.33341ZM1.6665 10.0001C1.6665 5.39771 5.39746 1.66675 9.99984 1.66675C14.6022 1.66675 18.3332 5.39771 18.3332 10.0001C18.3332 14.6025 14.6022 18.3334 9.99984 18.3334C5.39746 18.3334 1.6665 14.6025 1.6665 10.0001Z"
-                    fill="#56CDAD"
-                  />
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M13.0891 7.74408C13.4145 8.06951 13.4145 8.59715 13.0891 8.92259L9.75576 12.2559C9.43032 12.5814 8.90269 12.5814 8.57725 12.2559L6.91058 10.5893C6.58514 10.2638 6.58514 9.73618 6.91058 9.41074C7.23602 9.08531 7.76366 9.08531 8.08909 9.41074L9.1665 10.4882L11.9106 7.74408C12.236 7.41864 12.7637 7.41864 13.0891 7.74408Z"
-                    fill="#56CDAD"
-                  />
-                </g>
-                <defs>
-                  <clipPath id="clip0_323_20733">
-                    <rect width="20" height="20" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
-              Stay on top of trends on social media platforms, and suggest
-              content ideas to the team
-            </p>
-            <p>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <g clip-path="url(#clip0_323_20733)">
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M9.99984 3.33341C6.31794 3.33341 3.33317 6.31818 3.33317 10.0001C3.33317 13.682 6.31794 16.6667 9.99984 16.6667C13.6817 16.6667 16.6665 13.682 16.6665 10.0001C16.6665 6.31818 13.6817 3.33341 9.99984 3.33341ZM1.6665 10.0001C1.6665 5.39771 5.39746 1.66675 9.99984 1.66675C14.6022 1.66675 18.3332 5.39771 18.3332 10.0001C18.3332 14.6025 14.6022 18.3334 9.99984 18.3334C5.39746 18.3334 1.6665 14.6025 1.6665 10.0001Z"
-                    fill="#56CDAD"
-                  />
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M13.0891 7.74408C13.4145 8.06951 13.4145 8.59715 13.0891 8.92259L9.75576 12.2559C9.43032 12.5814 8.90269 12.5814 8.57725 12.2559L6.91058 10.5893C6.58514 10.2638 6.58514 9.73618 6.91058 9.41074C7.23602 9.08531 7.76366 9.08531 8.08909 9.41074L9.1665 10.4882L11.9106 7.74408C12.236 7.41864 12.7637 7.41864 13.0891 7.74408Z"
-                    fill="#56CDAD"
-                  />
-                </g>
-                <defs>
-                  <clipPath id="clip0_323_20733">
-                    <rect width="20" height="20" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
-              Engage with online communities
-            </p>
-          </div>
-          <div className="company-section">
-            <h2>Who You Are</h2>
-            <p>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <g clip-path="url(#clip0_323_20733)">
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M9.99984 3.33341C6.31794 3.33341 3.33317 6.31818 3.33317 10.0001C3.33317 13.682 6.31794 16.6667 9.99984 16.6667C13.6817 16.6667 16.6665 13.682 16.6665 10.0001C16.6665 6.31818 13.6817 3.33341 9.99984 3.33341ZM1.6665 10.0001C1.6665 5.39771 5.39746 1.66675 9.99984 1.66675C14.6022 1.66675 18.3332 5.39771 18.3332 10.0001C18.3332 14.6025 14.6022 18.3334 9.99984 18.3334C5.39746 18.3334 1.6665 14.6025 1.6665 10.0001Z"
-                    fill="#56CDAD"
-                  />
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M13.0891 7.74408C13.4145 8.06951 13.4145 8.59715 13.0891 8.92259L9.75576 12.2559C9.43032 12.5814 8.90269 12.5814 8.57725 12.2559L6.91058 10.5893C6.58514 10.2638 6.58514 9.73618 6.91058 9.41074C7.23602 9.08531 7.76366 9.08531 8.08909 9.41074L9.1665 10.4882L11.9106 7.74408C12.236 7.41864 12.7637 7.41864 13.0891 7.74408Z"
-                    fill="#56CDAD"
-                  />
-                </g>
-                <defs>
-                  <clipPath id="clip0_323_20733">
-                    <rect width="20" height="20" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
-              You get energy from people and building the ideal work environment
-            </p>
-            <p>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <g clip-path="url(#clip0_323_20733)">
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M9.99984 3.33341C6.31794 3.33341 3.33317 6.31818 3.33317 10.0001C3.33317 13.682 6.31794 16.6667 9.99984 16.6667C13.6817 16.6667 16.6665 13.682 16.6665 10.0001C16.6665 6.31818 13.6817 3.33341 9.99984 3.33341ZM1.6665 10.0001C1.6665 5.39771 5.39746 1.66675 9.99984 1.66675C14.6022 1.66675 18.3332 5.39771 18.3332 10.0001C18.3332 14.6025 14.6022 18.3334 9.99984 18.3334C5.39746 18.3334 1.6665 14.6025 1.6665 10.0001Z"
-                    fill="#56CDAD"
-                  />
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M13.0891 7.74408C13.4145 8.06951 13.4145 8.59715 13.0891 8.92259L9.75576 12.2559C9.43032 12.5814 8.90269 12.5814 8.57725 12.2559L6.91058 10.5893C6.58514 10.2638 6.58514 9.73618 6.91058 9.41074C7.23602 9.08531 7.76366 9.08531 8.08909 9.41074L9.1665 10.4882L11.9106 7.74408C12.236 7.41864 12.7637 7.41864 13.0891 7.74408Z"
-                    fill="#56CDAD"
-                  />
-                </g>
-                <defs>
-                  <clipPath id="clip0_323_20733">
-                    <rect width="20" height="20" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
-              You have a sense for beautiful spaces and office experiences
-            </p>
-            <p>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <g clip-path="url(#clip0_323_20733)">
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M9.99984 3.33341C6.31794 3.33341 3.33317 6.31818 3.33317 10.0001C3.33317 13.682 6.31794 16.6667 9.99984 16.6667C13.6817 16.6667 16.6665 13.682 16.6665 10.0001C16.6665 6.31818 13.6817 3.33341 9.99984 3.33341ZM1.6665 10.0001C1.6665 5.39771 5.39746 1.66675 9.99984 1.66675C14.6022 1.66675 18.3332 5.39771 18.3332 10.0001C18.3332 14.6025 14.6022 18.3334 9.99984 18.3334C5.39746 18.3334 1.6665 14.6025 1.6665 10.0001Z"
-                    fill="#56CDAD"
-                  />
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M13.0891 7.74408C13.4145 8.06951 13.4145 8.59715 13.0891 8.92259L9.75576 12.2559C9.43032 12.5814 8.90269 12.5814 8.57725 12.2559L6.91058 10.5893C6.58514 10.2638 6.58514 9.73618 6.91058 9.41074C7.23602 9.08531 7.76366 9.08531 8.08909 9.41074L9.1665 10.4882L11.9106 7.74408C12.236 7.41864 12.7637 7.41864 13.0891 7.74408Z"
-                    fill="#56CDAD"
-                  />
-                </g>
-                <defs>
-                  <clipPath id="clip0_323_20733">
-                    <rect width="20" height="20" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
-              You are a confident office manager, ready for added
-              responsibilities
-            </p>
-            <p>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <g clip-path="url(#clip0_323_20733)">
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M9.99984 3.33341C6.31794 3.33341 3.33317 6.31818 3.33317 10.0001C3.33317 13.682 6.31794 16.6667 9.99984 16.6667C13.6817 16.6667 16.6665 13.682 16.6665 10.0001C16.6665 6.31818 13.6817 3.33341 9.99984 3.33341ZM1.6665 10.0001C1.6665 5.39771 5.39746 1.66675 9.99984 1.66675C14.6022 1.66675 18.3332 5.39771 18.3332 10.0001C18.3332 14.6025 14.6022 18.3334 9.99984 18.3334C5.39746 18.3334 1.6665 14.6025 1.6665 10.0001Z"
-                    fill="#56CDAD"
-                  />
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M13.0891 7.74408C13.4145 8.06951 13.4145 8.59715 13.0891 8.92259L9.75576 12.2559C9.43032 12.5814 8.90269 12.5814 8.57725 12.2559L6.91058 10.5893C6.58514 10.2638 6.58514 9.73618 6.91058 9.41074C7.23602 9.08531 7.76366 9.08531 8.08909 9.41074L9.1665 10.4882L11.9106 7.74408C12.236 7.41864 12.7637 7.41864 13.0891 7.74408Z"
-                    fill="#56CDAD"
-                  />
-                </g>
-                <defs>
-                  <clipPath id="clip0_323_20733">
-                    <rect width="20" height="20" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
-              You're detail-oriented and creative
-            </p>
-            <p>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <g clip-path="url(#clip0_323_20733)">
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M9.99984 3.33341C6.31794 3.33341 3.33317 6.31818 3.33317 10.0001C3.33317 13.682 6.31794 16.6667 9.99984 16.6667C13.6817 16.6667 16.6665 13.682 16.6665 10.0001C16.6665 6.31818 13.6817 3.33341 9.99984 3.33341ZM1.6665 10.0001C1.6665 5.39771 5.39746 1.66675 9.99984 1.66675C14.6022 1.66675 18.3332 5.39771 18.3332 10.0001C18.3332 14.6025 14.6022 18.3334 9.99984 18.3334C5.39746 18.3334 1.6665 14.6025 1.6665 10.0001Z"
-                    fill="#56CDAD"
-                  />
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M13.0891 7.74408C13.4145 8.06951 13.4145 8.59715 13.0891 8.92259L9.75576 12.2559C9.43032 12.5814 8.90269 12.5814 8.57725 12.2559L6.91058 10.5893C6.58514 10.2638 6.58514 9.73618 6.91058 9.41074C7.23602 9.08531 7.76366 9.08531 8.08909 9.41074L9.1665 10.4882L11.9106 7.74408C12.236 7.41864 12.7637 7.41864 13.0891 7.74408Z"
-                    fill="#56CDAD"
-                  />
-                </g>
-                <defs>
-                  <clipPath id="clip0_323_20733">
-                    <rect width="20" height="20" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
-              You're a growth marketer and know how to run campaigns
-            </p>
-          </div>
-          <div className="company-section">
-            <h2>Nice-To-Haves</h2>
-            <p>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <g clip-path="url(#clip0_323_20733)">
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M9.99984 3.33341C6.31794 3.33341 3.33317 6.31818 3.33317 10.0001C3.33317 13.682 6.31794 16.6667 9.99984 16.6667C13.6817 16.6667 16.6665 13.682 16.6665 10.0001C16.6665 6.31818 13.6817 3.33341 9.99984 3.33341ZM1.6665 10.0001C1.6665 5.39771 5.39746 1.66675 9.99984 1.66675C14.6022 1.66675 18.3332 5.39771 18.3332 10.0001C18.3332 14.6025 14.6022 18.3334 9.99984 18.3334C5.39746 18.3334 1.6665 14.6025 1.6665 10.0001Z"
-                    fill="#56CDAD"
-                  />
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M13.0891 7.74408C13.4145 8.06951 13.4145 8.59715 13.0891 8.92259L9.75576 12.2559C9.43032 12.5814 8.90269 12.5814 8.57725 12.2559L6.91058 10.5893C6.58514 10.2638 6.58514 9.73618 6.91058 9.41074C7.23602 9.08531 7.76366 9.08531 8.08909 9.41074L9.1665 10.4882L11.9106 7.74408C12.236 7.41864 12.7637 7.41864 13.0891 7.74408Z"
-                    fill="#56CDAD"
-                  />
-                </g>
-                <defs>
-                  <clipPath id="clip0_323_20733">
-                    <rect width="20" height="20" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
-              Fluent in English
-            </p>
-            <p>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <g clip-path="url(#clip0_323_20733)">
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M9.99984 3.33341C6.31794 3.33341 3.33317 6.31818 3.33317 10.0001C3.33317 13.682 6.31794 16.6667 9.99984 16.6667C13.6817 16.6667 16.6665 13.682 16.6665 10.0001C16.6665 6.31818 13.6817 3.33341 9.99984 3.33341ZM1.6665 10.0001C1.6665 5.39771 5.39746 1.66675 9.99984 1.66675C14.6022 1.66675 18.3332 5.39771 18.3332 10.0001C18.3332 14.6025 14.6022 18.3334 9.99984 18.3334C5.39746 18.3334 1.6665 14.6025 1.6665 10.0001Z"
-                    fill="#56CDAD"
-                  />
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M13.0891 7.74408C13.4145 8.06951 13.4145 8.59715 13.0891 8.92259L9.75576 12.2559C9.43032 12.5814 8.90269 12.5814 8.57725 12.2559L6.91058 10.5893C6.58514 10.2638 6.58514 9.73618 6.91058 9.41074C7.23602 9.08531 7.76366 9.08531 8.08909 9.41074L9.1665 10.4882L11.9106 7.74408C12.236 7.41864 12.7637 7.41864 13.0891 7.74408Z"
-                    fill="#56CDAD"
-                  />
-                </g>
-                <defs>
-                  <clipPath id="clip0_323_20733">
-                    <rect width="20" height="20" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
-              Project management skills
-            </p>
-            <p>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <g clip-path="url(#clip0_323_20733)">
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M9.99984 3.33341C6.31794 3.33341 3.33317 6.31818 3.33317 10.0001C3.33317 13.682 6.31794 16.6667 9.99984 16.6667C13.6817 16.6667 16.6665 13.682 16.6665 10.0001C16.6665 6.31818 13.6817 3.33341 9.99984 3.33341ZM1.6665 10.0001C1.6665 5.39771 5.39746 1.66675 9.99984 1.66675C14.6022 1.66675 18.3332 5.39771 18.3332 10.0001C18.3332 14.6025 14.6022 18.3334 9.99984 18.3334C5.39746 18.3334 1.6665 14.6025 1.6665 10.0001Z"
-                    fill="#56CDAD"
-                  />
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M13.0891 7.74408C13.4145 8.06951 13.4145 8.59715 13.0891 8.92259L9.75576 12.2559C9.43032 12.5814 8.90269 12.5814 8.57725 12.2559L6.91058 10.5893C6.58514 10.2638 6.58514 9.73618 6.91058 9.41074C7.23602 9.08531 7.76366 9.08531 8.08909 9.41074L9.1665 10.4882L11.9106 7.74408C12.236 7.41864 12.7637 7.41864 13.0891 7.74408Z"
-                    fill="#56CDAD"
-                  />
-                </g>
-                <defs>
-                  <clipPath id="clip0_323_20733">
-                    <rect width="20" height="20" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
-              Copy editing skills
-            </p>
+          <div className={styles.perksGrid}>
+            {job.company?.benefits && job.company.benefits.length > 0 ? (
+              job.company.benefits.map((benefit: Benefit, idx: number) => (
+                <div key={idx} className={styles.perkCard}>
+                  <div
+                    className={styles.perkIcon}
+                    style={{
+                      fontSize: "24px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {benefit.emoji}
+                  </div>
+                  <h3>{benefit.name}</h3>
+                  <p>{benefit.desc}</p>
+                </div>
+              ))
+            ) : (
+              <p>لا توجد مزايا محددة.</p>
+            )}
           </div>
         </div>
-        <div className="Aboutthisrole">
-          <JobDetails />
+
+        {/* Similar Jobs */}
+        <div className={styles.similarJobsSection}>
+          <div className={styles.similarHeader}>
+            <h2>وظائف مشابهة</h2>
+            <Link to="/JobListing" className={styles.companyLink}>
+              عرض كل الوظائف{" "}
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                style={{ transform: "rotate(180deg)" }}
+              >
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </Link>
+          </div>
+
+          <div className={styles.similarGrid}>
+            {similarJobs.length > 0 ? (
+              similarJobs.map((simJob: Job) => (
+                <div
+                  key={simJob.jobId}
+                  className={styles.similarJobCard}
+                  onClick={() => {
+                    navigate("/Job details", {
+                      state: { jobId: simJob.jobId },
+                    });
+                    window.scrollTo(0, 0);
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  <div
+                    className={styles.simLogo}
+                    style={{
+                      backgroundColor: simJob.company?.logoUrl
+                        ? "transparent"
+                        : "#4640de",
+                    }}
+                  >
+                    <img
+                      src={
+                        simJob.company?.logoUrl
+                          ? simJob.company.logoUrl.startsWith("http")
+                            ? simJob.company.logoUrl
+                            : `${API_BASE_URL}${simJob.company.logoUrl}`
+                          : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
+                              simJob.company?.name || "Company"
+                            )}`
+                      }
+                      alt={simJob.company?.name}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius: "inherit",
+                      }}
+                    />
+                  </div>
+                  <div className={styles.simDetails}>
+                    <div className={styles.simTitleGroup}>
+                      <h3>{simJob.title}</h3>
+                      <p>
+                        {simJob.company?.name} • {simJob.address}
+                      </p>
+                    </div>
+                    <div className={styles.simTags}>
+                      <span className={styles.tagGreen}>{simJob.jobType === "full-time" ? "دوام كامل" : "دوام جزئي"}</span>
+                      {simJob.category && (
+                        <span className={styles.tagYellowOutline}>
+                          {simJob.category.name}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p>لا توجد وظائف مشابهة متاحة.</p>
+            )}
+          </div>
         </div>
-      </section>
-      <PerksBenefits />
-      <StripeSection />
-      <EJobsSection />
+      </div>
+
+      <ApplyJobModal
+        isOpen={isApplyModalOpen}
+        onClose={() => setIsApplyModalOpen(false)}
+        jobId={jobId}
+        jobTitle={job?.title}
+        companyName={job?.company?.name || "شركة"}
+        location={job?.address || "عن بعد"}
+        jobType={job?.jobType === "full-time" ? "دوام كامل" : "دوام جزئي"}
+        isActive={job?.isActive}
+        logoUrl={
+          job?.company?.logoUrl
+            ? job.company.logoUrl.startsWith("http")
+              ? job.company.logoUrl
+              : `${API_BASE_URL}${job.company.logoUrl}`
+            : undefined
+        }
+      />
     </div>
   );
 };

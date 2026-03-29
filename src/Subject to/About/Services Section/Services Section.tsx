@@ -1,107 +1,141 @@
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Users,
-  Building2,
   Briefcase,
   Target,
   HeadphonesIcon,
   TrendingUp,
   Star,
   Zap,
+  Building2,
 } from "lucide-react";
 import styles from "./Services Section.module.css";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
+
+interface BackendService {
+  serviceId: number;
+  title: string;
+  titleEn: string;
+  description: string;
+  descriptionEn: string;
+  icon: string;
+}
+
+interface MappedService {
+  title: string;
+  description: string;
+  icon: JSX.Element;
+  gradient: string;
+}
 
 // ✅ Header variants
-const headerVariants = {
+const headerVariants: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1, y: 0,
-    transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
   },
 };
 
-// ✅ Grid container — stagger على الكاردات
-const gridVariants = {
+// ✅ Grid container
+const gridVariants: Variants = {
   hidden: {},
   visible: {
     transition: { staggerChildren: 0.08, delayChildren: 0.2 },
   },
 };
 
-// ✅ كل كارت بيطلع من تحت
-const cardVariants = {
+// ✅ Card variants
+const cardVariants: Variants = {
   hidden: { opacity: 0, y: 40, scale: 0.96 },
   visible: {
     opacity: 1, y: 0, scale: 1,
-    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
   },
 };
 
+
 export const ServicesSection = () => {
-  const services = [
-    {
-      title: "Workplace Efficiency",
-      description:
-        "We provide workplace coaching across all levels of the business, helping individuals reach their potential and achieve workplace success.",
-      icon: <Users className={styles.serviceIcon} />,
-      gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-    },
-    {
-      title: "Organisational and Structural Redesign",
-      description:
-        "We support businesses with reshaping and realigning their business model and structure to adapt to the rapidly changing world we live in.",
-      icon: <Building2 className={styles.serviceIcon} />,
-      gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-    },
-    {
-      title: "Career Enhancement Services",
-      description:
-        "Career transitioning can be a daunting experience. We can help you gain confidence and find your potential, landing you the job you desire.",
-      icon: <Briefcase className={styles.serviceIcon} />,
-      gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
-    },
-    {
-      title: "Talent Acquisition & Onboarding",
-      description:
-        "Our team of specialists are dedicated to finding you professionals with the right skills and attitude that will help take your business to the next level.",
-      icon: <Target className={styles.serviceIcon} />,
-      gradient: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
-    },
-    {
-      title: "General HR Support",
-      description:
-        "We provide a range of generalist HR and people administration support. Whether it's over the phone, via email or in person, we've got the knowledge.",
-      icon: <HeadphonesIcon className={styles.serviceIcon} />,
-      gradient: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
-    },
-    {
-      title: "Managing Performance",
-      description:
-        "When your organisation gets performance management right, your people will work together cohesively to reach your companies objectives.",
-      icon: <TrendingUp className={styles.serviceIcon} />,
-      gradient: "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
-    },
-    {
-      title: "Strategic Planning",
-      description:
-        "We help you develop and implement strategic HR initiatives that align with your business goals and drive sustainable growth.",
-      icon: <Zap className={styles.serviceIcon} />,
-      gradient: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
-    },
-    {
-      title: "Employee Engagement",
-      description:
-        "Create a thriving workplace culture with our employee engagement programs designed to boost productivity and retention.",
-      icon: <Star className={styles.serviceIcon} />,
-      gradient: "linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%)",
-    },
-  ];
+  const [services, setServices] = useState<MappedService[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_loading, setLoading] = useState(true);
+
+  const gradients = useMemo(() => [
+    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+    "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+    "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+    "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
+    "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
+    "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
+    "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+    "linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%)",
+  ], []);
+
+  const iconMap: Record<string, JSX.Element> = useMemo(() => ({
+    "trending-up": <TrendingUp className={styles.serviceIcon} />,
+    "layout": <TrendingUp className={styles.serviceIcon} />, 
+    "refresh-cw": <Zap className={styles.serviceIcon} />, 
+    "users": <Users className={styles.serviceIcon} />,
+    "help-circle": <Star className={styles.serviceIcon} />,
+    "bar-chart": <Zap className={styles.serviceIcon} />,
+    "target": <Target className={styles.serviceIcon} />,
+    "heart": <Zap className={styles.serviceIcon} />,
+    "monitor": <Zap className={styles.serviceIcon} />,
+    "shield": <Zap className={styles.serviceIcon} />,
+    "headphones": <HeadphonesIcon className={styles.serviceIcon} />,
+    "briefcase": <Briefcase className={styles.serviceIcon} />,
+    "building-2": <Building2 className={styles.serviceIcon} />,
+  }), []);
+
+  useEffect(() => {
+    const MOCK_SERVICES_DATA = [
+      {
+        title: "توظيف المحترفين",
+        description: "نساعد الشركات في الوصول إلى أفضل الكفاءات والكوادر المهنية المتخصصة في مختلف المجالات التقنية والإدارية.",
+        icon: "briefcase",
+      },
+      {
+        title: "تطوير المسار المهني",
+        description: "نقدم استشارات مهنية وورش عمل لتطوير المهارات الشخصية والتقنية بما يتناسب مع متطلبات سوق العمل الحديث.",
+        icon: "trending-up",
+      },
+      {
+        title: "حلول الشركات",
+        description: "منصة متكاملة لإدارة عمليات التوظيف وتصفية المرشحين بكل سهولة وكفاءة لضمان اختيار الشخص المناسب.",
+        icon: "building-2",
+      },
+      {
+        title: "دعم فني متواصل",
+        description: "فريق دعم مخصص لمساعدة المستخدمين والشركات في حل أي مشكلات تقنية وضمان تجربة استخدام سلسة.",
+        icon: "headphones",
+      },
+      {
+        title: "تحليل البيانات",
+        description: "توفير تقارير وإحصائيات دقيقة حول سوق العمل واتجاهات التوظيف لمساعدة الشركات في اتخاذ قرارات مدروسة.",
+        icon: "bar-chart",
+      },
+      {
+        title: "الأمن والموثوقية",
+        description: "نضمن حماية كاملة لبيانات المستخدمين والشركات مع تطبيق أعلى معايير الخصوصية والأمان الرقمي.",
+        icon: "shield",
+      },
+    ];
+
+    const mapped = MOCK_SERVICES_DATA.map((s, idx) => ({
+      title: s.title,
+      description: s.description,
+      icon: iconMap[s.icon] || <Zap className={styles.serviceIcon} />,
+      gradient: gradients[idx % gradients.length],
+    }));
+    setServices(mapped);
+    setLoading(false);
+  }, [gradients, iconMap]);
 
   return (
     <section className={styles.servicesSection}>
       <div className={styles.container}>
 
-        {/* ✅ Section Header — بيظهر لما يدخل الشاشة */}
+        {/* ✅ Section Header */}
         <motion.div
           className={styles.sectionHeader}
           variants={headerVariants}
@@ -110,12 +144,12 @@ export const ServicesSection = () => {
           viewport={{ once: true, amount: 0.3 }}
         >
           <h2>
-            Services <span>We Offer</span>
+            ماذا نحن <span>نقدم لكم</span>
           </h2>
-          <p>Freedom HR provides custom HR solutions for your business...</p>
+          <p>نحن نوفر مجموعة متكاملة من الخدمات التي تلبي احتياجات الباحثين عن عمل والشركات على حد سواء، مع التركيز على الجودة والاحترافية.</p>
         </motion.div>
 
-        {/* ✅ Cards Grid — stagger واحدة ورا التانية */}
+        {/* ✅ Cards Grid */}
         <motion.div
           className={styles.servicesGrid}
           variants={gridVariants}
@@ -147,7 +181,7 @@ export const ServicesSection = () => {
                   </motion.div>
                   <h3>{service.title}</h3>
                   <p>{service.description.substring(0, 80)}...</p>
-                  <span className={styles.serviceHoverHint}>Hover to learn more</span>
+                  <span className={styles.serviceHoverHint}>اقرأ المزيد</span>
                 </div>
 
                 {/* Back */}
@@ -158,13 +192,6 @@ export const ServicesSection = () => {
                   <div className={styles.serviceBackContent}>
                     <h4>{service.title}</h4>
                     <p>{service.description}</p>
-                    <motion.button
-                      className={styles.serviceBackButton}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      Read More
-                    </motion.button>
                   </div>
                 </div>
 

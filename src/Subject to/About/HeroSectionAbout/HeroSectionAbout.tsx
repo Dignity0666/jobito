@@ -1,24 +1,25 @@
 import { ArrowRight, Sparkles } from "lucide-react";
 import styles from "./HeroSectionAbout.module.css";
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: {},
   visible: {
     transition: { staggerChildren: 0.12, delayChildren: 0.1 },
   },
 };
 
-const fadeUp = {
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 32 },
   visible: {
     opacity: 1, y: 0,
-    transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] as any },
   },
 };
 
-const fadeLeft = {
+const fadeLeft: Variants = {
   hidden: { opacity: 0, x: -20 },
   visible: {
     opacity: 1, x: 0,
@@ -26,25 +27,26 @@ const fadeLeft = {
   },
 };
 
-const buttonsVariant = {
+const buttonsVariant: Variants = {
   hidden: { opacity: 0, y: 20, scale: 0.97 },
   visible: {
     opacity: 1, y: 0, scale: 1,
-    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as any },
   },
 };
 
 export const HeroSectionAbout = () => {
-  const [isVisible, setIsVisible] = useState({});
-  const sectionRefs = useRef({});
+  const [isVisible, setIsVisible] = useState<any>({});
+  const sectionRefs = useRef<any>({});
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const observers = {};
+    const observers: any = {};
 
     Object.keys(sectionRefs.current).forEach((key) => {
       observers[key] = new IntersectionObserver(
         ([entry]) => {
-          setIsVisible((prev) => ({ ...prev, [key]: entry.isIntersecting }));
+          setIsVisible((prev: any) => ({ ...prev, [key]: entry.isIntersecting }));
         },
         { threshold: 0.2, rootMargin: "0px 0px -100px 0px" },
       );
@@ -55,14 +57,16 @@ export const HeroSectionAbout = () => {
     });
 
     return () => {
-      Object.values(observers).forEach((observer) => observer.disconnect());
+      Object.values(observers).forEach((observer: any) => observer.disconnect());
     };
   }, []);
 
   return (
     <section
       className={styles.heroSection}
-      ref={(el) => (sectionRefs.current.hero = el)}
+      ref={(el) => {
+        if (el) sectionRefs.current.hero = el;
+      }}
     >
       {/* ── Background ── */}
       <div className={styles.heroBackground}>
@@ -98,19 +102,19 @@ export const HeroSectionAbout = () => {
       >
         <div className={styles.content}>
 
-          {/* ✅ Badge — نفس النص */}
+          {/* ✅ Badge */}
           <motion.div className={styles.badge} variants={fadeLeft}>
             <Sparkles size={16} />
-            <span>Welcome to Excellence</span>
+            <span>مرحباً بكم في جوبيتو</span>
           </motion.div>
 
-          {/* ✅ Title — نفس النص */}
+          {/* ✅ Title */}
           <motion.h1 className={styles.title} variants={fadeUp}>
-            <span className={styles.servicesWord}>Services</span>
+            <span className={styles.servicesWord}>خدماتنا</span>
             <span className={styles.titleLine}>
-              <span className={styles.purpleText}>WE</span>
+              <span className={styles.purpleText}>نحن</span>
               <span className={styles.blueText}>
-                Offer
+                نقدم الأفضل
                 <svg className={styles.underline} viewBox="0 0 300 20">
                   <motion.path
                     d="M5 15 Q 40 5, 80 15 T 160 15 T 240 15 T 300 15"
@@ -126,30 +130,21 @@ export const HeroSectionAbout = () => {
             </span>
           </motion.h1>
 
-          {/* ✅ Description — نفس النص */}
+          {/* ✅ Description */}
           <motion.p className={styles.description} variants={fadeUp}>
-            Freedom HR provides custom HR solutions for your business in the
-            most flexible and value driven way.
+            نحن نساعدك في العثور على الوظيفة المثالية أو اكتشاف المواهب المناسبة لشركتك. جوبيتو هو شريكك الموثوق في رحلة النجاح المهني.
           </motion.p>
 
           <motion.div className={styles.heroButtons} variants={buttonsVariant}>
             <motion.button
               className={styles.primaryButton}
+              onClick={() => navigate("/user-information")}
               whileHover={{ scale: 1.04, x: 3 }}
               whileTap={{ scale: 0.96 }}
               transition={{ type: "spring", stiffness: 400, damping: 15 }}
             >
-              Get Started
+              ابدأ الآن
               <ArrowRight size={18} />
-            </motion.button>
-
-            <motion.button
-              className={styles.secondaryButton}
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              transition={{ type: "spring", stiffness: 400, damping: 15 }}
-            >
-              Learn More
             </motion.button>
           </motion.div>
 

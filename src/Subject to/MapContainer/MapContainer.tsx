@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
-import "./MapContainer.css"
+import "./MapContainer.module.css";
 interface MapProps {
   lat?: number;
   lng?: number;

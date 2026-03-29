@@ -1,7 +1,6 @@
 .servicesSection {
-  padding: 100px 0;
-  background: white;
-}
+  padding: 100px ;
+ }
 
 .sectionHeader {
   text-align: center;
@@ -53,7 +52,7 @@
 
 .servicesGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 3fr));
   gap: 30px;
   padding: 20px;
 }

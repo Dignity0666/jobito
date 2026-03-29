@@ -3,7 +3,7 @@ import image2 from "../.../../../../assets/Img/Gemini_Generated_Image_lk4biqlk4b
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
-// ✅ Hook الـ Typewriter — بيكتب النص حرف حرف
+// ✅ Hook الـ Typewriter
 function useTypewriter(text: string, speed = 28, startDelay = 0) {
   const [displayed, setDisplayed] = useState("");
   const [started, setStarted] = useState(false);
@@ -46,7 +46,8 @@ function TypewriterText({
 
   useEffect(() => {
     if (inView) start();
-  }, [inView]);
+  }, [inView, start]);
+
 
   return (
     <Tag ref={ref} className={className}>
@@ -80,13 +81,13 @@ export const BannerSection = () => {
 
             <TypewriterText
               tag="h2"
-              text="We're Here To Help"
+              text="نحن نؤمن بالابتكار الرقمي"
               speed={60}
               startDelay={300}
             />
 
             <TypewriterText
-              text="At Freedom HR we become an invaluable resource within your business, teaming up as your HR expert and freeing you to concentrate on other areas of your business. We offer a scalable and cost-effective solution and become your friend and trusted advisor."
+              text="مهمتنا هي تمكين كل فرد من الوصول إلى الفرصة التي يستحقها، من خلال تقنيات حديثة وتواصل فعال يكسر الحواجز."
               speed={18}
               startDelay={1400}
               className={styles.description}
@@ -98,7 +99,7 @@ export const BannerSection = () => {
               animate={inView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.6, delay: 2.2, ease: "easeOut" }}
             >
-              <strong>Farah Mody</strong> - Director
+              <strong>Farah Mody</strong> - مديرة العمليات
             </motion.div>
 
           </div>

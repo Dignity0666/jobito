@@ -10,10 +10,15 @@
   color: #333;
   font-weight: 500;
   width: 50%;
+  padding: 10px;
   display: flex;
   justify-content: center;
   flex-direction: column;
   align-items: center;
+}
+
+.GoogleOAuthProvide {
+  width: 400px;
 }
 
 .textcenter {

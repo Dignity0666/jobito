@@ -1,9 +1,20 @@
-import { useState } from "react";
-import { LoaderIcon, MessageCircleIcon } from "lucide-react";
-import { motion } from "framer-motion";
-import "./CompanyRegister.css";
+import { useState, useEffect } from "react";
+import { 
+  LoaderIcon, 
+  MessageCircleIcon, 
+  CheckCircleIcon, 
+  MailIcon, 
+  LinkIcon, 
+  SmartphoneIcon,
+  Building2Icon,
+  PhoneIcon,
+  MapPinIcon,
+  FileTextIcon,
+  ShieldCheckIcon
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import styles from "./CompanyRegister.module.css";
 import signupImage from "../../../../assets/signup.png";
-import { VerifyEmailPage } from "../Customer Account/VerifyEmailPage/VerifyEmailPage";
 import { useNavigate } from "react-router-dom";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
@@ -12,9 +23,8 @@ interface CompanyRegisterProps {
   setIsCustomer: (value: boolean) => void;
 }
 
-export const CompanyRegister: React.FC<CompanyRegisterProps> = ({
-  setIsCustomer,
-}) => {
+export const CompanyRegister: React.FC<CompanyRegisterProps> = ({ setIsCustomer }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     companyName: "",
     companyPhone: "",
@@ -30,7 +40,16 @@ export const CompanyRegister: React.FC<CompanyRegisterProps> = ({
   const [isCreating, setIsCreating] = useState(false);
   const [success, setSuccess] = useState(false);
   const [formError, setFormError] = useState("");
-  const navigate = useNavigate();
+  const [verifiedStatus, setVerifiedStatus] = useState<null | "success" | "error">(null);
+  const [verifyMethod, setVerifyMethod] = useState<null | "code" | "link">(null);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("verified") === "true") setVerifiedStatus("success");
+    else if (params.get("verified") === "false") setVerifiedStatus("error");
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,14 +60,8 @@ export const CompanyRegister: React.FC<CompanyRegisterProps> = ({
       return;
     }
 
-    if (formData.password.length < 6) {
-      setFormError("Password must be at least 6 characters");
-      return;
-    }
-
     try {
       setIsCreating(true);
-
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -64,191 +77,197 @@ export const CompanyRegister: React.FC<CompanyRegisterProps> = ({
       });
 
       const data = await response.json();
-
       if (!response.ok) throw new Error(data.message || "Registration failed");
-
       setSuccess(true);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Something went wrong";
-      setFormError(message);
+    } catch (err: any) {
+      setFormError(err.message);
     } finally {
       setIsCreating(false);
     }
   };
 
-  // ✨ Variants للأنيميشن
-  const containerVariants = {
-    hidden: { opacity: 0, x: 50 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.5 } },
-    exit: { opacity: 0, x: -50, transition: { duration: 0.3 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError("");
+    try {
+      setIsVerifying(true);
+      const res = await fetch(`${API_BASE_URL}/auth/verify-email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.companyEmail, code: verificationCode }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Verification failed");
+      setVerifiedStatus("success");
+      setSuccess(false);
+    } catch (err: any) {
+      setFormError(err.message);
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   return (
-    <motion.div
-      className="company-container"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-    >
-      <div className="company-left">
-        {success ? (
-          <VerifyEmailPage
-            email={formData.companyEmail}
-            onVerified={() => navigate("/user-Information")}
-          />
-        ) : (
-          <>
-            <motion.div className="welcome-box" variants={itemVariants}>
-              <MessageCircleIcon className="welcome-icon" />
-              <h2>Company Registration</h2>
-              <p>Register your company to start hiring</p>
-            </motion.div>
-
-            <motion.div className="form-wrapper" variants={itemVariants}>
-              <form className="form" onSubmit={handleSubmit}>
-                {formError && (
-                  <motion.div
-                    className="errorMsg"
-                    initial={{ opacity: 0, y: -6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    style={{ color: "red", textAlign: "center", marginBottom: "1rem" }}
-                  >
-                    {formError}
-                  </motion.div>
-                )}
-                <motion.div className="three-columns" variants={itemVariants}>
-                  <Input
-                    label="Company Name"
-                    value={formData.companyName}
-                    onChange={(v) => setFormData({ ...formData, companyName: v })}
-                  />
-                  <Input
-                    label="Tax Number"
-                    value={formData.taxNumber}
-                    onChange={(v) => setFormData({ ...formData, taxNumber: v })}
-                  />
-                  <Input
-                    label="Company Phone"
-                    value={formData.companyPhone}
-                    onChange={(v) => setFormData({ ...formData, companyPhone: v })}
-                  />
-                </motion.div>
-
-                <motion.div className="three-columns" variants={itemVariants}>
-                  <Input
-                    label="Company Address"
-                    value={formData.companyAddress}
-                    onChange={(v) =>
-                      setFormData({ ...formData, companyAddress: v })
-                    }
-                  />
-                  <Input
-                    label="License Number"
-                    value={formData.licenseNumber}
-                    onChange={(v) => setFormData({ ...formData, licenseNumber: v })}
-                  />
-                </motion.div>
-
-                <motion.div variants={itemVariants}>
-                  <Input
-                    label="Company Email"
-                    type="email"
-                    value={formData.companyEmail}
-                    onChange={(v) => setFormData({ ...formData, companyEmail: v })}
-                  />
-                </motion.div>
-
-                <motion.div variants={itemVariants}>
-                  <Input
-                    label="Password"
-                    type="password"
-                    value={formData.password}
-                    onChange={(v) => setFormData({ ...formData, password: v })}
-                  />
-                </motion.div>
-
-                <motion.div variants={itemVariants}>
-                  <Input
-                    label="Confirm Password"
-                    type="password"
-                    value={formData.confirmPassword}
-                    onChange={(v) =>
-                      setFormData({ ...formData, confirmPassword: v })
-                    }
-                  />
-                </motion.div>
-
-                <motion.button
-                  type="submit"
-                  className="submit-btn"
-                  disabled={isCreating}
-                  variants={itemVariants}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {isCreating ? (
-                    <LoaderIcon className="loader" />
-                  ) : (
-                    "Create Company"
-                  )}
-                </motion.button>
-
-                <motion.div className="switch-box" variants={itemVariants}>
-                  <button type="button" onClick={() => setIsCustomer(true)}>
-                    انشاء حساب
-                  </button>
-                </motion.div>
-              </form>
-            </motion.div>
-          </>
-        )}
-      </div>
-
-      <motion.div
-        className="company-right"
-        variants={itemVariants}
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1, transition: { duration: 0.6 } }}
+    <div className={styles.signupwrapper}>
+      <motion.div 
+        className={styles.signupleft}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
       >
-        <img
-          src={signupImage}
-          alt="Company Illustration"
-          className="company-image"
-        />
+        <AnimatePresence mode="wait">
+          {verifiedStatus === "success" ? (
+            <motion.div key="success-final" className={styles.centeredBox} initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+              <div className={styles.successIcon}><CheckCircleIcon size={64} /></div>
+              <h2 className={styles.title}>Company Activated!</h2>
+              <p className={styles.subtitle}>Your business profile is ready. Start posting jobs today.</p>
+              <button className={styles.authbtn} onClick={() => navigate("/user-information")}>Go to Login</button>
+            </motion.div>
+          ) : success ? (
+            <motion.div key="verify-steps" className={styles.centeredBox} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              {!verifyMethod ? (
+                <>
+                  <div className={styles.iconCircle}><Building2Icon size={32} /></div>
+                  <h2 className={styles.title}>Verify Business Account</h2>
+                  <p className={styles.subtitle}>Confirming <b>{formData.companyEmail}</b></p>
+                  
+                  <div className={styles.methodGrid}>
+                    <button className={styles.methodCard} onClick={() => setVerifyMethod("link")}>
+                      <LinkIcon size={24} />
+                      <div>
+                        <strong>Click Link</strong>
+                        <span>Special activation link in your inbox</span>
+                      </div>
+                    </button>
+                    <button className={styles.methodCard} onClick={() => setVerifyMethod("code")}>
+                      <SmartphoneIcon size={24} />
+                      <div>
+                        <strong>Enter Code</strong>
+                        <span>6-digit manual verification code</span>
+                      </div>
+                    </button>
+                  </div>
+                  <button className={styles.backBtn} onClick={() => setSuccess(false)}>Back to Registration</button>
+                </>
+              ) : verifyMethod === "code" ? (
+                <div style={{ width: "100%" }}>
+                  <h2 className={styles.title}>Enter Business Code</h2>
+                  <p className={styles.subtitle}>Check your company email for a code</p>
+                  <form onSubmit={handleVerifyCode}>
+                    <input 
+                      type="text" 
+                      className={styles.otpInput} 
+                      maxLength={6} 
+                      placeholder="000000"
+                      value={verificationCode}
+                      onChange={(e) => setVerificationCode(e.target.value)}
+                    />
+                    <button className={styles.authbtn} type="submit" disabled={isVerifying}>
+                      {isVerifying ? <LoaderIcon className="loader" /> : "Verify Business"}
+                    </button>
+                  </form>
+                  <button className={styles.backBtn} onClick={() => setVerifyMethod(null)}>Back to Options</button>
+                </div>
+              ) : (
+                <div style={{ textAlign: "center" }}>
+                  <div className={styles.waitingLoader}>⏳</div>
+                  <h2 className={styles.title}>Verifying Business...</h2>
+                  <p className={styles.subtitle}>Please click the activation link in your inbox.</p>
+                  <button className={styles.backBtn} onClick={() => setVerifyMethod(null)}>Use Code instead</button>
+                </div>
+              )}
+            </motion.div>
+          ) : (
+            <motion.div key="register-form" style={{ width: "100%" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <div className={styles.header}>
+                <div className={styles.logoIcon}><Building2Icon size={32} /></div>
+                <h2 className={styles.title}>Business Registration</h2>
+                <p className={styles.subtitle}>Hire top talent for your growing company</p>
+              </div>
+
+              <form className={styles.form} onSubmit={handleSubmit}>
+                {formError && <div className={styles.errorBox}>{formError}</div>}
+                
+                <div className={styles.row}>
+                  <div className={styles.inputGroup}>
+                    <label>Company Name</label>
+                    <div className={styles.relativeInput}>
+                      <Building2Icon size={18} className={styles.inputIcon} />
+                      <input type="text" placeholder="Acme Inc." value={formData.companyName} onChange={(e) => setFormData({...formData, companyName: e.target.value})} required />
+                    </div>
+                  </div>
+                  <div className={styles.inputGroup}>
+                    <label>Tax Number / CR</label>
+                    <div className={styles.relativeInput}>
+                      <FileTextIcon size={18} className={styles.inputIcon} />
+                      <input type="text" placeholder="123456789" value={formData.taxNumber} onChange={(e) => setFormData({...formData, taxNumber: e.target.value})} required />
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.row}>
+                  <div className={styles.inputGroup}>
+                    <label>Phone Number</label>
+                    <div className={styles.relativeInput}>
+                      <PhoneIcon size={18} className={styles.inputIcon} />
+                      <input type="text" placeholder="+123..." value={formData.companyPhone} onChange={(e) => setFormData({...formData, companyPhone: e.target.value})} required />
+                    </div>
+                  </div>
+                  <div className={styles.inputGroup}>
+                    <label>Headquarters</label>
+                    <div className={styles.relativeInput}>
+                      <MapPinIcon size={18} className={styles.inputIcon} />
+                      <input type="text" placeholder="City, Country" value={formData.companyAddress} onChange={(e) => setFormData({...formData, companyAddress: e.target.value})} required />
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.inputGroup}>
+                  <label>Business Email</label>
+                  <div className={styles.relativeInput}>
+                    <MailIcon size={18} className={styles.inputIcon} />
+                    <input type="email" placeholder="hr@acme.com" value={formData.companyEmail} onChange={(e) => setFormData({...formData, companyEmail: e.target.value})} required />
+                  </div>
+                </div>
+
+                <div className={styles.row}>
+                  <div className={styles.inputGroup}>
+                    <label>Password</label>
+                    <div className={styles.relativeInput}>
+                      <ShieldCheckIcon size={18} className={styles.inputIcon} />
+                      <input type="password" placeholder="••••••••" value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} required />
+                    </div>
+                  </div>
+                  <div className={styles.inputGroup}>
+                    <label>Confirm</label>
+                    <div className={styles.relativeInput}>
+                      <ShieldCheckIcon size={18} className={styles.inputIcon} />
+                      <input type="password" placeholder="••••••••" value={formData.confirmPassword} onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})} required />
+                    </div>
+                  </div>
+                </div>
+
+                <button className={styles.authbtn} type="submit" disabled={isCreating}>
+                  {isCreating ? <LoaderIcon className="loader" /> : "Create Business Profile"}
+                </button>
+              </form>
+
+              <div className={styles.footer}>
+                <span>Are you a student?</span>
+                <button onClick={() => setIsCustomer(true)}>Register as Student</button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
-    </motion.div>
+
+      <div className={styles.signuplight}>
+        <motion.img 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          src={signupImage} 
+          alt="Business Signup Illustration" 
+        />
+      </div>
+    </div>
   );
 };
-
-interface InputProps {
-  label: string;
-  value: string;
-  type?: string;
-  onChange: (value: string) => void;
-}
-
-const Input: React.FC<InputProps> = ({
-  label,
-  value,
-  type = "text",
-  onChange,
-}) => (
-  <div>
-    <label className="auth-label">{label}</label>
-    <div className="input-wrapper">
-      <input
-        type={type}
-        className="input"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        required
-      />
-    </div>
-  </div>
-);

@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import "./DoughnutChart.css"
+import styles from "./DoughnutChart.module.css";
+import { useJobitoAuth } from "../../context/AuthContext";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Chart,
   DoughnutController,
@@ -10,59 +12,39 @@ import {
 
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
 
-const apps = [
-  {
-    id: 1,
-    company: "Nomad",
-    role: "Social Media Assistant",
-    location: "Paris, France",
-    type: "Full-Time",
-    date: "24 July 2021",
-    status: "In Review",
-    icon: "🧭",
-    color: "#12b886",
-    delay: "0s",
-  },
-  {
-    id: 2,
-    company: "Udacity",
-    role: "Social Media Assistant",
-    location: "New York, USA",
-    type: "Full-Time",
-    date: "23 July 2021",
-    status: "Shortlisted",
-    icon: "🎓",
-    color: "#228be6",
-    delay: "0.1s",
-  },
-  {
-    id: 3,
-    company: "Packer",
-    role: "Social Media Assistant",
-    location: "Madrid, Spain",
-    type: "Full-Time",
-    date: "22 July 2021",
-    status: "Declined",
-    icon: "📦",
-    color: "#f03e3e",
-    delay: "0.2s",
-  },
-];
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
-function DoughnutChart() {
-  const ref = useRef(null);
-  const chartRef = useRef(null);
+interface Application {
+  applicationId: string | number;
+  status: string;
+  appliedAt: string;
+  job: {
+    title: string;
+    jobType?: string;
+    company: {
+      name: string;
+      logoUrl?: string;
+    };
+  };
+}
+
+function DoughnutChartComponent({ chartData }: { chartData: number[] }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const chartRef = useRef<Chart | null>(null);
 
   useEffect(() => {
     if (!ref.current) return;
+    if (chartRef.current) chartRef.current.destroy();
+    
+    // Data mapping: [Applied, Reviewing, Hired, Declined]
     chartRef.current = new Chart(ref.current, {
       type: "doughnut",
       data: {
-        labels: ["Unsuitable", "Interviewed"],
+        labels: ["الانتظار", "قيد المراجعة", "تم التوظيف", "مرفوض"],
         datasets: [
           {
-            data: [60, 40],
-            backgroundColor: ["#e8eaf0", "#3b5bdb"],
+            data: chartData,
+            backgroundColor: ["#3b82f6", "#f59e0b", "#10b981", "#ef4444"],
             borderWidth: 0,
             hoverOffset: 4,
           },
@@ -73,29 +55,39 @@ function DoughnutChart() {
         plugins: {
           legend: { display: false },
           tooltip: {
-            callbacks: { label: (ctx) => ` ${ctx.parsed}%` },
+            callbacks: { label: (ctx) => ` ${ctx.parsed}` },
           },
         },
         animation: { animateRotate: true, duration: 900 },
       },
     });
-    return () => chartRef.current?.destroy();
-  }, []);
+    return () => {
+      if (chartRef.current) {
+        chartRef.current.destroy();
+      }
+    };
+  }, [chartData]);
 
   return <canvas ref={ref} />;
 }
 
-function CountUp({ target }) {
+function CountUp({ target }: { target: number }) {
   const [val, setVal] = useState(0);
   useEffect(() => {
+    if (target === 0) {
+      setVal(0);
+      return;
+    }
     let start = 0;
-    const step = Math.ceil(target / 30);
+    const step = Math.ceil(target / 30) || 1;
     const interval = setInterval(() => {
       start += step;
       if (start >= target) {
         setVal(target);
         clearInterval(interval);
-      } else setVal(start);
+      } else {
+        setVal(start);
+      }
     }, 30);
     return () => clearInterval(interval);
   }, [target]);
@@ -103,167 +95,200 @@ function CountUp({ target }) {
 }
 
 export default function JobDashboard() {
+  const { user, apiFetch } = useJobitoAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const jobTitle = location.state?.jobTitle;
+  
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        const response = await apiFetch(`${API_BASE_URL}/applications/my`);
+        if (!response.ok) throw new Error("Failed to fetch");
+        const data = await response.json();
+        setApplications(Array.isArray(data) ? data : (data.data || []));
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (user) fetchApplications();
+  }, [user, apiFetch]);
+
+  const totalApps = applications.length;
+  // Let's treat "reviewing" or "hired" as "interviewed/processed"
+  const interviewed = applications.filter(a => ['reviewing', 'hired'].includes(a.status?.toLowerCase())).length;
+
+  const appliedCount = applications.filter(a => a.status?.toLowerCase() === 'applied').length;
+  const reviewingCount = applications.filter(a => a.status?.toLowerCase() === 'reviewing').length;
+  const hiredCount = applications.filter(a => a.status?.toLowerCase() === 'hired').length;
+  const declinedCount = applications.filter(a => a.status?.toLowerCase() === 'declined').length;
+
+  const chartData = [appliedCount, reviewingCount, hiredCount, declinedCount];
+  
+  const getStatusLabel = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case "applied": return "الانتظار";
+      case "reviewing": return "قيد المراجعة";
+      case "hired": return "تم التوظيف";
+      case "declined": return "مرفوض";
+      default: return status || "غير معروف";
+    }
+  };
+
+  const getStatusBadgeClass = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case "applied": return styles.badgeReview; // Using existing blue/gray style
+      case "reviewing": return styles.badgeReview;
+      case "hired": return styles.badgeShortlisted;
+      case "declined": return styles.badgeDeclined;
+      default: return "";
+    }
+  };
+
+  const recentApps = applications.slice(0, 3);
+
   return (
     <>
-      <div className="dashboard">
-        {/* Header */}
-        <div className="header">
+      <div className={styles.dashboard} style={{ direction: "rtl" }}>
+        <div className={styles.header}>
           <div>
-            <h1>Good morning, Jake 👋</h1>
+            <h1>صباح الخير، {user?.name || "الملف الشخصي"} {jobTitle ? ` - ${jobTitle}` : ""}</h1>
             <p>
-              Here is what's happening with your job search applications from
-              Jul 19 – Jul 25.
+              هذا ما يحدث مع {jobTitle ? `وظيفة "${jobTitle}"` : "طلباتك"} حتى الآن.
             </p>
           </div>
-          <div className="date-badge">
-            <svg
-              width="14"
-              height="14"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <rect x="3" y="4" width="18" height="18" rx="2" />
-              <path d="M16 2v4M8 2v4M3 10h18" />
-            </svg>
-            Jul 19 – Jul 25
-          </div>
         </div>
 
-        {/* Top grid */}
-        <div className="top-grid">
-          {/* Stats */}
-          <div className="stats-col">
-            <div className="card stat-card">
-              <div className="stat-label">Total Jobs Applied</div>
-              <div className="stat-num">
-                <CountUp target={45} />
-              </div>
-              <span className="stat-icon">📋</span>
-            </div>
-            <div className="card stat-card">
-              <div className="stat-label">Interviewed</div>
-              <div className="stat-num">
-                <CountUp target={18} />
-              </div>
-              <span className="stat-icon">🧑‍💼</span>
-            </div>
-          </div>
-
-          {/* Chart */}
-          <div className="card chart-card">
-            <h3>Jobs Applied Status</h3>
-            <div className="chart-inner">
-              <div className="chart-wrap">
-                <DoughnutChart />
-              </div>
-              <div className="legend">
-                <div className="legend-item">
-                  <div
-                    className="legend-dot"
-                    style={{ background: "#3b5bdb" }}
-                  />
-                  <div>
-                    <div className="legend-pct">60%</div>
-                    <div className="legend-label">Unsuitable</div>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '50px' }}>جاري التحميل...</div>
+        ) : (
+          <>
+            <div className={styles.topGrid}>
+              <div className={styles.statsCol}>
+                <div className={`${styles.card} ${styles.statCard}`}>
+                  <div className={styles.statLabel}>إجمالي ما تم التقديم عليه</div>
+                  <div className={styles.statNum}>
+                    <CountUp target={totalApps} />
                   </div>
+                  <span className={styles.statIcon}>
+                     {/* Placeholder icon */}
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#578BC7" strokeWidth="2" style={{opacity: 0.5}}>
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                  </span>
                 </div>
-                <div className="legend-item">
-                  <div
-                    className="legend-dot"
-                    style={{ background: "#e8eaf0", border: "1px solid #cdd" }}
-                  />
-                  <div>
-                    <div className="legend-pct">40%</div>
-                    <div className="legend-label">Interviewed</div>
+                <div className={`${styles.card} ${styles.statCard}`}>
+                  <div className={styles.statLabel}>تم النظر في طلبك</div>
+                  <div className={styles.statNum}>
+                    <CountUp target={interviewed} />
                   </div>
+                  <span className={styles.statIcon}>
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#578BC7" strokeWidth="2" style={{opacity: 0.5}}>
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M12 6v6l4 2"></path>
+                    </svg>
+                  </span>
                 </div>
               </div>
-            </div>
-            <button className="view-link">View All Applications →</button>
-          </div>
 
-          {/* Interviews */}
-          <div className="card interviews-card">
-            <div className="interview-nav">
-              <div>
-                <div className="stat-label">Upcoming Interviews</div>
-                <div className="interview-date">Today, 26 November</div>
-              </div>
-              <div className="nav-btns">
-                <button className="nav-btn">‹</button>
-                <button className="nav-btn">›</button>
-              </div>
-            </div>
-            <div className="timeline">
-              {["10:00 AM", "10:30 AM", "11:00 AM"].map((t, i) => (
-                <div className="time-slot" key={t}>
-                  <span className="time-label">{t}</span>
-                  {i === 1 ? (
-                    <div className="interview-slot">
-                      <div className="avatar">J</div>
-                      <div>
-                        <div className="interview-name">Joe Bartmann</div>
-                        <div className="interview-role">
-                          HR Manager at Divvy
+              {/* Chart */}
+              <div className={`${styles.card} ${styles.chartCard}`}>
+                <h3>حالة التقديم</h3>
+                <div className={styles.chartInner}>
+                  {totalApps > 0 ? (
+                    <>
+                      <div className={styles.chartWrap}>
+                        <DoughnutChartComponent chartData={chartData} />
+                      </div>
+                      <div className={styles.legend}>
+                        <div className={styles.legendItem}>
+                          <div className={styles.legendDot} style={{ background: "#3b82f6" }} />
+                          <div>
+                            <div className={styles.legendPct}>{appliedCount}</div>
+                            <div className={styles.legendLabel}>الانتظار</div>
+                          </div>
+                        </div>
+                        <div className={styles.legendItem}>
+                          <div className={styles.legendDot} style={{ background: "#f59e0b" }} />
+                          <div>
+                            <div className={styles.legendPct}>{reviewingCount}</div>
+                            <div className={styles.legendLabel}>قيد المراجعة</div>
+                          </div>
+                        </div>
+                        <div className={styles.legendItem}>
+                          <div className={styles.legendDot} style={{ background: "#10b981" }} />
+                          <div>
+                            <div className={styles.legendPct}>{hiredCount}</div>
+                            <div className={styles.legendLabel}>تم التوظيف</div>
+                          </div>
+                        </div>
+                        <div className={styles.legendItem}>
+                          <div className={styles.legendDot} style={{ background: "#ef4444" }} />
+                          <div>
+                            <div className={styles.legendPct}>{declinedCount}</div>
+                            <div className={styles.legendLabel}>مرفوض</div>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    </>
                   ) : (
-                    <div className="time-line" />
+                    <div style={{ padding: '20px', color: '#888', width: '100%', textAlign: 'center' }}>لا توجد بيانات مخطط بعد</div>
                   )}
                 </div>
-              ))}
+                <button className={styles.viewLink} onClick={() => navigate('/MyApplications')}>عرض الكل ←</button>
+              </div>
             </div>
-          </div>
-        </div>
 
-        {/* History */}
-        <div className="history-header">
-          <h2>Recent Applications History</h2>
-        </div>
-        <div className="app-list">
-          {apps.map((app) => (
-            <div
-              className="app-item"
-              key={app.id}
-              style={{ animationDelay: app.delay }}
-            >
-              <div
-                className="app-logo"
-                style={{ background: app.color + "20" }}
-              >
-                {app.icon}
-              </div>
-              <div className="app-info">
-                <div className="app-title">{app.role}</div>
-                <div className="app-meta">
-                  {app.company} · {app.location} · {app.type}
-                </div>
-              </div>
-              <div className="app-date-col">
-                <div className="app-date-label">Date Applied</div>
-                <div className="app-date-val">{app.date}</div>
-              </div>
-              <span
-                className={`badge ${
-                  app.status === "In Review"
-                    ? "badge-review"
-                    : app.status === "Shortlisted"
-                      ? "badge-shortlisted"
-                      : "badge-declined"
-                }`}
-              >
-                {app.status}
-              </span>
-              <button className="more-btn">⋯</button>
+            {/* History */}
+            <div className={styles.historyHeader}>
+              <h2>السجل الأخير</h2>
             </div>
-          ))}
-        </div>
-        <div className="bottom-link">
-          <button className="view-link">View all applications history →</button>
-        </div>
+            <div className={styles.appList}>
+              {recentApps.length === 0 ? (
+                <div style={{ padding: "20px", color: "#666" }}>لم تقم بالتقديم على أي وظائف بعد.</div>
+              ) : (
+                recentApps.map((app, index) => (
+                  <div
+                    className={styles.appItem}
+                    key={app.applicationId}
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <div className={styles.appLogo} style={{ background: "#f1f5f9", display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                      {app.job?.company?.logoUrl ? (
+                         <img src={app.job.company.logoUrl.startsWith('http') ? app.job.company.logoUrl : `${API_BASE_URL}${app.job.company.logoUrl.startsWith('/')?'':'/'}${app.job.company.logoUrl}`} alt="logo" style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+                      ) : "🏢"}
+                    </div>
+                    <div className={styles.appInfo}>
+                      <div className={styles.appTitle}>{app.job?.title || "الوظيفة"}</div>
+                      <div className={styles.appMeta}>
+                        {app.job?.company?.name || "الشركة"} · {app.job?.jobType || "دوام كامل"}
+                      </div>
+                    </div>
+                    <div className={styles.appDateCol}>
+                      <div className={styles.appDateLabel}>تاريخ التقديم</div>
+                      <div className={styles.appDateVal}>{new Date(app.appliedAt).toLocaleDateString('ar-EG')}</div>
+                    </div>
+                    <span className={`${styles.badge} ${getStatusBadgeClass(app.status)}`}>
+                      {getStatusLabel(app.status)}
+                    </span>
+                    <button className={styles.moreBtn} onClick={() => navigate('/MyApplications')}>⋯</button>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className={styles.bottomLink}>
+              <button className={styles.viewLink} onClick={() => navigate('/MyApplications')}>
+                عرض كل السجل →
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </>
   );

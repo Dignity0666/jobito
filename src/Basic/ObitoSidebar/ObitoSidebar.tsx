@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useJobitoAuth } from "../../context/AuthContext";
 import styles from "./ObitoSidebar.module.css";
 import LogoIMG from "../../assets/412ec68f361b4f49b52fb8d584c317ccf197a403.png";
 
@@ -108,33 +109,67 @@ const CloseIcon = () => (
 );
 
 const navItems = [
-  { id: "home", label: "Home", icon: HomeIcon, route: "/JobDashboard" },
+  { id: "home", label: "الرئيسية", icon: HomeIcon, route: "/JobDashboard" },
   {
     id: "messages",
-    label: "Messages",
+    label: "الرسائل",
     icon: MessageIcon,
     route: "/Messagingapp",
     badge: 1,
   },
   {
     id: "applications",
-    label: "My Applications",
+    label: "طلباتي",
     icon: ApplicationIcon,
     route: "/MyApplications",
   },
   {
     id: "profile",
-    label: "My Public Profile",
+    label: "ملفي الشخصي",
     icon: UserIcon,
     route: "/ProfilePage",
   },
 ];
 
-const settingsItems = [
-  { id: "help", label: "Help Center", icon: HelpIcon, route: "/Help" },
+const navItemscompany = [
+  {
+    id: "home",
+    label: "الرئيسية",
+    icon: HomeIcon,
+    route: "/company-home",
+  },
+  {
+    id: "post-job",
+    label: "نشر وظيفة",
+    icon: ApplicationIcon,
+    route: "/PostJob",
+  },
+  {
+    id: "messages",
+    label: "الرسائل",
+    icon: MessageIcon,
+    route: "/Messagingapp",
+    badge: 1,
+  },
+  {
+    id: "job-listings",
+    label: "وظائفي",
+    icon: ApplicationIcon,
+    route: "/JobListing",
+  },
+  {
+    id: "applicants",
+    label: "المتقدمون",
+    icon: UserIcon,
+    route: "/Applicants",
+  },
 ];
 
-const sidebarVariants = {
+const settingsItems = [
+  { id: "help", label: "مركز المساعدة", icon: HelpIcon, route: "/Help" },
+];
+
+const sidebarVariants: any = {
   hidden: { x: -280, opacity: 0 },
   show: {
     x: 0,
@@ -144,36 +179,37 @@ const sidebarVariants = {
   exit: {
     x: -280,
     opacity: 0,
-    transition: { duration: 0.25, ease: [0.4, 0, 1, 1] },
+    transition: { duration: 0.25, ease: "easeInOut" },
   },
 };
 
-const listVariants = {
+const listVariants: any = {
   hidden: {},
   show: { transition: { staggerChildren: 0.07, delayChildren: 0.15 } },
 };
 
-const itemVariants = {
+const itemVariants: any = {
   hidden: { opacity: 0, x: -18 },
   show: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.35, ease: "easeOut" },
   },
 };
 
-const footerVariants = {
+const footerVariants: any = {
   hidden: { opacity: 0, y: 16 },
   show: {
     opacity: 1,
     y: 0,
-    transition: { delay: 0.45, duration: 0.4, ease: [0.22, 1, 0.36, 1] },
+    transition: { delay: 0.45, duration: 0.4, ease: "easeOut" },
   },
 };
 
 export const ObitoSidebar: React.FC<ObitoSidebarProps> = ({
   setshowObitoSidebar,
 }) => {
+  const { role, user } = useJobitoAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(true);
@@ -184,6 +220,8 @@ export const ObitoSidebar: React.FC<ObitoSidebarProps> = ({
     setIsOpen(false);
     setshowObitoSidebar(false);
   };
+
+  const currentNavItems = role === "company" ? navItemscompany : navItems;
 
   return (
     <div className={styles.wrapper}>
@@ -229,7 +267,7 @@ export const ObitoSidebar: React.FC<ObitoSidebarProps> = ({
                 initial="hidden"
                 animate="show"
               >
-                {navItems.map(({ id, label, icon: Icon, badge, route }) => {
+                {currentNavItems.map(({ id, label, icon: Icon, badge, route }) => {
                   const active = isActive(route);
                   return (
                     <motion.li
@@ -346,11 +384,13 @@ export const ObitoSidebar: React.FC<ObitoSidebarProps> = ({
                 whileHover={{ scale: 1.08 }}
                 transition={{ type: "spring", stiffness: 300, damping: 16 }}
               >
-                <div className={styles.avatarInner}>J</div>
+                <div className={styles.avatarInner}>
+                  {user?.avatar ? <img src={user.avatar} alt="avatar" /> : (user?.name?.[0] || 'U')}
+                </div>
               </motion.div>
               <div className={styles.userInfo}>
-                <div className={styles.userName}>Jake Gyll</div>
-                <div className={styles.userEmail}>jakegyll@email.com</div>
+                <div className={styles.userName}>{user?.name || "الملف الشخصي"}</div>
+                <div className={styles.userEmail}>{user?.email || 'user@example.com'}</div>
               </div>
             </motion.div>
           </motion.div>

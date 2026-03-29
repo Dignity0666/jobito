@@ -7,7 +7,7 @@ interface MyLoginPageProps {
 
 const MyLoginPage: React.FC<MyLoginPageProps> = ({ onGoogleLogin }) => {
   return (
-    <div style={{ width: "70%", margin: "10px" }}>
+    <div style={{ width: "100%", margin: "10px" }}>
       <GoogleLogin
         onSuccess={onGoogleLogin}
         onError={() => alert("Google login failed")}

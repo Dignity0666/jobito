@@ -1,22 +1,122 @@
-.Navbar {
-  display: flex;
-  justify-content: center;
-  flex-shrink: 0ّ;
-  justify-content: center;
+.burger {
+  display: none;
+  background: none;
+  border: none;
+  color: #374151;
+  cursor: pointer;
+  padding: 4px;
+  margin-right: 12px;
+  border-radius: 6px;
 }
-.Navbar ul {
+
+@media (max-width: 768px) {
+  .burger {
+    display: flex;
+  }
+}
+
+.nav {
   display: flex;
-  gap: 10px;
-  justify-content: space-between;
+  align-items: stretch;
+  flex: 1;
+  margin-left: 8px;
+}
+
+@media (max-width: 768px) {
+  .nav {
+    display: none;
+  }
+}
+
+.navItem {
+  display: flex;
+  align-items: stretch;
+}
+
+.sep {
+  display: block;
+  width: 1px;
+  background: #d1d5e8;
+  transform: skewX(-18deg);
+  transform-origin: bottom;
+  height: 70%;
+  align-self: center;
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+.link {
+  display: flex;
   align-items: center;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  text-decoration: none;
+  position: relative;
+  white-space: nowrap;
+  transition: color 0.18s;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
 }
 
-.Navbar ul li {
-  list-style: none;
-  padding: 10px;
+.link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 12px;
+  right: 12px;
+  height: 2px;
+  background: #4f46e5;
+  border-radius: 2px 2px 0 0;
+  transform: scaleX(0);
+  transition: transform 0.2s ease;
 }
 
-.Navbar ul li a {
-  color: #0f36c2;
+.link:hover {
+  color: #4f46e5;
+  background: #f5f5ff;
+}
 
+.link:hover::after,
+.linkActive::after {
+  transform: scaleX(1);
+}
+
+.linkActive {
+  color: #4f46e5;
+  font-weight: 600;
+  background: #f0efff;
+}
+
+/* Mobile nav */
+.mobileNav {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-top: 1px solid #ececf3;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  font-family: "Poppins", sans-serif;
+  position: absolute;
+  top: 62px;
+  left: 0;
+  right: 0;
+  z-index: 999;
+}
+
+.mobileLink {
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #374151;
+  text-decoration: none;
+  border-bottom: 1px solid #f1f5f9;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.mobileLink:hover,
+.mobileLinkActive {
+  background: #f5f5ff;
+  color: #4f46e5;
 }

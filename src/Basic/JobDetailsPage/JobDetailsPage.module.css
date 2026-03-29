@@ -1,0 +1,680 @@
+.pageContainer {
+  min-height: 100vh;
+  font-family: "Inter", sans-serif;
+  color: #25324b;
+  padding-bottom: 80px;
+}
+
+.contentWrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  background-color: #ffffff;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  font-size: 14px;
+  color: #515b6f;
+  margin-bottom: 32px;
+}
+
+.activeBreadcrumb {
+  color: #202430;
+  font-weight: 500;
+}
+
+/* Language Toggle */
+.langToggle {
+  display: flex;
+  background: #f4f4f7;
+  padding: 4px;
+  border-radius: 8px;
+  gap: 4px;
+}
+
+.langBtn {
+  border: none;
+  background: transparent;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #515b6f;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.langBtn:hover {
+  color: #25324b;
+}
+
+.activeLang {
+  background: white;
+  color: #4640de;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Header Card */
+.headerCard {
+  background-color: #ffffff;
+  border: 1px solid #d6ddeb;
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 48px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.companyLogo {
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.companyLogo span {
+  color: white;
+  font-family: "Epilogue", sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+}
+
+.headerTitles h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #25324b;
+  margin: 0 0 8px 0;
+}
+
+.headerTitles p {
+  font-size: 16px;
+  color: #515b6f;
+  margin: 0;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.shareBtn {
+  background: white;
+  border: 1px solid #d6ddeb;
+  color: #4640de;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.shareBtn:hover {
+  background: #f4f5f7;
+}
+
+.applyBtn {
+  background: #4640de;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 40px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: "Epilogue", sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.applyBtn:hover {
+  background: #3b36b5;
+}
+
+.editBtn {
+  background: white;
+  color: #4640de;
+  border: 1px solid #d6ddeb;
+  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.editBtn:hover {
+  background: #f8f8fd;
+  border-color: #4640de;
+}
+
+.deleteBtn {
+  background: white;
+  color: #ff4d4f;
+  border: 1px solid #d6ddeb;
+  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.deleteBtn:hover {
+  background: #fff1f0;
+  border-color: #ff4d4f;
+}
+
+.closeBtn {
+  background: white;
+  color: #ff4d4f;
+  border: 1px solid #d6ddeb;
+  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.closeBtn:hover {
+  background: #fff1f0;
+  border-color: #ff4d4f;
+}
+
+.reopenBtn {
+  background: white;
+  color: #56cdad;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reopenBtn:hover {
+  background: #f6ffed;
+  border-color: #56cdad;
+}
+
+.closedBtn {
+  background: #f4f5f7;
+  color: #a0aabf;
+  border: 1px solid #d6ddeb;
+  border-radius: 8px;
+  padding: 14px 40px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: "Epilogue", sans-serif;
+  cursor: not-allowed;
+  transition: all 0.2s;
+}
+
+/* Main Layout */
+.mainLayout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 64px;
+  margin-bottom: 64px;
+}
+
+/* Left Column */
+.leftCol {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.section h2 {
+  font-family: "Epilogue", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #25324b;
+  margin: 0 0 16px 0;
+}
+
+.section p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #515b6f;
+  margin: 0;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #515b6f;
+}
+
+.checkIcon {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+/* Right Column */
+.rightCol {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.widget h2 {
+  font-family: "Epilogue", sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #25324b;
+  margin: 0 0 24px 0;
+}
+
+.separator {
+  height: 1px;
+  background-color: #d6ddeb;
+  margin: 8px 0;
+}
+
+.capacityBox {
+  margin-bottom: 24px;
+}
+
+.capacityText {
+  font-size: 14px;
+  color: #515b6f;
+  margin-bottom: 8px;
+}
+
+.boldText {
+  font-weight: 600;
+  color: #25324b;
+}
+
+.progressBar {
+  height: 6px;
+  background-color: #e5e7eb;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progressFill {
+  width: 50%;
+  height: 100%;
+  background-color: #56cdad;
+  border-radius: 99px;
+}
+
+.roleDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.roleRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+}
+
+.roleLabel {
+  color: #515b6f;
+}
+
+.roleValue {
+  color: #25324b;
+  font-weight: 600;
+}
+
+.tagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tagYellow {
+  background: #fff8e6;
+  color: #ffb836;
+  padding: 6px 16px;
+  border-radius: 99px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.tagGreen {
+  background: #eafcf5;
+  color: #56cdad;
+  padding: 6px 16px;
+  border-radius: 99px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.tagOutlineBlue {
+  background: #f8f8fd;
+  color: #4640de;
+  padding: 6px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Perks & Benefits */
+.perksSection {
+  margin-bottom: 64px;
+}
+
+.perksHeader {
+  margin-bottom: 32px;
+}
+
+.perksHeader h2 {
+  font-family: "Epilogue", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #25324b;
+  margin: 0 0 8px 0;
+}
+
+.perksHeader p {
+  font-size: 16px;
+  color: #515b6f;
+  margin: 0;
+}
+
+.perksGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px 24px;
+}
+
+.perkCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.perkIcon {
+  margin-bottom: 20px;
+}
+
+.perkCard h3 {
+  font-family: "Epilogue", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #25324b;
+  margin: 0 0 12px 0;
+}
+
+.perkCard p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #515b6f;
+  margin: 0;
+}
+
+/* About Company */
+.aboutCompanySection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  margin-bottom: 80px;
+  align-items: center;
+}
+
+.companyHeader {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.companyLogoBig {
+  width: 64px;
+  height: 64px;
+  background-color: #5c4ee5;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.companyLogoBig span {
+  color: white;
+  font-family: "Epilogue", sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.companyTitles h2 {
+  font-family: "Epilogue", sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #25324b;
+  margin: 0 0 8px 0;
+}
+
+.companyLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #4640de;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.companyLink:hover {
+  text-decoration: underline;
+}
+
+.companyLeft p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #515b6f;
+  margin: 0;
+}
+
+.companyRight {
+  display: flex;
+  gap: 16px;
+}
+
+.companyImgMain {
+  width: 60%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.companyImgCol {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.companyImgSub {
+  width: 100%;
+  height: 50%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Similar Jobs */
+.similarJobsSection {
+  border-top: 1px solid #d6ddeb;
+  padding-top: 64px;
+}
+
+.similarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.similarHeader h2 {
+  font-family: "Epilogue", sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #25324b;
+  margin: 0;
+}
+
+.similarGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.similarJobCard {
+  background: white;
+  border: 1px solid #d6ddeb;
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  gap: 20px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.similarJobCard:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  border-color: #c0c8da;
+}
+
+.simLogo {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  font-weight: 700;
+  font-family: "Epilogue", sans-serif;
+}
+
+.simDetails {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.simTitleGroup h3 {
+  font-family: "Epilogue", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #25324b;
+  margin: 0 0 8px 0;
+}
+
+.simTitleGroup p {
+  font-size: 14px;
+  color: #515b6f;
+  margin: 0 0 16px 0;
+}
+
+.simTags {
+  display: flex;
+  gap: 8px;
+}
+
+.tagYellowOutline {
+  border: 1px solid #ffb836;
+  color: #ffb836;
+  background: white;
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tagBlueOutline {
+  border: 1px solid #4640de;
+  color: #4640de;
+  background: white;
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.appliedStatusContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.appliedBtn {
+  background-color: #eef2ff;
+  color: #4640de;
+  border: 1px solid #4640de;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: not-allowed;
+  width: 100%;
+}
+
+.statusBadge {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  border: 1px solid;
+}
+
+.status-applied, .status-reviewing {
+  background-color: #fffbeb;
+  color: #d97706;
+  border-color: #fcd34d;
+}
+
+.status-shortlisted, .status-interviewed, .status-hired {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border-color: #bbf7d0;
+}
+
+.status-declined {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}

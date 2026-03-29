@@ -1,110 +1,51 @@
 import React from "react";
-import "./JobsSection.css";
-
-const featuredJobs = [
-  {
-    title: "Email Marketing",
-    company: "Revolut · Madrid, Spain",
-    tags: ["Marketing", "Design"],
-  },
-  {
-    title: "Brand Designer",
-    company: "Dropbox · San Francisco, US",
-    tags: ["Design", "Business"],
-  },
-  {
-    title: "Email Marketing",
-    company: "Pitch · Berlin, Germany",
-    tags: ["Marketing"],
-  },
-  {
-    title: "Visual Designer",
-    company: "Blinklist · Granada, Spain",
-    tags: ["Design"],
-  },
-  {
-    title: "Product Designer",
-    company: "ClassPass · Manchester, UK",
-    tags: ["Marketing", "Design"],
-  },
-  {
-    title: "Lead Designer",
-    company: "Canva · Ontario, Canada",
-    tags: ["Design", "Business"],
-  },
-  {
-    title: "Brand Strategist",
-    company: "GoDaddy · Marseille, France",
-    tags: ["Marketing"],
-  },
-  {
-    title: "Data Analyst",
-    company: "Twitter · San Diego, US",
-    tags: ["Technology"],
-  },
-];
+import styles from "./JobsSection.module.css";
 
 const latestJobs = [
-  {
-    title: "Social Media Assistant",
-    company: "Nomad · Paris, France",
-  },
-  {
-    title: "Social Media Assistant",
-    company: "Netlify · Paris, France",
-  },
-  {
-    title: "Brand Designer",
-    company: "Dropbox · San Francisco, USA",
-  },
-  {
-    title: "Brand Designer",
-    company: "Maze · San Francisco, USA",
-  },
-  {
-    title: "Interactive Developer",
-    company: "Terraform · Hamburg, Germany",
-  },
-  {
-    title: "Interactive Developer",
-    company: "Udacity · Hamburg, Germany",
-  },
-  {
-    title: "HR Manager",
-    company: "Packer · Lucern, Switzerland",
-  },
-  {
-    title: "HR Manager",
-    company: "Webflow · Lucern, Switzerland",
-  },
+  { title: "Social Media Assistant", company: "Nomad · Paris, France" },
+  { title: "Social Media Assistant", company: "Netlify · Paris, France" },
+  { title: "Brand Designer", company: "Dropbox · San Francisco, USA" },
+  { title: "Brand Designer", company: "Maze · San Francisco, USA" },
+  { title: "Interactive Developer", company: "Terraform · Hamburg, Germany" },
+  { title: "Interactive Developer", company: "Udacity · Hamburg, Germany" },
+  { title: "HR Manager", company: "Packer · Lucern, Switzerland" },
+  { title: "HR Manager", company: "Webflow · Lucern, Switzerland" },
 ];
 
-const EJobsSection = () => {
+const EJobsSection: React.FC = () => {
   return (
-    <>
-      <div className="section-header">
+    <div className={styles.jobsContainer}>
+      <div className={styles.sectionHeader}>
         <h2>
-          Similiar <span> Jobs </span>
+          Similar <span>Jobs</span>
         </h2>
-        <a href="#">Show all jobs →</a>
+        <a href="#" className={styles.showAll}>
+          Show all jobs →
+        </a>
       </div>
-      <div className="latest-grid">
+      <div className={styles.latestGrid}>
         {latestJobs.map((job, index) => (
-          <div key={index} className="latest-card">
-            <div className="logo small">Logo</div>
-            <div>
+          <div key={index} className={styles.latestCard}>
+
+            <div style={{ flex: 1 }}>
               <h4>{job.title}</h4>
               <p>{job.company}</p>
-              <div className="tags">
-                <span className="tag fulltime">Full Time</span>
-                <span className="tag marketing">Marketing</span>
-                <span className="tag design">Design</span>
+              <div className={styles.tags}>
+                <span className={`${styles.tag} ${styles.tagFulltime}`}>
+                  Full Time
+                </span>
+                <span className={`${styles.tag} ${styles.tagMarketing}`}>
+                  Marketing
+                </span>
+                <span className={`${styles.tag} ${styles.tagDesign}`}>
+                  Design
+                </span>
               </div>
             </div>
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 };
 

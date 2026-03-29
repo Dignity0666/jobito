@@ -1,358 +1,491 @@
-/* ================================================
-   ProfileSettings.module.css
-   ================================================ */
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap");
 
 .page {
-  max-width: 860px;
+  max-width: 100%;
+  background-color: #f8f9fb;
+  min-height: 100vh;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.tabContent {
+  display: flex;
+  flex-direction: column;
+  padding: 40px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 32px 24px 80px;
-  font-family: "Epilogue", "Segoe UI", sans-serif;
+  background: #ffffff;
+  border: 1px solid #d6ddeb;
+  border-radius: 12px;
+  margin-top: 40px;
+}
+
+.sectionHeader {
+  margin-bottom: 32px;
+}
+
+.sectionHeader h2 {
+  font-size: 24px;
+  font-weight: 800;
+  margin: 0;
   color: #202430;
 }
 
-/* ── Tab bar ─────────────────────────────────── */
-.tabBar {
+/* ── Sub tab bar ────────────────────────────── */
+.subTabBar {
   display: flex;
-  gap: 0;
-  border-bottom: 1.5px solid #e5e7eb;
-  margin-bottom: 36px;
+  gap: 24px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid #d6ddeb;
 }
 
-.tabBtn {
-  position: relative;
+.subTabBtn {
   background: none;
   border: none;
-  padding: 12px 24px;
-  font-size: 15px;
-  font-weight: 500;
+  padding: 12px 4px;
+  font-size: 14px;
+  font-weight: 600;
   color: #7c8493;
   cursor: pointer;
-  transition: color 0.2s ease;
-}
-.tabBtn:hover { color: #202430; }
-
-.tabActive {
-  color: #202430;
-  font-weight: 600;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
 }
 
-.tabUnderline {
-  position: absolute;
-  bottom: -1.5px;
-  left: 0;
-  right: 0;
-  height: 2.5px;
-  background: #26a4ff;
-  border-radius: 2px 2px 0 0;
+.subTabBtn:hover {
+  color: #4640de;
 }
 
-/* ── Section header ──────────────────────────── */
-.sectionHeader {
-  margin-bottom: 28px;
-}
-.sectionHeader h2 {
-  font-size: 18px;
-  font-weight: 700;
-  margin: 0 0 4px;
-  color: #202430;
-}
-.sectionHeader p {
-  font-size: 14px;
-  color: #7c8493;
-  margin: 0;
+.subTabActive {
+  color: #4640de;
+  border-bottom-color: #4640de;
 }
 
 /* ── Row layout ──────────────────────────────── */
 .row {
   display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 24px 40px;
-  padding: 24px 0;
+  grid-template-columns: 280px 1fr;
+  gap: 40px;
+  padding: 32px 0;
+  border-bottom: 1px solid #f1f3f9;
+}
+
+.row:last-of-type {
+  border-bottom: none;
 }
 
 .rowLabel {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
+
 .rowLabel strong {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   color: #202430;
 }
+
 .rowLabel span {
-  font-size: 13px;
+  font-size: 14px;
   color: #7c8493;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .rowContent {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
 }
 
-.divider {
-  height: 1px;
-  background: #f0f1f3;
-}
-
-/* ── Photo row ───────────────────────────────── */
-.photoRow {
+/* ── Logo Upload ─────────────────────────────── */
+.logoUploadRow {
   display: flex;
   align-items: center;
   gap: 24px;
 }
 
-.avatarPreview {
+.logoCirclePreview {
   width: 80px;
   height: 80px;
   border-radius: 50%;
+  background: #f8f9fb;
   overflow: hidden;
   flex-shrink: 0;
-  border: 2px solid #e5e7eb;
-}
-.avatarPreview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.avatarPlaceholder {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #b0b0c0, #8080a0);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-size: 28px;
-  font-weight: 700;
+  border: 1px solid #d6ddeb;
 }
 
-.uploadZone {
+.logoCirclePreview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 8px;
+}
+
+.logoPlaceholder {
+  font-size: 32px;
+  font-weight: 800;
+  color: #4640de;
+}
+
+.logoUploadZone {
   flex: 1;
-  border: 1.5px dashed #d1d5db;
+  border: 2px dashed #d6ddeb;
+  background: #f8f9fb;
   border-radius: 12px;
-  padding: 20px;
+  padding: 24px;
   text-align: center;
   cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  transition: all 0.2s;
+}
+
+.logoUploadZone:hover {
+  border-color: #4640de;
+  background: #f0f1ff;
+}
+
+.logoUploadZone p {
+  margin: 0;
+  font-size: 14px;
+  color: #202430;
+  font-weight: 600;
+}
+
+.logoUploadZone span {
+  font-size: 12px;
   color: #7c8493;
 }
-.uploadZone p {
-  font-size: 14px;
-  margin: 0;
-  color: #515b6f;
-}
-.uploadZone span {
-  font-size: 12px;
-  color: #9ca3af;
-}
-.uploadLink {
-  color: #26a4ff;
-  font-weight: 600;
+
+.blueText {
+  color: #4640de;
+  font-weight: 700;
 }
 
 /* ── Form fields ─────────────────────────────── */
 .fieldFull {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
+
 .fieldGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-.fieldGrid > div {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  gap: 20px;
 }
 
 label {
-  font-size: 13px;
-  font-weight: 500;
-  color: #515b6f;
+  font-size: 14px;
+  font-weight: 600;
+  color: #202430;
 }
-.req { color: #ef4444; }
 
 input[type="text"],
 input[type="email"],
 input[type="tel"],
 input[type="password"],
 input[type="date"],
-select {
+select,
+textarea {
   width: 100%;
-  border: 1.5px solid #e5e7eb;
+  background: #ffffff;
+  border: 1px solid #d6ddeb;
   border-radius: 8px;
-  padding: 10px 14px;
+  padding: 12px 16px;
   font-size: 14px;
   color: #202430;
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  background: #fff;
+  transition: all 0.2s;
   font-family: inherit;
-  box-sizing: border-box;
-}
-input:focus,
-select:focus {
-  border-color: #26a4ff;
-  box-shadow: 0 0 0 3px rgba(38, 164, 255, 0.12);
 }
 
-.hint {
-  font-size: 12px;
-  color: #9ca3af;
-  margin-top: 2px;
+input:focus, select:focus, textarea:focus {
+  border-color: #4640de;
+  box-shadow: 0 0 0 4px rgba(70, 64, 222, 0.1);
 }
 
-/* ── Radio cards ─────────────────────────────── */
-.radioCard {
+/* ── Chips ───────────────────────────────────── */
+.chipContainer {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  cursor: pointer;
-  padding: 4px 0;
-  transition: transform 0.2s ease;
-}
-.radioCard input[type="radio"] {
-  width: 18px;
-  height: 18px;
-  margin-top: 2px;
-  accent-color: #26a4ff;
-  flex-shrink: 0;
-}
-.radioCard div {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.radioCard strong {
-  font-size: 14px;
-  font-weight: 600;
-  color: #202430;
-}
-.radioCard span {
-  font-size: 13px;
-  color: #7c8493;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
 }
 
-/* ── Checkbox cards ──────────────────────────── */
-.checkCard {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  cursor: pointer;
-  padding: 4px 0;
-  transition: transform 0.2s ease;
-}
-.checkCard input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  margin-top: 2px;
-  accent-color: #26a4ff;
-  flex-shrink: 0;
-  border-radius: 4px;
-}
-.checkCard div {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.checkCard strong {
-  font-size: 14px;
-  font-weight: 600;
-  color: #202430;
-}
-.checkCard span {
-  font-size: 13px;
-  color: #7c8493;
-}
-
-/* ── Verified email ──────────────────────────── */
-.verifiedEmail {
+.chip {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #202430;
+  gap: 6px;
+  background: #f1f3f9;
+  color: #4640de;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 700;
 }
-.verifiedEmail small {
+
+.chip span {
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 4px;
+}
+
+/* ── Rich Text Editor Layout ─────────────────── */
+.richTextEditor {
+  border: 1px solid #d6ddeb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.editorToolbar {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f8f9fb;
+  border-bottom: 1px solid #d6ddeb;
+}
+
+.editorToolbar button {
+  background: none;
+  border: none;
+  color: #7c8493;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.richTextEditor textarea {
+  border: none;
+  background: transparent;
+  padding: 16px;
+  min-height: 150px;
+}
+
+.editorFooter {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 12px;
   font-size: 12px;
-  color: #26a4ff;
-  font-weight: 400;
+  color: #7c8493;
+  background: #f8f9fb;
+  border-top: 1px solid #d6ddeb;
 }
 
 /* ── Buttons ─────────────────────────────────── */
 .saveBtn {
-  align-self: flex-end;
   background: #4640de;
   color: #fff;
   border: none;
-  padding: 12px 28px;
+  padding: 12px 32px;
   border-radius: 8px;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s ease;
-  font-family: inherit;
+  transition: all 0.2s;
 }
-.saveBtn:hover { background: #3530b0; }
+
+.saveBtn:hover {
+  background: #3934b3;
+}
+
+.saveBtn:disabled {
+  background: #f1f3f9;
+  color: #7c8493;
+  cursor: not-allowed;
+}
 
 .saveRow {
   display: flex;
   justify-content: flex-end;
-  padding-top: 24px;
+  padding-top: 32px;
+  margin-top: 32px;
+  border-top: 1px solid #f1f3f9;
 }
 
-/* ── Close account ───────────────────────────── */
-.closeAccountRow {
+/* ── Security Section Specific ────────────────── */
+.inlineForm {
   display: flex;
-  justify-content: flex-end;
-  padding: 16px 0 4px;
+  gap: 16px;
+  align-items: flex-end;
 }
-.closeAccountBtn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: none;
-  color: #ef4444;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  transition: color 0.2s ease;
-  opacity: 0.75;
-}
-.closeAccountBtn:hover { opacity: 1; }
 
-/* ── Tab content ─────────────────────────────── */
-.tabContent {
+.inlineAction {
+  flex-shrink: 0;
+}
+
+.passwordForm {
   display: flex;
   flex-direction: column;
+  gap: 16px;
+}
+
+.linkedBadge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f0fdf4;
+  color: #16a34a;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: 1px solid #bbfcce;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.linkNote {
+  font-size: 14px;
+  color: #7c8493;
+  margin: 0;
+  margin-bottom: 12px;
+}
+
+.linkAction {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.googleBtnWrapper {
+  max-width: 240px;
+}
+
+/* ── Benefits List Editor ─────────────────────── */
+/* ── Benefits premium grid layout ─────────────────────── */
+.benefitsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  width: 100%;
+}
+
+.benefitCard {
+  background: #ffffff;
+  border: 1px solid #d6ddeb;
+  border-radius: 12px;
+  padding: 24px;
+  position: relative;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.benefitCard:hover {
+  border-color: #4640de;
+  box-shadow: 0 4px 20px rgba(70, 64, 222, 0.08);
+}
+
+.benefitCard h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #202430;
+}
+
+.benefitCard p {
+  margin: 0;
+  font-size: 14px;
+  color: #515b6f;
+  line-height: 1.6;
+}
+
+.removeBenefitBtn {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #fff;
+  border: 1px solid #f1f3f9;
+  color: #7c8493;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.removeBenefitBtn:hover {
+  background: #fee2e2;
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.addBenefitCard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  background: #ffffff;
+  border: 2px dashed #4640de;
+  border-radius: 12px;
+  background-color: rgba(70, 64, 222, 0.02);
+}
+
+.benefitAddActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.addBtnSmall {
+  background: #4640de;
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cancelBtnSmall {
+  background: #f1f3f9;
+  color: #202430;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.addBenefitTrigger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px;
+  background: #f8f9fb;
+  border: 2px dashed #d6ddeb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #7c8493;
+}
+
+.addBenefitTrigger:hover {
+  border-color: #4640de;
+  background: #f0f1ff;
+  color: #4640de;
 }
 
 /* ── Responsive ──────────────────────────────── */
-@media (max-width: 640px) {
+@media (max-width: 850px) {
   .row {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
-  .fieldGrid {
-    grid-template-columns: 1fr;
-  }
-  .photoRow {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .tabBtn {
-    padding: 10px 14px;
-    font-size: 13px;
+  .tabContent {
+    padding: 24px;
+    margin: 20px;
   }
 }

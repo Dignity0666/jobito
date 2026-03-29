@@ -1,74 +1,107 @@
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { BarChart3, Rocket, Shield, Sparkles } from "lucide-react";
 import styles from "./ChooseUsSection.module.css";
-import { useEffect, useRef, useState } from "react";
+
+interface BackendFeature {
+  featureId: number;
+  title: string;
+  titleEn: string;
+  description: string;
+  descriptionEn: string;
+  icon: string;
+}
+
+interface MappedFeature {
+  title: string;
+  description: string;
+  icon: JSX.Element;
+  color: string;
+  highlighted: boolean;
+}
 
 export const ChooseUsSection = () => {
-  const [isVisible, setIsVisible] = useState({});
-  const sectionRefs = useRef({});
+  const [isVisible, setIsVisible] = useState<Record<string, boolean>>({});
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+  const [features, setFeatures] = useState<MappedFeature[]>([]);
+
+  const colors = useMemo(() => ["#FF6B6B", "#4ECDC4", "#A78BFA", "#FFA26B"], []);
+  
+  const iconMap: Record<string, JSX.Element> = useMemo(() => ({
+    "sparkles": <Sparkles className={styles.featureIcon} />,
+    "shield": <Shield className={styles.featureIcon} />,
+    "bar-chart-2": <BarChart3 className={styles.featureIcon} />,
+    "monitor": <Sparkles className={styles.featureIcon} />,
+    "headphones": <Rocket className={styles.featureIcon} />,
+    "rocket": <Rocket className={styles.featureIcon} />,
+  }), []);
 
   useEffect(() => {
-    const observers: any = {};
+    const MOCK_FEATURES_DATA = [
+      {
+        title: "البحث الذكي",
+        description: "نظام متطور يعتمد على الذكاء الاصطناعي لترشيح أفضل الوظائف المناسبة لمهاراتك وخبراتك.",
+        icon: "sparkles",
+      },
+      {
+        title: "حماية البيانات",
+        description: "نطبق أعلى معايير التشفير لضمان سرية معلوماتك الشخصية وسجل أعمالك المهني.",
+        icon: "shield",
+      },
+      {
+        title: "تحليلات الأداء",
+        description: "لوحة تحكم شاملة تتيح لك متابعة طلبات التوظيف ومدى توافق ملفك الشخصي مع السوق.",
+        icon: "bar-chart-2",
+      },
+      {
+        title: "سرعة التنفيذ",
+        description: "نهدف إلى تقليل الوقت المستغرق في عملية التوظيف من خلال أدوات تواصل سريعة وفعالة.",
+        icon: "rocket",
+      },
+    ];
+
+    const mapped = MOCK_FEATURES_DATA.map((f, idx) => ({
+      title: f.title,
+      description: f.description,
+      icon: iconMap[f.icon] || <Sparkles className={styles.featureIcon} />,
+      color: colors[idx % colors.length],
+      highlighted: idx === 1,
+    }));
+    setFeatures(mapped);
+  }, [colors, iconMap]);
+
+  useEffect(() => {
+    const observers: Record<string, IntersectionObserver> = {};
 
     Object.keys(sectionRefs.current).forEach((key) => {
-      observers[key] = new IntersectionObserver(
-        ([entry]) => {
-          setIsVisible((prev) => ({ ...prev, [key]: entry.isIntersecting }));
-        },
-        { threshold: 0.2, rootMargin: "0px 0px -100px 0px" },
-      );
-
-      if (sectionRefs.current[key]) {
-        observers[key].observe(sectionRefs.current[key]);
+      const target = sectionRefs.current[key];
+      if (target) {
+        observers[key] = new IntersectionObserver(
+          ([entry]) => {
+            setIsVisible((prev) => ({ ...prev, [key]: entry.isIntersecting }));
+          },
+          { threshold: 0.2, rootMargin: "0px 0px -100px 0px" },
+        );
+        observers[key].observe(target);
       }
     });
 
     return () => {
-      Object.values(observers).forEach((observer: any) =>
+      Object.values(observers).forEach((observer) =>
         observer.disconnect(),
       );
     };
   }, []);
-  const features = [
-    {
-      title: "Elegant and Modern Design",
-      description:
-        "The designs we make are designs that are trending. Our team makes sure your website always looks good.",
-      icon: <Sparkles className={styles.featureIcon} />,
-      color: "#FF6B6B",
-    },
-    {
-      title: "Data is always Safe",
-      description:
-        "We finally found a host that truly understood the unique secure lens need to know basis found a host that truly know.",
-      icon: <Shield className={styles.featureIcon} />,
-      color: "#4ECDC4",
-    },
-    {
-      title: "High-End Analyzing",
-      description:
-        "Share processes and data secure lens need to know basis. Our team assured your website is always safe and secure.",
-      icon: <BarChart3 className={styles.featureIcon} />,
-      color: "#A78BFA",
-      highlighted: true,
-    },
-    {
-      title: "Our Dedicated Support",
-      description:
-        "We finally found a host that truly understood the unique secure lens need to know basis found a host that truly know.",
-      icon: <Rocket className={styles.featureIcon} />,
-      color: "#FFA26B",
-    },
-  ];
 
   return (
     <section
       className={styles.whyUsSection}
-      ref={(el) => (sectionRefs.current.whyUs = el)}
+      ref={(el) => { if (el) sectionRefs.current.whyUs = el; }}
     >
+
       <div className={styles.container}>
         <div className={styles.headerTop}>
-          <span className={styles.subtitle}>Best software</span>
-          <h2 className={styles.sectionTitle}>Why Choose Us</h2>
+          <span className={styles.subtitle}>لماذا نحن؟</span>
+          <h2 className={styles.sectionTitle}>ما الذي يميز جوبيتو؟</h2>
         </div>
 
         <div className={styles.featuresGrid}>

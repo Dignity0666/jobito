@@ -29,16 +29,16 @@ body {
 .main-layout {
   flex: 1;
   height: 100vh;
-  overflow-y: auto; /* هنا السكروووول */
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
 
-/* الروابط */
+/* Links */
 a {
   display: block;
-  text-decoration: none; /* شيلنا الـ quotes */
-  color: #fff; /* شيلنا الـ quotes */
+  text-decoration: none;
+  color: #fff;
   transition: 0.2s ease;
 }
 
@@ -46,11 +46,16 @@ a:hover {
   opacity: 0.8;
 }
 
-/* الفورم */
+/* Form elements */
 button,
 input {
   outline: none;
   padding: 10px;
   border: none;
-  font-weight: 600;
+}
+
+input {
+  outline: none;
+  padding: 10px;
+  border: none;
 }
