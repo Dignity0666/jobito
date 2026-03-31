@@ -109,7 +109,7 @@ export default function Partners() {
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        نوثق بهم ويثقون بنا
+        نثق بهم ويثقون بنا
       </motion.h2>
 
       <motion.div 

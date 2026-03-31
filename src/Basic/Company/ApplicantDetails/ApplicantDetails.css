@@ -281,12 +281,12 @@
   margin-top: 24px;
 }
 
-.sidebar-actions.dual-actions {
+.sidebar-actions.dual-actions, .sidebar-actions.multi-actions {
   display: flex;
   gap: 10px;
 }
 
-.accept-btn, .reject-btn {
+.accept-btn, .reject-btn, .waitlist-btn {
   flex: 1;
   padding: 12px;
   border: none;
@@ -307,9 +307,45 @@
   opacity: 0.9;
 }
 
-.accept-btn:hover, .reject-btn:hover {
+.waitlist-btn {
+  background: #f59e0b;
+  color: white;
+}
+
+.accept-btn:hover, .reject-btn:hover, .waitlist-btn:hover {
   opacity: 1;
   filter: brightness(1.1);
+}
+
+.status-result {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  font-size: 16px;
+}
+
+.status-hired {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.status-declined {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.status-waitlisted {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .message-btn {

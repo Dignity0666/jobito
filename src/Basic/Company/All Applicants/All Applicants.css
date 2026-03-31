@@ -185,15 +185,15 @@
 }
 
 .badge-inreview {
-  color: #d97706;
-  border-color: #fcd34d;
-  background: #fff;
-}
-
-.badge-shortlisted {
   color: #3b82f6;
   border-color: #93c5fd;
-  background: #fff;
+  background: #eff6ff;
+}
+
+.badge-waitlisted {
+  color: #d97706;
+  border-color: #fcd34d;
+  background: #fffbeb;
 }
 
 .badge-declined {
@@ -318,4 +318,65 @@
 
 .page-nav svg {
   color: #4b5563;
+}
+
+/* Filter Checkboxes */
+.filter-checkboxes {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.filter-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.filter-chip:hover {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+.filter-chip input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  accent-color: currentColor;
+}
+
+.filter-chip-active.filter-chip-hired {
+  border-color: #6ee7b7;
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.filter-chip-active.filter-chip-declined {
+  border-color: #fca5a5;
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.filter-chip-active.filter-chip-waitlisted {
+  border-color: #fcd34d;
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.filter-chip-active.filter-chip-inreview {
+  border-color: #93c5fd;
+  background: #eff6ff;
+  color: #2563eb;
 }

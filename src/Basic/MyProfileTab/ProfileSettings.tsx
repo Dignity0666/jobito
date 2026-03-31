@@ -57,6 +57,7 @@ export default function ProfileSettings() {
     },
     logo: "",
     avatar: "",
+    classification: "",
     benefits: [] as { title: string; description: string }[],
   });
 
@@ -99,6 +100,7 @@ export default function ProfileSettings() {
             locationTags: Array.isArray(data.locationTags) ? data.locationTags : [],
             techStack: Array.isArray(data.techStack) ? data.techStack : [],
             benefits: Array.isArray(data.benefits) ? data.benefits : [],
+            classification: data.classification || "تقني",
             foundedDate: (data.foundedYear && data.foundedMonth && data.foundedDay) 
               ? `${data.foundedYear}-${String(data.foundedMonth).padStart(2, '0')}-${String(data.foundedDay).padStart(2, '0')}`
               : "",
@@ -159,7 +161,11 @@ export default function ProfileSettings() {
       let bodyData: any;
       
       if (role === 'company') {
-        bodyData = { ...formData, logo: finalImgUrl };
+        bodyData = { 
+          ...formData, 
+          logo: finalImgUrl,
+          classification: formData.classification
+        };
         if (formData.foundedDate) {
           const [y, m, d] = formData.foundedDate.split("-");
           bodyData.foundedYear = y;
@@ -167,7 +173,12 @@ export default function ProfileSettings() {
           bodyData.foundedDay = d;
         }
       } else {
-        bodyData = { ...formData, avatar: finalImgUrl, fullName: formData.fullName || formData.name };
+        bodyData = { 
+          ...formData, 
+          avatar: finalImgUrl, 
+          fullName: formData.fullName || formData.name,
+          classification: formData.classification 
+        };
       }
 
       const res = await apiFetch(`${API_BASE_URL}${endpoint}`, {
@@ -340,15 +351,39 @@ export default function ProfileSettings() {
                     />
                   </div>
                   {role === 'student' && (
-                    <div className={styles.fieldFull}>
-                        <label>نبذة تعريفية</label>
-                        <textarea
-                            name="bio"
-                            value={formData.bio}
+                    <>
+                      <div className={styles.fieldGrid}>
+                        <div className={styles.fieldFull}>
+                          <label>الاسم الكامل</label>
+                          <input
+                            name="fullName"
+                            type="text"
+                            value={formData.fullName}
                             onChange={handleChange}
-                            rows={4}
-                        />
-                    </div>
+                          />
+                        </div>
+                        <div className={styles.fieldFull}>
+                          <label>التصنيف المهني</label>
+                          <select 
+                            name="classification" 
+                            value={formData.classification} 
+                            onChange={handleChange}
+                          >
+                            <option value="تقني">تقني</option>
+                            <option value="غير تقني">غير تقني</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className={styles.fieldFull}>
+                          <label>نبذة تعريفية</label>
+                          <textarea
+                              name="bio"
+                              value={formData.bio}
+                              onChange={handleChange}
+                              rows={4}
+                          />
+                      </div>
+                    </>
                   )}
                   {role === 'company' && (
                     <>
@@ -364,7 +399,7 @@ export default function ProfileSettings() {
                           />
                         </div>
                         <div>
-                          <label>الصناعة</label>
+                          <label>مجال العمل</label>
                           <input 
                             name="industry" 
                             type="text" 
@@ -376,6 +411,17 @@ export default function ProfileSettings() {
                       </div>
                       <div className={styles.fieldGrid}>
                         <div>
+                          <label>التصنيف</label>
+                          <select 
+                            name="classification" 
+                            value={formData.classification} 
+                            onChange={handleChange}
+                          >
+                            <option value="تقني">تقني</option>
+                            <option value="غير تقني">غير تقني</option>
+                          </select>
+                        </div>
+                        <div>
                           <label>الموقع (العنوان)</label>
                           <input
                             name="address"
@@ -385,6 +431,8 @@ export default function ProfileSettings() {
                             placeholder="مثال: الرياض، السعودية"
                           />
                         </div>
+                      </div>
+                      <div className={styles.fieldGrid}>
                         <div>
                           <label>تاريخ التأسيس</label>
                           <input
@@ -394,6 +442,7 @@ export default function ProfileSettings() {
                             onChange={handleChange}
                           />
                         </div>
+                        <div /> 
                       </div>
                       <div className={styles.fieldFull}>
                         <label>الوصف</label>

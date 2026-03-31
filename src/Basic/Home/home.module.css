@@ -108,6 +108,26 @@
   background-color: #3530a3;
 }
 
+.heroDownloadBtn {
+  display: inline-flex;
+  align-items: center;
+  background-color: #101828;
+  color: #ffffff;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.1);
+  transition: all 0.2s ease;
+}
+
+.heroDownloadBtn:hover {
+  background-color: #1d2939;
+  transform: translateY(-2px);
+  color: #ffffff;
+}
+
 .popular {
   margin-top: 20px;
   color: #7c8493;

@@ -1,6 +1,6 @@
 .heroSection {
   width: 100%;
-  padding: 90px 0;
+  padding: 150px 0;
   position: relative;
   display: flex;
   align-items: center;
@@ -13,7 +13,7 @@
 }
 
 .title {
-  font-size: 72px;
+  font-size: 52px;
   font-weight: 800;
   color: #202430;
   text-align: center;
@@ -58,7 +58,7 @@
 
 .inputGroup {
   display: flex;
-  /* align-items: center; */
+  align-items: center;
   flex: 1;
   padding: 0 15px;
 }

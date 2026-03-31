@@ -89,13 +89,7 @@ export default function ApplicantDetails() {
     }
   }, [app?.status, id, apiFetch]);
 
-  const getAvatarUrl = (url?: string, name?: string) => {
-    if (url) {
-      if (url.startsWith("http")) return url;
-      return `${API_BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`;
-    }
-    return `https://api.dicebear.com/7.x/initials/svg?seed=${name || "User"}`;
-  };
+  // Removed unused getAvatarUrl
 
   const handleStatusUpdate = async (newStatus: string) => {
     try {
@@ -108,7 +102,7 @@ export default function ApplicantDetails() {
       });
       if (!res.ok) throw new Error("فشل في تحديث الحالة");
       setApp((prev) => (prev ? { ...prev, status: newStatus } : null));
-      alert(`تم تحديث الحالة إلى: ${newStatus === 'hired' ? 'مقبول' : 'مرفوض'}`);
+      alert(`تم تحديث الحالة إلى: ${newStatus === 'hired' ? 'مقبول' : newStatus === 'declined' ? 'مرفوض' : 'في الانتظار'}`);
     } catch (err) {
       alert(err instanceof Error ? err.message : "خطأ");
     }
@@ -142,6 +136,20 @@ export default function ApplicantDetails() {
       window.open(url, "_blank");
       setIsDownloaded(true);
     }
+  };
+
+  const handleGoToChat = () => {
+    if (!u) return;
+    navigate('/Messagingapp', {
+      state: {
+        preselectedUser: {
+          userId: u.userId,
+          fullName: u.fullName,
+          avatarUrl: u.avatarUrl || null,
+          email: u.email
+        }
+      }
+    });
   };
 
   if (loading) return <div className="details-loading">جاري التحميل...</div>;
@@ -238,33 +246,72 @@ export default function ApplicantDetails() {
             )}
 
             <div className="sidebar-divider" />
-
-            <div className="sidebar-section">
-              <div className="stage-info-row">
-                <span className="current-stage">
-                  {app.status === 'hired' ? 'مقبول' : 
-                   app.status === 'declined' ? 'مرفوض' : 
-                   app.status === 'reviewing' ? 'تحت المراجعة' : 'قيد المراجعة'}
-                </span>
-                <span className="info-label">المرحلة</span>
-              </div>
-              <div className="stage-bars">
-                <div className={`stage-bar active`} />
-                <div className={`stage-bar ${['reviewing', 'hired', 'declined'].includes(app.status) ? 'active' : ''}`} />
-                <div className={`stage-bar ${['hired', 'declined'].includes(app.status) ? 'active' : ''}`} />
-                <div className={`stage-bar ${app.status === 'hired' ? 'active' : app.status === 'declined' ? 'declined' : ''}`} 
-                     style={app.status === 'declined' ? { backgroundColor: '#ef4444' } : {}} />
-              </div>
-            </div>
-
-            <div className="sidebar-actions dual-actions">
-              <button className="accept-btn" onClick={() => handleStatusUpdate('hired')}>قبول</button>
-              <button className="reject-btn" onClick={() => handleStatusUpdate('declined')}>رفض</button>
+            <div className="sidebar-actions multi-actions">
+              {app.status === 'hired' ? (
+                <div className="status-result status-hired">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                  تم التوظيف
+                </div>
+              ) : app.status === 'declined' ? (
+                <div className="status-result status-declined">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                  </svg>
+                  تم الرفض
+                </div>
+              ) : app.status === 'waitlisted' ? (
+                <div className="status-result status-waitlisted">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  في الانتظار
+                </div>
+              ) : (
+                <>
+                  <button className="accept-btn" onClick={() => handleStatusUpdate('hired')}>قبول</button>
+                  <button className="reject-btn" onClick={() => handleStatusUpdate('declined')}>رفض</button>
+                  <button className="waitlist-btn" onClick={() => handleStatusUpdate('waitlisted')}>انتظار</button>
+                </>
+              )}
             </div>
           </div>
 
           <div className="sidebar-card contact-card">
             <div className="sidebar-section-title">بيانات التواصل</div>
+            
+            <button 
+               onClick={handleGoToChat}
+               style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#4640de',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  marginBottom: '16px',
+                  transition: 'background-color 0.2s'
+               }}
+               onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#3b35bd'}
+               onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#4640de'}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+              مراسلة المتقدم
+            </button>
+
             <div className="contact-item">
               <div className="item-icon green-bg">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

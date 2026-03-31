@@ -66,22 +66,16 @@ export const Home = () => {
               نربط المحترفين الموهوبين بأفضل الفرص في الشرق الأوسط.
             </motion.p>
 
-            <motion.div className={styles.searchBar} variants={itemVariants}>
-              <div className={styles.inputGroup}>
-                <Search className={styles.icon} size={20} />
-                <input type="text" placeholder="مسمى وظيفي، كلمات مفتاحية..." />
-              </div>
-
-              <div className={styles.divider}></div>
-
-              <div className={styles.inputGroup}>
-                <MapPin className={styles.icon} size={20} />
-                <select defaultValue="Florence">
-                   <option value="Florence">Egpt , EL-shrock</option>
-                </select>
-              </div>
-
-              <button className={styles.searchBtn}>بحث</button>
+            <motion.div variants={itemVariants} style={{ marginTop: '20px', marginBottom: '20px' }}>
+              <a 
+                href="https://play.google.com/store/apps/details?id=com.jobito.app" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className={styles.heroDownloadBtn}
+              >
+                <i className="fab fa-google-play" style={{ paddingLeft: "8px" }}></i>
+                احصل عليه من Google Play
+              </a>
             </motion.div>
 
             <motion.p className={styles.popular} variants={itemVariants}>

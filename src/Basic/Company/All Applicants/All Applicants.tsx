@@ -51,7 +51,17 @@ export default function AllApplicants() {
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState("Table View");
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilters, setStatusFilters] = useState({
+    hired: false,
+    declined: false,
+    inreview: false,
+    waitlisted: false,
+  });
   const navigate = useNavigate();
+
+  const toggleFilter = (key: keyof typeof statusFilters) => {
+    setStatusFilters((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   useEffect(() => {
     const fetchApplicants = async () => {
@@ -101,16 +111,16 @@ export default function AllApplicants() {
       case "applied":
       case "inreview":
       case "reviewing":
+      case "interviewed":
+      case "interviewing":
         return "badge-inreview";
       case "shortlisted":
-        return "badge-shortlisted";
+      case "waitlisted":
+        return "badge-waitlisted";
       case "declined":
         return "badge-declined";
       case "hired":
         return "badge-hired";
-      case "interviewed":
-      case "interviewing":
-        return "badge-interviewed";
       default:
         return "badge-inreview";
     }
@@ -124,7 +134,8 @@ export default function AllApplicants() {
       case "reviewing":
         return "تحت المراجعة";
       case "shortlisted":
-        return "تم الاختيار";
+      case "waitlisted":
+        return "في الانتظار";
       case "declined":
         return "مرفوض";
       case "hired":
@@ -156,10 +167,23 @@ export default function AllApplicants() {
     return `https://api.dicebear.com/7.x/initials/svg?seed=${name || "User"}`;
   };
 
-  const filteredApplicants = applicants.filter((app) =>
-    (app.user?.fullName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (app.user?.email || "").toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredApplicants = applicants.filter((app) => {
+    const matchesSearch =
+      (app.user?.fullName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (app.user?.email || "").toLowerCase().includes(searchTerm.toLowerCase());
+
+    const anyFilterActive = statusFilters.hired || statusFilters.declined || statusFilters.inreview || statusFilters.waitlisted;
+    if (!anyFilterActive) return matchesSearch;
+
+    const s = (app.status || "applied").toLowerCase();
+    const matchesStatus =
+      (statusFilters.hired && s === "hired") ||
+      (statusFilters.declined && s === "declined") ||
+      (statusFilters.waitlisted && ["waitlisted", "shortlisted"].includes(s)) ||
+      (statusFilters.inreview && ["applied", "inreview", "reviewing", "interviewing", "interviewed"].includes(s));
+
+    return matchesSearch && matchesStatus;
+  });
 
 
   if (loading) {
@@ -190,19 +214,7 @@ export default function AllApplicants() {
         </h2>
         <div className="top-p-actions">
           <div className="search-box">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
+           
             <input
               type="text"
               placeholder="البحث عن متقدم..."
@@ -210,39 +222,42 @@ export default function AllApplicants() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <button className="filter-btn">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="4" y1="6" x2="16" y2="6"></line>
-              <line x1="8" y1="12" x2="20" y2="12"></line>
-              <line x1="4" y1="18" x2="12" y2="18"></line>
-            </svg>
-            تصفية
-          </button>
-
-          <div className="view-toggle">
-            <button
-              className={`view-btn ${view === "Pipeline View" ? "active" : ""}`}
-              onClick={() => setView("Pipeline View")}
-            >
-              عرض المسار
-            </button>
-            <button
-              className={`view-btn ${view === "Table View" ? "active" : ""}`}
-              onClick={() => setView("Table View")}
-            >
-              عرض الجدول
-            </button>
-          </div>
         </div>
+      </div>
+
+      <div className="filter-checkboxes">
+        <label className={`filter-chip ${statusFilters.hired ? "filter-chip-active filter-chip-hired" : ""}`}>
+          <input
+            type="checkbox"
+            checked={statusFilters.hired}
+            onChange={() => toggleFilter("hired")}
+          />
+          تم التوظيف
+        </label>
+        <label className={`filter-chip ${statusFilters.declined ? "filter-chip-active filter-chip-declined" : ""}`}>
+          <input
+            type="checkbox"
+            checked={statusFilters.declined}
+            onChange={() => toggleFilter("declined")}
+          />
+          مرفوض
+        </label>
+        <label className={`filter-chip ${statusFilters.waitlisted ? "filter-chip-active filter-chip-waitlisted" : ""}`}>
+          <input
+            type="checkbox"
+            checked={statusFilters.waitlisted}
+            onChange={() => toggleFilter("waitlisted")}
+          />
+          في الانتظار
+        </label>
+        <label className={`filter-chip ${statusFilters.inreview ? "filter-chip-active filter-chip-inreview" : ""}`}>
+          <input
+            type="checkbox"
+            checked={statusFilters.inreview}
+            onChange={() => toggleFilter("inreview")}
+          />
+          تحت المراجعة
+        </label>
       </div>
 
       <div className="table-container">

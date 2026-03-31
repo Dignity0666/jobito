@@ -24,6 +24,8 @@ export const ApplicationsHistory = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const getFullImageUrl = (url?: string) => {
     if (!url) return `https://api.dicebear.com/7.x/identicon/svg?seed=${Math.random().toString(36).substring(7)}`;
@@ -63,14 +65,23 @@ export const ApplicationsHistory = () => {
     }
   }, [user, apiFetch]);
 
-  const filteredApplications = applications.filter(app => 
-    activeTab === "all" || (app.status || "applied").toLowerCase() === activeTab
-  );
+  const filteredApplications = applications.filter(app => {
+    const status = (app.status || "applied").toLowerCase();
+    const tabMatch = activeTab === "all" || 
+                     status === activeTab || 
+                     (activeTab === "applied" && status === "waitlisted");
+    
+    const searchMatch = searchQuery === "" || 
+      (app.job?.title?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+      (app.job?.company?.name?.toLowerCase() || "").includes(searchQuery.toLowerCase());
+    return tabMatch && searchMatch;
+  });
 
   const getStatusLabel = (status: string) => {
     const s = status.toLowerCase();
     switch (s) {
       case "applied": return "الانتظار";
+      case "waitlisted": return "في الانتظار";
       case "reviewing": return "قيد المراجعة";
       case "hired": return "تم التوظيف";
       case "declined": return "مرفوض";
@@ -129,53 +140,69 @@ export const ApplicationsHistory = () => {
           <div className="ah-table-header">
             <h2 className="ah-table-title">سجل التقديم</h2>
             <div className="ah-table-actions">
-              <button
-                className="ah-action-btn"
-                style={{ backgroundColor: "#E2EFFC", color: "#4640DE" }}
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{ marginLeft: 8 }}
+              {showSearch ? (
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                  <input
+                    type="text"
+                    placeholder="ابحث عن شركة، وظيفة..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    style={{
+                      padding: '10px 16px 10px 40px',
+                      borderRadius: '4px',
+                      border: '1px solid #d6ddeb',
+                      outline: 'none',
+                      fontSize: '14px',
+                      width: '250px'
+                    }}
+                    autoFocus
+                  />
+                  <button 
+                    onClick={() => {
+                        setShowSearch(false);
+                        setSearchQuery("");
+                    }}
+                    style={{
+                      position: 'absolute',
+                      left: '12px',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: '#7c8493',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className="ah-action-btn"
+                  style={{ backgroundColor: "#E2EFFC", color: "#4640DE" }}
+                  onClick={() => setShowSearch(true)}
                 >
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                بحث
-              </button>
-              <button
-                className="ah-action-btn"
-                style={{ backgroundColor: "#E2EFFC", color: "#4640DE" }}
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{ marginLeft: 8 }}
-                >
-                  <line x1="4" y1="21" x2="4" y2="14"></line>
-                  <line x1="4" y1="10" x2="4" y2="3"></line>
-                  <line x1="12" y1="21" x2="12" y2="12"></line>
-                  <line x1="12" y1="8" x2="12" y2="3"></line>
-                  <line x1="20" y1="21" x2="20" y2="16"></line>
-                  <line x1="20" y1="12" x2="20" y2="3"></line>
-                  <line x1="1" y1="14" x2="7" y2="14"></line>
-                  <line x1="9" y1="8" x2="15" y2="8"></line>
-                  <line x1="17" y1="16" x2="23" y2="16"></line>
-                </svg>
-                تصفية
-              </button>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ marginLeft: 8 }}
+                  >
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  بحث
+                </button>
+              )}
             </div>
           </div>
 

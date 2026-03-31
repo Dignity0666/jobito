@@ -8,6 +8,7 @@ import UI from "../../Subject to/User Information/CreateAcont/Up/UP";
 
 export const UserInformation: React.FC = () => {
   const [showLogin, setShowLogin] = useState(true);
+  const [isCustomer, setIsCustomer] = useState(true);
 
   const toggleLogin = () => setShowLogin(!showLogin);
 
@@ -31,19 +32,33 @@ export const UserInformation: React.FC = () => {
         <BorderAnimatedContainer>
           <AnimatePresence>
             {!showLogin && (
-              <motion.button
-                key="signin-btn"
-                className={styles.signInBtn}
-                onClick={toggleLogin}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+              <motion.div
+                key="header-btns"
+                style={{ position: "absolute", top: 32, right: 32, display: "flex", gap: "12px", zIndex: 10 }}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                Sign In
-              </motion.button>
+                <motion.button
+                  className={styles.signInBtn}
+                  style={{ position: "static", backgroundColor: "#f8fafc", color: "#4f46e5", border: "1px solid #4f46e5", boxShadow: "none" }}
+                  onClick={() => setIsCustomer(!isCustomer)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {isCustomer ? "صاحب عمل؟ حساب شركة" : "مستخدم ؟ إنشاء حساب"}
+                </motion.button>
+                <motion.button
+                  className={styles.signInBtn}
+                  style={{ position: "static" }}
+                  onClick={toggleLogin}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  تسجيل الدخول
+                </motion.button>
+              </motion.div>
             )}
           </AnimatePresence>
 
@@ -73,13 +88,15 @@ export const UserInformation: React.FC = () => {
                 initial="hidden"
                 animate="visible"
                 exit="exit"
+                className="w-full h-full"
               >
                 <motion.div
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
+                  className="w-full h-full"
                 >
-                  <UI setShowLogin={setShowLogin} />
+                  <UI setShowLogin={setShowLogin} isCustomer={isCustomer} setIsCustomer={setIsCustomer} />
                 </motion.div>
               </motion.div>
             )}

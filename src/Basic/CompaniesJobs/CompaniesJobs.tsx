@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Building2 } from "lucide-react";
+import { motion, type Variants } from "framer-motion";
 import styles from "./CompaniesJobs.module.css";
 
 
@@ -16,26 +17,50 @@ interface Company {
   jobsCount: number;
   logoUrl?: string;
   industry?: string;
+  classification?: string;
   employees?: string;
 }
 
-const DEFAULT_INDUSTRIES = [
-  "نقمي", "غير تقني", "حرفي"
+const DEFAULT_CLASSIFICATIONS = [
+  "تقني", "غير تقني"
 ];
 
-const DEFAULT_TAGS = [
-  "تكنولوجيا", "تصميم", "تسويق", "مبيعات", "هندسة", "إدارة", "مالية"
-];
+const heroContainer = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] },
+  },
+};
+
+const searchBarVariant: Variants = {
+  hidden: { opacity: 0, y: 24, scale: 0.98 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.45 },
+  },
+};
 
 const CompaniesJobs = () => {
 
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -49,8 +74,6 @@ const CompaniesJobs = () => {
         setIsLoading(true);
         const params = new URLSearchParams();
         if (searchTerm) params.append("search", searchTerm);
-        if (selectedIndustries.length > 0) params.append("industry", selectedIndustries[0]);
-        if (selectedSizes.length > 0) params.append("employees", selectedSizes[0]);
 
         const response = await fetch(`${API_BASE_URL}/companies?${params.toString()}`);
 
@@ -83,6 +106,7 @@ const CompaniesJobs = () => {
           description?: string;
           logoUrl?: string;
           industry?: string;
+          classification?: string;
           employees?: string;
           jobs?: APIJob[];
         }
@@ -113,17 +137,19 @@ const CompaniesJobs = () => {
               jobsCount: item.jobs?.length || 0,
               logoUrl: item.logoUrl,
               industry: item.industry,
+              classification: item.classification,
               employees: item.employees,
             };
 
             const existing = uniqueCompaniesMap.get(
-              companyObj.name.toLowerCase(),
+              companyObj.id.toString(),
             );
             if (
               !existing ||
-              (companyObj.jobsCount > 0 && existing.jobsCount === 0)
+              (companyObj.jobsCount > 0 && existing.jobsCount === 0) ||
+              (companyObj.classification && !existing.classification)
             ) {
-              uniqueCompaniesMap.set(companyObj.name.toLowerCase(), companyObj);
+              uniqueCompaniesMap.set(companyObj.id.toString(), companyObj);
             }
           });
 
@@ -146,66 +172,30 @@ const CompaniesJobs = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [searchTerm]);
 
   const filteredCompanies = companies.filter((company) => {
     const matchesSearch = company.name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
-
-    const matchesTag =
-      selectedTags.length === 0 ||
-      selectedTags.some((tag) => company.tags.includes(tag));
-
     const matchesIndustry =
       selectedIndustries.length === 0 ||
-      (company.industry && selectedIndustries.includes(company.industry));
+      (company.classification && selectedIndustries.includes(company.classification));
 
-    const matchesSize =
-      selectedSizes.length === 0 ||
-      (company.employees && selectedSizes.includes(company.employees));
-
-    return matchesSearch && matchesTag && matchesIndustry && matchesSize;
-  });
-
-  // Calculate counts for sidebar filters
-  const tagCounts = companies.flatMap(c => c.tags).reduce((acc, tag) => {
-    acc[tag] = (acc[tag] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  // Add defaults to tagCounts with 0 if not present
-  DEFAULT_TAGS.forEach(tag => {
-    if (tagCounts[tag] === undefined) tagCounts[tag] = 0;
+    return matchesSearch && matchesIndustry;
   });
 
   const industryCounts = companies.reduce((acc, company) => {
-    if (company.industry) {
-      acc[company.industry] = (acc[company.industry] || 0) + 1;
+    if (company.classification) {
+      acc[company.classification] = (acc[company.classification] || 0) + 1;
     }
     return acc;
   }, {} as Record<string, number>);
 
   // Add defaults to industryCounts
-  DEFAULT_INDUSTRIES.forEach(ind => {
+  DEFAULT_CLASSIFICATIONS.forEach(ind => {
     if (industryCounts[ind] === undefined) industryCounts[ind] = 0;
   });
-
-  const sizeCounts = companies.reduce((acc, company) => {
-    if (company.employees) {
-      acc[company.employees] = (acc[company.employees] || 0) + 1;
-    }
-    return acc;
-  }, {} as Record<string, number>);
-
-  const sizeBuckets = [
-    "1-50",
-    "51-150",
-    "151-250",
-    "251-500",
-    "501-1000",
-    "1000 - above",
-  ];
 
   const totalPages = Math.ceil(filteredCompanies.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -215,11 +205,9 @@ const CompaniesJobs = () => {
     indexOfLastItem,
   );
 
-  const handleTagChange = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
-    );
+  const handleSearchClick = () => {
     setCurrentPage(1);
+    // The useEffect will refetch due to dependencies
   };
 
   const handleIndustryChange = (industry: string) => {
@@ -231,25 +219,31 @@ const CompaniesJobs = () => {
     setCurrentPage(1);
   };
 
-  const handleSizeChange = (size: string) => {
-    setSelectedSizes((prev) =>
-      prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size],
-    );
-    setCurrentPage(1);
-  };
-
   return (
     <div style={{ direction: "rtl" }}>
       <section className={styles.heroSection}>
         <div className={styles.container}>
-          <div className={styles.content}>
-            <h1 className={styles.title}>
+          <motion.div
+            className={styles.content}
+            variants={heroContainer}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.h1 className={styles.title} variants={fadeUp}>
               ابحث عن{" "}
               <span className={styles.purpleText}>
                 الشركات التي تحلم بها
               </span>
-            </h1>
-            <div className={styles.searchBar}>
+            </motion.h1>
+
+            <motion.p className={styles.description} variants={fadeUp}>
+              اكتشف أفضل الشركات وبيئات العمل المثالية لمستقبلك المهني.
+            </motion.p>
+
+            <motion.div
+              className={styles.searchBar}
+              variants={searchBarVariant}
+            >
               <div className={styles.inputGroup}>
                 <Search className={styles.icon} size={20} />
                 <input
@@ -262,16 +256,22 @@ const CompaniesJobs = () => {
                   }}
                 />
               </div>
-              <button className={styles.searchBtn}>بحث</button>
-            </div>
-          </div>
+
+              <button 
+                className={styles.searchBtn}
+                onClick={handleSearchClick}
+              >
+                بحث
+              </button>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
       <div className={styles.Companiespage}>
         <aside className={styles.sidebar}>
           <div className={styles.filterSection}>
-            <h4 className={styles.filterTitle}>القطاع (Industry)</h4>
+            <h4 className={styles.filterTitle}>التصنيف</h4>
             <div className={styles.filterList}>
               {Object.entries(industryCounts).map(([ind, count]) => (
                 <label key={ind} className={styles.checkboxLabel}>
@@ -289,28 +289,6 @@ const CompaniesJobs = () => {
               {Object.keys(industryCounts).length === 0 && !isLoading && (
                 <p className={styles.emptyText}>لا توجد قطاعات.</p>
               )}
-            </div>
-          </div>
-
-          <div className={styles.filterSection}>
-            <h4 className={styles.filterTitle}>حجم الشركة (Company Size)</h4>
-            <div className={styles.filterList}>
-              {sizeBuckets.map((size) => {
-                const count = sizeCounts[size] || 0;
-                return (
-                  <label key={size} className={styles.checkboxLabel}>
-                    <input
-                      type="checkbox"
-                      className={styles.checkbox}
-                      checked={selectedSizes.includes(size)}
-                      onChange={() => handleSizeChange(size)}
-                    />
-                    <span className={styles.labelSpan}>
-                      {size} <span className={styles.countText}>({count})</span>
-                    </span>
-                  </label>
-                );
-              })}
             </div>
           </div>
         </aside>

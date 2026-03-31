@@ -40,6 +40,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { io, Socket } from "socket.io-client";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useJobitoAuth } from "../../context/AuthContext";
 // import EmojiPicker from "emoji-picker-react"; // TEMPORARILY DISABLED
 
@@ -232,6 +233,10 @@ interface ChatAppProps {
 const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
   const { user, apiFetch } = useJobitoAuth();
   const myUserId = user?.id || '';
+  const location = useLocation();
+  const navigate = useNavigate();
+  const preselectedUser = location.state?.preselectedUser;
+  const processedPreselectRef = useRef(false);
 
   // State
   const [chats, setChats] = useState<ChatContact[]>([]);
@@ -586,6 +591,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
 
       // 2. Setup Web Audio API for Visualizer
       const AudioCtx = (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext);
+      let drawLoop = () => {};
       if (!AudioCtx) {
         console.warn("Audio Context not supported");
       } else {
@@ -634,6 +640,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
             x += barWidth;
           }
         };
+        drawLoop = draw;
         draw();
       }
 
@@ -681,7 +688,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
       };
 
       mediaRecorder.start();
-      draw(); // Start visualization
+      drawLoop(); // Start visualization
       setIsRecording(true);
       setRecordingTime(0);
       timerRef.current = window.setInterval(() => {
@@ -743,7 +750,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
     return () => { if (chatSearchTimerRef.current) clearTimeout(chatSearchTimerRef.current); };
   }, [newChatQuery, searchUsers]);
 
-  const startChatWithUser = (selectedUser: UserSearchResult) => {
+  const startChatWithUser = useCallback((selectedUser: UserSearchResult) => {
     const newContact: ChatContact = {
       oderId: selectedUser.userId,
       name: selectedUser.fullName,
@@ -756,17 +763,31 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
     };
     
     // Check if already exists
-    const exists = chats.find(c => c.oderId === selectedUser.userId);
-    if (exists) {
-      selectChat(exists);
-    } else {
-      setChats(prev => [newContact, ...prev]);
-      selectChat(newContact);
-    }
+    setChats(prev => {
+      const exists = prev.find(c => c.oderId === selectedUser.userId);
+      if (exists) {
+        selectChat(exists);
+        return prev;
+      } else {
+        selectChat(newContact);
+        return [newContact, ...prev];
+      }
+    });
+
     setShowNewChatModal(false);
     setNewChatQuery("");
     setSearchResults([]);
-  };
+  }, [myUserId, selectChat]);
+
+  // Handle preselected user from navigation
+  useEffect(() => {
+    if (preselectedUser && myUserId && !loading && !processedPreselectRef.current) {
+      processedPreselectRef.current = true;
+      startChatWithUser(preselectedUser);
+      // Clear state so it doesn't trigger again on refresh
+      navigate('.', { replace: true, state: {} });
+    }
+  }, [preselectedUser, myUserId, loading, startChatWithUser, navigate]);
 
   // ─── Message Context Menu ────────────────────────────────────────────
   const handleMessageContextMenu = (e: React.MouseEvent, msg: MessageItem, isMe: boolean) => {
@@ -1138,7 +1159,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                 ) : (
                   <>
                     <div className={s.inputBar}>
-                      <Paperclip size={20} className={s.footerIcon} onClick={(e) => { e.stopPropagation(); setShowAttachMenu(!showAttachMenu); setShowEmojiPicker(false); }} />
+                      <Paperclip size={20} className={s.footerIcon} onClick={(e) => { e.stopPropagation(); setShowAttachMenu(!showAttachMenu); }} />
                       <AnimatePresence>
                         {showAttachMenu && (
                           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className={s.dropdownMenu} style={{bottom: 70, left: 40}}>
@@ -1162,7 +1183,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                         disabled={uploadingFile}
                       />
                       <div style={{ position: 'relative' }}>
-                        <Smile size={20} className={s.footerIcon} onClick={(e) => { e.stopPropagation(); setShowEmojiPicker(p => !p); setShowAttachMenu(false); }} />
+                        <Smile size={20} className={s.footerIcon} onClick={(e) => { e.stopPropagation(); setShowAttachMenu(false); }} />
                         {/* EmojiPicker Temporarily Disabled */}
                       </div>
                     </div>

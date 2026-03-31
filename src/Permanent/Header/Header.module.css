@@ -29,6 +29,31 @@
   z-index: 1000;
 }
 
+.downloadBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f7f9fc;
+  color: #4640de;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid #d6ddeb;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.downloadBtn i {
+  font-size: 14px;
+}
+
+.downloadBtn:hover {
+  background-color: #eef2ff;
+  border-color: #4640de;
+}
+
 .langBtn {
   display: flex;
   align-items: center;

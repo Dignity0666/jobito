@@ -289,7 +289,6 @@ const AllJobs: React.FC<AllJobsProps> = ({
         if (t === "دوام جزئي") return jt === "part-time";
         if (t === "عن بعد") return jt === "remote";
         if (t === "تدريب") return jt === "internship";
-        if (t === "عقد") return jt === "contract";
         if (t === "عمل لمرة واحدة") return jt === "one-time";
         return jt.includes(t.toLowerCase());
       });
@@ -361,7 +360,6 @@ const AllJobs: React.FC<AllJobsProps> = ({
             { name: "دوام جزئي", count: jobs.filter(j => (j.jobType || "").toLowerCase() === "part-time").length },
             { name: "عن بعد", count: jobs.filter(j => (j.jobType || "").toLowerCase() === "remote").length },
             { name: "تدريب", count: jobs.filter(j => (j.jobType || "").toLowerCase() === "internship").length },
-            { name: "عقد", count: jobs.filter(j => (j.jobType || "").toLowerCase() === "contract").length },
             { name: "عمل لمرة واحدة", count: jobs.filter(j => (j.jobType || "").toLowerCase() === "one-time").length },
           ]}
           selected={selectedTypes}
