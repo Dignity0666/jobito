@@ -15,15 +15,20 @@ import { useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
 import signupImage from "../../../../assets/signup.png";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 export const SignUpPage: React.FC = () => {
   const navigate = useNavigate();
   const [isSigningUp, setIsSigningUp] = useState(false);
   const [success, setSuccess] = useState(false);
   const [formError, setFormError] = useState("");
-  const [verifiedStatus, setVerifiedStatus] = useState<null | "success" | "error">(null);
-  const [verifyMethod, setVerifyMethod] = useState<null | "code" | "link">(null);
+  const [verifiedStatus, setVerifiedStatus] = useState<
+    null | "success" | "error"
+  >(null);
+  const [verifyMethod, setVerifyMethod] = useState<null | "code" | "link">(
+    null,
+  );
   const [verificationCode, setVerificationCode] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -70,7 +75,7 @@ export const SignUpPage: React.FC = () => {
     setFormError("");
 
     if (formData.password !== formData.confirmPassword) {
-      setFormError("Passwords do not match");
+      setFormError("كلمات المرور غير متطابقة");
       return;
     }
 
@@ -121,130 +126,289 @@ export const SignUpPage: React.FC = () => {
   return (
     <div className={Style.signupwrapper}>
       {/* Floating Google Auth Button */}
-      <button 
-        className={Style.googleFloatingBtn}
-        onClick={() => googleLogin()}
-      >
-        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="24" height="24" />
-        <span>Continue with Google</span>
-      </button>
 
-      <motion.div 
+      <motion.div
         className={Style.signupleft}
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
       >
         <AnimatePresence mode="wait">
           {verifiedStatus === "success" ? (
-            <motion.div key="success-final" className={Style.centeredBox} initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-              <div className={Style.successIcon}><CheckCircleIcon size={64} /></div>
-              <h2 className={Style.title}>Account Activated!</h2>
-              <p className={Style.subtitle}>Welcome to Jobito. Your student profile is ready.</p>
-              <button className={Style.authbtn} onClick={() => navigate("/user-information")}>Go to Login</button>
+            <motion.div
+              key="success-final"
+              className={Style.centeredBox}
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+            >
+              <div className={Style.successIcon}>
+                <CheckCircleIcon size={64} />
+              </div>
+              <h2 className={Style.title}>تم تفعيل الحساب!</h2>
+              <p className={Style.subtitle}>
+                أهلاً بك في Jobito. ملفك الشخصي مستخدم جاهز الآن.
+              </p>
+              <button
+                className={Style.authbtn}
+                onClick={() => navigate("/user-information")}
+              >
+                الذهاب لتسجيل الدخول
+              </button>
             </motion.div>
           ) : success ? (
-            <motion.div key="verify-steps" className={Style.centeredBox} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <motion.div
+              key="verify-steps"
+              className={Style.centeredBox}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
               {!verifyMethod ? (
                 <>
-                  <div className={Style.iconCircle}><MailIcon size={32} /></div>
-                  <h2 className={Style.title}>Verify Your Email</h2>
-                  <p className={Style.subtitle}>Choose how you want to verify <b>{formData.email}</b></p>
-                  
+                  <div className={Style.iconCircle}>
+                    <MailIcon size={32} />
+                  </div>
+                  <h2 className={Style.title}>تفعيل البريد الإلكتروني</h2>
+                  <p className={Style.subtitle}>
+                    اختر طريقة التفعيل لـ <b>{formData.email}</b>
+                  </p>
+
                   <div className={Style.methodGrid}>
-                    <button className={Style.methodCard} onClick={() => setVerifyMethod("link")}>
+                    <button
+                      className={Style.methodCard}
+                      onClick={() => setVerifyMethod("link")}
+                    >
                       <LinkIcon size={24} />
                       <div>
-                        <strong>Email Link</strong>
-                        <span>Click the link in your inbox</span>
+                        <strong>رابط عبر البريد</strong>
+                        <span>اضغط على الرابط في صندوق الوارد</span>
                       </div>
                     </button>
-                    <button className={Style.methodCard} onClick={() => setVerifyMethod("code")}>
+                    <button
+                      className={Style.methodCard}
+                      onClick={() => setVerifyMethod("code")}
+                    >
                       <SmartphoneIcon size={24} />
                       <div>
-                        <strong>6-Digit Code</strong>
-                        <span>Enter the code manually</span>
+                        <strong>رمز مكون من 6 أرقام</strong>
+                        <span>أدخل الرمز يدوياً</span>
                       </div>
                     </button>
                   </div>
-                  <button className={Style.backBtn} onClick={() => setSuccess(false)}>Back to Registration</button>
+                  <button
+                    className={Style.backBtn}
+                    onClick={() => setSuccess(false)}
+                  >
+                    العودة لإنشاء الحساب
+                  </button>
                 </>
               ) : verifyMethod === "code" ? (
                 <div style={{ width: "100%" }}>
-                  <h2 className={Style.title}>Enter Code</h2>
-                  <p className={Style.subtitle}>6-digit code sent to your email</p>
+                  <h2 className={Style.title}>أدخل الرمز</h2>
+                  <p className={Style.subtitle}>
+                    تم إرسال رمز من 6 أرقام إلى بريدك الإلكتروني
+                  </p>
                   <form onSubmit={handleVerifyCode}>
-                    <input 
-                      type="text" 
-                      className={Style.otpInput} 
-                      maxLength={6} 
+                    <input
+                      type="text"
+                      className={Style.otpInput}
+                      maxLength={6}
                       placeholder="000000"
                       value={verificationCode}
                       onChange={(e) => setVerificationCode(e.target.value)}
                     />
-                    <button className={Style.authbtn} type="submit" disabled={isVerifying}>
-                      {isVerifying ? <LoaderIcon className="loader" /> : "Verify Account"}
+                    <button
+                      className={Style.authbtn}
+                      type="submit"
+                      disabled={isVerifying}
+                    >
+                      {isVerifying ? (
+                        <LoaderIcon className="loader" />
+                      ) : (
+                        "تفعيل الحساب"
+                      )}
                     </button>
                   </form>
-                  <button className={Style.backBtn} onClick={() => setVerifyMethod(null)}>Back to Options</button>
+                   <button
+                    className={Style.backBtn}
+                    onClick={() => setVerifyMethod(null)}
+                  >
+                    العودة للخيارات
+                  </button>
                 </div>
               ) : (
                 <div style={{ textAlign: "center" }}>
                   <div className={Style.waitingLoader}>⏳</div>
-                  <h2 className={Style.title}>Waiting for Link...</h2>
-                  <p className={Style.subtitle}>Please click the link in your email to activate.</p>
-                  <button className={Style.backBtn} onClick={() => setVerifyMethod(null)}>Use Code instead</button>
+                  <h2 className={Style.title}>بانتظار الرابط...</h2>
+                  <p className={Style.subtitle}>
+                    يرجى الضغط على الرابط المرسل لبريدك الإلكتروني للتفعيل.
+                  </p>
+                  <button
+                    className={Style.backBtn}
+                    onClick={() => setVerifyMethod(null)}
+                  >
+                    استخدم الرمز بدلاً من ذلك
+                  </button>
                 </div>
               )}
             </motion.div>
           ) : (
-            <motion.div key="register-form" style={{ width: "100%" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <motion.div
+              key="register-form"
+              style={{ width: "100%" }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
               <div className={Style.header}>
-                <div className={Style.logoIcon}><UserPlusIcon size={32} /></div>
-                <h2 className={Style.title}>Create Student Account</h2>
-                <p className={Style.subtitle}>Start your career journey with Jobito</p>
+                <div className={Style.logoIcon}>
+                  <UserPlusIcon size={32} />
+                </div>
+                <h2 className={Style.title}>إنشاء حساب جديد</h2>
+                <p className={Style.subtitle}>
+                  ابدأ رحلتك المهنية مع Jobito
+                </p>
               </div>
 
               <form className={Style.form} onSubmit={handleSubmit}>
                 {formError && (
                   <div className={Style.errorBox}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
                     {formError}
                   </div>
                 )}
-                
+
                 <div className={Style.inputGroup}>
-                  <label>Full Name</label>
-                  <input type="text" placeholder="John Doe" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required />
+                  <label>الاسم بالكامل</label>
+                  <input
+                    type="text"
+                    placeholder="أدخل اسمك بالكامل"
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                    required
+                  />
                 </div>
 
                 <div className={Style.inputGroup}>
-                  <label>Email Address</label>
-                  <input type="email" placeholder="name@domain.com" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} required />
+                  <label>البريد الإلكتروني</label>
+                  <input
+                    type="email"
+                    placeholder="name@domain.com"
+                    value={formData.email}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                    required
+                  />
                 </div>
 
                 <div className={Style.row}>
                   <div className={Style.inputGroup}>
-                    <label>Password</label>
+                    <label>كلمة المرور</label>
                     <div className={Style.relativeInput}>
-                      <input type={showPassword ? "text" : "password"} placeholder="••••••••" value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} required />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '14px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#94a3b8', padding: 0 }}>
-                        {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={formData.password}
+                        onChange={(e) =>
+                          setFormData({ ...formData, password: e.target.value })
+                        }
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        style={{
+                          position: "absolute",
+                          right: "14px",
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          color: "#94a3b8",
+                          padding: 0,
+                        }}
+                      >
+                        {showPassword ? (
+                          <EyeOffIcon size={18} />
+                        ) : (
+                          <EyeIcon size={18} />
+                        )}
                       </button>
                     </div>
                   </div>
                   <div className={Style.inputGroup}>
-                    <label>Confirm</label>
+                    <label>تأكيد كلمة المرور</label>
                     <div className={Style.relativeInput}>
-                      <input type={showConfirmPassword ? "text" : "password"} placeholder="••••••••" value={formData.confirmPassword} onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})} required />
-                      <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} style={{ position: 'absolute', right: '14px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#94a3b8', padding: 0 }}>
-                        {showConfirmPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={formData.confirmPassword}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            confirmPassword: e.target.value,
+                          })
+                        }
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        style={{
+                          position: "absolute",
+                          right: "14px",
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          color: "#94a3b8",
+                          padding: 0,
+                        }}
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOffIcon size={18} />
+                        ) : (
+                          <EyeIcon size={18} />
+                        )}
                       </button>
                     </div>
                   </div>
                 </div>
 
-                <button className={Style.authbtn} type="submit" disabled={isSigningUp}>
-                  {isSigningUp ? <LoaderIcon className="loader" /> : "Sign Up"}
+                <button
+                  className={Style.authbtn}
+                  type="submit"
+                  disabled={isSigningUp}
+                >
+                  {isSigningUp ? <LoaderIcon className="loader" /> : "إنشاء حساب"}
+                </button>
+                <button
+                  className={Style.googleFloatingBtn}
+                  onClick={() => googleLogin()}
+                >
+                  <img
+                  className={Style.googleFloatingBtnimg}
+                    src="https://www.svgrepo.com/show/475656/google-color.svg"
+                    alt="Google"
+                    width="24"
+                    height="24"
+                  />
+                  <span>متابعة باستخدام Google</span>
                 </button>
               </form>
             </motion.div>
@@ -253,11 +417,11 @@ export const SignUpPage: React.FC = () => {
       </motion.div>
 
       <div className={Style.signuplight}>
-        <motion.img 
+        <motion.img
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          src={signupImage} 
-          alt="Signup Illustration" 
+          src={signupImage}
+          alt="Signup Illustration"
         />
       </div>
     </div>

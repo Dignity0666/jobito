@@ -78,10 +78,7 @@ export const Home = () => {
               </a>
             </motion.div>
 
-            <motion.p className={styles.popular} variants={itemVariants}>
-              <strong>عمليات البحث الشائعة:</strong> UI Designer, UX Researcher, Android,
-              Admin
-            </motion.p>
+            {/* Popular searches section removed as requested */}
           </motion.div>
         </div>
         <motion.img
