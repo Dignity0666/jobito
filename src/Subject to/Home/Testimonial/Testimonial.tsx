@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import styles from "./Testimonial.module.css";
+import { useTranslation } from "../../../context/translation-context";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
@@ -23,6 +24,7 @@ interface BackendTestimonial {
 }
 
 export default function Testimonial() {
+  const { t } = useTranslation();
   const firstRowRef = useRef(null);
   const secondRowRef = useRef(null);
   const [reviews, setReviews] = useState<TestimonialProps[]>([]);
@@ -33,25 +35,25 @@ export default function Testimonial() {
       .then((data: BackendTestimonial[]) => {
         const mapped = data.map((tItem) => ({
           img: tItem.user?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${tItem.user?.email || tItem.id}`,
-          name: tItem.user?.fullName || "Anonymous",
+          name: tItem.user?.fullName || t("Anonymous"),
           username: tItem.user?.email || "",
-          body: tItem.body,
+          body: t(tItem.body),
         }));
         setReviews(mapped);
       })
       .catch((err) => console.error("Failed to fetch testimonials:", err));
-  }, []);
+  }, [t]);
 
   const ReviewCard = ({ img, name, username, body }: TestimonialProps) => (
     <figure className={styles.reviewCard}>
       <div className={styles.userinfo}>
-        <img src={img} alt={name} />
+        <img src={img} alt={t(name)} />
         <div>
-          <figcaption>{name}</figcaption>
+          <figcaption>{t(name)}</figcaption>
           <p>{username}</p>
         </div>
       </div>
-      <blockquote>{body}</blockquote>
+      <blockquote>{t(body)}</blockquote>
     </figure>
   );
 
@@ -66,7 +68,7 @@ export default function Testimonial() {
 
   return (
     <div className={styles.testimonial}>
-      <h2>ماذا يقول عملاؤنا</h2>
+      <h2>{t("ماذا يقول عملاؤنا")}</h2>
 
       <div className={styles["marquee-container"]}>
         {displayFirstRow.length > 0 && (

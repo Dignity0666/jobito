@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { useJobitoAuth } from "../../context/AuthContext";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { useJobitoAuth } from "../../context/LinkContxt";
+import { useTranslation } from "../../context/translation-context";
 import styles from "./ObitoSidebar.module.css";
 import LogoIMG from "../../assets/412ec68f361b4f49b52fb8d584c317ccf197a403.png";
 
@@ -169,7 +170,7 @@ const settingsItems = [
   { id: "help", label: "مركز المساعدة", icon: HelpIcon, route: "/Help" },
 ];
 
-const sidebarVariants: any = {
+const sidebarVariants: Variants = {
   hidden: { x: -280, opacity: 0 },
   show: {
     x: 0,
@@ -183,12 +184,12 @@ const sidebarVariants: any = {
   },
 };
 
-const listVariants: any = {
+const listVariants: Variants = {
   hidden: {},
   show: { transition: { staggerChildren: 0.07, delayChildren: 0.15 } },
 };
 
-const itemVariants: any = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, x: -18 },
   show: {
     opacity: 1,
@@ -197,7 +198,7 @@ const itemVariants: any = {
   },
 };
 
-const footerVariants: any = {
+const footerVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
   show: {
     opacity: 1,
@@ -210,6 +211,7 @@ export const ObitoSidebar: React.FC<ObitoSidebarProps> = ({
   setshowObitoSidebar,
 }) => {
   const { role, user } = useJobitoAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(true);
@@ -224,20 +226,20 @@ export const ObitoSidebar: React.FC<ObitoSidebarProps> = ({
   const currentNavItems = role === "company" ? navItemscompany : navItems;
 
   return (
-    <div className={styles.wrapper}>
+    <div className={(styles as any).wrapper}>
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className={styles.sidebar}
+            className={(styles as any).sidebar}
             variants={sidebarVariants}
             initial="hidden"
             animate="show"
             exit="exit"
           >
-            <div className={styles.topSection}>
-              <div className={styles.header}>
+            <div className={(styles as any).topSection}>
+              <div className={(styles as any).header}>
                 <motion.div
-                  className={styles.logo}
+                  className={(styles as any).logo}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{
@@ -251,7 +253,7 @@ export const ObitoSidebar: React.FC<ObitoSidebarProps> = ({
                 </motion.div>
 
                 <motion.button
-                  className={styles.closeBtn}
+                  className={(styles as any).closeBtn}
                   onClick={handleClose}
                   whileHover={{ scale: 1.12, rotate: 90 }}
                   whileTap={{ scale: 0.9 }}
@@ -262,72 +264,74 @@ export const ObitoSidebar: React.FC<ObitoSidebarProps> = ({
               </div>
 
               <motion.ul
-                className={styles.navList}
+                className={(styles as any).navList}
                 variants={listVariants}
                 initial="hidden"
                 animate="show"
               >
-                {currentNavItems.map(({ id, label, icon: Icon, badge, route }) => {
-                  const active = isActive(route);
-                  return (
-                    <motion.li
-                      key={id}
-                      variants={itemVariants}
-                      className={`${styles.navItem} ${active ? styles.active : ""}`}
-                      onClick={() => handleNav(route)}
-                      whileHover={
-                        !active
-                          ? { x: 5, backgroundColor: "rgba(255,255,255,0.1)" }
-                          : {}
-                      }
-                      whileTap={{ scale: 0.97 }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 20,
-                      }}
-                    >
-                      {active && (
-                        <motion.span
-                          className={styles.activeBar}
-                          layoutId="activeBar"
-                          transition={{
-                            type: "spring",
-                            stiffness: 380,
-                            damping: 30,
-                          }}
-                        />
-                      )}
+                {currentNavItems.map(
+                  ({ id, label, icon: Icon, badge, route }) => {
+                    const active = isActive(route);
+                    return (
+                      <motion.li
+                        key={id}
+                        variants={itemVariants}
+                        className={`${(styles as any).navItem} ${active ? (styles as any).active : ""}`}
+                        onClick={() => handleNav(route)}
+                        whileHover={
+                          !active
+                            ? { x: 5, backgroundColor: "rgba(255,255,255,0.1)" }
+                            : {}
+                        }
+                        whileTap={{ scale: 0.97 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 20,
+                        }}
+                      >
+                        {active && (
+                          <motion.span
+                            className={(styles as any).activeBar}
+                            layoutId="activeBar"
+                            transition={{
+                              type: "spring",
+                              stiffness: 380,
+                              damping: 30,
+                            }}
+                          />
+                        )}
 
-                      <span className={styles.navIcon}>
-                        <Icon />
-                      </span>
-                      <span className={styles.navLabel}>{label}</span>
+                        <span className={(styles as any).navIcon}>
+                          <Icon />
+                        </span>
+                        <span className={(styles as any).navLabel}>{t(label)}</span>
 
-                      {badge && (
-                        <motion.span
-                          className={styles.badge}
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          transition={{
-                            type: "spring",
-                            stiffness: 400,
-                            damping: 14,
-                            delay: 0.3,
-                          }}
-                        >
-                          {badge}
-                        </motion.span>
-                      )}
-                    </motion.li>
-                  );
-                })}
+                        {badge && (
+                          <motion.span
+                            className={(styles as any).badge}
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{
+                              type: "spring",
+                              stiffness: 400,
+                              damping: 14,
+                              delay: 0.3,
+                            }}
+                          >
+                            {badge}
+                          </motion.span>
+                        )}
+                      </motion.li>
+                    );
+                  },
+                )}
               </motion.ul>
             </div>
 
-            <div className={styles.bottomSection}>
+            <div className={(styles as any).bottomSection}>
               <motion.ul
-                className={styles.navList}
+                className={(styles as any).navList}
                 variants={listVariants}
                 initial="hidden"
                 animate="show"
@@ -338,7 +342,7 @@ export const ObitoSidebar: React.FC<ObitoSidebarProps> = ({
                     <motion.li
                       key={id}
                       variants={itemVariants}
-                      className={`${styles.navItem} ${active ? styles.active : ""}`}
+                      className={`${(styles as any).navItem} ${active ? (styles as any).active : ""}`}
                       onClick={() => handleNav(route)}
                       whileHover={
                         !active
@@ -354,7 +358,7 @@ export const ObitoSidebar: React.FC<ObitoSidebarProps> = ({
                     >
                       {active && (
                         <motion.span
-                          className={styles.activeBar}
+                          className={(styles as any).activeBar}
                           layoutId="activeBarSettings"
                           transition={{
                             type: "spring",
@@ -363,10 +367,10 @@ export const ObitoSidebar: React.FC<ObitoSidebarProps> = ({
                           }}
                         />
                       )}
-                      <span className={styles.navIcon}>
+                      <span className={(styles as any).navIcon}>
                         <Icon />
                       </span>
-                      <span className={styles.navLabel}>{label}</span>
+                      <span className={(styles as any).navLabel}>{t(label)}</span>
                     </motion.li>
                   );
                 })}
@@ -374,23 +378,31 @@ export const ObitoSidebar: React.FC<ObitoSidebarProps> = ({
             </div>
 
             <motion.div
-              className={styles.footer}
+              className={(styles as any).footer}
               variants={footerVariants}
               initial="hidden"
               animate="show"
             >
               <motion.div
-                className={styles.avatar}
+                className={(styles as any).avatar}
                 whileHover={{ scale: 1.08 }}
                 transition={{ type: "spring", stiffness: 300, damping: 16 }}
               >
-                <div className={styles.avatarInner}>
-                  {user?.avatar ? <img src={user.avatar} alt="avatar" /> : (user?.name?.[0] || 'U')}
+                <div className={(styles as any).avatarInner}>
+                  {user?.avatar ? (
+                    <img src={user.avatar} alt="avatar" />
+                  ) : (
+                    user?.name?.[0] || "U"
+                  )}
                 </div>
               </motion.div>
-              <div className={styles.userInfo}>
-                <div className={styles.userName}>{user?.name || "الملف الشخصي"}</div>
-                <div className={styles.userEmail}>{user?.email || 'user@example.com'}</div>
+              <div className={(styles as any).userInfo}>
+                <div className={(styles as any).userName}>
+                  {user?.name || t("الملف الشخصي")}
+                </div>
+                <div className={(styles as any).userEmail}>
+                  {user?.email || "user@example.com"}
+                </div>
               </div>
             </motion.div>
           </motion.div>
@@ -399,3 +411,5 @@ export const ObitoSidebar: React.FC<ObitoSidebarProps> = ({
     </div>
   );
 };
+
+export default ObitoSidebar;

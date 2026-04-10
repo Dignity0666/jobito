@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import styles from "./Services Section.module.css";
 import { motion, type Variants } from "framer-motion";
+import { useTranslation } from "../../../context/translation-context";
 
 interface BackendService {
   serviceId: number;
@@ -57,6 +58,7 @@ const cardVariants: Variants = {
 
 export const ServicesSection = () => {
   const [services, setServices] = useState<MappedService[]>([]);
+  const { t } = useTranslation();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_loading, setLoading] = useState(true);
 
@@ -90,33 +92,33 @@ export const ServicesSection = () => {
   useEffect(() => {
     const MOCK_SERVICES_DATA = [
       {
-        title: "توظيف المحترفين",
-        description: "نساعد الشركات في الوصول إلى أفضل الكفاءات والكوادر المهنية المتخصصة في مختلف المجالات التقنية والإدارية.",
+        title: t("توظيف المحترفين"),
+        description: t("نساعد الشركات في الوصول إلى أفضل الكفاءات والكوادر المهنية المتخصصة في مختلف المجالات التقنية والإدارية."),
         icon: "briefcase",
       },
       {
-        title: "تطوير المسار المهني",
-        description: "نقدم استشارات مهنية وورش عمل لتطوير المهارات الشخصية والتقنية بما يتناسب مع متطلبات سوق العمل الحديث.",
+        title: t("تطوير المسار المهني"),
+        description: t("نقدم استشارات مهنية وورش عمل لتطوير المهارات الشخصية والتقنية بما يتناسب مع متطلبات سوق العمل الحديث."),
         icon: "trending-up",
       },
       {
-        title: "حلول الشركات",
-        description: "منصة متكاملة لإدارة عمليات التوظيف وتصفية المرشحين بكل سهولة وكفاءة لضمان اختيار الشخص المناسب.",
+        title: t("حلول الشركات"),
+        description: t("منصة متكاملة لإدارة عمليات التوظيف وتصفية المرشحين بكل سهولة وكفاءة لضمان اختيار الشخص المناسب."),
         icon: "building-2",
       },
       {
-        title: "دعم فني متواصل",
-        description: "فريق دعم مخصص لمساعدة المستخدمين والشركات في حل أي مشكلات تقنية وضمان تجربة استخدام سلسة.",
+        title: t("دعم فني متواصل"),
+        description: t("فريق دعم مخصص لمساعدة المستخدمين والشركات في حل أي مشكلات تقنية وضمان تجربة استخدام سلسة."),
         icon: "headphones",
       },
       {
-        title: "تحليل البيانات",
-        description: "توفير تقارير وإحصائيات دقيقة حول سوق العمل واتجاهات التوظيف لمساعدة الشركات في اتخاذ قرارات مدروسة.",
+        title: t("تحليل البيانات"),
+        description: t("توفير تقارير وإحصائيات دقيقة حول سوق العمل واتجاهات التوظيف لمساعدة الشركات في اتخاذ قرارات مدروسة."),
         icon: "bar-chart",
       },
       {
-        title: "الأمن والموثوقية",
-        description: "نضمن حماية كاملة لبيانات المستخدمين والشركات مع تطبيق أعلى معايير الخصوصية والأمان الرقمي.",
+        title: t("الأمن والموثوقية"),
+        description: t("نضمن حماية كاملة لبيانات المستخدمين والشركات مع تطبيق أعلى معايير الخصوصية والأمان الرقمي."),
         icon: "shield",
       },
     ];
@@ -144,9 +146,9 @@ export const ServicesSection = () => {
           viewport={{ once: true, amount: 0.3 }}
         >
           <h2>
-            ماذا نحن <span>نقدم لكم</span>
+            {t("ماذا نحن")} <span>{t("نقدم لكم")}</span>
           </h2>
-          <p>نحن نوفر مجموعة متكاملة من الخدمات التي تلبي احتياجات الباحثين عن عمل والشركات على حد سواء، مع التركيز على الجودة والاحترافية.</p>
+          <p>{t("نحن نوفر مجموعة متكاملة من الخدمات التي تلبي احتياجات الباحثين عن عمل والشركات على حد سواء، مع التركيز على الجودة والاحترافية.")}</p>
         </motion.div>
 
         {/* ✅ Cards Grid */}
@@ -181,7 +183,7 @@ export const ServicesSection = () => {
                   </motion.div>
                   <h3>{service.title}</h3>
                   <p>{service.description.substring(0, 80)}...</p>
-                  <span className={styles.serviceHoverHint}>اقرأ المزيد</span>
+                  <span className={styles.serviceHoverHint}>{t("اقرأ المزيد")}</span>
                 </div>
 
                 {/* Back */}

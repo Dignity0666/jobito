@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import styles from "./Partners.module.css";
+import { useTranslation } from "../../../context/translation-context";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
@@ -19,6 +20,7 @@ interface BackendCompany {
 }
 
 export default function Partners() {
+  const { t } = useTranslation();
   const [partners, setPartners] = useState<Partner[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const firstRowRef = useRef(null);
@@ -39,7 +41,7 @@ export default function Partners() {
           name: c.name,
           logo: c.logoUrl 
             ? (c.logoUrl.startsWith("http") ? c.logoUrl : `${API_BASE_URL}${c.logoUrl}`)
-            : null, // Set to null if no logo to trigger fallback
+            : undefined, // Set to undefined if no logo to trigger fallback
         }));
 
         // Default "Featured" Partners
@@ -73,11 +75,11 @@ export default function Partners() {
   }, []);
 
   const ReviewCard = ({ logo, name }: { logo?: string; name: string }) => (
-    <figure className={`${styles.reviewCard} ${!logo ? styles.nameOnly : ""}`} title={name}>
+    <figure className={`${styles.reviewCard} ${!logo ? styles.nameOnly : ""}`} title={t(name)}>
       {logo ? (
-        <img src={logo} alt={name} className={styles.partnerLogo} />
+        <img src={logo} alt={t(name)} className={styles.partnerLogo} />
       ) : (
-        <span className={styles.partnerName}>{name}</span>
+        <span className={styles.partnerName}>{t(name)}</span>
       )}
     </figure>
   );
@@ -90,7 +92,7 @@ export default function Partners() {
   if (isLoading && partners.length === 0) {
     return (
       <div className={styles.testimonial}>
-        <div className={styles.loading}>جاري تحميل الشركاء...</div>
+        <div className={styles.loading}>{t("جاري تحميل الشركاء...")}</div>
       </div>
     );
   }
@@ -109,7 +111,7 @@ export default function Partners() {
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        نثق بهم ويثقون بنا
+        {t("نثق بهم ويثقون بنا")}
       </motion.h2>
 
       <motion.div 

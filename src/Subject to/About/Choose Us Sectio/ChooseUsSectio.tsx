@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { BarChart3, Rocket, Shield, Sparkles } from "lucide-react";
 import styles from "./ChooseUsSection.module.css";
+import { useTranslation } from "../../../context/translation-context";
 
 interface BackendFeature {
   featureId: number;
@@ -23,6 +24,7 @@ export const ChooseUsSection = () => {
   const [isVisible, setIsVisible] = useState<Record<string, boolean>>({});
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const [features, setFeatures] = useState<MappedFeature[]>([]);
+  const { t } = useTranslation();
 
   const colors = useMemo(() => ["#FF6B6B", "#4ECDC4", "#A78BFA", "#FFA26B"], []);
   
@@ -38,23 +40,23 @@ export const ChooseUsSection = () => {
   useEffect(() => {
     const MOCK_FEATURES_DATA = [
       {
-        title: "البحث الذكي",
-        description: "نظام متطور يعتمد على الذكاء الاصطناعي لترشيح أفضل الوظائف المناسبة لمهاراتك وخبراتك.",
+        title: t("البحث الذكي"),
+        description: t("نظام متطور يعتمد على الذكاء الاصطناعي لترشيح أفضل الوظائف المناسبة لمهاراتك وخبراتك."),
         icon: "sparkles",
       },
       {
-        title: "حماية البيانات",
-        description: "نطبق أعلى معايير التشفير لضمان سرية معلوماتك الشخصية وسجل أعمالك المهني.",
+        title: t("حماية البيانات"),
+        description: t("نطبق أعلى معايير التشفير لضمان سرية معلوماتك الشخصية وسجل أعمالك المهني."),
         icon: "shield",
       },
       {
-        title: "تحليلات الأداء",
-        description: "لوحة تحكم شاملة تتيح لك متابعة طلبات التوظيف ومدى توافق ملفك الشخصي مع السوق.",
+        title: t("تحليلات الأداء"),
+        description: t("لوحة تحكم شاملة تتيح لك متابعة طلبات التوظيف ومدى توافق ملفك الشخصي مع السوق."),
         icon: "bar-chart-2",
       },
       {
-        title: "سرعة التنفيذ",
-        description: "نهدف إلى تقليل الوقت المستغرق في عملية التوظيف من خلال أدوات تواصل سريعة وفعالة.",
+        title: t("سرعة التنفيذ"),
+        description: t("نهدف إلى تقليل الوقت المستغرق في عملية التوظيف من خلال أدوات تواصل سريعة وفعالة."),
         icon: "rocket",
       },
     ];
@@ -100,8 +102,8 @@ export const ChooseUsSection = () => {
 
       <div className={styles.container}>
         <div className={styles.headerTop}>
-          <span className={styles.subtitle}>لماذا نحن؟</span>
-          <h2 className={styles.sectionTitle}>ما الذي يميز جوبيتو؟</h2>
+          <span className={styles.subtitle}>{t("لماذا نحن؟")}</span>
+          <h2 className={styles.sectionTitle}>{t("ما الذي يميز جوبيتو؟")}</h2>
         </div>
 
         <div className={styles.featuresGrid}>

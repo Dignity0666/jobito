@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import BorderAnimatedContainer from "../../Subject to/User Information/BorderAnimatedContainer";
 import styles from "./User_Information.module.css";
+import { useTranslation } from "../../context/translation-context";
 
 import LoginPage from "../../Subject to/User Information/Login/Login";
 import UI from "../../Subject to/User Information/CreateAcont/Up/UP";
@@ -9,6 +10,7 @@ import UI from "../../Subject to/User Information/CreateAcont/Up/UP";
 export const UserInformation: React.FC = () => {
   const [showLogin, setShowLogin] = useState(true);
   const [isCustomer, setIsCustomer] = useState(true);
+  const { t } = useTranslation();
 
   const toggleLogin = () => setShowLogin(!showLogin);
 
@@ -47,7 +49,7 @@ export const UserInformation: React.FC = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  {isCustomer ? "صاحب عمل؟ حساب شركة" : "مستخدم ؟ إنشاء حساب"}
+                  {isCustomer ? t("صاحب عمل؟ حساب شركة") : t("مستخدم ؟ إنشاء حساب")}
                 </motion.button>
                 <motion.button
                   className={styles.signInBtn}
@@ -56,7 +58,7 @@ export const UserInformation: React.FC = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  تسجيل الدخول
+                  {t("تسجيل الدخول")}
                 </motion.button>
               </motion.div>
             )}

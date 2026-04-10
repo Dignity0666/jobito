@@ -1,8 +1,9 @@
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import styles from "./JobDetailsPage.module.css";
 import { ApplyJobModal } from "./ApplyJobModal/ApplyJobModal";
-import { useJobitoAuth } from "../../context/AuthContext";
+import { useJobitoAuth } from "../../context/LinkContxt.js";
 import { useEffect, useState } from "react";
+import { useTranslation } from "../../context/translation-context";
 
 const CheckIcon = () => (
   <svg
@@ -23,8 +24,7 @@ const CheckIcon = () => (
   </svg>
 );
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+import { API_BASE_URL } from "../../services/api.js";
 
 interface Benefit {
   emoji: string;
@@ -66,6 +66,7 @@ interface Job {
 
 export const JobDetailsPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const location = useLocation();
   const { apiFetch, isAuthenticated, role } = useJobitoAuth();
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
@@ -73,7 +74,9 @@ export const JobDetailsPage = () => {
   const [similarJobs, setSimilarJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [lang, setLang] = useState<"original" | "en">("original");
-  const [userApplication, setUserApplication] = useState<Application | null>(null);
+  const [userApplication, setUserApplication] = useState<Application | null>(
+    null,
+  );
 
   const jobId = location.state?.jobId || 1;
 
@@ -81,12 +84,20 @@ export const JobDetailsPage = () => {
     const fetchJobData = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_BASE_URL}/jobs/${jobId}`);
+        const res = await fetch(`${API_BASE_URL}/jobs/${jobId}`, {
+          headers: {
+            "ngrok-skip-browser-warning": "69420",
+          },
+        });
         if (!res.ok) throw new Error("Failed to fetch");
         const data = await res.json();
         setJob(data);
 
-        const simRes = await fetch(`${API_BASE_URL}/jobs/similar/${jobId}`);
+        const simRes = await fetch(`${API_BASE_URL}/jobs/similar/${jobId}`, {
+          headers: {
+            "ngrok-skip-browser-warning": "69420",
+          },
+        });
         if (simRes.ok) {
           const simData = await simRes.json();
           setSimilarJobs(simData);
@@ -100,9 +111,11 @@ export const JobDetailsPage = () => {
     fetchJobData();
 
     const fetchApplicationStatus = async () => {
-      if (isAuthenticated && role === 'student') {
+      if (isAuthenticated && role === "student") {
         try {
-          const res = await apiFetch(`${API_BASE_URL}/applications/status/${jobId}`);
+          const res = await apiFetch(
+            `${API_BASE_URL}/applications/status/${jobId}`,
+          );
           if (res.ok) {
             const data = await res.json();
             setUserApplication(data);
@@ -117,16 +130,18 @@ export const JobDetailsPage = () => {
     // 📈 Record View logic
     const recordView = async () => {
       try {
-        let sessionId = localStorage.getItem('jobito_session_id');
+        let sessionId = localStorage.getItem("jobito_session_id");
         if (!sessionId) {
-          sessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-          localStorage.setItem('jobito_session_id', sessionId);
+          sessionId =
+            Math.random().toString(36).substring(2, 15) +
+            Math.random().toString(36).substring(2, 15);
+          localStorage.setItem("jobito_session_id", sessionId);
         }
 
         await apiFetch(`${API_BASE_URL}/jobs/${jobId}/view`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId })
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId }),
         });
       } catch (err) {
         // Silent fail for view tracking
@@ -136,13 +151,13 @@ export const JobDetailsPage = () => {
   }, [jobId, apiFetch, isAuthenticated, role]);
 
   const handleDelete = async () => {
-    if (!window.confirm("هل أنت متأكد من حذف هذه الوظيفة؟")) return;
+    if (!window.confirm(t("هل أنت متأكد من حذف هذه الوظيفة؟"))) return;
     try {
       const res = await apiFetch(`${API_BASE_URL}/jobs/${jobId}`, {
         method: "DELETE",
       });
       if (res.ok) {
-        alert("تم حذف الوظيفة بنجاح.");
+        alert(t("تم حذف الوظيفة بنجاح."));
         navigate("/JobListing");
       } else {
         throw new Error("Failed to delete job");
@@ -150,7 +165,7 @@ export const JobDetailsPage = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error deleting job:", error);
-      alert("خطأ أثناء حذف الوظيفة.");
+      alert(t("خطأ أثناء حذف الوظيفة."));
     }
   };
 
@@ -168,13 +183,15 @@ export const JobDetailsPage = () => {
         setJob((prev) =>
           prev ? { ...prev, isActive: updatedJob.isActive } : null,
         );
-        alert(updatedJob.isActive ? "تم إعادة فتح الوظيفة" : "تم إغلاق الوظيفة");
+        alert(
+          updatedJob.isActive ? t("تم إعادة فتح الوظيفة") : t("تم إغلاق الوظيفة"),
+        );
       } else {
         throw new Error("Failed to update status");
       }
     } catch (error) {
       console.error("Error toggling job status:", error);
-      alert("خطأ أثناء تحديث حالة الوظيفة.");
+      alert(t("خطأ أثناء تحديث حالة الوظيفة."));
     }
   };
 
@@ -194,9 +211,9 @@ export const JobDetailsPage = () => {
     return (
       <div
         className={styles.pageContainer}
-        style={{ padding: "40px", textAlign: "center", direction: "rtl" }}
+        style={{ padding: "40px", textAlign: "center" }}
       >
-        جاري التحميل...
+        {t("جاري التحميل...")}
       </div>
     );
   }
@@ -205,35 +222,44 @@ export const JobDetailsPage = () => {
     return (
       <div
         className={styles.pageContainer}
-        style={{ padding: "40px", textAlign: "center", direction: "rtl" }}
+        style={{ padding: "40px", textAlign: "center" }}
       >
-        الوظيفة غير موجودة.
+        {t("الوظيفة غير موجودة.")}
       </div>
     );
   }
 
   return (
-    <div className={styles.pageContainer} style={{ direction: "rtl" }}>
+    <div className={styles.pageContainer}>
       <div className={styles.contentWrapper}>
         {/* Breadcrumb */}
-        <div className={styles.breadcrumb} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div
+          className={styles.breadcrumb}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <div>
-            الرئيسية / الشركات / {job.company?.name || "شركة"} /{" "}
-            <span className={styles.activeBreadcrumb}>{lang === 'en' && job.titleEn ? job.titleEn : job.title}</span>
+            {t("الرئيسية")} / {t("الشركات")} / {t(job.company?.name || "شركة")} /{" "}
+            <span className={styles.activeBreadcrumb}>
+              {lang === "en" && job.titleEn ? job.titleEn : t(job.title)}
+            </span>
           </div>
           {job.titleEn && (
             <div className={styles.langToggle}>
-              <button 
-                className={`${styles.langBtn} ${lang === 'original' ? styles.activeLang : ''}`}
-                onClick={() => setLang('original')}
+              <button
+                className={`${styles.langBtn} ${lang === "original" ? styles.activeLang : ""}`}
+                onClick={() => setLang("original")}
               >
-                الأصلية
+                {t("الأصلية")}
               </button>
-              <button 
-                className={`${styles.langBtn} ${lang === 'en' ? styles.activeLang : ''}`}
-                onClick={() => setLang('en')}
+              <button
+                className={`${styles.langBtn} ${lang === "en" ? styles.activeLang : ""}`}
+                onClick={() => setLang("en")}
               >
-                الإنجليزية
+                {t("الإنجليزية")}
               </button>
             </div>
           )}
@@ -258,14 +284,16 @@ export const JobDetailsPage = () => {
               )}
             </div>
             <div className={styles.headerTitles}>
-              <h1>{lang === 'en' && job.titleEn ? job.titleEn : job.title}</h1>
+              <h1>
+                {lang === "en" && job.titleEn ? job.titleEn : t(job.title)}
+              </h1>
               <p>
-                {job.company?.name || "شركة"} • {job.address || "الموقع"} •{" "}
+                {t(job.company?.name || "شركة")} • {t(job.address || "الموقع")} •{" "}
                 {job.jobType === "full-time"
-                  ? "دوام كامل"
+                  ? t("دوام كامل")
                   : job.jobType === "part-time"
-                    ? "دوام جزئي"
-                    : job.jobType || "دوام كامل"}
+                    ? t("دوام جزئي")
+                    : t(job.jobType || "دوام كامل")}
               </p>
             </div>
           </div>
@@ -273,44 +301,98 @@ export const JobDetailsPage = () => {
             <div className={styles.headerRight}>
               <button
                 className={styles.applyBtn}
-                title="عرض المتقدمين"
+                title={t("عرض المتقدمين")}
                 onClick={() => navigate(`/AllApplicants?jobId=${jobId}`)}
                 style={{ fontSize: "14px", padding: "8px 16px" }}
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "6px" }}>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ marginLeft: "6px" }}
+                >
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                   <circle cx="9" cy="7" r="4" />
                   <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
                   <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                 </svg>
-                المتقدمون ({job.applications?.length || 0})
+                {t("المتقدمون")} ({job.applications?.length || 0})
               </button>
-              <button className={styles.editBtn} title="تعديل الوظيفة" onClick={handleEdit}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <button
+                className={styles.editBtn}
+                title={t("تعديل الوظيفة")}
+                onClick={handleEdit}
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
                   <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                 </svg>
               </button>
               <button
                 className={job.isActive ? styles.closeBtn : styles.reopenBtn}
-                title={job.isActive ? "إغلاق الوظيفة" : "فتح الوظيفة"}
+                title={job.isActive ? t("إغلاق الوظيفة") : t("فتح الوظيفة")}
                 onClick={toggleActive}
               >
                 {job.isActive ? (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                     <line x1="9" y1="9" x2="15" y2="15" />
                     <line x1="15" y1="9" x2="9" y2="15" />
                   </svg>
                 ) : (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
                     <polyline points="22 4 12 14.01 9 11.01" />
                   </svg>
                 )}
               </button>
-              <button className={styles.deleteBtn} title="حذف الوظيفة" onClick={handleDelete}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+               <button
+                className={styles.deleteBtn}
+                title={t("حذف الوظيفة")}
+                onClick={handleDelete}
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <polyline points="3 6 5 6 21 6" />
                   <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                   <line x1="10" y1="11" x2="10" y2="17" />
@@ -340,17 +422,29 @@ export const JobDetailsPage = () => {
               {userApplication ? (
                 <div className={(styles as any).appliedStatusContainer}>
                   <button className={(styles as any).appliedBtn} disabled>
-                    <i className="fa-solid fa-check-circle" style={{ marginLeft: '8px' }}></i>
+                    <i
+                      className="fa-solid fa-check-circle"
+                      style={{ marginLeft: "8px" }}
+                    ></i>
                     تم التقديم مسبقاً
                   </button>
-                  <div className={`${(styles as any).statusBadge} ${(styles as any)['status-' + (userApplication.status || 'applied')]}`}>
-                    <span style={{ fontSize: '13px', opacity: 0.8 }}>حالة الطلب:</span>
-                    <strong style={{ marginLeft: '4px' }}>
-                      {
-                        (userApplication.status === 'applied' || userApplication.status === 'reviewing') ? 'تحت المراجعة ⏳' :
-                        (userApplication.status === 'shortlisted' || userApplication.status === 'interviewed' || userApplication.status === 'hired') ? 'تم القبول (تواصل معنا) ✅' : 
-                        (userApplication.status === 'declined') ? 'نأسف، تم الرفض ❌' : 'تحت المراجعة ⏳'
-                      }
+                  <div
+                    className={`${(styles as any).statusBadge} ${(styles as any)["status-" + (userApplication.status || "applied")]}`}
+                  >
+                    <span style={{ fontSize: "13px", opacity: 0.8 }}>
+                      {t("حالة الطلب")}:
+                    </span>
+                    <strong style={{ marginLeft: "4px" }}>
+                      {userApplication.status === "applied" ||
+                      userApplication.status === "reviewing"
+                        ? t("تحت المراجعة") + " ⏳"
+                        : userApplication.status === "shortlisted" ||
+                            userApplication.status === "interviewed" ||
+                            userApplication.status === "hired"
+                          ? t("تم القبول (تواصل معنا)") + " ✅"
+                          : userApplication.status === "declined"
+                            ? t("نأسف، تم الرفض") + " ❌"
+                            : t("تحت المراجعة") + " ⏳"}
                     </strong>
                   </div>
                 </div>
@@ -360,7 +454,7 @@ export const JobDetailsPage = () => {
                   onClick={handleApplyClick}
                   disabled={!job.isActive}
                 >
-                  {job.isActive ? "تقدم الآن" : "مغلق"}
+                  {job.isActive ? t("تقدم الآن") : t("مغلق")}
                 </button>
               )}
             </div>
@@ -372,7 +466,10 @@ export const JobDetailsPage = () => {
           {/* Left Column */}
           <div className={styles.leftCol}>
             {(() => {
-              const descriptionToUse = lang === 'en' && job.descriptionEn ? job.descriptionEn : job.description;
+              const descriptionToUse =
+                lang === "en" && job.descriptionEn
+                  ? job.descriptionEn
+                  : job.description;
               if (!descriptionToUse) return null;
 
               const sections: Record<string, string> = {};
@@ -403,19 +500,19 @@ export const JobDetailsPage = () => {
 
                 return (
                   <section key={title} className={styles.section}>
-                    <h2>{title}</h2>
+                    <h2>{t(title)}</h2>
                     {isList ? (
                       <ul className={styles.list}>
                         {listItems.map((item, i) => (
                           <li key={i}>
                             <CheckIcon />
-                            {item}
+                            {t(item)}
                           </li>
                         ))}
                       </ul>
                     ) : (
                       <div
-                        dangerouslySetInnerHTML={{ __html: content }}
+                        dangerouslySetInnerHTML={{ __html: t(content) }}
                         className={styles.descriptionText}
                       />
                     )}
@@ -428,14 +525,14 @@ export const JobDetailsPage = () => {
           {/* Right Column */}
           <div className={styles.rightCol}>
             <div className={styles.widget}>
-              <h2>عن الوظيفة</h2>
+              <h2>{t("عن الوظيفة")}</h2>
               <div className={styles.capacityBox}>
                 <div className={styles.capacityText}>
-                <span className={styles.boldText}>
-                  {job.applications?.length || 0} تم التقديم
-                </span>{" "}
-                من {job.slotsAvailable || 10} متاح
-              </div>
+                  <span className={styles.boldText}>
+                    {job.applications?.length || 0} {t("تم التقديم")}
+                  </span>{" "}
+                  {t("من")} {job.slotsAvailable || 10} {t("متاح")}
+                </div>
                 <div className={styles.progressBar}>
                   <div
                     className={styles.progressFill}
@@ -453,36 +550,40 @@ export const JobDetailsPage = () => {
 
               <div className={styles.roleDetails}>
                 <div className={styles.roleRow}>
-                  <span className={styles.roleLabel}>نشر في</span>
+                  <span className={styles.roleLabel}>{t("نشر في")}</span>
                   <span className={styles.roleValue}>
                     {job.createdAt
-                      ? new Date(job.createdAt).toLocaleDateString()
-                      : "غير متاح"}
+                      ? t(new Date(job.createdAt).toLocaleDateString())
+                      : t("غير متاح")}
                   </span>
                 </div>
                 {job.expiresAt && (
                   <div className={styles.roleRow}>
-                    <span className={styles.roleLabel}>تقدم قبل</span>
+                    <span className={styles.roleLabel}>{t("تقدم قبل")}</span>
                     <span
                       className={styles.roleValue}
                       style={{ color: "#FF6550", fontWeight: 600 }}
                     >
-                      {new Date(job.expiresAt).toLocaleDateString()}
+                      {t(new Date(job.expiresAt).toLocaleDateString())}
                     </span>
                   </div>
                 )}
 
                 <div className={styles.roleRow}>
-                  <span className={styles.roleLabel}>نوع الوظيفة</span>
+                  <span className={styles.roleLabel}>{t("نوع الوظيفة")}</span>
                   <span
                     className={styles.roleValue}
                     style={{ textTransform: "capitalize" }}
                   >
-                    {job.jobType === "full-time" ? "دوام كامل" : job.jobType === "part-time" ? "دوام جزئي" : job.jobType || "دوام كامل"}
+                    {job.jobType === "full-time"
+                      ? t("دوام كامل")
+                      : job.jobType === "part-time"
+                        ? t("دوام جزئي")
+                        : t(job.jobType || "دوام كامل")}
                   </span>
                 </div>
                 <div className={styles.roleRow}>
-                  <span className={styles.roleLabel}>الراتب</span>
+                  <span className={styles.roleLabel}>{t("الراتب")}</span>
                   <span className={styles.roleValue}>
                     ${job.salaryMin || 0} - ${job.salaryMax || 0}
                   </span>
@@ -493,12 +594,12 @@ export const JobDetailsPage = () => {
             <div className={styles.separator}></div>
 
             <div className={styles.widget}>
-              <h2>الأقسام</h2>
+              <h2>{t("الأقسام")}</h2>
               <div className={styles.tagsContainer}>
                 {job.category ? (
-                  <span className={styles.tagYellow}>{job.category.name}</span>
+                  <span className={styles.tagYellow}>{t(job.category.name)}</span>
                 ) : (
-                  <span className={styles.tagYellow}>تسويق</span>
+                  <span className={styles.tagYellow}>{t("تسويق")}</span>
                 )}
               </div>
             </div>
@@ -506,34 +607,39 @@ export const JobDetailsPage = () => {
             <div className={styles.separator}></div>
 
             <div className={styles.widget}>
-              <h2>المهارات المطلوبة</h2>
+              <h2>{t("المهارات المطلوبة")}</h2>
               <div className={styles.tagsContainer}>
                 {(() => {
                   if (!job.description) {
                     return (
                       <p style={{ fontSize: "14px", color: "#666" }}>
-                        سيتم تحديد المهارات لاحقاً
+                        {t("سيتم تحديد المهارات لاحقاً")}
                       </p>
                     );
                   }
                   const skillsLine = job.description
                     .split("\n")
-                    .find((l: string) => l.startsWith("**Required Skills:**") || l.startsWith("**المهارات المطلوبة:**"));
+                    .find(
+                      (l: string) =>
+                        l.startsWith("**Required Skills:**") ||
+                        l.startsWith("**المهارات المطلوبة:**"),
+                    );
                   if (skillsLine) {
                     const skills = skillsLine
                       .replace("**Required Skills:**", "")
                       .replace("**المهارات المطلوبة:**", "")
                       .split(",")
                       .map((s: string) => s.trim())
-                      .filter((s: string) => s);                    return skills.map((skill: string, i: number) => (
+                      .filter((s: string) => s);
+                    return skills.map((skill: string, i: number) => (
                       <span key={i} className={styles.tagOutlineBlue}>
-                        {skill}
+                        {t(skill)}
                       </span>
                     ));
                   }
                   return (
                     <p style={{ fontSize: "14px", color: "#666" }}>
-                      سيتم تحديد المهارات لاحقاً
+                      {t("سيتم تحديد المهارات لاحقاً")}
                     </p>
                   );
                 })()}
@@ -545,8 +651,8 @@ export const JobDetailsPage = () => {
         {/* Perks & Benefits */}
         <div className={styles.perksSection}>
           <div className={styles.perksHeader}>
-            <h2>المزايا والفوائد</h2>
-            <p>نحن نقدم مزايا رائعة لموظفينا.</p>
+            <h2>{t("المزايا والفوائد")}</h2>
+            <p>{t("نحن نقدم مزايا رائعة لموظفينا.")}</p>
           </div>
           <div className={styles.perksGrid}>
             {job.company?.benefits && job.company.benefits.length > 0 ? (
@@ -563,12 +669,12 @@ export const JobDetailsPage = () => {
                   >
                     {benefit.emoji}
                   </div>
-                  <h3>{benefit.name}</h3>
-                  <p>{benefit.desc}</p>
+                  <h3>{t(benefit.name)}</h3>
+                  <p>{t(benefit.desc)}</p>
                 </div>
               ))
             ) : (
-              <p>لا توجد مزايا محددة.</p>
+              <p>{t("لا توجد مزايا محددة.")}</p>
             )}
           </div>
         </div>
@@ -576,9 +682,9 @@ export const JobDetailsPage = () => {
         {/* Similar Jobs */}
         <div className={styles.similarJobsSection}>
           <div className={styles.similarHeader}>
-            <h2>وظائف مشابهة</h2>
+            <h2>{t("وظائف مشابهة")}</h2>
             <Link to="/JobListing" className={styles.companyLink}>
-              عرض كل الوظائف{" "}
+              {t("عرض كل الوظائف")}{" "}
               <svg
                 width="16"
                 height="16"
@@ -623,7 +729,7 @@ export const JobDetailsPage = () => {
                             ? simJob.company.logoUrl
                             : `${API_BASE_URL}${simJob.company.logoUrl}`
                           : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
-                              simJob.company?.name || "Company"
+                              simJob.company?.name || "Company",
                             )}`
                       }
                       alt={simJob.company?.name}
@@ -637,16 +743,20 @@ export const JobDetailsPage = () => {
                   </div>
                   <div className={styles.simDetails}>
                     <div className={styles.simTitleGroup}>
-                      <h3>{simJob.title}</h3>
+                      <h3>{t(simJob.title)}</h3>
                       <p>
-                        {simJob.company?.name} • {simJob.address}
+                        {t(simJob.company?.name || "") || "Jobito"} • {t(simJob.address || "") || t("عالمي")}
                       </p>
                     </div>
                     <div className={styles.simTags}>
-                      <span className={styles.tagGreen}>{simJob.jobType === "full-time" ? "دوام كامل" : "دوام جزئي"}</span>
+                      <span className={styles.tagGreen}>
+                        {simJob.jobType === "full-time"
+                          ? t("دوام كامل")
+                          : t("دوام جزئي")}
+                      </span>
                       {simJob.category && (
                         <span className={styles.tagYellowOutline}>
-                          {simJob.category.name}
+                          {t(simJob.category.name)}
                         </span>
                       )}
                     </div>
@@ -654,7 +764,7 @@ export const JobDetailsPage = () => {
                 </div>
               ))
             ) : (
-              <p>لا توجد وظائف مشابهة متاحة.</p>
+              <p>{t("لا توجد وظائف مشابهة متاحة.")}</p>
             )}
           </div>
         </div>
@@ -664,10 +774,10 @@ export const JobDetailsPage = () => {
         isOpen={isApplyModalOpen}
         onClose={() => setIsApplyModalOpen(false)}
         jobId={jobId}
-        jobTitle={job?.title}
-        companyName={job?.company?.name || "شركة"}
-        location={job?.address || "عن بعد"}
-        jobType={job?.jobType === "full-time" ? "دوام كامل" : "دوام جزئي"}
+        jobTitle={t(job?.title || "")}
+        companyName={t(job?.company?.name || "شركة")}
+        location={t(job?.address || "عن بعد")}
+        jobType={job?.jobType === "full-time" ? t("دوام كامل") : t("دوام جزئي")}
         isActive={job?.isActive}
         logoUrl={
           job?.company?.logoUrl

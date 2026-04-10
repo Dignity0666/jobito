@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+import { API_BASE_URL } from "./api.js";
 
 export const getProfile = async () => {
     const token = localStorage.getItem("token");
@@ -7,6 +7,7 @@ export const getProfile = async () => {
     const res = await fetch(`${API_BASE_URL}/users/me`, {
         headers: {
             Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "69420",
         },
     });
 
@@ -23,6 +24,7 @@ export const updateProfile = async (data: any) => {
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "69420",
         },
         body: JSON.stringify(data),
     });

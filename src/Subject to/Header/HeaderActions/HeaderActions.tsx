@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./HeaderActions.module.css";
+import { useTranslation } from "../../../context/translation-context";
 
 type HeaderActionsProps = {
   isAuthenticated: boolean;
@@ -22,6 +23,7 @@ export function HeaderActions({
   onLogout,
 }: HeaderActionsProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [avatarError, setAvatarError] = useState(false);
 
   const initials = user?.name
@@ -48,7 +50,7 @@ export function HeaderActions({
             <Link
               to="/ProfileSettings"
               className={styles.avatar}
-              title={user?.name || "Profile Settings"}
+              title={user?.name || t("nav.profile")}
             >
               { (user?.avatarUrl || user?.avatar) && !avatarError ? (
                 <img
@@ -63,7 +65,7 @@ export function HeaderActions({
             <button
               className={styles.logoutBtn}
               onClick={handleLogoutClick}
-              title="Logout"
+              title={t("nav.logout")}
             >
               <i className="fa-solid fa-right-from-bracket"></i>
             </button>
@@ -74,6 +76,7 @@ export function HeaderActions({
             onClick={() => {
               navigate("/user-information");
             }}
+            title={t("nav.login")}
           >
             <i className="fa-solid fa-user"></i>
           </button>

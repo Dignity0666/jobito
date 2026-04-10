@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import "./All Applicants.css";
-import { useJobitoAuth } from "../../../context/AuthContext";
+import { useJobitoAuth } from "../../../context/LinkContxt";
+import { useTranslation } from "../../../context/translation-context";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 interface Applicant {
   applicationId: number;
@@ -42,6 +44,7 @@ const SortIcon = () => (
 const CustomCheckbox = () => <div className="custom-checkbox"></div>;
 
 export default function AllApplicants() {
+  const { t, language } = useTranslation();
   const { apiFetch } = useJobitoAuth();
   const [searchParams] = useSearchParams();
   const jobId = searchParams.get("jobId");
@@ -66,7 +69,7 @@ export default function AllApplicants() {
   useEffect(() => {
     const fetchApplicants = async () => {
       if (!jobId) {
-        setError("لم يتم تحديد الوظيفة");
+        setError(t("لم يتم تحديد الوظيفة"));
         setLoading(false);
         return;
       }
@@ -75,14 +78,14 @@ export default function AllApplicants() {
         setLoading(true);
         const res = await apiFetch(`${API_BASE_URL}/applications/job/${jobId}`);
         if (!res.ok) {
-          throw new Error("فشل في جلب بيانات المتقدمين");
+          throw new Error(t("فشل في جلب بيانات المتقدمين"));
         }
         const data = await res.json();
         const list = Array.isArray(data) ? data : data.data || [];
         setApplicants(list);
       } catch (err) {
         console.error("Error fetching applicants:", err);
-        setError(err instanceof Error ? err.message : "خطأ غير متوقع");
+        setError(err instanceof Error ? t(err.message) : t("خطأ غير متوقع"));
       } finally {
         setLoading(false);
       }
@@ -92,13 +95,19 @@ export default function AllApplicants() {
   }, [jobId, apiFetch]);
 
   const handleDeleteApplicant = async (applicationId: number) => {
-    if (!window.confirm("هل أنت متأكد من رغبتك في حذف هذا المتقدم بشكل نهائي؟")) return;
+    if (!window.confirm(t("هل أنت متأكد من رغبتك في حذف هذا المتقدم بشكل نهائي؟")))
+      return;
     try {
-      const res = await apiFetch(`${API_BASE_URL}/applications/${applicationId}`, {
-        method: "DELETE",
-      });
+      const res = await apiFetch(
+        `${API_BASE_URL}/applications/${applicationId}`,
+        {
+          method: "DELETE",
+        },
+      );
       if (!res.ok) throw new Error("فشل في حذف المتقدم");
-      setApplicants((prev) => prev.filter((app) => app.applicationId !== applicationId));
+      setApplicants((prev) =>
+        prev.filter((app) => app.applicationId !== applicationId),
+      );
     } catch (err) {
       console.error(err);
       alert("حدث خطأ أثناء محاولة الحذف");
@@ -132,27 +141,28 @@ export default function AllApplicants() {
       case "applied":
       case "inreview":
       case "reviewing":
-        return "تحت المراجعة";
+        return t("تحت المراجعة");
       case "shortlisted":
       case "waitlisted":
-        return "في الانتظار";
+        return t("في الانتظار");
       case "declined":
-        return "مرفوض";
+        return t("مرفوض");
       case "hired":
-        return "تم التوظيف";
+        return t("تم التوظيف");
       case "interviewed":
       case "interviewing":
-        return "تمت المقابلة";
+        return t("تمت المقابلة");
       case "offered":
-        return "عرض عمل";
+        return t("عرض عمل");
       default:
-        return stage;
+        return t(stage);
     }
   };
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "N/A";
-    return new Date(dateStr).toLocaleDateString("ar-EG", {
+    const loc = language === "ar" ? "ar-EG" : "en-US";
+    return new Date(dateStr).toLocaleDateString(loc, {
       day: "numeric",
       month: "long",
       year: "numeric",
@@ -169,10 +179,16 @@ export default function AllApplicants() {
 
   const filteredApplicants = applicants.filter((app) => {
     const matchesSearch =
-      (app.user?.fullName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (app.user?.fullName || "")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       (app.user?.email || "").toLowerCase().includes(searchTerm.toLowerCase());
 
-    const anyFilterActive = statusFilters.hired || statusFilters.declined || statusFilters.inreview || statusFilters.waitlisted;
+    const anyFilterActive =
+      statusFilters.hired ||
+      statusFilters.declined ||
+      statusFilters.inreview ||
+      statusFilters.waitlisted;
     if (!anyFilterActive) return matchesSearch;
 
     const s = (app.status || "applied").toLowerCase();
@@ -180,17 +196,25 @@ export default function AllApplicants() {
       (statusFilters.hired && s === "hired") ||
       (statusFilters.declined && s === "declined") ||
       (statusFilters.waitlisted && ["waitlisted", "shortlisted"].includes(s)) ||
-      (statusFilters.inreview && ["applied", "inreview", "reviewing", "interviewing", "interviewed"].includes(s));
+      (statusFilters.inreview &&
+        [
+          "applied",
+          "inreview",
+          "reviewing",
+          "interviewing",
+          "interviewed",
+        ].includes(s));
 
     return matchesSearch && matchesStatus;
   });
 
-
   if (loading) {
     return (
       <div className="applicant-page">
-        <div style={{ textAlign: "center", padding: "60px 0", color: "#7C8493" }}>
-          جاري تحميل المتقدمين...
+        <div
+          style={{ textAlign: "center", padding: "60px 0", color: "#7C8493" }}
+        >
+          {t("جاري تحميل المتقدمين...")}
         </div>
       </div>
     );
@@ -199,7 +223,9 @@ export default function AllApplicants() {
   if (error) {
     return (
       <div className="applicant-page">
-        <div style={{ textAlign: "center", padding: "60px 0", color: "#FF6B6B" }}>
+        <div
+          style={{ textAlign: "center", padding: "60px 0", color: "#FF6B6B" }}
+        >
           ⚠️ {error}
         </div>
       </div>
@@ -209,15 +235,12 @@ export default function AllApplicants() {
   return (
     <div className="applicant-page">
       <div className="top-p-header">
-        <h2 className="top-p-title">
-          إجمالي المتقدمين : {applicants.length}
-        </h2>
+        <h2 className="top-p-title">{t("إجمالي المتقدمين")} : {applicants.length}</h2>
         <div className="top-p-actions">
           <div className="search-box">
-           
             <input
               type="text"
-              placeholder="البحث عن متقدم..."
+              placeholder={t("البحث عن متقدم...")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -226,37 +249,45 @@ export default function AllApplicants() {
       </div>
 
       <div className="filter-checkboxes">
-        <label className={`filter-chip ${statusFilters.hired ? "filter-chip-active filter-chip-hired" : ""}`}>
+        <label
+          className={`filter-chip ${statusFilters.hired ? "filter-chip-active filter-chip-hired" : ""}`}
+        >
           <input
             type="checkbox"
             checked={statusFilters.hired}
             onChange={() => toggleFilter("hired")}
           />
-          تم التوظيف
+          {t("تم التوظيف")}
         </label>
-        <label className={`filter-chip ${statusFilters.declined ? "filter-chip-active filter-chip-declined" : ""}`}>
+        <label
+          className={`filter-chip ${statusFilters.declined ? "filter-chip-active filter-chip-declined" : ""}`}
+        >
           <input
             type="checkbox"
             checked={statusFilters.declined}
             onChange={() => toggleFilter("declined")}
           />
-          مرفوض
+          {t("مرفوض")}
         </label>
-        <label className={`filter-chip ${statusFilters.waitlisted ? "filter-chip-active filter-chip-waitlisted" : ""}`}>
+        <label
+          className={`filter-chip ${statusFilters.waitlisted ? "filter-chip-active filter-chip-waitlisted" : ""}`}
+        >
           <input
             type="checkbox"
             checked={statusFilters.waitlisted}
             onChange={() => toggleFilter("waitlisted")}
           />
-          في الانتظار
+          {t("في الانتظار")}
         </label>
-        <label className={`filter-chip ${statusFilters.inreview ? "filter-chip-active filter-chip-inreview" : ""}`}>
+        <label
+          className={`filter-chip ${statusFilters.inreview ? "filter-chip-active filter-chip-inreview" : ""}`}
+        >
           <input
             type="checkbox"
             checked={statusFilters.inreview}
             onChange={() => toggleFilter("inreview")}
           />
-          تحت المراجعة
+          {t("تحت المراجعة")}
         </label>
       </div>
 
@@ -268,30 +299,37 @@ export default function AllApplicants() {
                 <CustomCheckbox />
               </th>
               <th>
-                الاسم الكامل <SortIcon />
+                {t("الاسم الكامل")} <SortIcon />
               </th>
               <th>
-                البريد الإلكتروني <SortIcon />
+                {t("البريد الإلكتروني")} <SortIcon />
               </th>
               <th>
-                مرحلة التوظيف <SortIcon />
+                {t("مرحلة التوظيف")} <SortIcon />
               </th>
               <th>
-                تاريخ التقديم <SortIcon />
+                {t("تاريخ التقديم")} <SortIcon />
               </th>
               <th>
-                الهاتف <SortIcon />
+                {t("الهاتف")} <SortIcon />
               </th>
               <th>
-                الإجراء <SortIcon />
+                {t("الإجراء")} <SortIcon />
               </th>
             </tr>
           </thead>
           <tbody>
             {filteredApplicants.length === 0 ? (
               <tr>
-                <td colSpan={7} style={{ textAlign: "center", padding: "40px", color: "#7C8493" }}>
-                  لا يوجد متقدمون لهذه الوظيفة بعد.
+                <td
+                  colSpan={7}
+                  style={{
+                    textAlign: "center",
+                    padding: "40px",
+                    color: "#7C8493",
+                  }}
+                >
+                  {t("لا يوجد متقدمون لهذه الوظيفة بعد.")}
                 </td>
               </tr>
             ) : (
@@ -303,31 +341,38 @@ export default function AllApplicants() {
                   <td>
                     <div className="app-user">
                       <img
-                        src={getAvatarUrl(app.user?.avatarUrl, app.user?.fullName)}
-                        alt={app.user?.fullName || "User"}
+                        src={getAvatarUrl(
+                          app.user?.avatarUrl,
+                          app.user?.fullName,
+                        )}
+                        alt={t(app.user?.fullName || "User")}
                       />
-                      <span>{app.user?.fullName || "مستخدم"}</span>
+                      <span>{t(app.user?.fullName || "مستخدم")}</span>
                     </div>
                   </td>
-                  <td className="app-role">{app.user?.email || "—"}</td>
+                  <td className="app-role">{t(app.user?.email || "—")}</td>
                   <td>
                     <span className={`app-badge ${getBadgeClass(app.status)}`}>
                       {getTranslatedStage(app.status)}
                     </span>
                   </td>
                   <td className="app-date">{formatDate(app.appliedAt)}</td>
-                  <td className="app-role">{app.user?.phone || "—"}</td>
+                  <td className="app-role">{t(app.user?.phone || "—")}</td>
                   <td>
                     <div className="app-actions">
                       {app.resumeUrl && (
                         <a
-                          href={app.resumeUrl.startsWith("http") ? app.resumeUrl : `${API_BASE_URL}${app.resumeUrl}`}
+                          href={
+                            app.resumeUrl.startsWith("http")
+                              ? app.resumeUrl
+                              : `${API_BASE_URL}${app.resumeUrl}`
+                          }
                           target="_blank"
                           rel="noopener noreferrer"
                           className="see-app-btn"
                           style={{ textDecoration: "none" }}
                         >
-                          السيرة الذاتية
+                          {t("السيرة الذاتية")}
                         </a>
                       )}
                       {app.portfolioUrl && (
@@ -338,21 +383,32 @@ export default function AllApplicants() {
                           className="see-app-btn"
                           style={{ textDecoration: "none" }}
                         >
-                          Portfolio
+                          {t("Portfolio")}
                         </a>
                       )}
-                      <button 
+                      <button
                         className="see-app-btn"
-                        onClick={() => navigate(`/ApplicantDetails/${app.applicationId}`)}
+                        onClick={() =>
+                          navigate(`/ApplicantDetails/${app.applicationId}`)
+                        }
                       >
-                        عرض الطلب
+                        {t("عرض الطلب")}
                       </button>
-                      <button 
+                      <button
                         className="delete-app-btn"
                         onClick={() => handleDeleteApplicant(app.applicationId)}
                         title="حذف المتقدم"
                       >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
                           <polyline points="3 6 5 6 21 6"></polyline>
                           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                         </svg>
@@ -368,8 +424,8 @@ export default function AllApplicants() {
 
       <div className="pagination-footer">
         <div className="page-size-wrap">
-          عرض
-          <div className="page-select-box">
+          {t("عرض")}
+          <div className="page-size-box">
             <span>10</span>
             <svg
               width="12"
@@ -384,7 +440,7 @@ export default function AllApplicants() {
               <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
           </div>
-          لكل صفحة
+          {t("لكل صفحة")}
         </div>
         <div className="page-controls">
           <button className="page-nav">

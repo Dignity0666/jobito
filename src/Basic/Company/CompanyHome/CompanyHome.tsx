@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Style from "./CompanyHome.module.css";
 import Statistics from "../../../Subject to/CompanyHome/Statistics";
-import { useJobitoAuth } from "../../../context/AuthContext";
-import type { AuthUser } from "../../../context/AuthContext";
+import { useJobitoAuth } from "../../../context/LinkContxt";
+import type { AuthUser } from "../../../context/LinkContxt";
+import { useTranslation } from "../../../context/translation-context";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
@@ -29,60 +30,69 @@ const JobCard: React.FC<JobCardProps> = ({
   title,
   company,
   location,
-  type = "دوام كامل",
+  type,
   applicantsCount = 0,
   capacity = 10,
   logo,
   tags = [],
-}) => (
-  <div className={Style.jobCard}>
-    <div className={Style.cardTop}>
-      <div className={Style.logoBox}>
-        {logo ? (
-          <img
-            src={getLogoUrl(logo) || ""}
-            alt={company}
-            style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: "6px" }}
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.display = 'none';
-              (e.target as HTMLImageElement).parentElement!.innerText = '💼';
-            }}
-          />
+}) => {
+  const { t } = useTranslation();
+  const displayType = type || t("دوام كامل");
+  return (
+    <div className={Style.jobCard}>
+      <div className={Style.cardTop}>
+        <div className={Style.logoBox}>
+          {logo ? (
+            <img
+              src={getLogoUrl(logo) || ""}
+              alt={company}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                borderRadius: "6px",
+              }}
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = "none";
+                (e.target as HTMLImageElement).parentElement!.innerText = "💼";
+              }}
+            />
+          ) : (
+            "💼"
+          )}
+        </div>
+        <span className={Style.jobTypeBadge}>
+          {t(displayType)}
+        </span>
+      </div>
+      <h4 className={Style.cardTitle}>{title}</h4>
+      <p className={Style.cardMeta}>
+        {company} • {location}
+      </p>
+      <div className={Style.tagGroup}>
+        {tags.length > 0 ? (
+          tags.map((tag, idx) => (
+            <span
+              key={idx}
+              className={`${Style.tag} ${idx % 2 === 0 ? Style.tagOrange : Style.tagBlue}`}
+            >
+              {tag}
+            </span>
+          ))
         ) : (
-          "💼"
+          <>
+            <span className={`${Style.tag} ${Style.tagOrange}`}>{t("تكنولوجيا")}</span>
+            <span className={`${Style.tag} ${Style.tagBlue}`}>{t("تطوير")}</span>
+          </>
         )}
       </div>
-      <span className={Style.jobTypeBadge}>
-        {(type || "Full-Time").charAt(0).toUpperCase() + (type || "Full-Time").slice(1)}
-      </span>
+      <div className={Style.cardFooter}>
+        {applicantsCount} {t("تقدّموا")} <span className={Style.capacityText}>{t("من")} {capacity} {t("متاح")}</span>
+      </div>
     </div>
-    <h4 className={Style.cardTitle}>{title}</h4>
-    <p className={Style.cardMeta}>
-      {company} • {location}
-    </p>
-    <div className={Style.tagGroup}>
-      {tags.length > 0 ? (
-        tags.map((tag, idx) => (
-          <span
-            key={idx}
-            className={`${Style.tag} ${idx % 2 === 0 ? Style.tagOrange : Style.tagBlue}`}
-          >
-            {tag}
-          </span>
-        ))
-      ) : (
-        <>
-          <span className={`${Style.tag} ${Style.tagOrange}`}>تكنولوجيا</span>
-          <span className={`${Style.tag} ${Style.tagBlue}`}>تطوير</span>
-        </>
-      )}
-    </div>
-    <div className={Style.cardFooter}>
-      {applicantsCount} تقدّموا{" "}
-      <span className={Style.capacityText}>من {capacity} متاح</span>
-    </div>
-  </div>
-);
+  );
+};
+
 
 interface Job {
   jobId: number;
@@ -96,24 +106,24 @@ interface Job {
 }
 
 // Get current week date range string
-function getCurrentWeekRange(): string {
+function getCurrentWeekRange(t: any): string {
   const now = new Date();
   const dayOfWeek = now.getDay();
   const monday = new Date(now);
   monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
   const sunday = new Date(monday);
   sunday.setDate(monday.getDate() + 6);
-
-  const months = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
-  const startStr = `${months[monday.getMonth()]} ${monday.getDate()}`;
-  const endStr = `${months[sunday.getMonth()]} ${sunday.getDate()}`;
-
+ 
+  const startStr = monday.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  const endStr = sunday.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+ 
   return `${startStr} - ${endStr}`;
 }
 
 const CompanyHome = () => {
   const { user, apiFetch } = useJobitoAuth();
-  const userName = user?.name || "عضو";
+  const { t, language } = useTranslation();
+  const userName = user?.name || t("عضو");
 
   const [dashboardData, setDashboardData] = useState({
     newCandidates: 0,
@@ -123,7 +133,7 @@ const CompanyHome = () => {
   const [latestJobs, setLatestJobs] = useState<Job[]>([]);
   const [companyId, setCompanyId] = useState<number | null>(null);
   const [companyData, setCompanyData] = useState<AuthUser | null>(null);
-  const [dateRange] = useState(getCurrentWeekRange());
+  const [dateRange] = useState(getCurrentWeekRange(t));
 
   useEffect(() => {
     const initDashboard = async () => {
@@ -133,12 +143,13 @@ const CompanyHome = () => {
         // 1. Fetch company profile
         try {
           const profileRes = await apiFetch(
-            `${API_BASE_URL}/companies/my/profile`
+            `${API_BASE_URL}/companies/my/profile`,
           );
 
           if (profileRes.ok) {
             const profileData = await profileRes.json();
-            const cid = profileData.companyId || profileData.company_id || profileData.id;
+            const cid =
+              profileData.companyId || profileData.company_id || profileData.id;
             if (cid) {
               activeCompanyId = cid;
               setCompanyId(cid);
@@ -155,7 +166,7 @@ const CompanyHome = () => {
         if (activeCompanyId) {
           try {
             const summaryRes = await apiFetch(
-              `${API_BASE_URL}/companies/my/dashboard-summary`
+              `${API_BASE_URL}/companies/my/dashboard-summary`,
             );
             if (summaryRes.ok) {
               const summaryData = await summaryRes.json();
@@ -172,7 +183,7 @@ const CompanyHome = () => {
           // 3. Fetch Latest 4 Jobs
           try {
             const jobsRes = await apiFetch(
-              `${API_BASE_URL}/jobs?companyId=${activeCompanyId}&limit=4`
+              `${API_BASE_URL}/jobs?companyId=${activeCompanyId}&limit=4`,
             );
             if (jobsRes.ok) {
               const jobsData = await jobsRes.json();
@@ -196,15 +207,11 @@ const CompanyHome = () => {
   const summaryStats = [
     {
       count: dashboardData.newCandidates,
-      label: "مرشحين جدد للمراجعة",
-    },
-    {
-      count: dashboardData.scheduleToday,
-      label: "جدول اليوم",
+      label: t("مرشحين جدد للمراجعة"),
     },
     {
       count: dashboardData.messagesReceived,
-      label: "رسائل مستلمة",
+      label: t("رسائل مستلمة"),
     },
   ];
 
@@ -215,9 +222,9 @@ const CompanyHome = () => {
           <div className={Style.headerSection}>
             <div className={Style.headerTop}>
               <div>
-                <h2 className={Style.headerTitle}>صباح الخير، {userName}</h2>
+                <h2 className={Style.headerTitle}>{t("صباح الخير،")} {userName}</h2>
                 <p className={Style.headerSubtitle}>
-                  إليك تقرير إحصائيات الوظائف من {dateRange}.
+                  {t("إليك تقرير إحصائيات الوظائف من")} {dateRange}.
                 </p>
               </div>
 
@@ -314,8 +321,8 @@ const CompanyHome = () => {
 
           <div className={Style.updatesSection}>
             <div className={Style.updatesHeader}>
-              <h3 className={Style.updatesTitle}>آخر تحديثات الوظائف</h3>
-              <button className={Style.viewAllBtn}>عرض الكل ←</button>
+              <h3 className={Style.updatesTitle}>{t("آخر تحديثات الوظائف")}</h3>
+              <button className={Style.viewAllBtn}>{t("عرض الكل ←")}</button>
             </div>
 
             <div className={Style.jobGrid}>
@@ -324,17 +331,28 @@ const CompanyHome = () => {
                   <JobCard
                     key={job.jobId}
                     title={job.title}
-                    company={user?.name || "الشركة"}
-                    location={job.address || "عن بُعد"}
-                    type={job.jobType || "دوام كامل"}
+                    company={user?.name || t("الشركة")}
+                    location={job.address || t("عن بُعد")}
+                    type={job.jobType || t("دوام كامل")}
                     applicantsCount={job.applications?.length || 0}
                     capacity={job.slotsAvailable || job.slots || 10}
-                    tags={job.category?.name ? [job.category.name, "Design"] : undefined}
-                    logo={companyData?.logoUrl || companyData?.logo_url || companyData?.logo || companyData?.avatarUrl || companyData?.avatar || user?.avatar}
+                    tags={
+                      job.category?.name
+                        ? [job.category.name, t("تصميم")]
+                        : undefined
+                    }
+                    logo={
+                      companyData?.logoUrl ||
+                      companyData?.logo_url ||
+                      companyData?.logo ||
+                      companyData?.avatarUrl ||
+                      companyData?.avatar ||
+                      user?.avatar
+                    }
                   />
                 ))
               ) : (
-                <p style={{ color: "#6B7280" }}>لا توجد تحديثات وظائف بعد.</p>
+                <p style={{ color: "#6B7280" }}>{t("لا توجد تحديثات وظائف بعد.")}</p>
               )}
             </div>
           </div>

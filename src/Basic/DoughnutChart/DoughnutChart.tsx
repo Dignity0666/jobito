@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import styles from "./DoughnutChart.module.css";
-import { useJobitoAuth } from "../../context/AuthContext";
+import { useJobitoAuth } from "../../context/LinkContxt";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Chart,
@@ -9,10 +9,12 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { useTranslation } from "../../context/translation-context";
 
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 interface Application {
   applicationId: string | number;
@@ -29,18 +31,19 @@ interface Application {
 }
 
 function DoughnutChartComponent({ chartData }: { chartData: number[] }) {
+  const { t } = useTranslation();
   const ref = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<Chart | null>(null);
 
   useEffect(() => {
     if (!ref.current) return;
     if (chartRef.current) chartRef.current.destroy();
-    
+
     // Data mapping: [Applied, Reviewing, Hired, Declined]
     chartRef.current = new Chart(ref.current, {
       type: "doughnut",
       data: {
-        labels: ["الانتظار", "قيد المراجعة", "تم التوظيف", "مرفوض"],
+        labels: [t("الانتظار"), t("قيد المراجعة"), t("تم التوظيف"), t("مرفوض")],
         datasets: [
           {
             data: chartData,
@@ -66,7 +69,7 @@ function DoughnutChartComponent({ chartData }: { chartData: number[] }) {
         chartRef.current.destroy();
       }
     };
-  }, [chartData]);
+  }, [chartData, t]);
 
   return <canvas ref={ref} />;
 }
@@ -96,10 +99,11 @@ function CountUp({ target }: { target: number }) {
 
 export default function JobDashboard() {
   const { user, apiFetch } = useJobitoAuth();
+  const { t, language } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const jobTitle = location.state?.jobTitle;
-  
+
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -109,7 +113,7 @@ export default function JobDashboard() {
         const response = await apiFetch(`${API_BASE_URL}/applications/my`);
         if (!response.ok) throw new Error("Failed to fetch");
         const data = await response.json();
-        setApplications(Array.isArray(data) ? data : (data.data || []));
+        setApplications(Array.isArray(data) ? data : data.data || []);
       } catch (err) {
         console.error(err);
       } finally {
@@ -121,32 +125,52 @@ export default function JobDashboard() {
 
   const totalApps = applications.length;
   // Let's treat "reviewing" or "hired" as "interviewed/processed"
-  const interviewed = applications.filter(a => ['reviewing', 'hired'].includes(a.status?.toLowerCase())).length;
+  const interviewed = applications.filter((a) =>
+    ["reviewing", "hired"].includes(a.status?.toLowerCase()),
+  ).length;
 
-  const appliedCount = applications.filter(a => a.status?.toLowerCase() === 'applied').length;
-  const reviewingCount = applications.filter(a => a.status?.toLowerCase() === 'reviewing').length;
-  const hiredCount = applications.filter(a => a.status?.toLowerCase() === 'hired').length;
-  const declinedCount = applications.filter(a => a.status?.toLowerCase() === 'declined').length;
+  const appliedCount = applications.filter(
+    (a) => a.status?.toLowerCase() === "applied",
+  ).length;
+  const reviewingCount = applications.filter(
+    (a) => a.status?.toLowerCase() === "reviewing",
+  ).length;
+  const hiredCount = applications.filter(
+    (a) => a.status?.toLowerCase() === "hired",
+  ).length;
+  const declinedCount = applications.filter(
+    (a) => a.status?.toLowerCase() === "declined",
+  ).length;
 
   const chartData = [appliedCount, reviewingCount, hiredCount, declinedCount];
-  
+
   const getStatusLabel = (status: string) => {
     switch (status?.toLowerCase()) {
-      case "applied": return "الانتظار";
-      case "reviewing": return "قيد المراجعة";
-      case "hired": return "تم التوظيف";
-      case "declined": return "مرفوض";
-      default: return status || "غير معروف";
+      case "applied":
+        return t("الانتظار");
+      case "reviewing":
+        return t("قيد المراجعة");
+      case "hired":
+        return t("تم التوظيف");
+      case "declined":
+        return t("مرفوض");
+      default:
+        return t(status) || t("غير معروف");
     }
   };
 
   const getStatusBadgeClass = (status: string) => {
     switch (status?.toLowerCase()) {
-      case "applied": return styles.badgeReview; // Using existing blue/gray style
-      case "reviewing": return styles.badgeReview;
-      case "hired": return styles.badgeShortlisted;
-      case "declined": return styles.badgeDeclined;
-      default: return "";
+      case "applied":
+        return styles.badgeReview; // Using existing blue/gray style
+      case "reviewing":
+        return styles.badgeReview;
+      case "hired":
+        return styles.badgeShortlisted;
+      case "declined":
+        return styles.badgeDeclined;
+      default:
+        return "";
     }
   };
 
@@ -154,42 +178,69 @@ export default function JobDashboard() {
 
   return (
     <>
-      <div className={styles.dashboard} style={{ direction: "rtl" }}>
+      <div className={styles.dashboard}>
         <div className={styles.header}>
           <div>
-            <h1>صباح الخير، {user?.name || "الملف الشخصي"} {jobTitle ? ` - ${jobTitle}` : ""}</h1>
+            <h1>
+              {t("صباح الخير،")} {t(user?.name || "") || t("الملف الشخصي")}{" "}
+              {jobTitle ? ` - ${t(jobTitle)}` : ""}
+            </h1>
             <p>
-              هذا ما يحدث مع {jobTitle ? `وظيفة "${jobTitle}"` : "طلباتك"} حتى الآن.
+              {jobTitle
+                ? t("هذا ما يحدث مع وظيفة \"{{jobTitle}}\" حتى الآن.", {
+                    jobTitle,
+                  })
+                : t("هذا ما يحدث مع طلباتك حتى الآن.")}
             </p>
           </div>
         </div>
 
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '50px' }}>جاري التحميل...</div>
+          <div style={{ textAlign: "center", padding: "50px" }}>
+            {t("جاري التحميل...")}
+          </div>
         ) : (
           <>
             <div className={styles.topGrid}>
               <div className={styles.statsCol}>
                 <div className={`${styles.card} ${styles.statCard}`}>
-                  <div className={styles.statLabel}>إجمالي ما تم التقديم عليه</div>
+                  <div className={styles.statLabel}>
+                    {t("إجمالي ما تم التقديم عليه")}
+                  </div>
                   <div className={styles.statNum}>
                     <CountUp target={totalApps} />
                   </div>
                   <span className={styles.statIcon}>
-                     {/* Placeholder icon */}
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#578BC7" strokeWidth="2" style={{opacity: 0.5}}>
+                    {/* Placeholder icon */}
+                    <svg
+                      width="40"
+                      height="40"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#578BC7"
+                      strokeWidth="2"
+                      style={{ opacity: 0.5 }}
+                    >
                       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                       <polyline points="14 2 14 8 20 8"></polyline>
                     </svg>
                   </span>
                 </div>
                 <div className={`${styles.card} ${styles.statCard}`}>
-                  <div className={styles.statLabel}>تم النظر في طلبك</div>
+                  <div className={styles.statLabel}>{t("تم النظر في طلبك")}</div>
                   <div className={styles.statNum}>
                     <CountUp target={interviewed} />
                   </div>
                   <span className={styles.statIcon}>
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#578BC7" strokeWidth="2" style={{opacity: 0.5}}>
+                    <svg
+                      width="40"
+                      height="40"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#578BC7"
+                      strokeWidth="2"
+                      style={{ opacity: 0.5 }}
+                    >
                       <circle cx="12" cy="12" r="10"></circle>
                       <path d="M12 6v6l4 2"></path>
                     </svg>
@@ -199,7 +250,7 @@ export default function JobDashboard() {
 
               {/* Chart */}
               <div className={`${styles.card} ${styles.chartCard}`}>
-                <h3>حالة التقديم</h3>
+                <h3>{t("حالة التقديم")}</h3>
                 <div className={styles.chartInner}>
                   {totalApps > 0 ? (
                     <>
@@ -208,50 +259,86 @@ export default function JobDashboard() {
                       </div>
                       <div className={styles.legend}>
                         <div className={styles.legendItem}>
-                          <div className={styles.legendDot} style={{ background: "#3b82f6" }} />
+                          <div
+                            className={styles.legendDot}
+                            style={{ background: "#3b82f6" }}
+                          />
                           <div>
-                            <div className={styles.legendPct}>{appliedCount}</div>
-                            <div className={styles.legendLabel}>الانتظار</div>
+                            <div className={styles.legendPct}>
+                              {appliedCount}
+                            </div>
+                            <div className={styles.legendLabel}>{t("الانتظار")}</div>
                           </div>
                         </div>
                         <div className={styles.legendItem}>
-                          <div className={styles.legendDot} style={{ background: "#f59e0b" }} />
+                          <div
+                            className={styles.legendDot}
+                            style={{ background: "#f59e0b" }}
+                          />
                           <div>
-                            <div className={styles.legendPct}>{reviewingCount}</div>
-                            <div className={styles.legendLabel}>قيد المراجعة</div>
+                            <div className={styles.legendPct}>
+                              {reviewingCount}
+                            </div>
+                            <div className={styles.legendLabel}>
+                              {t("قيد المراجعة")}
+                            </div>
                           </div>
                         </div>
                         <div className={styles.legendItem}>
-                          <div className={styles.legendDot} style={{ background: "#10b981" }} />
+                          <div
+                            className={styles.legendDot}
+                            style={{ background: "#10b981" }}
+                          />
                           <div>
                             <div className={styles.legendPct}>{hiredCount}</div>
-                            <div className={styles.legendLabel}>تم التوظيف</div>
+                            <div className={styles.legendLabel}>{t("تم التوظيف")}</div>
                           </div>
                         </div>
                         <div className={styles.legendItem}>
-                          <div className={styles.legendDot} style={{ background: "#ef4444" }} />
+                          <div
+                            className={styles.legendDot}
+                            style={{ background: "#ef4444" }}
+                          />
                           <div>
-                            <div className={styles.legendPct}>{declinedCount}</div>
-                            <div className={styles.legendLabel}>مرفوض</div>
+                            <div className={styles.legendPct}>
+                              {declinedCount}
+                            </div>
+                            <div className={styles.legendLabel}>{t("مرفوض")}</div>
                           </div>
                         </div>
                       </div>
                     </>
                   ) : (
-                    <div style={{ padding: '20px', color: '#888', width: '100%', textAlign: 'center' }}>لا توجد بيانات مخطط بعد</div>
+                    <div
+                      style={{
+                        padding: "20px",
+                        color: "#888",
+                        width: "100%",
+                        textAlign: "center",
+                      }}
+                    >
+                      {t("لا توجد بيانات مخطط بعد")}
+                    </div>
                   )}
                 </div>
-                <button className={styles.viewLink} onClick={() => navigate('/MyApplications')}>عرض الكل ←</button>
+                <button
+                  className={styles.viewLink}
+                  onClick={() => navigate("/MyApplications")}
+                >
+                  {t("عرض الكل")} ←
+                </button>
               </div>
             </div>
 
             {/* History */}
             <div className={styles.historyHeader}>
-              <h2>السجل الأخير</h2>
+              <h2>{t("السجل الأخير")}</h2>
             </div>
             <div className={styles.appList}>
               {recentApps.length === 0 ? (
-                <div style={{ padding: "20px", color: "#666" }}>لم تقم بالتقديم على أي وظائف بعد.</div>
+                <div style={{ padding: "20px", color: "#666" }}>
+                  {t("لم تقم بالتقديم على أي وظائف بعد.")}
+                </div>
               ) : (
                 recentApps.map((app, index) => (
                   <div
@@ -259,32 +346,74 @@ export default function JobDashboard() {
                     key={app.applicationId}
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
-                    <div className={styles.appLogo} style={{ background: "#f1f5f9", display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                    <div
+                      className={styles.appLogo}
+                      style={{
+                        background: "#f1f5f9",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        overflow: "hidden",
+                      }}
+                    >
                       {app.job?.company?.logoUrl ? (
-                         <img src={app.job.company.logoUrl.startsWith('http') ? app.job.company.logoUrl : `${API_BASE_URL}${app.job.company.logoUrl.startsWith('/')?'':'/'}${app.job.company.logoUrl}`} alt="logo" style={{width: '100%', height: '100%', objectFit: 'cover'}} />
-                      ) : "🏢"}
+                        <img
+                          src={
+                            app.job.company.logoUrl.startsWith("http")
+                              ? app.job.company.logoUrl
+                              : `${API_BASE_URL}${app.job.company.logoUrl.startsWith("/") ? "" : "/"}${app.job.company.logoUrl}`
+                          }
+                          alt="logo"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
+                      ) : (
+                        "🏢"
+                      )}
                     </div>
                     <div className={styles.appInfo}>
-                      <div className={styles.appTitle}>{app.job?.title || "الوظيفة"}</div>
+                      <div className={styles.appTitle}>
+                        {t(app.job?.title || "") || t("الوظيفة")}
+                      </div>
                       <div className={styles.appMeta}>
-                        {app.job?.company?.name || "الشركة"} · {app.job?.jobType || "دوام كامل"}
+                        {t(app.job?.company?.name || "") || t("الشركة")} ·{" "}
+                        {t(app.job?.jobType || "") || t("دوام كامل")}
                       </div>
                     </div>
                     <div className={styles.appDateCol}>
-                      <div className={styles.appDateLabel}>تاريخ التقديم</div>
-                      <div className={styles.appDateVal}>{new Date(app.appliedAt).toLocaleDateString('ar-EG')}</div>
+                      <div className={styles.appDateLabel}>
+                        {t("تاريخ التقديم")}
+                      </div>
+                      <div className={styles.appDateVal}>
+                        {new Date(app.appliedAt).toLocaleDateString(
+                          language === "ar" ? "ar-EG" : "en-US",
+                        )}
+                      </div>
                     </div>
-                    <span className={`${styles.badge} ${getStatusBadgeClass(app.status)}`}>
+                    <span
+                      className={`${styles.badge} ${getStatusBadgeClass(app.status)}`}
+                    >
                       {getStatusLabel(app.status)}
                     </span>
-                    <button className={styles.moreBtn} onClick={() => navigate('/MyApplications')}>⋯</button>
+                    <button
+                      className={styles.moreBtn}
+                      onClick={() => navigate("/MyApplications")}
+                    >
+                      ⋯
+                    </button>
                   </div>
                 ))
               )}
             </div>
             <div className={styles.bottomLink}>
-              <button className={styles.viewLink} onClick={() => navigate('/MyApplications')}>
-                عرض كل السجل →
+              <button
+                className={styles.viewLink}
+                onClick={() => navigate("/MyApplications")}
+              >
+                {t("عرض كل السجل")} ←
               </button>
             </div>
           </>

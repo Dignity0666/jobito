@@ -6,17 +6,19 @@ import {
 } from "react-icons/fa";
 import type { FC } from "react";
 import "./Footer.css";
+import { useTranslation } from "../../context/translation-context";
 
 const Footer: FC = () => {
+  const { t } = useTranslation();
   return (
-    <footer className="footer" dir="ltr">
+    <footer className="footer">
       <div className="footer-container">
         <div className="footer-grid">
           {/* Column 1: Brand, Description & Social Media */}
           <div className="footer-brand-section">
             <h2 className="footer-logo">Jobito</h2>
             <p className="footer-description">
-              جوبيتو (Jobito) هي منصتك المتكاملة لاكتشاف أفضل فرص العمل والتواصل مع كبرى الشركات الرائدة. نحن هنا لتمكين طموحك المهني ومساعدتك في بناء المستقبل الذي تستحقه.
+              {t("جوبيتو (Jobito) هي منصتك المتكاملة لاكتشاف أفضل فرص العمل والتواصل مع كبرى الشركات الرائدة. نحن هنا لتمكين طموحك المهني ومساعدتك في بناء المستقبل الذي تستحقه.")}
             </p>
             <div className="social-links">
               {[
@@ -57,43 +59,43 @@ const Footer: FC = () => {
 
           {/* Column 2: For Candidates / للمرشحين */}
           <div className="footer-column">
-            <h3 className="footer-heading">للمرشحين</h3>
+            <h3 className="footer-heading">{t("للمرشحين")}</h3>
             <ul className="footer-links">
-              <li>تصفح الوظائف</li>
-              <li>دليل الشركات</li>
-              <li>إنشاء سيرة ذاتية</li>
-              <li>نصائح مهنية</li>
-              <li>حاسبة الرواتب</li>
+              <li>{t("تصفح الوظائف")}</li>
+              <li>{t("دليل الشركات")}</li>
+              <li>{t("إنشاء سيرة ذاتية")}</li>
+              <li>{t("نصائح مهنية")}</li>
+              <li>{t("حاسبة الرواتب")}</li>
             </ul>
           </div>
 
           {/* Column 3: For Employers / لأصحاب العمل */}
           <div className="footer-column">
-            <h3 className="footer-heading">لأصحاب العمل</h3>
+            <h3 className="footer-heading">{t("لأصحاب العمل")}</h3>
             <ul className="footer-links">
-              <li>نشر وظيفة جديدة</li>
-              <li>البحث عن مرشحين</li>
-              <li>باقات التوظيف</li>
-              <li>إدارة المتقدمين</li>
+              <li>{t("نشر وظيفة جديدة")}</li>
+              <li>{t("البحث عن مرشحين")}</li>
+              <li>{t("باقات التوظيف")}</li>
+              <li>{t("إدارة المتقدمين")}</li>
             </ul>
           </div>
 
           {/* Column 4: Support & Legal / المنصة والدعم */}
           <div className="footer-column">
-            <h3 className="footer-heading">عن المنصة والمساعدة</h3>
+            <h3 className="footer-heading">{t("عن المنصة والمساعدة")}</h3>
             <ul className="footer-links">
-              <li>من نحن</li>
-              <li>تواصل معنا</li>
-              <li>الأسئلة الشائعة</li>
-              <li>الشروط والأحكام</li>
-              <li>سياسة الخصوصية</li>
+              <li>{t("من نحن")}</li>
+              <li>{t("تواصل معنا")}</li>
+              <li>{t("الأسئلة الشائعة")}</li>
+              <li>{t("الشروط والأحكام")}</li>
+              <li>{t("سياسة الخصوصية")}</li>
             </ul>
           </div>
         </div>
 
         {/* Copyright */}
         <div className="footer-bottom">
-          <p className="copyright">© 2026 Jobito. جميع الحقوق محفوظة.</p>
+          <p className="copyright">© 2026 Jobito. {t("جميع الحقوق محفوظة.")}</p>
         </div>
       </div>
     </footer>

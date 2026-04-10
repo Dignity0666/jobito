@@ -12,11 +12,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import styles from "./CompanyRegister.module.css";
 import signupImage from "../../../../assets/signup.png";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "../../../../context/translation-context";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 export const CompanyRegister: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     companyName: "",
@@ -57,7 +59,7 @@ export const CompanyRegister: React.FC = () => {
     setFormError("");
 
     if (formData.password !== formData.confirmPassword) {
-      setFormError("كلمات المرور غير متطابقة");
+      setFormError(t("كلمات المرور غير متطابقة"));
       return;
     }
 
@@ -80,7 +82,7 @@ export const CompanyRegister: React.FC = () => {
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "فشل التسجيل");
+      if (!response.ok) throw new Error(data.message || t("فشل التسجيل"));
       setSuccess(true);
     } catch (err: any) {
       setFormError(err.message);
@@ -103,7 +105,7 @@ export const CompanyRegister: React.FC = () => {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "فشل التفعيل");
+      if (!res.ok) throw new Error(data.message || t("فشل التفعيل"));
       setVerifiedStatus("success");
       setSuccess(false);
     } catch (err: any) {
@@ -131,15 +133,15 @@ export const CompanyRegister: React.FC = () => {
               <div className={styles.successIcon}>
                 <CheckCircleIcon size={64} />
               </div>
-              <h2 className={styles.title}>تم تفعيل الشركة!</h2>
+              <h2 className={styles.title}>{t("تم تفعيل الشركة!")}</h2>
               <p className={styles.subtitle}>
-                ملف عملك جاهز الآن. ابدأ بنشر الوظائف اليوم.
+                {t("ملف عملك جاهز الآن. ابدأ بنشر الوظائف اليوم.")}
               </p>
               <button
                 className={styles.authbtn}
                 onClick={() => navigate("/user-information")}
               >
-                الذهاب لتسجيل الدخول
+                {t("الذهاب لتسجيل الدخول")}
               </button>
             </motion.div>
           ) : success ? (
@@ -154,9 +156,9 @@ export const CompanyRegister: React.FC = () => {
                   <div className={styles.iconCircle}>
                     <Building2Icon size={32} />
                   </div>
-                  <h2 className={styles.title}>تفعيل حساب العمل</h2>
+                  <h2 className={styles.title}>{t("تفعيل حساب العمل")}</h2>
                   <p className={styles.subtitle}>
-                    تأكيد <b>{formData.companyEmail}</b>
+                    {t("تأكيد")} <b>{formData.companyEmail}</b>
                   </p>
 
                   <div className={styles.methodGrid}>
@@ -166,8 +168,8 @@ export const CompanyRegister: React.FC = () => {
                     >
                       <LinkIcon size={24} />
                       <div>
-                        <strong>اضغط على الرابط</strong>
-                        <span>رابط تفعيل خاص في صندوق الوارد الخاص بك</span>
+                        <strong>{t("اضغط على الرابط")}</strong>
+                        <span>{t("رابط تفعيل خاص في صندوق الوارد الخاص بك")}</span>
                       </div>
                     </button>
                     <button
@@ -176,8 +178,8 @@ export const CompanyRegister: React.FC = () => {
                     >
                       <SmartphoneIcon size={24} />
                       <div>
-                        <strong>أدخل الكود</strong>
-                        <span>كود تفعيل يدوي من 6 أرقام</span>
+                        <strong>{t("أدخل الكود")}</strong>
+                        <span>{t("كود تفعيل يدوي من 6 أرقام")}</span>
                       </div>
                     </button>
                   </div>
@@ -185,14 +187,14 @@ export const CompanyRegister: React.FC = () => {
                     className={styles.backBtn}
                     onClick={() => setSuccess(false)}
                   >
-                    العودة للتسجيل
+                    {t("العودة للتسجيل")}
                   </button>
                 </>
               ) : verifyMethod === "code" ? (
                 <div style={{ width: "100%" }}>
-                  <h2 className={styles.title}>أدخل كود العمل</h2>
+                  <h2 className={styles.title}>{t("أدخل كود العمل")}</h2>
                   <p className={styles.subtitle}>
-                    تحقق من بريد الشركة الإلكتروني للحصول على الكود
+                    {t("تحقق من بريد الشركة الإلكتروني للحصول على الكود")}
                   </p>
                   <form onSubmit={handleVerifyCode}>
                     <input
@@ -211,7 +213,7 @@ export const CompanyRegister: React.FC = () => {
                       {isVerifying ? (
                         <LoaderIcon className="loader" />
                       ) : (
-                        "تفعيل العمل"
+                        t("تفعيل العمل")
                       )}
                     </button>
                   </form>
@@ -219,21 +221,21 @@ export const CompanyRegister: React.FC = () => {
                     className={styles.backBtn}
                     onClick={() => setVerifyMethod(null)}
                   >
-                    العودة للخيارات
+                    {t("العودة للخيارات")}
                   </button>
                 </div>
               ) : (
                 <div style={{ textAlign: "center" }}>
                   <div className={styles.waitingLoader}>⏳</div>
-                  <h2 className={styles.title}>جاري تفعيل العمل...</h2>
+                  <h2 className={styles.title}>{t("جاري تفعيل العمل...")}</h2>
                   <p className={styles.subtitle}>
-                    يرجى الضغط على رابط التفعيل في صندوق الوارد.
+                    {t("يرجى الضغط على رابط التفعيل في صندوق الوارد.")}
                   </p>
                   <button
                     className={styles.backBtn}
                     onClick={() => setVerifyMethod(null)}
                   >
-                    استخدم الكود بدلاً من ذلك
+                    {t("استخدم الكود بدلاً من ذلك")}
                   </button>
                 </div>
               )}
@@ -250,10 +252,10 @@ export const CompanyRegister: React.FC = () => {
                   <div className={styles.logoIcon}>
                     <Building2Icon size={32} />
                   </div>
-                  <h2 className={styles.title}>تسجيل الشركة</h2>
+                  <h2 className={styles.title}>{t("تسجيل الشركة")}</h2>
                 </div>
                 <p className={styles.subtitle}>
-                  أنشئ حساب عمل لتوظيف أفضل المواهب على Jobito
+                  {t("أنشئ حساب عمل لتوظيف أفضل المواهب على Jobito")}
                 </p>
               </div>
 
@@ -278,10 +280,10 @@ export const CompanyRegister: React.FC = () => {
 
                 <div className={styles.formGrid}>
                   <div className={styles.inputGroup}>
-                    <label>اسم الشركة</label>
+                    <label>{t("اسم الشركة")}</label>
                     <input
                       type="text"
-                      placeholder="مثال: شركة أكيمي"
+                      placeholder={t("مثال: شركة أكيمي")}
                       value={formData.companyName}
                       onChange={(e) =>
                         setFormData({
@@ -293,9 +295,7 @@ export const CompanyRegister: React.FC = () => {
                     />
                   </div>
                   <div className={styles.inputGroup}>
-                    <label>  
-                      الرقم الضريبي
-                      </label>
+                    <label>{t("الرقم الضريبي")}</label>
                     <input
                       type="text"
                       placeholder="123456789"
@@ -307,7 +307,7 @@ export const CompanyRegister: React.FC = () => {
                     />
                   </div>
                   <div className={styles.inputGroup}>
-                    <label>هاتف الشركة</label>
+                    <label>{t("هاتف الشركة")}</label>
                     <input
                       type="text"
                       placeholder="+20 (123) 456-7890"
@@ -322,10 +322,10 @@ export const CompanyRegister: React.FC = () => {
                     />
                   </div>
                   <div className={styles.inputGroup}>
-                    <label>عنوان الشركة</label>
+                    <label>{t("عنوان الشركة")}</label>
                     <input
                       type="text"
-                      placeholder="المدينة، الدولة"
+                      placeholder={t("المدينة، الدولة")}
                       value={formData.companyAddress}
                       onChange={(e) =>
                         setFormData({
@@ -337,7 +337,7 @@ export const CompanyRegister: React.FC = () => {
                     />
                   </div>
                   <div className={styles.inputGroup}>
-                    <label>البريد الإلكتروني للشركة</label>
+                    <label>{t("البريد الإلكتروني للشركة")}</label>
                     <input
                       type="email"
                       placeholder="hr@acme-inc.com"
@@ -352,7 +352,7 @@ export const CompanyRegister: React.FC = () => {
                     />
                   </div>
                   <div className={styles.inputGroup}>
-                    <label>السجل التجاري</label>
+                    <label>{t("السجل التجاري")}</label>
                     <input
                       type="text"
                       placeholder="LN-8899221"
@@ -368,7 +368,7 @@ export const CompanyRegister: React.FC = () => {
                   </div>
                   <div className={styles.fullWidthRow}>
                     <div className={styles.inputGroup}>
-                      <label>كلمة المرور</label>
+                      <label>{t("كلمة المرور")}</label>
                       <div className={styles.relativeInput}>
                         <input
                           type={showPassword ? "text" : "password"}
@@ -406,7 +406,7 @@ export const CompanyRegister: React.FC = () => {
                       </div>
                     </div>
                     <div className={styles.inputGroup}>
-                      <label>تأكيد كلمة المرور</label>
+                      <label>{t("تأكيد كلمة المرور")}</label>
                       <div className={styles.relativeInput}>
                         <input
                           type={showConfirmPassword ? "text" : "password"}
@@ -451,10 +451,10 @@ export const CompanyRegister: React.FC = () => {
                     style={{ alignItems: "flex-end" }}
                   >
                     <div className={styles.inputGroup}>
-                      <label>الرقم القومي للمسؤول</label>
+                      <label>{t("الرقم القومي للمسؤول")}</label>
                       <input
                         type="text"
-                        placeholder="مثال: 29901011234567"
+                        placeholder={t("مثال: 29901011234567")}
                         value={formData.nationalId}
                         onChange={(e) =>
                           setFormData({
@@ -476,7 +476,7 @@ export const CompanyRegister: React.FC = () => {
                   {isCreating ? (
                     <LoaderIcon className="loader" />
                   ) : (
-                    "إنشاء ملف حساب العمل"
+                    t("إنشاء ملف حساب العمل")
                   )}
                 </button>
               </form>

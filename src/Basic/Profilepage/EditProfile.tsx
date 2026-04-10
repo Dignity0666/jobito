@@ -1,13 +1,26 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styles from "./EditProfile.module.css";
-import { useJobitoAuth } from "../../context/AuthContext";
+import { useJobitoAuth } from "../../context/LinkContxt";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect } from "react";
- 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+import { useTranslation } from "../../context/translation-context";
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 const UploadIcon = () => (
-  <svg className={styles.uploadIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+  <svg
+    className={styles.uploadIcon}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+    <circle cx="8.5" cy="8.5" r="1.5" />
+    <polyline points="21 15 16 10 5 21" />
+  </svg>
 );
 
 interface Experience {
@@ -32,13 +45,14 @@ const getAvatarUrl = (path: string | undefined | null) => {
 };
 
 export default function EditProfile() {
+  const { t } = useTranslation();
   const { user, apiFetch } = useJobitoAuth();
   const [activeTab, setActiveTab] = useState<Tab>("profile");
-  
+
   // Advanced Profile State
   const [profileData, setProfileData] = useState({
     fullName: user?.name || "",
-    phone: user?.phone || "غير محدد",
+    phone: user?.phone || t("غير محدد"),
     email: user?.email || "mohamednasseremam380@gmail.com",
     dob: user?.dob || "",
     gender: user?.gender || "",
@@ -51,16 +65,20 @@ export default function EditProfile() {
     },
     location: user?.location || "",
   });
-  
-  const [experience, setExperience] = useState<Experience[]>(user?.experiences || []);
-  const [education, setEducation] = useState<Education[]>(user?.educations || []);
+
+  const [experience, setExperience] = useState<Experience[]>(
+    user?.experiences || [],
+  );
+  const [education, setEducation] = useState<Education[]>(
+    user?.educations || [],
+  );
   const [skills, setSkills] = useState<string[]>(user?.skills || []);
   const [languages, setLanguages] = useState<string[]>(user?.languages || []);
   const [gallery, setGallery] = useState<string[]>(user?.portfolios || []);
-  
+
   const [skillInput, setSkillInput] = useState("");
   const [langInput, setLangInput] = useState("");
-  
+
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -83,14 +101,21 @@ export default function EditProfile() {
     marketing: false,
   });
 
-  const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleProfileChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
+  ) => {
     setProfileData({ ...profileData, [e.target.name]: e.target.value });
   };
 
   const handleSocialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setProfileData({
       ...profileData,
-      socialLinks: { ...profileData.socialLinks, [e.target.name]: e.target.value }
+      socialLinks: {
+        ...profileData.socialLinks,
+        [e.target.name]: e.target.value,
+      },
     });
   };
 
@@ -111,9 +136,10 @@ export default function EditProfile() {
   const handleGalleryUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      Array.from(files).forEach(file => {
+      Array.from(files).forEach((file) => {
         const reader = new FileReader();
-        reader.onloadend = () => setGallery(prev => [...prev, reader.result as string]);
+        reader.onloadend = () =>
+          setGallery((prev) => [...prev, reader.result as string]);
         reader.readAsDataURL(file);
       });
     }
@@ -133,7 +159,7 @@ export default function EditProfile() {
           fullName: data.fullName || "",
           phone: data.phone || "",
           email: data.email || "",
-          dob: data.dob ? new Date(data.dob).toISOString().split('T')[0] : "",
+          dob: data.dob ? new Date(data.dob).toISOString().split("T")[0] : "",
           gender: data.gender || "",
           bio: data.bio || "",
           accountType: data.role === "company" ? "employer" : "job_seeker",
@@ -162,13 +188,13 @@ export default function EditProfile() {
 
   const handleSave = async () => {
     if (activeTab === "login" && passwords.new !== passwords.confirm) {
-      alert("كلمات المرور الجديدة غير متطابقة!");
+      alert(t("كلمات المرور الجديدة غير متطابقة!"));
       return;
     }
 
     try {
       setIsSaving(true);
-      
+
       let finalAvatarUrl = user?.avatar || "";
       if (selectedFile) {
         const fd = new FormData();
@@ -195,7 +221,7 @@ export default function EditProfile() {
           });
           if (!passRes.ok) {
             const err = await passRes.json();
-            throw new Error(err.message || "فشل تحديث كلمة المرور");
+            throw new Error(err.message || t("فشل تحديث كلمة المرور"));
           }
         }
       } else {
@@ -235,41 +261,41 @@ export default function EditProfile() {
         }
       }
 
-      alert("تم حفظ التعديلات بنجاح!");
+      alert(t("تم حفظ التعديلات بنجاح!"));
       setSelectedFile(null);
       setPhotoPreview(null);
       if (activeTab === "login") {
         setPasswords({ current: "", new: "", confirm: "" });
       }
     } catch (error: any) {
-      alert(`فشل الحفظ: ${error.message}`);
+      alert(`${t("فشل الحفظ:")} ${error.message}`);
     } finally {
       setIsSaving(false);
     }
   };
 
   return (
-    <div className={styles.container} dir="rtl">
+    <div className={styles.container}>
       <div className={styles.header}>
-        <h1 className={styles.title}>تعديل الملف الشخصي</h1>
+        <h1 className={styles.title}>{t("تعديل الملف الشخصي")}</h1>
         <div className={styles.tabs}>
-          <button 
+          <button
             className={`${styles.tabBtn} ${activeTab === "profile" ? styles.activeTab : ""}`}
             onClick={() => setActiveTab("profile")}
           >
-            الملف الشخصي
+            {t("الملف الشخصي")}
           </button>
-          <button 
+          <button
             className={`${styles.tabBtn} ${activeTab === "login" ? styles.activeTab : ""}`}
             onClick={() => setActiveTab("login")}
           >
-            بيانات الدخول
+            {t("بيانات الدخول")}
           </button>
-          <button 
+          <button
             className={`${styles.tabBtn} ${activeTab === "notifications" ? styles.activeTab : ""}`}
             onClick={() => setActiveTab("notifications")}
           >
-            الإشعارات
+            {t("الإشعارات")}
           </button>
         </div>
       </div>
@@ -277,38 +303,54 @@ export default function EditProfile() {
       <div className={styles.content}>
         <AnimatePresence mode="wait">
           {activeTab === "profile" && (
-            <motion.div 
+            <motion.div
               key="profile"
               initial={{ opacity: 0, x: 10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -10 }}
             >
-              {/* Profile Photo */}
+              {/* Basic Info */}
               <div className={styles.section}>
-                <h3 className={styles.sectionTitle}>المعلومات الأساسية</h3>
-                <p className={styles.sectionSub}>هذه معلوماتك الشخصية التي يمكنك تحديثها في أي وقت.</p>
-                
+                <h3 className={styles.sectionTitle}>{t("المعلومات الأساسية")}</h3>
+                <p className={styles.sectionSub}>
+                  {t("هذه معلوماتك الشخصية التي يمكنك تحديثها في أي وقت.")}
+                </p>
+
                 <div className={styles.row}>
                   <div className={styles.labelGroup}>
-                    <p className={styles.label}>صورة الملف الشخصي</p>
-                    <p className={styles.sectionSub}>تُعرض هذه الصورة للعامة وتساعد أصحاب العمل في التعرف عليك.</p>
+                    <p className={styles.label}>{t("صورة الملف الشخصي")}</p>
+                    <p className={styles.sectionSub}>
+                      {t("تُعرض هذه الصورة للعامة وتساعد أصحاب العمل في التعرف عليك.")}
+                    </p>
                   </div>
                   <div className={styles.photoSection}>
-                    <img 
-                      src={photoPreview || getAvatarUrl(user?.avatar) || "https://i.pravatar.cc/150?u=fake"} 
-                      alt="Avatar" 
-                      className={styles.avatar} 
+                    <img
+                      src={
+                        photoPreview ||
+                        getAvatarUrl(user?.avatar) ||
+                        "https://i.pravatar.cc/150?u=fake"
+                      }
+                      alt="Avatar"
+                      className={styles.avatar}
                     />
-                    <div className={styles.uploadZone} onClick={() => fileInputRef.current?.click()}>
+                    <div
+                      className={styles.uploadZone}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
                       <UploadIcon />
                       <p className={styles.uploadText}>
-                        <span className={styles.uploadLink}>انقر للاستبدال</span> أو سحب وإفلات
+                        <span className={styles.uploadLink}>
+                          {t("انقر للاستبدال")}
+                        </span>{" "}
+                        {t("أو سحب وإفلات")}
                       </p>
-                      <p className={styles.uploadHint}>SVG, PNG, JPG or GIF (max. 400 x 400px)</p>
-                      <input 
-                        type="file" 
-                        ref={fileInputRef} 
-                        style={{ display: "none" }} 
+                      <p className={styles.uploadHint}>
+                        SVG, PNG, JPG or GIF (max. 400 x 400px)
+                      </p>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        style={{ display: "none" }}
                         accept="image/*"
                         onChange={handlePhotoUpload}
                       />
@@ -321,69 +363,79 @@ export default function EditProfile() {
               <div className={styles.section}>
                 <div className={styles.row}>
                   <div className={styles.labelGroup}>
-                    <p className={styles.label}>التفاصيل الشخصية</p>
+                    <p className={styles.label}>{t("التفاصيل الشخصية")}</p>
                   </div>
                   <div className={styles.formGrid}>
                     <div className={`${styles.field} ${styles.fieldFull}`}>
-                      <label className={styles.label}>الاسم الكامل <span>*</span></label>
-                      <input 
-                        type="text" 
+                      <label className={styles.label}>
+                        {t("الاسم الكامل")} <span>*</span>
+                      </label>
+                      <input
+                        type="text"
                         name="fullName"
-                        className={styles.input} 
-                        value={profileData.fullName} 
+                        className={styles.input}
+                        value={profileData.fullName}
                         onChange={handleProfileChange}
                       />
                     </div>
                     <div className={styles.field}>
-                      <label className={styles.label}>رقم الهاتف <span>*</span></label>
-                      <input 
-                        type="tel" 
+                      <label className={styles.label}>
+                        {t("رقم الهاتف")} <span>*</span>
+                      </label>
+                      <input
+                        type="tel"
                         name="phone"
-                        className={styles.input} 
+                        className={styles.input}
                         value={profileData.phone}
                         onChange={handleProfileChange}
                       />
                     </div>
                     <div className={styles.field}>
-                      <label className={styles.label}>البريد الإلكتروني <span>*</span></label>
-                      <input 
-                        type="email" 
+                      <label className={styles.label}>
+                        {t("البريد الإلكتروني")} <span>*</span>
+                      </label>
+                      <input
+                        type="email"
                         name="email"
-                        className={styles.input} 
+                        className={styles.input}
                         value={profileData.email}
                         onChange={handleProfileChange}
                       />
                     </div>
                     <div className={styles.field}>
-                      <label className={styles.label}>تاريخ الميلاد <span>*</span></label>
-                      <input 
-                        type="date" 
+                      <label className={styles.label}>
+                        {t("تاريخ الميلاد")} <span>*</span>
+                      </label>
+                      <input
+                        type="date"
                         name="dob"
-                        className={styles.input} 
+                        className={styles.input}
                         value={profileData.dob}
                         onChange={handleProfileChange}
                       />
                     </div>
                     <div className={styles.field}>
-                      <label className={styles.label}>الجنس <span>*</span></label>
-                      <select 
+                      <label className={styles.label}>
+                        {t("الجنس")} <span>*</span>
+                      </label>
+                      <select
                         name="gender"
-                        className={styles.select} 
+                        className={styles.select}
                         value={profileData.gender}
                         onChange={handleProfileChange}
                       >
-                        <option value="">اختر...</option>
-                        <option value="male">ذكر</option>
-                        <option value="female">أنثى</option>
+                        <option value="">{t("اختر...")}</option>
+                        <option value="male">{t("ذكر")}</option>
+                        <option value="female">{t("أنثى")}</option>
                       </select>
                     </div>
                     <div className={styles.fieldFull}>
-                      <label className={styles.label}>الموقع / السكن</label>
-                      <input 
-                        type="text" 
+                      <label className={styles.label}>{t("الموقع / السكن")}</label>
+                      <input
+                        type="text"
                         name="location"
-                        className={styles.input} 
-                        placeholder="مثل: القاهرة، مصر"
+                        className={styles.input}
+                        placeholder={t("مثل: القاهرة، مصر")}
                         value={profileData.location}
                         onChange={handleProfileChange}
                       />
@@ -396,14 +448,16 @@ export default function EditProfile() {
               <div className={styles.section}>
                 <div className={styles.row}>
                   <div className={styles.labelGroup}>
-                    <p className={styles.label}>نبذة عني</p>
-                    <p className={styles.sectionSub}>صف مهاراتك وخبراتك باختصار.</p>
+                    <p className={styles.label}>{t("نبذة عني")}</p>
+                    <p className={styles.sectionSub}>
+                      {t("صف مهاراتك وخبراتك باختصار.")}
+                    </p>
                   </div>
                   <div className={styles.fieldFull}>
-                    <textarea 
+                    <textarea
                       name="bio"
                       className={styles.textarea}
-                      placeholder="أضف نبذة عن نفسك..."
+                      placeholder={t("أضف نبذة عن نفسك...")}
                       value={profileData.bio}
                       onChange={handleProfileChange}
                     />
@@ -415,47 +469,67 @@ export default function EditProfile() {
               <div className={styles.section}>
                 <div className={styles.row}>
                   <div className={styles.labelGroup}>
-                    <p className={styles.label}>الخبرات</p>
-                    <p className={styles.sectionSub}>أضف خبراتك العملية السابقة.</p>
+                    <p className={styles.label}>{t("الخبرات")}</p>
+                    <p className={styles.sectionSub}>
+                      {t("أضف خبراتك العملية السابقة.")}
+                    </p>
                   </div>
                   <div className={styles.listContainer}>
                     {experience.map((exp, index) => (
                       <div key={index} className={styles.listItem}>
                         <div className={styles.listHeader}>
-                          <p className={styles.label}>خبرة {index + 1}</p>
-                          <button 
-                            className={styles.removeBtn} 
-                            onClick={() => setExperience(experience.filter((_, i) => i !== index))}
+                          <p className={styles.label}>{t("خبرة")} {index + 1}</p>
+                          <button
+                            className={styles.removeBtn}
+                            onClick={() =>
+                              setExperience(
+                                experience.filter((_, i) => i !== index),
+                              )
+                            }
                           >
-                            حذف
+                            {t("حذف")}
                           </button>
                         </div>
-                          <div className={styles.fieldFull}>
-                            <label className={styles.label}>المسمى الوظيفي</label>
-                            <input 
-                              type="text" 
-                              className={styles.input}
-                              value={exp.role}
-                                onChange={(e) => {
-                                  setExperience(experience.map((item, i) => i === index ? { ...item, role: e.target.value } : item));
-                                }}
-                            />
-                          </div>
-                          <div className={styles.fieldFull}>
-                            <label className={styles.label}>المدة</label>
-                            <input 
-                              type="text" 
-                              className={styles.input}
-                              placeholder="مثل: يناير 2020 - مارس 2023"
-                              value={exp.period}
-                                onChange={(e) => {
-                                  setExperience(experience.map((item, i) => i === index ? { ...item, period: e.target.value } : item));
-                                }}
-                            />
-                          </div>
+                        <div className={styles.fieldFull}>
+                          <label className={styles.label}>{t("المسمى الوظيفي")}</label>
+                          <input
+                            type="text"
+                            className={styles.input}
+                            value={exp.role}
+                            onChange={(e) => {
+                              setExperience(
+                                experience.map((item, i) =>
+                                  i === index
+                                    ? { ...item, role: e.target.value }
+                                    : item,
+                                ),
+                              );
+                            }}
+                          />
                         </div>
+                        <div className={styles.fieldFull}>
+                          <label className={styles.label}>{t("المدة")}</label>
+                          <input
+                            type="text"
+                            className={styles.input}
+                            placeholder={t("مثل: يناير 2020 - مارس 2023")}
+                            value={exp.period}
+                            onChange={(e) => {
+                              setExperience(
+                                experience.map((item, i) =>
+                                  i === index
+                                    ? { ...item, period: e.target.value }
+                                    : item,
+                                ),
+                              );
+                            }}
+                          />
+                        </div>
+                      </div>
                     ))}
-                    <button className={styles.addBtn} onClick={addExperience}>+ إضافة خبرة جديدة</button>
+                    <button className={styles.addBtn} onClick={addExperience}>
+                      + {t("إضافة خبرة جديدة")}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -464,37 +538,51 @@ export default function EditProfile() {
               <div className={styles.section}>
                 <div className={styles.row}>
                   <div className={styles.labelGroup}>
-                    <p className={styles.label}>التعليم</p>
-                    <p className={styles.sectionSub}>أضف مؤهلاتك العلمية.</p>
+                    <p className={styles.label}>{t("التعليم")}</p>
+                    <p className={styles.sectionSub}>{t("أضف مؤهلاتك العلمية.")}</p>
                   </div>
                   <div className={styles.listContainer}>
                     {education.map((edu, index) => (
                       <div key={index} className={styles.listItem}>
                         <div className={styles.listHeader}>
-                          <p className={styles.label}>تعليم {index + 1}</p>
-                          <button 
-                            className={styles.removeBtn} 
-                            onClick={() => setEducation(education.filter((_, i) => i !== index))}
+                          <p className={styles.label}>{t("تعليم")} {index + 1}</p>
+                          <button
+                            className={styles.removeBtn}
+                            onClick={() =>
+                              setEducation(
+                                education.filter((_, i) => i !== index),
+                              )
+                            }
                           >
-                            حذف
+                            {t("حذف")}
                           </button>
                         </div>
                         <div className={styles.formGrid}>
                           <div className={styles.field}>
-                            <label className={styles.label}>المؤسسة التعليمية</label>
-                            <input 
-                              type="text" 
+                            <label className={styles.label}>
+                              {t("المؤسسة التعليمية")}
+                            </label>
+                            <input
+                              type="text"
                               className={styles.input}
                               value={edu.school}
-                               onChange={(e) => {
-                                 setEducation(education.map((item, i) => i === index ? { ...item, school: e.target.value } : item));
-                               }}
+                              onChange={(e) => {
+                                setEducation(
+                                  education.map((item, i) =>
+                                    i === index
+                                      ? { ...item, school: e.target.value }
+                                      : item,
+                                  ),
+                                );
+                              }}
                             />
                           </div>
                           <div className={styles.field}>
-                            <label className={styles.label}>الدرجة العلمية</label>
-                            <input 
-                              type="text" 
+                            <label className={styles.label}>
+                              {t("الدرجة العلمية")}
+                            </label>
+                            <input
+                              type="text"
                               className={styles.input}
                               value={edu.degree}
                               onChange={(e) => {
@@ -505,9 +593,9 @@ export default function EditProfile() {
                             />
                           </div>
                           <div className={styles.field}>
-                            <label className={styles.label}>المدة</label>
-                            <input 
-                              type="text" 
+                            <label className={styles.label}>{t("المدة")}</label>
+                            <input
+                              type="text"
                               className={styles.input}
                               value={edu.period}
                               onChange={(e) => {
@@ -520,7 +608,9 @@ export default function EditProfile() {
                         </div>
                       </div>
                     ))}
-                    <button className={styles.addBtn} onClick={addEducation}>+ إضافة تعليم جديد</button>
+                    <button className={styles.addBtn} onClick={addEducation}>
+                      + {t("إضافة تعليم جديد")}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -529,16 +619,16 @@ export default function EditProfile() {
               <div className={styles.section}>
                 <div className={styles.row}>
                   <div className={styles.labelGroup}>
-                    <p className={styles.label}>المهارات واللغات</p>
+                    <p className={styles.label}>{t("المهارات واللغات")}</p>
                   </div>
                   <div className={styles.formGrid}>
                     <div className={styles.field}>
-                      <label className={styles.label}>المهارات</label>
+                      <label className={styles.label}>{t("المهارات")}</label>
                       <div className={styles.tagInputWrapper}>
-                        <input 
-                          type="text" 
-                          className={styles.input} 
-                          placeholder="أضف مهارة واضغط Enter" 
+                        <input
+                          type="text"
+                          className={styles.input}
+                          placeholder={t("أضف مهارة واضغط Enter")}
                           value={skillInput}
                           onChange={(e) => setSkillInput(e.target.value)}
                           onKeyDown={(e) => {
@@ -553,18 +643,25 @@ export default function EditProfile() {
                         {skills.map((skill, i) => (
                           <span key={i} className={styles.tag}>
                             {skill}
-                            <span className={styles.tagRemove} onClick={() => setSkills(skills.filter((_, idx) => idx !== i))}>×</span>
+                            <span
+                              className={styles.tagRemove}
+                              onClick={() =>
+                                setSkills(skills.filter((_, idx) => idx !== i))
+                              }
+                            >
+                              ×
+                            </span>
                           </span>
                         ))}
                       </div>
                     </div>
                     <div className={styles.field}>
-                      <label className={styles.label}>اللغات</label>
+                      <label className={styles.label}>{t("اللغات")}</label>
                       <div className={styles.tagInputWrapper}>
-                        <input 
-                          type="text" 
-                          className={styles.input} 
-                          placeholder="أضف لغة واضغط Enter" 
+                        <input
+                          type="text"
+                          className={styles.input}
+                          placeholder={t("أضف لغة واضغط Enter")}
                           value={langInput}
                           onChange={(e) => setLangInput(e.target.value)}
                           onKeyDown={(e) => {
@@ -579,7 +676,16 @@ export default function EditProfile() {
                         {languages.map((lang, i) => (
                           <span key={i} className={styles.tag}>
                             {lang}
-                            <span className={styles.tagRemove} onClick={() => setLanguages(languages.filter((_, idx) => idx !== i))}>×</span>
+                            <span
+                              className={styles.tagRemove}
+                              onClick={() =>
+                                setLanguages(
+                                  languages.filter((_, idx) => idx !== i),
+                                )
+                              }
+                            >
+                              ×
+                            </span>
                           </span>
                         ))}
                       </div>
@@ -592,37 +698,37 @@ export default function EditProfile() {
               <div className={styles.section}>
                 <div className={styles.row}>
                   <div className={styles.labelGroup}>
-                    <p className={styles.label}>روابط التواصل الاجتماعي</p>
+                    <p className={styles.label}>{t("روابط التواصل الاجتماعي")}</p>
                   </div>
                   <div className={styles.formGrid}>
                     <div className={styles.field}>
-                      <label className={styles.label}>إنستجرام</label>
-                      <input 
-                        type="text" 
+                      <label className={styles.label}>{t("إنستجرام")}</label>
+                      <input
+                        type="text"
                         name="instagram"
-                        className={styles.input} 
-                        placeholder="غير محدد"
+                        className={styles.input}
+                        placeholder={t("غير محدد")}
                         value={profileData.socialLinks.instagram}
                         onChange={handleSocialChange}
                       />
                     </div>
                     <div className={styles.field}>
-                      <label className={styles.label}>تويتر</label>
-                      <input 
-                        type="text" 
+                      <label className={styles.label}>{t("تويتر")}</label>
+                      <input
+                        type="text"
                         name="twitter"
-                        className={styles.input} 
-                        placeholder="غير محدد"
+                        className={styles.input}
+                        placeholder={t("غير محدد")}
                         value={profileData.socialLinks.twitter}
                         onChange={handleSocialChange}
                       />
                     </div>
                     <div className={styles.fieldFull}>
-                      <label className={styles.label}>الموقع الإلكتروني</label>
-                      <input 
-                        type="text" 
+                      <label className={styles.label}>{t("الموقع الإلكتروني")}</label>
+                      <input
+                        type="text"
                         name="website"
-                        className={styles.input} 
+                        className={styles.input}
                         placeholder="https://example.com"
                         value={profileData.socialLinks.website}
                         onChange={handleSocialChange}
@@ -636,29 +742,42 @@ export default function EditProfile() {
               <div className={styles.section}>
                 <div className={styles.row}>
                   <div className={styles.labelGroup}>
-                    <p className={styles.label}>المعرض</p>
-                    <p className={styles.sectionSub}>أضف صوراً لأعمالك أو إنجازاتك.</p>
+                    <p className={styles.label}>{t("المعرض")}</p>
+                    <p className={styles.sectionSub}>
+                      {t("أضف صوراً لأعمالك أو إنجازاتك.")}
+                    </p>
                   </div>
                   <div className={styles.fieldFull}>
-                    <div className={styles.uploadZone} onClick={() => galleryInputRef.current?.click()}>
+                    <div
+                      className={styles.uploadZone}
+                      onClick={() => galleryInputRef.current?.click()}
+                    >
                       <UploadIcon />
-                      <p className={styles.uploadText}>انقر لإضافة صور إلى المعرض</p>
-                      <input 
-                        type="file" 
-                        ref={galleryInputRef} 
-                        style={{ display: "none" }} 
-                        accept="image/*" 
-                        multiple 
+                      <p className={styles.uploadText}>
+                        {t("انقر لإضافة صور إلى المعرض")}
+                      </p>
+                      <input
+                        type="file"
+                        ref={galleryInputRef}
+                        style={{ display: "none" }}
+                        accept="image/*"
+                        multiple
                         onChange={handleGalleryUpload}
                       />
                     </div>
                     <div className={styles.galleryGrid}>
                       {gallery.map((img, i) => (
                         <div key={i} className={styles.galleryItem}>
-                          <img src={img} alt={`Gallery ${i}`} className={styles.galleryImg} />
-                          <button 
+                          <img
+                            src={img}
+                            alt={`Gallery ${i}`}
+                            className={styles.galleryImg}
+                          />
+                          <button
                             className={styles.galleryRemove}
-                            onClick={() => setGallery(gallery.filter((_, idx) => idx !== i))}
+                            onClick={() =>
+                              setGallery(gallery.filter((_, idx) => idx !== i))
+                            }
                           >
                             ×
                           </button>
@@ -673,50 +792,42 @@ export default function EditProfile() {
               <div className={styles.section}>
                 <div className={styles.row}>
                   <div className={styles.labelGroup}>
-                    <p className={styles.label}>نوع الحساب</p>
-                    <p className={styles.sectionSub}>يمكنك تحديث نوع حسابك للوصول لميزات مختلفة.</p>
+                    <p className={styles.label}>{t("نوع الحساب")}</p>
+                    <p className={styles.sectionSub}>
+                      {t("يمكنك تحديث نوع حسابك للوصول لميزات مختلفة.")}
+                    </p>
                   </div>
                   <div className={styles.radioGroup}>
                     <label className={styles.radioItem}>
-                      <input 
-                        type="radio" 
-                        name="accountType" 
+                      <input
+                        type="radio"
+                        name="accountType"
                         value="job_seeker"
                         className={styles.radioInput}
                         checked={profileData.accountType === "job_seeker"}
                         onChange={handleProfileChange}
                       />
                       <div className={styles.radioLabel}>
-                        <span className={styles.radioTitle}>باحث عن عمل</span>
-                        <span className={styles.radioDesc}>ابحث عن وظائف وتقدم لها بسهولة</span>
+                        <span className={styles.radioTitle}>{t("باحث عن عمل")}</span>
+                        <span className={styles.radioDesc}>
+                          {t("ابحث عن وظائف وتقدم لها بسهولة")}
+                        </span>
                       </div>
                     </label>
                     <label className={styles.radioItem}>
-                      <input 
-                        type="radio" 
-                        name="accountType" 
-                        value="job_seeker"
-                        className={styles.radioInput}
-                        // checked={profileData.accountType === "job_seeker"}
-                        // onChange={handleProfileChange}
-                      />
-                      <div className={styles.radioLabel}>
-                        <span className={styles.radioTitle}>حرفي</span>
-                        <span className={styles.radioDesc}>ابحث عن وظائف وتقدم لها بسهولة</span>
-                      </div>
-                    </label>
-                    <label className={styles.radioItem}>
-                      <input 
-                        type="radio" 
-                        name="accountType" 
+                      <input
+                        type="radio"
+                        name="accountType"
                         value="employer"
                         className={styles.radioInput}
                         checked={profileData.accountType === "employer"}
                         onChange={handleProfileChange}
                       />
                       <div className={styles.radioLabel}>
-                        <span className={styles.radioTitle}>صاحب عمل</span>
-                        <span className={styles.radioDesc}>وظف أفضل الكفاءات وأعلن عن وظائفك</span>
+                        <span className={styles.radioTitle}>{t("خدمات")}</span>
+                        <span className={styles.radioDesc}>
+                          {t("قدم خدمة")}
+                        </span>
                       </div>
                     </label>
                   </div>
@@ -726,53 +837,55 @@ export default function EditProfile() {
           )}
 
           {activeTab === "login" && (
-            <motion.div 
+            <motion.div
               key="login"
               initial={{ opacity: 0, x: 10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -10 }}
             >
               <div className={styles.section}>
-                <h3 className={styles.sectionTitle}>أمان الحساب</h3>
-                <p className={styles.sectionSub}>قم بتحديث كلمة المرور الخاصة بك بانتظام للحفاظ على أمان حسابك.</p>
+                <h3 className={styles.sectionTitle}>{t("أمان الحساب")}</h3>
+                <p className={styles.sectionSub}>
+                  {t("قم بتحديث كلمة المرور الخاصة بك بانتظام للحفاظ على أمان حسابك.")}
+                </p>
                 <div className={styles.formGrid}>
                   <div className={`${styles.field} ${styles.fieldFull}`}>
-                    <label className={styles.label}>كلمة المرور الحالية</label>
+                    <label className={styles.label}>{t("كلمة المرور الحالية")}</label>
                     <div style={{ position: "relative" }}>
-                      <input 
-                        type={showPass ? "text" : "password"} 
+                      <input
+                        type={showPass ? "text" : "password"}
                         name="current"
-                        className={styles.input} 
-                        placeholder="••••••••" 
+                        className={styles.input}
+                        placeholder="••••••••"
                         value={passwords.current}
                         onChange={handlePasswordChange}
                       />
-                      <button 
+                      <button
                         className={styles.toggleBtn}
                         onClick={() => setShowPass(!showPass)}
                       >
-                        {showPass ? "إخفاء" : "إظهار"}
+                        {showPass ? t("إخفاء") : t("إظهار")}
                       </button>
                     </div>
                   </div>
                   <div className={styles.field}>
-                    <label className={styles.label}>كلمة المرور الجديدة</label>
-                    <input 
-                      type={showPass ? "text" : "password"} 
+                    <label className={styles.label}>{t("كلمة المرور الجديدة")}</label>
+                    <input
+                      type={showPass ? "text" : "password"}
                       name="new"
-                      className={styles.input} 
-                      placeholder="••••••••" 
+                      className={styles.input}
+                      placeholder="••••••••"
                       value={passwords.new}
                       onChange={handlePasswordChange}
                     />
                   </div>
                   <div className={styles.field}>
-                    <label className={styles.label}>تأكيد كلمة المرور</label>
-                    <input 
-                      type={showPass ? "text" : "password"} 
+                    <label className={styles.label}>{t("تأكيد كلمة المرور")}</label>
+                    <input
+                      type={showPass ? "text" : "password"}
                       name="confirm"
-                      className={styles.input} 
-                      placeholder="••••••••" 
+                      className={styles.input}
+                      placeholder="••••••••"
                       value={passwords.confirm}
                       onChange={handlePasswordChange}
                     />
@@ -783,24 +896,35 @@ export default function EditProfile() {
           )}
 
           {activeTab === "notifications" && (
-            <motion.div 
+            <motion.div
               key="notifications"
               initial={{ opacity: 0, x: 10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -10 }}
             >
               <div className={styles.section}>
-                <h3 className={styles.sectionTitle}>إعدادات الإشعارات</h3>
-                <p className={styles.sectionSub}>اختر كيف ومتى تود استلام الإشعارات منا.</p>
-                
+                <h3 className={styles.sectionTitle}>{t("إعدادات الإشعارات")}</h3>
+                <p className={styles.sectionSub}>
+                  {t("اختر كيف ومتى تود استلام الإشعارات منا.")}
+                </p>
+
                 <div className={styles.toggleRow}>
                   <div className={styles.toggleLabel}>
-                    <span className={styles.radioTitle}>إشعارات البريد الإلكتروني</span>
-                    <span className={styles.radioDesc}>استلم ملخصاً أسبوعياً للوظائف والمقالات</span>
+                    <span className={styles.radioTitle}>
+                      {t("إشعارات البريد الإلكتروني")}
+                    </span>
+                    <span className={styles.radioDesc}>
+                      {t("استلم ملخصاً أسبوعياً للوظائف والمقالات")}
+                    </span>
                   </div>
-                  <div 
+                  <div
                     className={`${styles.toggleSwitch} ${notifications.email ? styles.active : ""}`}
-                    onClick={() => setNotifications({...notifications, email: !notifications.email})}
+                    onClick={() =>
+                      setNotifications({
+                        ...notifications,
+                        email: !notifications.email,
+                      })
+                    }
                   >
                     <div className={styles.toggleSlider} />
                   </div>
@@ -808,12 +932,19 @@ export default function EditProfile() {
 
                 <div className={styles.toggleRow}>
                   <div className={styles.toggleLabel}>
-                    <span className={styles.radioTitle}>تنبيهات الوظائف</span>
-                    <span className={styles.radioDesc}>عند نشر وظيفة جديدة تناسب مهاراتك</span>
+                    <span className={styles.radioTitle}>{t("تنبيهات الوظائف")}</span>
+                    <span className={styles.radioDesc}>
+                      {t("عند نشر وظيفة جديدة تناسب مهاراتك")}
+                    </span>
                   </div>
-                  <div 
+                  <div
                     className={`${styles.toggleSwitch} ${notifications.jobAlerts ? styles.active : ""}`}
-                    onClick={() => setNotifications({...notifications, jobAlerts: !notifications.jobAlerts})}
+                    onClick={() =>
+                      setNotifications({
+                        ...notifications,
+                        jobAlerts: !notifications.jobAlerts,
+                      })
+                    }
                   >
                     <div className={styles.toggleSlider} />
                   </div>
@@ -821,12 +952,19 @@ export default function EditProfile() {
 
                 <div className={styles.toggleRow}>
                   <div className={styles.toggleLabel}>
-                    <span className={styles.radioTitle}>تحديثات الطلبات</span>
-                    <span className={styles.radioDesc}>عند تغيير حالة طلبات التوظيف الخاصة بك</span>
+                    <span className={styles.radioTitle}>{t("تحديثات الطلبات")}</span>
+                    <span className={styles.radioDesc}>
+                      {t("عند تغيير حالة طلبات التوظيف الخاصة بك")}
+                    </span>
                   </div>
-                  <div 
+                  <div
                     className={`${styles.toggleSwitch} ${notifications.applications ? styles.active : ""}`}
-                    onClick={() => setNotifications({...notifications, applications: !notifications.applications})}
+                    onClick={() =>
+                      setNotifications({
+                        ...notifications,
+                        applications: !notifications.applications,
+                      })
+                    }
                   >
                     <div className={styles.toggleSlider} />
                   </div>
@@ -836,10 +974,14 @@ export default function EditProfile() {
           )}
         </AnimatePresence>
       </div>
-      
+
       <div className={styles.footer}>
-        <button className={styles.saveBtn} onClick={handleSave} disabled={isSaving}>
-          {isSaving ? "جاري الحفظ..." : "حفظ الملف الشخصي"}
+        <button
+          className={styles.saveBtn}
+          onClick={handleSave}
+          disabled={isSaving}
+        >
+          {isSaving ? t("جاري الحفظ...") : t("حفظ الملف الشخصي")}
         </button>
       </div>
     </div>

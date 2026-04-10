@@ -1,14 +1,24 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./ProfileSettings.module.css";
-import { useJobitoAuth } from "../../context/AuthContext";
+import { useJobitoAuth } from "../../context/LinkContxt";
 import { GoogleLogin } from "@react-oauth/google";
+import { useTranslation } from "../../context/translation-context";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 const UploadIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    width="28"
+    height="28"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
     <polyline points="17 8 12 3 7 8" />
     <line x1="12" y1="3" x2="12" y2="15" />
@@ -17,8 +27,22 @@ const UploadIcon = () => (
 
 const tabVariants = {
   hidden: { opacity: 0, x: 24 },
-  show: { opacity: 1, x: 0, transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] } },
-  exit: { opacity: 0, x: -24, transition: { duration: 0.2, ease: [0.4, 0, 1, 1] as [number, number, number, number] } },
+  show: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.32,
+      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+    },
+  },
+  exit: {
+    opacity: 0,
+    x: -24,
+    transition: {
+      duration: 0.2,
+      ease: [0.4, 0, 1, 1] as [number, number, number, number],
+    },
+  },
 };
 
 const getFullImageUrl = (url?: string) => {
@@ -30,6 +54,7 @@ const getFullImageUrl = (url?: string) => {
 type ProfileSubTab = "overview" | "social" | "security" | "benefits";
 
 export default function ProfileSettings() {
+  const { t } = useTranslation();
   const { user, role, googleClientId, apiFetch, login } = useJobitoAuth();
   const [activeSubTab, setActiveSubTab] = useState<ProfileSubTab>("overview");
   const [isSaving, setIsSaving] = useState(false);
@@ -80,7 +105,8 @@ export default function ProfileSettings() {
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const endpoint = role === 'company' ? '/companies/my/profile' : '/users/me';
+        const endpoint =
+          role === "company" ? "/companies/my/profile" : "/users/me";
         const res = await apiFetch(`${API_BASE_URL}${endpoint}`);
         if (res.ok) {
           const data = await res.json();
@@ -97,13 +123,16 @@ export default function ProfileSettings() {
               linkedin: "",
               youtube: "",
             },
-            locationTags: Array.isArray(data.locationTags) ? data.locationTags : [],
+            locationTags: Array.isArray(data.locationTags)
+              ? data.locationTags
+              : [],
             techStack: Array.isArray(data.techStack) ? data.techStack : [],
             benefits: Array.isArray(data.benefits) ? data.benefits : [],
             classification: data.classification || "تقني",
-            foundedDate: (data.foundedYear && data.foundedMonth && data.foundedDay) 
-              ? `${data.foundedYear}-${String(data.foundedMonth).padStart(2, '0')}-${String(data.foundedDay).padStart(2, '0')}`
-              : "",
+            foundedDate:
+              data.foundedYear && data.foundedMonth && data.foundedDay
+                ? `${data.foundedYear}-${String(data.foundedMonth).padStart(2, "0")}-${String(data.foundedDay).padStart(2, "0")}`
+                : "",
           });
           setPreview(data.logoUrl || data.avatarUrl || null);
           setEmail(data.email || "");
@@ -115,7 +144,11 @@ export default function ProfileSettings() {
     fetchProfileData();
   }, [role, apiFetch]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
+  ) => {
     const { name, value } = e.target;
     setFormData((prev: any) => ({ ...prev, [name]: value }));
   };
@@ -149,7 +182,6 @@ export default function ProfileSettings() {
         const uploadRes = await apiFetch(`${API_BASE_URL}/images/profile`, {
           method: "PUT",
           body: fd,
-          // Note: apiFetch will handle the token, and fetch will automatically set the boundary for FormData
         });
         if (uploadRes.ok) {
           const imgData = await uploadRes.json();
@@ -157,14 +189,15 @@ export default function ProfileSettings() {
         }
       }
 
-      const endpoint = role === 'company' ? '/companies/my/profile' : '/users/me';
+      const endpoint =
+        role === "company" ? "/companies/my/profile" : "/users/me";
       let bodyData: any;
-      
-      if (role === 'company') {
-        bodyData = { 
-          ...formData, 
+
+      if (role === "company") {
+        bodyData = {
+          ...formData,
           logo: finalImgUrl,
-          classification: formData.classification
+          classification: formData.classification,
         };
         if (formData.foundedDate) {
           const [y, m, d] = formData.foundedDate.split("-");
@@ -173,16 +206,16 @@ export default function ProfileSettings() {
           bodyData.foundedDay = d;
         }
       } else {
-        bodyData = { 
-          ...formData, 
-          avatar: finalImgUrl, 
+        bodyData = {
+          ...formData,
+          avatar: finalImgUrl,
           fullName: formData.fullName || formData.name,
-          classification: formData.classification 
+          classification: formData.classification,
         };
       }
 
       const res = await apiFetch(`${API_BASE_URL}${endpoint}`, {
-        method: role === 'company' ? "PATCH" : "PUT",
+        method: role === "company" ? "PATCH" : "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -195,10 +228,10 @@ export default function ProfileSettings() {
           login(resData.access_token);
         }
         window.dispatchEvent(new Event("jobito-profile-updated"));
-        alert("تم حفظ التعديلات بنجاح!");
+        alert(t("تم حفظ التعديلات بنجاح!"));
       }
     } catch (err: any) {
-      alert(err.message || "فشل في تحديث الملف الشخصي.");
+      alert(err.message || t("فشل في تحديث الملف الشخصي."));
     } finally {
       setIsSaving(false);
     }
@@ -215,8 +248,8 @@ export default function ProfileSettings() {
         },
         body: JSON.stringify({ email }),
       });
-      if (!res.ok) throw new Error("فشل في تحديث البريد الإلكتروني.");
-      alert("تم تحديث البريد الإلكتروني بنجاح!");
+      if (!res.ok) throw new Error(t("فشل في تحديث البريد الإلكتروني."));
+      alert(t("تم تحديث البريد الإلكتروني بنجاح!"));
     } catch (err: any) {
       alert(err.message);
     } finally {
@@ -227,7 +260,7 @@ export default function ProfileSettings() {
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (passwords.new !== passwords.confirm) {
-      alert("كلمات المرور غير متطابقة!");
+      alert(t("كلمات المرور غير متطابقة!"));
       return;
     }
     try {
@@ -244,9 +277,9 @@ export default function ProfileSettings() {
       });
       if (!res.ok) {
         const errData = await res.json();
-        throw new Error(errData.message || "فشل في تحديث كلمة المرور.");
+        throw new Error(errData.message || t("فشل في تحديث كلمة المرور."));
       }
-      alert("تم تحديث كلمة المرور بنجاح!");
+      alert(t("تم تحديث كلمة المرور بنجاح!"));
       setPasswords({ current: "", new: "", confirm: "" });
     } catch (err: any) {
       alert(err.message);
@@ -265,7 +298,7 @@ export default function ProfileSettings() {
         body: JSON.stringify({ googleToken: response.credential }),
       });
       if (res.ok) {
-        alert("تم ربط حساب جوجل بنجاح!");
+        alert(t("تم ربط حساب جوجل بنجاح!"));
         window.location.reload();
       } else {
         const error = await res.json();
@@ -277,18 +310,22 @@ export default function ProfileSettings() {
   };
 
   const subTabs = [
-    { id: "overview" as ProfileSubTab, label: "نظرة عامة" },
-    ...(role === 'company' ? [
-        { id: "social" as ProfileSubTab, label: "روابط التواصل" },
-        { id: "benefits" as ProfileSubTab, label: "المزايا" }
-    ] : []),
-    { id: "security" as ProfileSubTab, label: "أمان الحساب" },
+    { id: "overview" as ProfileSubTab, label: t("نظرة عامة") },
+    ...(role === "company"
+      ? [
+          { id: "social" as ProfileSubTab, label: t("روابط التواصل") },
+          { id: "benefits" as ProfileSubTab, label: t("المزايا") },
+        ]
+      : []),
+    { id: "security" as ProfileSubTab, label: t("أمان الحساب") },
   ];
 
   return (
-    <div className={styles.tabContent} dir="rtl">
+    <div className={styles.tabContent}>
       <div className={styles.sectionHeader}>
-        <h2>{role === 'company' ? 'إعدادات الشركة' : 'إعدادات الملف الشخصي'}</h2>
+        <h2>
+          {role === "company" ? t("إعدادات الشركة") : t("إعدادات الملف الشخصي")}
+        </h2>
       </div>
 
       <div className={styles.subTabBar}>
@@ -315,22 +352,39 @@ export default function ProfileSettings() {
             <>
               <div className={styles.row}>
                 <div className={styles.rowLabel}>
-                  <strong>الصورة الشخصية</strong>
-                  <span>{role === 'company' ? 'شعار الشركة' : 'صورتك الشخصية'}</span>
+                  <strong>{t("الصورة الشخصية")}</strong>
+                  <span>
+                    {role === "company" ? t("شعار الشركة") : t("صورتك الشخصية")}
+                  </span>
                 </div>
                 <div className={styles.rowContent}>
                   <div className={styles.logoUploadRow}>
                     <div className={styles.logoCirclePreview}>
                       {preview ? (
-                        <img src={getFullImageUrl(preview) || ""} alt="avatar" />
+                        <img
+                          src={getFullImageUrl(preview) || ""}
+                          alt="avatar"
+                        />
                       ) : (
                         <div className={styles.logoPlaceholder}>LOGO</div>
                       )}
                     </div>
-                    <div className={styles.logoUploadZone} onClick={() => fileRef.current?.click()}>
+                    <div
+                      className={styles.logoUploadZone}
+                      onClick={() => fileRef.current?.click()}
+                    >
                       <UploadIcon />
-                      <p><span className={styles.blueText}>انقر للاستبدال</span> أو سحب وإفلات</p>
-                      <input ref={fileRef} type="file" accept="image/*" hidden onChange={handleFile} />
+                      <p>
+                        <span className={styles.blueText}>{t("انقر للاستبدال")}</span>{" "}
+                        {t("أو سحب وإفلات")}
+                      </p>
+                      <input
+                        ref={fileRef}
+                        type="file"
+                        accept="image/*"
+                        hidden
+                        onChange={handleFile}
+                      />
                     </div>
                   </div>
                 </div>
@@ -338,23 +392,27 @@ export default function ProfileSettings() {
 
               <div className={styles.row}>
                 <div className={styles.rowLabel}>
-                  <strong>المعلومات الأساسية</strong>
+                  <strong>{t("المعلومات الأساسية")}</strong>
                 </div>
                 <div className={styles.rowContent}>
                   <div className={styles.fieldFull}>
-                    <label>{role === 'company' ? 'اسم الشركة' : 'الاسم الكامل'}</label>
+                    <label>
+                      {role === "company" ? t("اسم الشركة") : t("الاسم الكامل")}
+                    </label>
                     <input
-                      name={role === 'company' ? "name" : "fullName"}
+                      name={role === "company" ? "name" : "fullName"}
                       type="text"
-                      value={role === 'company' ? formData.name : formData.fullName}
+                      value={
+                        role === "company" ? formData.name : formData.fullName
+                      }
                       onChange={handleChange}
                     />
                   </div>
-                  {role === 'student' && (
+                  {role === "student" && (
                     <>
                       <div className={styles.fieldGrid}>
                         <div className={styles.fieldFull}>
-                          <label>الاسم الكامل</label>
+                          <label>{t("الاسم الكامل")}</label>
                           <input
                             name="fullName"
                             type="text"
@@ -363,78 +421,78 @@ export default function ProfileSettings() {
                           />
                         </div>
                         <div className={styles.fieldFull}>
-                          <label>التصنيف المهني</label>
-                          <select 
-                            name="classification" 
-                            value={formData.classification} 
+                          <label>{t("التصنيف المهني")}</label>
+                          <select
+                            name="classification"
+                            value={formData.classification}
                             onChange={handleChange}
                           >
-                            <option value="تقني">تقني</option>
-                            <option value="غير تقني">غير تقني</option>
+                            <option value="تقني">{t("تقني")}</option>
+                            <option value="غير تقني">{t("غير تقني")}</option>
                           </select>
                         </div>
                       </div>
                       <div className={styles.fieldFull}>
-                          <label>نبذة تعريفية</label>
-                          <textarea
-                              name="bio"
-                              value={formData.bio}
-                              onChange={handleChange}
-                              rows={4}
-                          />
+                        <label>{t("نبذة تعريفية")}</label>
+                        <textarea
+                          name="bio"
+                          value={formData.bio}
+                          onChange={handleChange}
+                          rows={4}
+                        />
                       </div>
                     </>
                   )}
-                  {role === 'company' && (
+                  {role === "company" && (
                     <>
                       <div className={styles.fieldGrid}>
                         <div>
-                          <label>الموظفين</label>
-                          <input 
-                            name="employees" 
-                            type="text" 
-                            value={formData.employees} 
-                            onChange={handleChange} 
-                            placeholder="مثال: 50-100"
+                          <label>{t("الموظفين")}</label>
+                          <input
+                            name="employees"
+                            type="text"
+                            value={formData.employees}
+                            onChange={handleChange}
+                            placeholder={t("مثال: 50-100")}
                           />
                         </div>
                         <div>
-                          <label>مجال العمل</label>
-                          <input 
-                            name="industry" 
-                            type="text" 
-                            value={formData.industry} 
-                            onChange={handleChange} 
-                            placeholder="مثال: البرمجيات"
+                          <label>{t("مجال العمل")}</label>
+                          <input
+                            name="industry"
+                            type="text"
+                            value={formData.industry}
+                            onChange={handleChange}
+                            placeholder={t("مثال: البرمجيات")}
                           />
                         </div>
                       </div>
                       <div className={styles.fieldGrid}>
                         <div>
-                          <label>التصنيف</label>
-                          <select 
-                            name="classification" 
-                            value={formData.classification} 
+                          <label>{t("التصنيف")}</label>
+                          <select
+                            name="classification"
+                            value={formData.classification}
                             onChange={handleChange}
                           >
-                            <option value="تقني">تقني</option>
-                            <option value="غير تقني">غير تقني</option>
+                            <option value="تقني">{t("تقني")}</option>
+                            <option value="غير تقني">{t("غير تقني")}</option>
                           </select>
                         </div>
                         <div>
-                          <label>الموقع (العنوان)</label>
+                          <label>{t("الموقع (العنوان)")}</label>
                           <input
                             name="address"
                             type="text"
                             value={formData.address}
                             onChange={handleChange}
-                            placeholder="مثال: الرياض، السعودية"
+                            placeholder={t("مثال: الرياض، السعودية")}
                           />
                         </div>
                       </div>
                       <div className={styles.fieldGrid}>
                         <div>
-                          <label>تاريخ التأسيس</label>
+                          <label>{t("تاريخ التأسيس")}</label>
                           <input
                             name="foundedDate"
                             type="date"
@@ -442,11 +500,16 @@ export default function ProfileSettings() {
                             onChange={handleChange}
                           />
                         </div>
-                        <div /> 
+                        <div />
                       </div>
                       <div className={styles.fieldFull}>
-                        <label>الوصف</label>
-                        <textarea name="description" value={formData.description} onChange={handleChange} rows={5} />
+                        <label>{t("الوصف")}</label>
+                        <textarea
+                          name="description"
+                          value={formData.description}
+                          onChange={handleChange}
+                          rows={5}
+                        />
                       </div>
                     </>
                   )}
@@ -457,8 +520,8 @@ export default function ProfileSettings() {
           {activeSubTab === "social" && (
             <div className={styles.row}>
               <div className={styles.rowLabel}>
-                <strong>روابط التواصل الاجتماعي</strong>
-                <span>أضف روابط حسابات الشركة على منصات التواصل.</span>
+                <strong>{t("روابط التواصل الاجتماعي")}</strong>
+                <span>{t("أضف روابط حسابات الشركة على منصات التواصل.")}</span>
               </div>
               <div className={styles.rowContent}>
                 <div className={styles.fieldFull}>
@@ -517,17 +580,19 @@ export default function ProfileSettings() {
           {activeSubTab === "benefits" && (
             <div className={styles.row}>
               <div className={styles.rowLabel}>
-                <strong>المزايا والفوائد</strong>
-                <span>أضف المزايا التي توفرها شركتك للموظفين.</span>
+                <strong>{t("المزايا والفوائد")}</strong>
+                <span>{t("أضف المزايا التي توفرها شركتك للموظفين.")}</span>
               </div>
               <div className={styles.rowContent}>
                 <div className={styles.benefitsGrid}>
                   {formData.benefits?.map((benefit: any, index: number) => (
                     <div key={index} className={styles.benefitCard}>
-                      <button 
+                      <button
                         className={styles.removeBenefitBtn}
                         onClick={() => {
-                          const updated = formData.benefits.filter((_: any, i: number) => i !== index);
+                          const updated = formData.benefits.filter(
+                            (_: any, i: number) => i !== index,
+                          );
                           setFormData({ ...formData, benefits: updated });
                         }}
                       >
@@ -542,49 +607,70 @@ export default function ProfileSettings() {
                     <div className={styles.addBenefitCard}>
                       <input
                         type="text"
-                        placeholder="عنوان الميزة (مثال: تأمين صحي)"
+                        placeholder={t("عنوان الميزة (مثال: تأمين صحي)")}
                         value={newBenefit.title}
-                        onChange={(e) => setNewBenefit({ ...newBenefit, title: e.target.value })}
+                        onChange={(e) =>
+                          setNewBenefit({
+                            ...newBenefit,
+                            title: e.target.value,
+                          })
+                        }
                       />
                       <textarea
-                        placeholder="وصف الميزة..."
+                        placeholder={t("وصف الميزة...")}
                         value={newBenefit.description}
-                        onChange={(e) => setNewBenefit({ ...newBenefit, description: e.target.value })}
+                        onChange={(e) =>
+                          setNewBenefit({
+                            ...newBenefit,
+                            description: e.target.value,
+                          })
+                        }
                         rows={3}
                       />
                       <div className={styles.benefitAddActions}>
-                        <button 
+                        <button
                           className={styles.addBtnSmall}
                           onClick={() => {
-                            if (!newBenefit.title) return alert("يرجى إدخال عنوان الميزة");
+                            if (!newBenefit.title)
+                              return alert(t("يرجى إدخال عنوان الميزة"));
                             setFormData({
                               ...formData,
-                              benefits: [...(formData.benefits || []), newBenefit]
+                              benefits: [
+                                ...(formData.benefits || []),
+                                newBenefit,
+                              ],
                             });
                             setNewBenefit({ title: "", description: "" });
                             setShowAddBenefit(false);
                           }}
                         >
-                          إضافة
+                          {t("إضافة")}
                         </button>
-                        <button 
+                        <button
                           className={styles.cancelBtnSmall}
                           onClick={() => setShowAddBenefit(false)}
                         >
-                          إلغاء
+                          {t("إلغاء")}
                         </button>
                       </div>
                     </div>
                   ) : (
-                    <div 
+                    <div
                       className={styles.addBenefitTrigger}
                       onClick={() => setShowAddBenefit(true)}
                     >
-                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg
+                        width="32"
+                        height="32"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
                         <line x1="12" y1="5" x2="12" y2="19" />
                         <line x1="5" y1="12" x2="19" y2="12" />
                       </svg>
-                      <span>إضافة ميزة جديدة</span>
+                      <span>{t("إضافة ميزة جديدة")}</span>
                     </div>
                   )}
                 </div>
@@ -596,50 +682,106 @@ export default function ProfileSettings() {
             <>
               <div className={styles.row}>
                 <div className={styles.rowLabel}>
-                  <strong>البريد الإلكتروني</strong>
+                  <strong>{t("البريد الإلكتروني")}</strong>
                 </div>
                 <div className={styles.rowContent}>
-                  <form onSubmit={handleUpdateEmail} className={styles.inlineForm}>
-                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                    <button type="submit" className={styles.saveBtn} disabled={isSavingEmail}>تحديث</button>
+                  <form
+                    onSubmit={handleUpdateEmail}
+                    className={styles.inlineForm}
+                  >
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className={styles.saveBtn}
+                      disabled={isSavingEmail}
+                    >
+                      {t("تحديث")}
+                    </button>
                   </form>
                 </div>
               </div>
               <div className={styles.row}>
                 <div className={styles.rowLabel}>
-                  <strong>تغيير كلمة المرور</strong>
+                  <strong>{t("تغيير كلمة المرور")}</strong>
                 </div>
                 <div className={styles.rowContent}>
-                  <form onSubmit={handleUpdatePassword} className={styles.passwordForm}>
-                    <input type="password" placeholder="كلمة المرور الحالية" value={passwords.current} onChange={(e) => setPasswords({...passwords, current: e.target.value})} required />
-                    <input type="password" placeholder="كلمة المرور الجديدة" value={passwords.new} onChange={(e) => setPasswords({...passwords, new: e.target.value})} required />
-                    <input type="password" placeholder="تأكيد كلمة المرور" value={passwords.confirm} onChange={(e) => setPasswords({...passwords, confirm: e.target.value})} required />
-                    <button type="submit" className={styles.saveBtn} disabled={isSavingPass}>تحديث كلمة المرور</button>
+                  <form
+                    onSubmit={handleUpdatePassword}
+                    className={styles.passwordForm}
+                  >
+                    <input
+                      type="password"
+                      placeholder={t("كلمة المرور الحالية")}
+                      value={passwords.current}
+                      onChange={(e) =>
+                        setPasswords({ ...passwords, current: e.target.value })
+                      }
+                      required
+                    />
+                    <input
+                      type="password"
+                      placeholder={t("كلمة المرور الجديدة")}
+                      value={passwords.new}
+                      onChange={(e) =>
+                        setPasswords({ ...passwords, new: e.target.value })
+                      }
+                      required
+                    />
+                    <input
+                      type="password"
+                      placeholder={t("تأكيد كلمة المرور")}
+                      value={passwords.confirm}
+                      onChange={(e) =>
+                        setPasswords({ ...passwords, confirm: e.target.value })
+                      }
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className={styles.saveBtn}
+                      disabled={isSavingPass}
+                    >
+                      {t("تحديث كلمة المرور")}
+                    </button>
                   </form>
                 </div>
               </div>
 
               <div className={styles.row}>
                 <div className={styles.rowLabel}>
-                  <strong>ربط حساب جوجل</strong>
-                  <span>اربط حسابك لتتمكن من تسجيل الدخول بلمسة واحدة.</span>
+                  <strong>{t("ربط حساب جوجل")}</strong>
+                  <span>{t("اربط حسابك لتتمكن من تسجيل الدخول بلمسة واحدة.")}</span>
                 </div>
                 <div className={styles.rowContent}>
                   {formData.googleId ? (
                     <div className={styles.linkedBadge}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                         <polyline points="22 4 12 14.01 9 11.01" />
                       </svg>
-                      <span>حساب جوجل مرتبط بنجاح</span>
+                      <span>{t("حساب جوجل مرتبط بنجاح")}</span>
                     </div>
                   ) : (
                     <div className={styles.linkAction}>
-                      <p className={styles.linkNote}>الحساب غير مرتبط حالياً.</p>
+                      <p className={styles.linkNote}>
+                        {t("الحساب غير مرتبط حالياً.")}
+                      </p>
                       <div className={styles.googleBtnWrapper}>
                         <GoogleLogin
                           onSuccess={handleGoogleLinkSuccess}
-                          onError={() => alert("فشل الاتصال بجوجل")}
+                          onError={() => alert(t("فشل الاتصال بجوجل"))}
                           useOneTap
                           theme="outline"
                           text="continue_with"
@@ -656,8 +798,12 @@ export default function ProfileSettings() {
 
       {activeSubTab !== "security" && (
         <div className={styles.saveRow}>
-          <button className={styles.saveBtn} onClick={handleSave} disabled={isSaving}>
-            {isSaving ? "جاري الحفظ..." : "حفظ التغييرات"}
+          <button
+            className={styles.saveBtn}
+            onClick={handleSave}
+            disabled={isSaving}
+          >
+            {isSaving ? t("جاري الحفظ...") : t("حفظ التغييرات")}
           </button>
         </div>
       )}

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import styles from "./ChatApp.module.css";
-import { 
-  Plus, 
-  Mic, 
-  Smile, 
+import {
+  Plus,
+  Mic,
+  Smile,
   Send,
   X,
   FileText,
@@ -36,12 +36,12 @@ import {
   History,
   Heart,
   List,
-  LogOut
+  LogOut,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { io, Socket } from "socket.io-client";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useJobitoAuth } from "../../context/AuthContext";
+import { useJobitoAuth } from "../../context/LinkContxt";
 // import EmojiPicker from "emoji-picker-react"; // TEMPORARILY DISABLED
 
 const s = styles as Record<string, string>;
@@ -54,14 +54,22 @@ interface RealWaveVisualizerProps {
   blobScale: number;
 }
 
-const RealWaveVisualizer: React.FC<RealWaveVisualizerProps> = ({ canvasRef, blobScale }) => (
+const RealWaveVisualizer: React.FC<RealWaveVisualizerProps> = ({
+  canvasRef,
+  blobScale,
+}) => (
   <div className={s.visualizerWrapper}>
-    <motion.div 
-      className={s.recorderBlob} 
+    <motion.div
+      className={s.recorderBlob}
       animate={{ scale: blobScale }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     />
-    <canvas ref={canvasRef} className={s.visualizerCanvas} width={300} height={40} />
+    <canvas
+      ref={canvasRef}
+      className={s.visualizerCanvas}
+      width={300}
+      height={40}
+    />
   </div>
 );
 
@@ -75,7 +83,14 @@ interface VoiceMessageProps {
   isOutgoing?: boolean;
 }
 
-const VoiceMessage: React.FC<VoiceMessageProps> = ({ duration, avatar, audioUrl, senderName, timestamp, isOutgoing }) => {
+const VoiceMessage: React.FC<VoiceMessageProps> = ({
+  duration,
+  avatar,
+  audioUrl,
+  senderName,
+  timestamp,
+  isOutgoing,
+}) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -90,18 +105,25 @@ const VoiceMessage: React.FC<VoiceMessageProps> = ({ duration, avatar, audioUrl,
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
-      const p = (audioRef.current.currentTime / audioRef.current.duration) * 100;
+      const p =
+        (audioRef.current.currentTime / audioRef.current.duration) * 100;
       setProgress(p || 0);
     }
   };
 
   return (
     <div className={s.voiceMessageWhatsApp}>
-      {!isOutgoing && <span className={s.voiceSenderName}>{senderName || 'Contact'}</span>}
-      
+      {!isOutgoing && (
+        <span className={s.voiceSenderName}>{senderName || "Contact"}</span>
+      )}
+
       <div className={s.voiceMainContent}>
         <button className={s.voicePlayBtn} onClick={togglePlay}>
-          {isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" />}
+          {isPlaying ? (
+            <Pause size={24} fill="currentColor" />
+          ) : (
+            <Play size={24} fill="currentColor" />
+          )}
         </button>
 
         <div className={s.voiceWaveformArea}>
@@ -109,39 +131,58 @@ const VoiceMessage: React.FC<VoiceMessageProps> = ({ duration, avatar, audioUrl,
             <div className={s.voiceBarDot} />
             <div className={s.voiceBarDot} />
             {[...Array(18)].map((_, i) => (
-              <div 
-                key={i} 
-                className={`${s.voiceBarNormal} ${progress > (i / 18) * 100 ? s.active : ''}`} 
-                style={{ height: `${Math.random() * 12 + 6}px` }} 
+              <div
+                key={i}
+                className={`${s.voiceBarNormal} ${progress > (i / 18) * 100 ? s.active : ""}`}
+                style={{ height: `${Math.random() * 12 + 6}px` }}
               />
             ))}
             <div className={s.voiceBarDot} />
             <div className={s.voiceBarDot} />
           </div>
-          <div className={s.voiceProgressDot} style={{ left: `${progress}%` }} />
+          <div
+            className={s.voiceProgressDot}
+            style={{ left: `${progress}%` }}
+          />
         </div>
 
         <div className={s.voiceAvatarRight}>
-          <img src={getAvatarUrl(avatar) || "https://i.pravatar.cc/150?u=default"} className={s.voiceLargeAvatar} alt="" />
-          <div className={s.voiceMicBadge}><Mic size={12} fill="currentColor" /></div>
+          <img
+            src={getAvatarUrl(avatar) || "https://i.pravatar.cc/150?u=default"}
+            className={s.voiceLargeAvatar}
+            alt=""
+          />
+          <div className={s.voiceMicBadge}>
+            <Mic size={12} fill="currentColor" />
+          </div>
         </div>
 
         <div className={s.voiceContextArrow}>
-           <Search size={14} style={{transform: 'rotate(90deg)', opacity: 0.5}} />
+          <Search
+            size={14}
+            style={{ transform: "rotate(90deg)", opacity: 0.5 }}
+          />
         </div>
       </div>
 
       <div className={s.voiceMetaRow}>
-        <span className={s.voiceDuration}>{isPlaying ? formatTime(audioRef.current?.currentTime || 0) : duration}</span>
+        <span className={s.voiceDuration}>
+          {isPlaying
+            ? formatTime(audioRef.current?.currentTime || 0)
+            : duration}
+        </span>
         <span className={s.voiceTime}>{timestamp}</span>
       </div>
 
       {audioUrl && (
-        <audio 
-          ref={audioRef} 
-          src={getAvatarUrl(audioUrl)} 
+        <audio
+          ref={audioRef}
+          src={getAvatarUrl(audioUrl)}
           onTimeUpdate={handleTimeUpdate}
-          onEnded={() => { setIsPlaying(false); setProgress(0); }} 
+          onEnded={() => {
+            setIsPlaying(false);
+            setProgress(0);
+          }}
         />
       )}
     </div>
@@ -152,36 +193,42 @@ const VoiceMessage: React.FC<VoiceMessageProps> = ({ duration, avatar, audioUrl,
 function formatTime(seconds: number) {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
 function formatMessageTime(date: string | Date | undefined) {
-  if (!date) return ''; // fallback
+  if (!date) return ""; // fallback
   const d = new Date(date);
-  if (isNaN(d.getTime())) return ''; // valid date check
-  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).toLowerCase();
+  if (isNaN(d.getTime())) return ""; // valid date check
+  return d
+    .toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    })
+    .toLowerCase();
 }
 
 function formatTimeRelative(date: string | Date | undefined) {
-  if (!date) return '';
+  if (!date) return "";
   const d = new Date(date);
-  if (isNaN(d.getTime())) return '';
-  
+  if (isNaN(d.getTime())) return "";
+
   const now = new Date();
   const diff = now.getTime() - d.getTime();
   const oneMin = 60 * 1000;
   const oneHour = 60 * oneMin;
   const oneDay = 24 * oneHour;
 
-  if (diff < oneMin) return 'just now';
+  if (diff < oneMin) return "just now";
   if (diff < oneHour) return `${Math.floor(diff / oneMin)} mins ago`;
   if (diff < oneDay) {
     const hours = Math.floor(diff / oneHour);
-    if (hours === 1) return '1 hour ago';
+    if (hours === 1) return "1 hour ago";
     return `${hours} hours ago`;
   }
-  if (diff < 2 * oneDay) return 'Yesterday';
-  return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  if (diff < 2 * oneDay) return "Yesterday";
+  return d.toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
 function getAvatarUrl(path: string | undefined | null) {
@@ -191,7 +238,12 @@ function getAvatarUrl(path: string | undefined | null) {
 }
 
 function getInitials(name: string) {
-  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 }
 
 interface ChatContact {
@@ -232,7 +284,7 @@ interface ChatAppProps {
 
 const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
   const { user, apiFetch } = useJobitoAuth();
-  const myUserId = user?.id || '';
+  const myUserId = user?.id || "";
   const location = useLocation();
   const navigate = useNavigate();
   const preselectedUser = location.state?.preselectedUser;
@@ -282,7 +334,13 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
   const [fileCaption, setFileCaption] = useState("");
 
   // Message context menu state
-  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; msgId: string; isMe: boolean; msgText: string } | null>(null);
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    msgId: string;
+    isMe: boolean;
+    msgText: string;
+  } | null>(null);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Keep ref in sync with state
@@ -303,8 +361,8 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
     const handleError = (e: ErrorEvent) => {
       console.error("GLOBAL ERROR DETECTED:", e.message, e.filename, e.lineno);
     };
-    window.addEventListener('error', handleError);
-    return () => window.removeEventListener('error', handleError);
+    window.addEventListener("error", handleError);
+    return () => window.removeEventListener("error", handleError);
   }, []);
 
   // ─── Socket.IO Setup ──────────────────────────────────────────────────
@@ -312,43 +370,46 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
     if (!myUserId) return;
     console.log("🔌 Initializing Socket Connection for:", myUserId);
 
-    const socket = io(API, { transports: ['websocket', 'polling'] });
+    const socket = io(API, { transports: ["websocket", "polling"] });
     socketRef.current = socket;
 
-    socket.on('connect', () => {
-      console.log('🔌 WebSocket connected:', socket.id);
-      socket.emit('join_user', { userId: myUserId });
+    socket.on("connect", () => {
+      console.log("🔌 WebSocket connected:", socket.id);
+      socket.emit("join_user", { userId: myUserId });
     });
 
-    socket.on('new_p2p_message', (msg: MessageItem) => {
+    socket.on("new_p2p_message", (msg: MessageItem) => {
       const currentChat = activeChatRef.current;
-      const isRelevant = currentChat && (
-        (msg.senderId === myUserId && msg.recipientId === currentChat.oderId) ||
-        (msg.senderId === currentChat.oderId && msg.recipientId === myUserId)
-      );
+      const isRelevant =
+        currentChat &&
+        ((msg.senderId === myUserId &&
+          msg.recipientId === currentChat.oderId) ||
+          (msg.senderId === currentChat.oderId &&
+            msg.recipientId === myUserId));
 
       if (isRelevant) {
-        setMessages(prev => {
+        setMessages((prev) => {
           // 1. Exact match by real ID (already persisted)
-          if (prev.find(m => m._id === msg._id)) return prev;
+          if (prev.find((m) => m._id === msg._id)) return prev;
 
           // 2. ClientId-based replacement (The robust way)
           if (msg.clientId) {
-            const tempMatch = prev.find(m => m.clientId === msg.clientId);
+            const tempMatch = prev.find((m) => m.clientId === msg.clientId);
             if (tempMatch) {
-              return prev.map(m => m.clientId === msg.clientId ? msg : m);
+              return prev.map((m) => (m.clientId === msg.clientId ? msg : m));
             }
           }
 
           // 3. Prevent duplication based on text/sender (Fallback if clientId is missing on old msg)
-          if (msg.senderId === myUserId && msg.type === 'text') {
-             const contentMatch = prev.find(m => 
-               m._id.startsWith('temp_') && 
-               (m.message?.trim() || '') === (msg.message?.trim() || '')
-             );
-             if (contentMatch) {
-               return prev.map(m => m._id === contentMatch._id ? msg : m);
-             }
+          if (msg.senderId === myUserId && msg.type === "text") {
+            const contentMatch = prev.find(
+              (m) =>
+                m._id.startsWith("temp_") &&
+                (m.message?.trim() || "") === (msg.message?.trim() || ""),
+            );
+            if (contentMatch) {
+              return prev.map((m) => (m._id === contentMatch._id ? msg : m));
+            }
           }
 
           // 4. Default append
@@ -360,9 +421,12 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
       loadChats();
     });
 
-    socket.on('messages_read', (payload: { readBy: string }) => {
-      if (activeChatRef.current && payload.readBy === activeChatRef.current.oderId) {
-        setMessages(prev => prev.map(m => ({ ...m, isRead: true })));
+    socket.on("messages_read", (payload: { readBy: string }) => {
+      if (
+        activeChatRef.current &&
+        payload.readBy === activeChatRef.current.oderId
+      ) {
+        setMessages((prev) => prev.map((m) => ({ ...m, isRead: true })));
       }
       loadChats(); // Refresh unread counts in sidebar
     });
@@ -370,7 +434,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
     return () => {
       socket.disconnect();
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myUserId]);
 
   // ─── Load Chats ───────────────────────────────────────────────────────
@@ -383,7 +447,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
         setChats(data);
       }
     } catch (err) {
-      console.error('Failed to load chats:', err);
+      console.error("Failed to load chats:", err);
     } finally {
       setLoading(false);
     }
@@ -394,45 +458,60 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
   }, [loadChats]);
 
   // ─── Load Messages ────────────────────────────────────────────────────
-  const loadMessages = useCallback(async (otherId: string) => {
-    if (!myUserId) return;
-    setMessagesLoading(true);
-    try {
-      const res = await apiFetch(`${API}/chat/p2p/history?userId=${myUserId}&otherId=${otherId}`);
-      if (res.ok) {
-        const data = await res.json();
-        setMessages(data);
+  const loadMessages = useCallback(
+    async (otherId: string) => {
+      if (!myUserId) return;
+      setMessagesLoading(true);
+      try {
+        const res = await apiFetch(
+          `${API}/chat/p2p/history?userId=${myUserId}&otherId=${otherId}`,
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setMessages(data);
+        }
+      } catch (err) {
+        console.error("Failed to load messages:", err);
+      } finally {
+        setMessagesLoading(false);
       }
-    } catch (err) {
-      console.error('Failed to load messages:', err);
-    } finally {
-      setMessagesLoading(false);
-    }
-  }, [myUserId, apiFetch]);
+    },
+    [myUserId, apiFetch],
+  );
 
   // ─── Mark as read ─────────────────────────────────────────────────────
-  const markRead = useCallback(async (otherId: string) => {
-    if (!myUserId) return;
-    try {
-      await apiFetch(`${API}/chat/p2p/read`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: myUserId, otherId }),
-      });
-    } catch (err) {
-      console.error('Failed to mark read:', err);
-    }
-  }, [myUserId, apiFetch]);
+  const markRead = useCallback(
+    async (otherId: string) => {
+      if (!myUserId) return;
+      try {
+        await apiFetch(`${API}/chat/p2p/read`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId: myUserId, otherId }),
+        });
+      } catch (err) {
+        console.error("Failed to mark read:", err);
+      }
+    },
+    [myUserId, apiFetch],
+  );
 
   // ─── Select Chat ──────────────────────────────────────────────────────
-  const selectChat = useCallback((chat: ChatContact) => {
-    setActiveChat(chat);
-    setMobileChatOpen(true);
-    loadMessages(chat.oderId);
-    markRead(chat.oderId);
-    // Update local unread count
-    setChats(prev => prev.map(c => c.oderId === chat.oderId ? { ...c, unreadCount: 0 } : c));
-  }, [loadMessages, markRead]);
+  const selectChat = useCallback(
+    (chat: ChatContact) => {
+      setActiveChat(chat);
+      setMobileChatOpen(true);
+      loadMessages(chat.oderId);
+      markRead(chat.oderId);
+      // Update local unread count
+      setChats((prev) =>
+        prev.map((c) =>
+          c.oderId === chat.oderId ? { ...c, unreadCount: 0 } : c,
+        ),
+      );
+    },
+    [loadMessages, markRead],
+  );
 
   // ─── Auto-scroll ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -444,7 +523,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
   // ─── Send Text Message ────────────────────────────────────────────────
   const sendMessage = async () => {
     if (!inputText.trim() || !activeChat || !myUserId) return;
-    
+
     const content = inputText.trim();
     setInputText("");
 
@@ -457,31 +536,31 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
       senderId: myUserId,
       recipientId: activeChat.oderId,
       message: content,
-      type: 'text',
+      type: "text",
       isRead: false,
       createdAt: new Date().toISOString(),
     };
-    setMessages(prev => [...prev, tempMsg]);
+    setMessages((prev) => [...prev, tempMsg]);
 
     try {
       const res = await apiFetch(`${API}/chat/p2p`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           senderId: myUserId,
           recipientId: activeChat.oderId,
           content,
-          type: 'text',
-          clientId: clientId
+          type: "text",
+          clientId: clientId,
         }),
       });
       if (res.ok) {
-        // We rely on the socket listener (new_p2p_message) 
+        // We rely on the socket listener (new_p2p_message)
         // to replace our 'temp' message with the real one from the server.
-        loadChats(); 
+        loadChats();
       }
     } catch (err) {
-      console.error('Failed to send message:', err);
+      console.error("Failed to send message:", err);
     }
   };
 
@@ -494,7 +573,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
     setShowAttachMenu(false);
 
     // Create preview
-    if (file.type.startsWith('image/')) {
+    if (file.type.startsWith("image/")) {
       setFilePreviewUrl(URL.createObjectURL(file));
     } else {
       setFilePreviewUrl(null);
@@ -506,17 +585,17 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
 
     setUploadingFile(true);
 
-    const isImage = selectedFile.type.startsWith('image/');
-    const type = isImage ? 'image' : 'file';
+    const isImage = selectedFile.type.startsWith("image/");
+    const type = isImage ? "image" : "file";
 
     const formData = new FormData();
-    formData.append('file', selectedFile);
+    formData.append("file", selectedFile);
 
     try {
       const response = await fetch(`${API}/chat/upload`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: formData,
       });
@@ -524,8 +603,8 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
 
       // Send the file message
       const res = await apiFetch(`${API}/chat/p2p`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           senderId: myUserId,
           recipientId: activeChat.oderId,
@@ -535,31 +614,31 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
       });
 
       if (res.ok) {
-        // We DON'T setMessages here manually anymore. 
-        // The server will emit new_p2p_message via socket, 
+        // We DON'T setMessages here manually anymore.
+        // The server will emit new_p2p_message via socket,
         // and our socket listener will add it to the list.
-        
+
         // If there's a caption, send it as a separate text message
-        if (fileCaption.trim() !== '') {
+        if (fileCaption.trim() !== "") {
           const capRes = await apiFetch(`${API}/chat/p2p`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               senderId: myUserId,
               recipientId: activeChat.oderId,
-              content: fileCaption.trim(), 
-              type: 'text',
+              content: fileCaption.trim(),
+              type: "text",
             }),
           });
           if (capRes.ok) {
-             // Successfully sent caption
+            // Successfully sent caption
           }
         }
-        
+
         loadChats(); // Refresh chat list
       }
     } catch (err) {
-      console.error('Failed to upload file:', err);
+      console.error("Failed to upload file:", err);
     } finally {
       setUploadingFile(false);
       setSelectedFile(null);
@@ -580,7 +659,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
+
       // 1. Setup MediaRecorder
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
@@ -590,7 +669,10 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
       };
 
       // 2. Setup Web Audio API for Visualizer
-      const AudioCtx = (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext);
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext;
       let drawLoop = () => {};
       if (!AudioCtx) {
         console.warn("Audio Context not supported");
@@ -600,7 +682,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
         const source = audioCtx.createMediaStreamSource(stream);
         source.connect(analyser);
         analyser.fftSize = 256;
-        
+
         audioCtxRef.current = audioCtx;
         analyserRef.current = analyser;
 
@@ -611,30 +693,30 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
         const draw = () => {
           if (!analyserRef.current || !canvasRef.current) return;
           animationFrameRef.current = requestAnimationFrame(draw);
-          
+
           analyserRef.current.getByteFrequencyData(dataArray);
-          
+
           // Calculate volume for blob scaling
           let sum = 0;
-          for(let i=0; i<bufferLength; i++) sum += dataArray[i];
+          for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
           const average = sum / bufferLength;
-          setBlobScale(1 + (average / 120));
+          setBlobScale(1 + average / 120);
 
           // Draw Waveform on Canvas
           const canvas = canvasRef.current;
-          const ctx = canvas.getContext('2d');
+          const ctx = canvas.getContext("2d");
           if (!ctx) return;
 
           ctx.clearRect(0, 0, canvas.width, canvas.height);
-          
+
           const barWidth = (canvas.width / bufferLength) * 2;
           let x = 0;
 
-          for(let i = 0; i < bufferLength; i++) {
+          for (let i = 0; i < bufferLength; i++) {
             const barHeight = (dataArray[i] / 255) * canvas.height;
             const gradient = ctx.createLinearGradient(0, canvas.height, 0, 0);
-            gradient.addColorStop(0, '#3b82f6');
-            gradient.addColorStop(1, '#60a5fa');
+            gradient.addColorStop(0, "#3b82f6");
+            gradient.addColorStop(1, "#60a5fa");
             ctx.fillStyle = gradient;
             ctx.fillRect(x, canvas.height - barHeight, barWidth - 1, barHeight);
             x += barWidth;
@@ -645,8 +727,10 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
       }
 
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: "audio/webm",
+        });
+
         if (shouldSendRef.current && activeChatRef.current) {
           const clientId = `temp_${Date.now()}_voice`;
           const durationSeconds = recordingTime;
@@ -657,24 +741,24 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
             clientId,
             senderId: myUserId!,
             recipientId: activeChatRef.current.oderId,
-            type: 'voice',
+            type: "voice",
             audioUrl: URL.createObjectURL(audioBlob), // Local preview for immediate feedback
             duration: durationSeconds,
             isRead: false,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
           };
-          setMessages(prev => [...prev, tempVoice]);
+          setMessages((prev) => [...prev, tempVoice]);
 
           const formData = new FormData();
-          formData.append('file', audioBlob, 'voice.webm');
-          formData.append('senderId', myUserId);
-          formData.append('recipientId', activeChatRef.current.oderId);
-          formData.append('duration', durationSeconds.toString());
-          formData.append('clientId', clientId);
+          formData.append("file", audioBlob, "voice.webm");
+          formData.append("senderId", myUserId);
+          formData.append("recipientId", activeChatRef.current.oderId);
+          formData.append("duration", durationSeconds.toString());
+          formData.append("clientId", clientId);
 
           try {
-             await apiFetch(`${API}/chat/upload-audio`, {
-              method: 'POST',
+            await apiFetch(`${API}/chat/upload-audio`, {
+              method: "POST",
               body: formData,
             });
             // Reliability: Rely on new_p2p_message socket event to replace temp message.
@@ -692,9 +776,8 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
       setIsRecording(true);
       setRecordingTime(0);
       timerRef.current = window.setInterval(() => {
-        setRecordingTime(prev => prev + 1);
+        setRecordingTime((prev) => prev + 1);
       }, 1000);
-
     } catch (err) {
       console.error("Microphone access denied:", err);
       alert("Please allow microphone access to record.");
@@ -703,17 +786,19 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
 
   const stopRecording = (send: boolean = true) => {
     shouldSendRef.current = send;
-    
-    // Stop MediaRecorder
+
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+      mediaRecorderRef.current.stream
+        .getTracks()
+        .forEach((track) => track.stop());
     }
 
     // Stop Visualization
-    if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+    if (animationFrameRef.current)
+      cancelAnimationFrame(animationFrameRef.current);
     if (audioCtxRef.current) audioCtxRef.current.close();
-    
+
     audioCtxRef.current = null;
     analyserRef.current = null;
     setBlobScale(1);
@@ -722,86 +807,110 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
     setIsRecording(false);
   };
 
-  // ─── Search Users for New Chat ────────────────────────────────────────
-  const searchUsers = useCallback(async (query: string) => {
-    if (query.trim().length < 2) {
-      setSearchResults([]);
-      return;
-    }
-    setSearchingUsers(true);
-    try {
-      const res = await apiFetch(`${API}/chat/search-users?q=${encodeURIComponent(query)}&currentUserId=${myUserId}`);
-      if (res.ok) {
-        const data = await res.json();
-        setSearchResults(data);
+  const searchUsers = useCallback(
+    async (query: string) => {
+      if (query.trim().length < 2) {
+        setSearchResults([]);
+        return;
       }
-    } catch (err) {
-      console.error('Failed to search users:', err);
-    } finally {
-      setSearchingUsers(false);
-    }
-  }, [myUserId, apiFetch]);
+      setSearchingUsers(true);
+      try {
+        const res = await apiFetch(
+          `${API}/chat/search-users?q=${encodeURIComponent(query)}&currentUserId=${myUserId}`,
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setSearchResults(data);
+        }
+      } catch (err) {
+        console.error("Failed to search users:", err);
+      } finally {
+        setSearchingUsers(false);
+      }
+    },
+    [myUserId, apiFetch],
+  );
 
   useEffect(() => {
     if (chatSearchTimerRef.current) clearTimeout(chatSearchTimerRef.current);
     chatSearchTimerRef.current = setTimeout(() => {
       searchUsers(newChatQuery);
     }, 300);
-    return () => { if (chatSearchTimerRef.current) clearTimeout(chatSearchTimerRef.current); };
+    return () => {
+      if (chatSearchTimerRef.current) clearTimeout(chatSearchTimerRef.current);
+    };
   }, [newChatQuery, searchUsers]);
 
-  const startChatWithUser = useCallback((selectedUser: UserSearchResult) => {
-    const newContact: ChatContact = {
-      oderId: selectedUser.userId,
-      name: selectedUser.fullName,
-      avatar: selectedUser.avatarUrl,
-      email: selectedUser.email,
-      lastMessage: '',
-      lastTime: new Date().toISOString(),
-      senderId: myUserId,
-      unreadCount: 0,
-    };
-    
-    // Check if already exists
-    setChats(prev => {
-      const exists = prev.find(c => c.oderId === selectedUser.userId);
-      if (exists) {
-        selectChat(exists);
-        return prev;
-      } else {
-        selectChat(newContact);
-        return [newContact, ...prev];
-      }
-    });
+  const startChatWithUser = useCallback(
+    (selectedUser: UserSearchResult) => {
+      const newContact: ChatContact = {
+        oderId: selectedUser.userId,
+        name: selectedUser.fullName,
+        avatar: selectedUser.avatarUrl,
+        email: selectedUser.email,
+        lastMessage: "",
+        lastTime: new Date().toISOString(),
+        senderId: myUserId,
+        unreadCount: 0,
+      };
 
-    setShowNewChatModal(false);
-    setNewChatQuery("");
-    setSearchResults([]);
-  }, [myUserId, selectChat]);
+      // Check if already exists
+      setChats((prev) => {
+        const exists = prev.find((c) => c.oderId === selectedUser.userId);
+        if (exists) {
+          selectChat(exists);
+          return prev;
+        } else {
+          selectChat(newContact);
+          return [newContact, ...prev];
+        }
+      });
+
+      setShowNewChatModal(false);
+      setNewChatQuery("");
+      setSearchResults([]);
+    },
+    [myUserId, selectChat],
+  );
 
   // Handle preselected user from navigation
   useEffect(() => {
-    if (preselectedUser && myUserId && !loading && !processedPreselectRef.current) {
+    if (
+      preselectedUser &&
+      myUserId &&
+      !loading &&
+      !processedPreselectRef.current
+    ) {
       processedPreselectRef.current = true;
       startChatWithUser(preselectedUser);
       // Clear state so it doesn't trigger again on refresh
-      navigate('.', { replace: true, state: {} });
+      navigate(".", { replace: true, state: {} });
     }
   }, [preselectedUser, myUserId, loading, startChatWithUser, navigate]);
 
   // ─── Message Context Menu ────────────────────────────────────────────
-  const handleMessageContextMenu = (e: React.MouseEvent, msg: MessageItem, isMe: boolean) => {
+  const handleMessageContextMenu = (
+    e: React.MouseEvent,
+    msg: MessageItem,
+    isMe: boolean,
+  ) => {
     e.preventDefault();
     e.stopPropagation();
     const x = e.clientX;
     const y = e.clientY;
-    setContextMenu({ x, y, msgId: msg._id, isMe, msgText: msg.message || '' });
+    setContextMenu({ x, y, msgId: msg._id, isMe, msgText: msg.message || "" });
   };
 
   const handleMessageTouchStart = (msg: MessageItem, isMe: boolean) => {
     longPressTimer.current = setTimeout(() => {
       // Use center of screen for mobile
-      setContextMenu({ x: window.innerWidth / 2 - 140, y: window.innerHeight / 2 - 200, msgId: msg._id, isMe, msgText: msg.message || '' });
+      setContextMenu({
+        x: window.innerWidth / 2 - 140,
+        y: window.innerHeight / 2 - 200,
+        msgId: msg._id,
+        isMe,
+        msgText: msg.message || "",
+      });
     }, 500);
   };
 
@@ -823,12 +932,12 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
     const msgId = contextMenu.msgId;
     closeContextMenu();
     // Optimistic delete
-    setMessages(prev => prev.filter(m => m._id !== msgId));
+    setMessages((prev) => prev.filter((m) => m._id !== msgId));
     try {
-      await apiFetch(`${API}/chat/p2p/${msgId}`, { method: 'DELETE' });
+      await apiFetch(`${API}/chat/p2p/${msgId}`, { method: "DELETE" });
       loadChats();
     } catch (err) {
-      console.error('Failed to delete message:', err);
+      console.error("Failed to delete message:", err);
       // Reload messages on failure
       if (activeChat) loadMessages(activeChat.oderId);
     }
@@ -836,49 +945,82 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
 
   const handleReactToMessage = (emoji: string) => {
     // TODO: implement reaction API
-    console.log('React with', emoji, 'to', contextMenu?.msgId);
+    console.log("React with", emoji, "to", contextMenu?.msgId);
     closeContextMenu();
   };
 
   // ─── Filter chats by sidebar search ───────────────────────────────────
-  const filteredChats = chats.filter(c => 
-    (c.name || '').toLowerCase().includes((sidebarSearchQuery || '').toLowerCase()) ||
-    (c.email || '').toLowerCase().includes((sidebarSearchQuery || '').toLowerCase())
+  const filteredChats = chats.filter(
+    (c) =>
+      (c.name || "")
+        .toLowerCase()
+        .includes((sidebarSearchQuery || "").toLowerCase()) ||
+      (c.email || "")
+        .toLowerCase()
+        .includes((sidebarSearchQuery || "").toLowerCase()),
   );
 
   // ─── No user? ─────────────────────────────────────────────────────────
   if (!myUserId) {
     return (
       <div className={s.chatContainer}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#667781', fontSize: '18px' }}>
-          <MessageCircle size={24} style={{ marginRight: 10 }} /> Please login to use the chat
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+            color: "#667781",
+            fontSize: "18px",
+          }}
+        >
+          <MessageCircle size={24} style={{ marginRight: 10 }} /> Please login
+          to use the chat
         </div>
       </div>
     );
   }
 
   return (
-    <div className={s.chatContainer} onClick={() => {
-      setShowAttachMenu(false);
-      setShowHeaderMenu(false);
-      closeContextMenu();
-    }}>
+    <div
+      className={s.chatContainer}
+      onClick={() => {
+        setShowAttachMenu(false);
+        setShowHeaderMenu(false);
+        closeContextMenu();
+      }}
+    >
       <div className={s.contentWrapper}>
         {/* ─── Sidebar ─────────────────────────────────────────────────── */}
-        <aside className={`${s.sidebar} ${mobileChatOpen ? s.sidebarHiddenMobile : ''}`}>
-          <header style={{display:'flex', justifyContent:'space-between', padding:'20px 16px 0', alignItems:'center'}}>
-            <h2 style={{fontSize: 20, fontWeight: 700, margin: 0}}>Messages</h2>
-            <Plus size={20} style={{cursor: 'pointer', color: '#6b7280'}} onClick={() => setShowNewChatModal(true)} />
+        <aside
+          className={`${s.sidebar} ${mobileChatOpen ? s.sidebarHiddenMobile : ""}`}
+        >
+          <header
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              padding: "20px 16px 0",
+              alignItems: "center",
+            }}
+          >
+            <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>
+              Messages
+            </h2>
+            <Plus
+              size={20}
+              style={{ cursor: "pointer", color: "#6b7280" }}
+              onClick={() => setShowNewChatModal(true)}
+            />
           </header>
-          
+
           <div className={s.searchSection}>
             <div className={s.searchContainer}>
               <Search size={18} className={s.searchIcon} />
-              <input 
-                type="text" 
-                placeholder="Search messages" 
+              <input
+                type="text"
+                placeholder="Search messages"
                 value={sidebarSearchQuery}
-                onChange={e => setSidebarSearchQuery(e.target.value)}
+                onChange={(e) => setSidebarSearchQuery(e.target.value)}
               />
             </div>
           </div>
@@ -893,19 +1035,26 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
               <div className={s.emptyChats}>
                 <MessageCircle size={48} color="#d1d7db" />
                 <p>No conversations yet</p>
-                <button className={s.newChatBtn} onClick={() => setShowNewChatModal(true)}>
+                <button
+                  className={s.newChatBtn}
+                  onClick={() => setShowNewChatModal(true)}
+                >
                   <Plus size={16} /> Start a new chat
                 </button>
               </div>
             ) : (
-              filteredChats.map(chat => (
-                <div 
-                  key={chat.oderId} 
-                  className={`${s.chatItem} ${activeChat?.oderId === chat.oderId ? s.active : ""}`} 
+              filteredChats.map((chat) => (
+                <div
+                  key={chat.oderId}
+                  className={`${s.chatItem} ${activeChat?.oderId === chat.oderId ? s.active : ""}`}
                   onClick={() => selectChat(chat)}
                 >
                   {chat.avatar ? (
-                    <img src={getAvatarUrl(chat.avatar)} alt="" className={s.avatar} />
+                    <img
+                      src={getAvatarUrl(chat.avatar)}
+                      alt=""
+                      className={s.avatar}
+                    />
                   ) : (
                     <div className={s.avatarPlaceholder}>
                       {getInitials(chat.name)}
@@ -915,13 +1064,17 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                     <div className={s.chatTop}>
                       <span className={s.chatName}>
                         {chat.name}
-                        {chat.unreadCount > 0 && <span className={s.unreadDot} />}
+                        {chat.unreadCount > 0 && (
+                          <span className={s.unreadDot} />
+                        )}
                       </span>
-                      <span className={s.chatTime}>{formatTimeRelative(chat.lastTime)}</span>
+                      <span className={s.chatTime}>
+                        {formatTimeRelative(chat.lastTime)}
+                      </span>
                     </div>
                     <div className={s.chatBottom}>
                       <span className={s.lastMessage}>
-                        {chat.lastMessage || 'Start a conversation'}
+                        {chat.lastMessage || "Start a conversation"}
                       </span>
                     </div>
                   </div>
@@ -932,43 +1085,119 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
         </aside>
 
         {/* ─── Main Chat Area ──────────────────────────────────────────── */}
-        <main className={`${s.main} ${mobileChatOpen ? s.mainVisibleMobile : ''}`}>
+        <main
+          className={`${s.main} ${mobileChatOpen ? s.mainVisibleMobile : ""}`}
+        >
           {activeChat ? (
             <>
               <div className={s.mainBackground} />
               <header className={s.mainHeader}>
                 <div className={s.headerLeft}>
-                  <ArrowLeft size={24} className={s.backArrow} onClick={() => setMobileChatOpen(false)} style={{cursor:'pointer'}} />
+                  <ArrowLeft
+                    size={24}
+                    className={s.backArrow}
+                    onClick={() => setMobileChatOpen(false)}
+                    style={{ cursor: "pointer" }}
+                  />
                   {activeChat.avatar ? (
-                    <img src={getAvatarUrl(activeChat.avatar)} alt="" className={s.headerAvatar} style={{width: 36, height: 36}} />
+                    <img
+                      src={getAvatarUrl(activeChat.avatar)}
+                      alt=""
+                      className={s.headerAvatar}
+                      style={{ width: 36, height: 36 }}
+                    />
                   ) : (
-                    <div className={s.avatarPlaceholder} style={{width: 36, height: 36, fontSize: 13}}>
+                    <div
+                      className={s.avatarPlaceholder}
+                      style={{ width: 36, height: 36, fontSize: 13 }}
+                    >
                       {getInitials(activeChat.name)}
                     </div>
                   )}
                   <div className={s.headerInfo}>
-                    <h3 style={{display:'flex', alignItems:'center', gap: 6}}>{activeChat?.name}</h3>
-                    <p>{activeChat?.email || 'Online'}</p>
+                    <h3
+                      style={{ display: "flex", alignItems: "center", gap: 6 }}
+                    >
+                      {activeChat?.name}
+                    </h3>
+                    <p>{activeChat?.email || "Online"}</p>
                   </div>
                 </div>
                 <div className={s.headerActions}>
-                  <Pin size={18} style={{cursor: 'pointer'}} />
-                  <Star size={18} style={{cursor: 'pointer'}} />
-                  <MoreVertical size={18} onClick={(e) => { e.stopPropagation(); setShowHeaderMenu(!showHeaderMenu); }} style={{cursor: 'pointer'}} />
+                  <Pin size={18} style={{ cursor: "pointer" }} />
+                  <Star size={18} style={{ cursor: "pointer" }} />
+                  <MoreVertical
+                    size={18}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowHeaderMenu(!showHeaderMenu);
+                    }}
+                    style={{ cursor: "pointer" }}
+                  />
                 </div>
 
                 <AnimatePresence>
                   {showHeaderMenu && (
-                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className={`${s.dropdownMenu} ${s.headerDropdown}`}>
-                       <div className={s.menuItem}><div className={s.menuIcon}><UserPlus size={18} /></div>Add member</div>
-                       <div className={s.menuItem}><div className={s.menuIcon}><Info size={18} /></div>Contact info</div>
-                       <div className={s.menuItem}><div className={s.menuIcon}><CheckSquare size={18} /></div>Select messages</div>
-                       <div className={s.menuItem}><div className={s.menuIcon}><BellOff size={18} /></div>Mute notifications</div>
-                       <div className={s.menuItem}><div className={s.menuIcon}><History size={18} /></div>Disappearing messages</div>
-                       <div className={s.menuItem}><div className={s.menuIcon}><Heart size={18} /></div>Add to favourites</div>
-                       <div className={s.menuItem}><div className={s.menuIcon}><List size={18} /></div>Add to list</div>
-                       <div className={s.menuItem}><div className={s.menuIcon}><LogOut size={18} /></div>Close chat</div>
-                       <div className={s.menuItem}><div className={s.menuIcon}><Trash2 size={18} /></div>Clear chat</div>
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      className={`${s.dropdownMenu} ${s.headerDropdown}`}
+                    >
+                      <div className={s.menuItem}>
+                        <div className={s.menuIcon}>
+                          <UserPlus size={18} />
+                        </div>
+                        Add member
+                      </div>
+                      <div className={s.menuItem}>
+                        <div className={s.menuIcon}>
+                          <Info size={18} />
+                        </div>
+                        Contact info
+                      </div>
+                      <div className={s.menuItem}>
+                        <div className={s.menuIcon}>
+                          <CheckSquare size={18} />
+                        </div>
+                        Select messages
+                      </div>
+                      <div className={s.menuItem}>
+                        <div className={s.menuIcon}>
+                          <BellOff size={18} />
+                        </div>
+                        Mute notifications
+                      </div>
+                      <div className={s.menuItem}>
+                        <div className={s.menuIcon}>
+                          <History size={18} />
+                        </div>
+                        Disappearing messages
+                      </div>
+                      <div className={s.menuItem}>
+                        <div className={s.menuIcon}>
+                          <Heart size={18} />
+                        </div>
+                        Add to favourites
+                      </div>
+                      <div className={s.menuItem}>
+                        <div className={s.menuIcon}>
+                          <List size={18} />
+                        </div>
+                        Add to list
+                      </div>
+                      <div className={s.menuItem}>
+                        <div className={s.menuIcon}>
+                          <LogOut size={18} />
+                        </div>
+                        Close chat
+                      </div>
+                      <div className={s.menuItem}>
+                        <div className={s.menuIcon}>
+                          <Trash2 size={18} />
+                        </div>
+                        Clear chat
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -989,86 +1218,217 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                 ) : (
                   <>
                     <div className={s.chatBeginning}>
-                       {activeChat.avatar ? (
-                         <img src={getAvatarUrl(activeChat.avatar)} alt="" className={s.chatBeginningAvatar} />
-                       ) : (
-                         <div className={s.avatarPlaceholder} style={{width: 80, height: 80, fontSize: 30}}>{getInitials(activeChat.name)}</div>
-                       )}
-                       <h2>{activeChat?.name}</h2>
-                       <p className={s.subtitle}>{activeChat?.email}</p>
-                       <p className={s.notice}>This is the very beginning of your direct message with <strong>{activeChat?.name}</strong></p>
+                      {activeChat.avatar ? (
+                        <img
+                          src={getAvatarUrl(activeChat.avatar)}
+                          alt=""
+                          className={s.chatBeginningAvatar}
+                        />
+                      ) : (
+                        <div
+                          className={s.avatarPlaceholder}
+                          style={{ width: 80, height: 80, fontSize: 30 }}
+                        >
+                          {getInitials(activeChat.name)}
+                        </div>
+                      )}
+                      <h2>{activeChat?.name}</h2>
+                      <p className={s.subtitle}>{activeChat?.email}</p>
+                      <p className={s.notice}>
+                        This is the very beginning of your direct message with{" "}
+                        <strong>{activeChat?.name}</strong>
+                      </p>
                     </div>
-                    <div className={s.dateSeparator}><span className={s.dateTag}>Today</span></div>
-                    
+                    <div className={s.dateSeparator}>
+                      <span className={s.dateTag}>Today</span>
+                    </div>
+
                     <div className={s.messagesListAnchor}>
                       {messages.map((msg) => {
                         const isMe = msg.senderId === myUserId;
                         return (
-                          <div 
-                            key={msg._id} 
+                          <div
+                            key={msg._id}
                             className={`${s.messageRow} ${isMe ? s.outgoing : s.incoming}`}
                           >
-                            {!isMe && (
-                              activeChat?.avatar ? (
-                                <img src={getAvatarUrl(activeChat.avatar)} alt="" className={s.messageAvatar} />
+                            {!isMe &&
+                              (activeChat?.avatar ? (
+                                <img
+                                  src={getAvatarUrl(activeChat.avatar)}
+                                  alt=""
+                                  className={s.messageAvatar}
+                                />
                               ) : (
-                                <div className={s.messageAvatarPlaceholder}>{getInitials(activeChat?.name || "?")}</div>
-                              )
-                            )}
-                            
+                                <div className={s.messageAvatarPlaceholder}>
+                                  {getInitials(activeChat?.name || "?")}
+                                </div>
+                              ))}
+
                             <div className={s.messageMeta}>
-                              <div className={s.bubble}
-                                onContextMenu={(e) => handleMessageContextMenu(e, msg, isMe)}
-                                onTouchStart={() => handleMessageTouchStart(msg, isMe)}
+                              <div
+                                className={s.bubble}
+                                onContextMenu={(e) =>
+                                  handleMessageContextMenu(e, msg, isMe)
+                                }
+                                onTouchStart={() =>
+                                  handleMessageTouchStart(msg, isMe)
+                                }
                                 onTouchEnd={handleMessageTouchEnd}
                                 onTouchMove={handleMessageTouchEnd}
                               >
-                                {!isMe && msg.type !== 'voice' && <span className={s.voiceSenderName} style={{marginBottom: 4, display: 'block'}}>{activeChat?.name}</span>}
-                                {msg.type === 'voice' ? (
-                                  <VoiceMessage 
-                                    duration={msg.duration ? formatTime(msg.duration) : '0:00'} 
-                                    avatar={isMe ? user?.avatar : activeChat?.avatar} 
-                                    audioUrl={msg.audioUrl} 
-                                    senderName={isMe ? "You" : (activeChat?.name || "Contact")}
+                                {!isMe && msg.type !== "voice" && (
+                                  <span
+                                    className={s.voiceSenderName}
+                                    style={{
+                                      marginBottom: 4,
+                                      display: "block",
+                                    }}
+                                  >
+                                    {activeChat?.name}
+                                  </span>
+                                )}
+                                {msg.type === "voice" ? (
+                                  <VoiceMessage
+                                    duration={
+                                      msg.duration
+                                        ? formatTime(msg.duration)
+                                        : "0:00"
+                                    }
+                                    avatar={
+                                      isMe ? user?.avatar : activeChat?.avatar
+                                    }
+                                    audioUrl={msg.audioUrl}
+                                    senderName={
+                                      isMe
+                                        ? "You"
+                                        : activeChat?.name || "Contact"
+                                    }
                                     timestamp={formatMessageTime(msg.createdAt)}
                                     isOutgoing={isMe}
                                   />
-                                ) : msg.type === 'image' ? (
-                                  <div style={{ padding: '2px' }}>
-                                    <img src={getAvatarUrl(msg.message)} alt="Chat attachment" style={{ maxWidth: '100%', borderRadius: '12px', maxHeight: '350px', objectFit: 'contain', display: 'block' }} />
+                                ) : msg.type === "image" ? (
+                                  <div style={{ padding: "2px" }}>
+                                    <img
+                                      src={getAvatarUrl(msg.message)}
+                                      alt="Chat attachment"
+                                      style={{
+                                        maxWidth: "100%",
+                                        borderRadius: "12px",
+                                        maxHeight: "350px",
+                                        objectFit: "contain",
+                                        display: "block",
+                                      }}
+                                    />
                                   </div>
-                                ) : msg.type === 'file' ? (
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', backgroundColor: 'rgba(0,0,0,0.04)', borderRadius: '12px' }}>
-                                    <div style={{width: 40, height: 40, borderRadius: '8px', backgroundColor: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.05)'}}>
+                                ) : msg.type === "file" ? (
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "10px",
+                                      padding: "10px",
+                                      backgroundColor: "rgba(0,0,0,0.04)",
+                                      borderRadius: "12px",
+                                    }}
+                                  >
+                                    <div
+                                      style={{
+                                        width: 40,
+                                        height: 40,
+                                        borderRadius: "8px",
+                                        backgroundColor: "#fff",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                                      }}
+                                    >
                                       <FileText size={20} color="#3b82f6" />
                                     </div>
-                                    <div style={{display:'flex', flexDirection:'column', gap: 2}}>
-                                       <a href={getAvatarUrl(msg.message)} target="_blank" rel="noreferrer" style={{ color: isMe ? '#fff' : '#3b82f6', textDecoration: 'none', fontSize: '14px', fontWeight: 500, wordBreak: 'break-all' }}>
-                                         View Document
-                                       </a>
-                                       <span style={{fontSize: 11, opacity: 0.7}}>{msg.message?.split('/').pop()?.slice(-20)}</span>
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        gap: 2,
+                                      }}
+                                    >
+                                      <a
+                                        href={getAvatarUrl(msg.message)}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        style={{
+                                          color: isMe ? "#fff" : "#3b82f6",
+                                          textDecoration: "none",
+                                          fontSize: "14px",
+                                          fontWeight: 500,
+                                          wordBreak: "break-all",
+                                        }}
+                                      >
+                                        View Document
+                                      </a>
+                                      <span
+                                        style={{ fontSize: 11, opacity: 0.7 }}
+                                      >
+                                        {msg.message
+                                          ?.split("/")
+                                          .pop()
+                                          ?.slice(-20)}
+                                      </span>
                                     </div>
                                   </div>
                                 ) : (
-                                  <div className={s.bubbleContent}>{msg.message}</div>
+                                  <div className={s.bubbleContent}>
+                                    {msg.message}
+                                  </div>
                                 )}
-                                
-                                {msg.type !== 'voice' && (
-                                  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4, marginTop: 4}}>
-                                    <span className={s.msgTime} style={{marginTop: 0}}>{formatMessageTime(msg.createdAt)}</span>
-                                    {isMe && (msg.isRead ? <CheckCheck size={14} color="#ffffff" style={{opacity: 0.9}} /> : <Check size={14} color="#ffffff" style={{opacity: 0.7}} />)}
+
+                                {msg.type !== "voice" && (
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "flex-end",
+                                      gap: 4,
+                                      marginTop: 4,
+                                    }}
+                                  >
+                                    <span
+                                      className={s.msgTime}
+                                      style={{ marginTop: 0 }}
+                                    >
+                                      {formatMessageTime(msg.createdAt)}
+                                    </span>
+                                    {isMe &&
+                                      (msg.isRead ? (
+                                        <CheckCheck
+                                          size={14}
+                                          color="#ffffff"
+                                          style={{ opacity: 0.9 }}
+                                        />
+                                      ) : (
+                                        <Check
+                                          size={14}
+                                          color="#ffffff"
+                                          style={{ opacity: 0.7 }}
+                                        />
+                                      ))}
                                   </div>
                                 )}
                               </div>
                             </div>
-                            
-                            {isMe && (
-                              user?.avatar ? (
-                                <img src={getAvatarUrl(user.avatar)} alt="" className={s.messageAvatar} />
+
+                            {isMe &&
+                              (user?.avatar ? (
+                                <img
+                                  src={getAvatarUrl(user.avatar)}
+                                  alt=""
+                                  className={s.messageAvatar}
+                                />
                               ) : (
-                                <div className={s.messageAvatarPlaceholder}>{getInitials(user?.name || "Me")}</div>
-                              )
-                            )}
+                                <div className={s.messageAvatarPlaceholder}>
+                                  {getInitials(user?.name || "Me")}
+                                </div>
+                              ))}
                           </div>
                         );
                       })}
@@ -1098,7 +1458,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                     >
                       {/* Emoji reactions bar */}
                       <div className={s.contextReactions}>
-                        {['👍', '❤️', '😂', '😮', '😢', '🙏'].map(emoji => (
+                        {["👍", "❤️", "😂", "😮", "😢", "🙏"].map((emoji) => (
                           <button
                             key={emoji}
                             className={s.reactionBtn}
@@ -1107,40 +1467,79 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                             {emoji}
                           </button>
                         ))}
-                        <button className={s.reactionBtnPlus} onClick={() => handleReactToMessage('+')}>
+                        <button
+                          className={s.reactionBtnPlus}
+                          onClick={() => handleReactToMessage("+")}
+                        >
                           <Plus size={18} />
                         </button>
                       </div>
                       {/* Menu items */}
                       <div className={s.contextMenuItems}>
-                        <div className={s.contextMenuItem} onClick={closeContextMenu}>
-                          <Info size={18} /><span>Message info</span>
+                        <div
+                          className={s.contextMenuItem}
+                          onClick={closeContextMenu}
+                        >
+                          <Info size={18} />
+                          <span>Message info</span>
                         </div>
-                        <div className={s.contextMenuItem} onClick={closeContextMenu}>
-                          <Reply size={18} /><span>Reply</span>
+                        <div
+                          className={s.contextMenuItem}
+                          onClick={closeContextMenu}
+                        >
+                          <Reply size={18} />
+                          <span>Reply</span>
                         </div>
-                        <div className={s.contextMenuItem} onClick={handleCopyMessage}>
-                          <Copy size={18} /><span>Copy</span>
+                        <div
+                          className={s.contextMenuItem}
+                          onClick={handleCopyMessage}
+                        >
+                          <Copy size={18} />
+                          <span>Copy</span>
                         </div>
-                        <div className={s.contextMenuItem} onClick={closeContextMenu}>
-                          <Forward size={18} /><span>Forward</span>
+                        <div
+                          className={s.contextMenuItem}
+                          onClick={closeContextMenu}
+                        >
+                          <Forward size={18} />
+                          <span>Forward</span>
                         </div>
-                        <div className={s.contextMenuItem} onClick={closeContextMenu}>
-                          <Pin size={18} /><span>Pin</span>
+                        <div
+                          className={s.contextMenuItem}
+                          onClick={closeContextMenu}
+                        >
+                          <Pin size={18} />
+                          <span>Pin</span>
                         </div>
-                        <div className={s.contextMenuItem} onClick={closeContextMenu}>
-                          <Star size={18} /><span>Star</span>
+                        <div
+                          className={s.contextMenuItem}
+                          onClick={closeContextMenu}
+                        >
+                          <Star size={18} />
+                          <span>Star</span>
                         </div>
                         {contextMenu.isMe && (
-                          <div className={s.contextMenuItem} onClick={closeContextMenu}>
-                            <Pencil size={18} /><span>Edit</span>
+                          <div
+                            className={s.contextMenuItem}
+                            onClick={closeContextMenu}
+                          >
+                            <Pencil size={18} />
+                            <span>Edit</span>
                           </div>
                         )}
-                        <div className={s.contextMenuItem} onClick={closeContextMenu}>
-                          <CheckSquare size={18} /><span>Select</span>
+                        <div
+                          className={s.contextMenuItem}
+                          onClick={closeContextMenu}
+                        >
+                          <CheckSquare size={18} />
+                          <span>Select</span>
                         </div>
-                        <div className={`${s.contextMenuItem} ${s.contextMenuDanger}`} onClick={handleDeleteMessage}>
-                          <Trash2 size={18} /><span>Delete</span>
+                        <div
+                          className={`${s.contextMenuItem} ${s.contextMenuDanger}`}
+                          onClick={handleDeleteMessage}
+                        >
+                          <Trash2 size={18} />
+                          <span>Delete</span>
                         </div>
                       </div>
                     </motion.div>
@@ -1148,54 +1547,137 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                 )}
               </AnimatePresence>
 
-              <footer className={s.footer} style={{position: 'relative'}}>
+              <footer className={s.footer} style={{ position: "relative" }}>
                 {isRecording ? (
-                  <div className={s.inputBar} style={{width: '100%', display: 'flex', alignItems: 'center', gap: 15}}>
-                     <Trash2 className={s.footerIcon} size={20} onClick={() => stopRecording(false)} style={{color: '#ef4444'}} />
-                     <div style={{width: 10, height: 10, borderRadius: '50%', backgroundColor: '#ef4444', animation: 'pulse 1s infinite alternate'}} />
-                     <div style={{fontWeight: 500}}>{formatTime(recordingTime)}</div>
-                     <RealWaveVisualizer canvasRef={canvasRef} blobScale={blobScale} />
+                  <div
+                    className={s.inputBar}
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 15,
+                    }}
+                  >
+                    <Trash2
+                      className={s.footerIcon}
+                      size={20}
+                      onClick={() => stopRecording(false)}
+                      style={{ color: "#ef4444" }}
+                    />
+                    <div
+                      style={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: "50%",
+                        backgroundColor: "#ef4444",
+                        animation: "pulse 1s infinite alternate",
+                      }}
+                    />
+                    <div style={{ fontWeight: 500 }}>
+                      {formatTime(recordingTime)}
+                    </div>
+                    <RealWaveVisualizer
+                      canvasRef={canvasRef}
+                      blobScale={blobScale}
+                    />
                   </div>
                 ) : (
                   <>
                     <div className={s.inputBar}>
-                      <Paperclip size={20} className={s.footerIcon} onClick={(e) => { e.stopPropagation(); setShowAttachMenu(!showAttachMenu); }} />
+                      <Paperclip
+                        size={20}
+                        className={s.footerIcon}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowAttachMenu(!showAttachMenu);
+                        }}
+                      />
                       <AnimatePresence>
                         {showAttachMenu && (
-                          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className={s.dropdownMenu} style={{bottom: 70, left: 40}}>
-                             <div className={s.menuItem} onClick={() => fileInputRef.current?.click()}><FileText color="#7f66ff" size={18} /> Document</div>
-                             <div className={s.menuItem} onClick={() => fileInputRef.current?.click()}><ImageIcon color="#007bfc" size={18} /> Photos & videos</div>
-                             <div className={s.menuItem}><ImageIcon color="#ff2e74" size={18} /> Camera</div>
-                             <div className={s.menuItem}><Headphones color="#ff7f35" size={18} /> Audio</div>
-                             <div className={s.menuItem}><UserIcon color="#009de2" size={18} /> Contact</div>
-                             <div className={s.menuItem}><BarChart2 color="#ffbc38" size={18} /> Poll</div>
-                             <div className={s.menuItem}><Sticker color="#00c0cb" size={18} /> New sticker</div>
-                             <input type="file" ref={fileInputRef} onChange={handleFileSelect} style={{ display: 'none' }} />
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className={s.dropdownMenu}
+                            style={{ bottom: 70, left: 40 }}
+                          >
+                            <div
+                              className={s.menuItem}
+                              onClick={() => fileInputRef.current?.click()}
+                            >
+                              <FileText color="#7f66ff" size={18} /> Document
+                            </div>
+                            <div
+                              className={s.menuItem}
+                              onClick={() => fileInputRef.current?.click()}
+                            >
+                              <ImageIcon color="#007bfc" size={18} /> Photos &
+                              videos
+                            </div>
+                            <div className={s.menuItem}>
+                              <ImageIcon color="#ff2e74" size={18} /> Camera
+                            </div>
+                            <div className={s.menuItem}>
+                              <Headphones color="#ff7f35" size={18} /> Audio
+                            </div>
+                            <div className={s.menuItem}>
+                              <UserIcon color="#009de2" size={18} /> Contact
+                            </div>
+                            <div className={s.menuItem}>
+                              <BarChart2 color="#ffbc38" size={18} /> Poll
+                            </div>
+                            <div className={s.menuItem}>
+                              <Sticker color="#00c0cb" size={18} /> New sticker
+                            </div>
+                            <input
+                              type="file"
+                              ref={fileInputRef}
+                              onChange={handleFileSelect}
+                              style={{ display: "none" }}
+                            />
                           </motion.div>
                         )}
                       </AnimatePresence>
-                      <input 
-                        type="text" 
-                        placeholder={uploadingFile ? "Uploading..." : "Reply message"} 
-                        value={inputText} 
-                        onChange={(e) => setInputText(e.target.value)} 
-                        onKeyDown={(e) => e.key === "Enter" && !uploadingFile && sendMessage()} 
+                      <input
+                        type="text"
+                        placeholder={
+                          uploadingFile ? "Uploading..." : "Reply message"
+                        }
+                        value={inputText}
+                        onChange={(e) => setInputText(e.target.value)}
+                        onKeyDown={(e) =>
+                          e.key === "Enter" && !uploadingFile && sendMessage()
+                        }
                         disabled={uploadingFile}
                       />
-                      <div style={{ position: 'relative' }}>
-                        <Smile size={20} className={s.footerIcon} onClick={(e) => { e.stopPropagation(); setShowAttachMenu(false); }} />
+                      <div style={{ position: "relative" }}>
+                        <Smile
+                          size={20}
+                          className={s.footerIcon}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowAttachMenu(false);
+                          }}
+                        />
                         {/* EmojiPicker Temporarily Disabled */}
                       </div>
                     </div>
                   </>
                 )}
-                
-                <button className={s.sendBtn} onClick={() => {
-                  if (isRecording) stopRecording(true);
-                  else if (inputText.trim()) sendMessage();
-                  else startRecording();
-                }}>
-                  {isRecording || inputText.trim() ? <Send size={20} /> : <Mic size={20} />}
+
+                <button
+                  className={s.sendBtn}
+                  onClick={() => {
+                    if (isRecording) stopRecording(true);
+                    else if (inputText.trim()) sendMessage();
+                    else startRecording();
+                  }}
+                >
+                  {isRecording || inputText.trim() ? (
+                    <Send size={20} />
+                  ) : (
+                    <Mic size={20} />
+                  )}
                 </button>
               </footer>
             </>
@@ -1206,91 +1688,125 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                 <MessageCircle size={80} strokeWidth={1} color="#d1d7db" />
               </div>
               <h2>Jobito Chat</h2>
-              <p>Send and receive messages with other users. <br/> Select a conversation or start a new one.</p>
-              <button className={s.newChatBtn} onClick={() => setShowNewChatModal(true)}>
+              <p>
+                Send and receive messages with other users. <br /> Select a
+                conversation or start a new one.
+              </p>
+              <button
+                className={s.newChatBtn}
+                onClick={() => setShowNewChatModal(true)}
+              >
                 <Plus size={18} /> New Chat
               </button>
             </div>
           )}
-          
+
           {/* ─── File Preview Overlay ────────────────────────────────────── */}
           <AnimatePresence>
             {selectedFile && (
-              <motion.div 
+              <motion.div
                 className={s.filePreviewOverlay}
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
               >
                 <header className={s.previewHeader}>
-                  <X size={26} className={s.previewCloseIcon} onClick={cancelFileUpload} />
+                  <X
+                    size={26}
+                    className={s.previewCloseIcon}
+                    onClick={cancelFileUpload}
+                  />
                   <span className={s.previewFileName}>{selectedFile.name}</span>
                 </header>
-                
+
                 <div className={s.previewContent}>
                   {filePreviewUrl ? (
-                    <img src={filePreviewUrl} alt="Preview" className={s.previewImage} />
+                    <img
+                      src={filePreviewUrl}
+                      alt="Preview"
+                      className={s.previewImage}
+                    />
                   ) : (
                     <div className={s.previewNoImage}>
                       <FileText size={80} color="#8696a0" />
                       <p>No preview available</p>
-                      <span>{(selectedFile.size / 1024).toFixed(2)} KB - {selectedFile.type || 'Document'}</span>
+                      <span>
+                        {(selectedFile.size / 1024).toFixed(2)} KB -{" "}
+                        {selectedFile.type || "Document"}
+                      </span>
                     </div>
                   )}
                 </div>
 
                 <div className={s.previewFooter}>
                   <div className={s.previewInputWrapper}>
-                    <input 
-                      type="text" 
-                      placeholder="Type a message" 
-                      value={fileCaption} 
+                    <input
+                      type="text"
+                      placeholder="Type a message"
+                      value={fileCaption}
                       onChange={(e) => setFileCaption(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && confirmFileUpload()}
+                      onKeyDown={(e) =>
+                        e.key === "Enter" && confirmFileUpload()
+                      }
                     />
                   </div>
-                  
+
                   <div className={s.previewSendArea}>
                     <div className={s.previewThumb}>
-                       {filePreviewUrl ? (
-                         <img src={filePreviewUrl} alt="thumb" />
-                       ) : (
-                         <FileText size={20} color="#ffffff" />
-                       )}
+                      {filePreviewUrl ? (
+                        <img src={filePreviewUrl} alt="thumb" />
+                      ) : (
+                        <FileText size={20} color="#ffffff" />
+                      )}
                     </div>
-                    
-                    <button 
-                      className={s.previewSendBtn} 
+
+                    <button
+                      className={s.previewSendBtn}
                       onClick={confirmFileUpload}
                       disabled={uploadingFile}
                     >
-                      {uploadingFile ? <div className={s.spinnerSmall} /> : <Send size={24} color="#ffffff" />}
+                      {uploadingFile ? (
+                        <div className={s.spinnerSmall} />
+                      ) : (
+                        <Send size={24} color="#ffffff" />
+                      )}
                     </button>
                   </div>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-
         </main>
 
         {/* ─── Search Messages Sidebar ─────────────────────────────────── */}
         <AnimatePresence>
           {showSearchSidebar && (
-            <motion.div initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "tween" }} className={s.searchSidebar}>
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "tween" }}
+              className={s.searchSidebar}
+            >
               <header className={s.searchSidebarHeader}>
-                 <X size={20} onClick={() => setShowSearchSidebar(false)} style={{cursor: 'pointer'}} />
-                 <h3>Search messages</h3>
+                <X
+                  size={20}
+                  onClick={() => setShowSearchSidebar(false)}
+                  style={{ cursor: "pointer" }}
+                />
+                <h3>Search messages</h3>
               </header>
               <div className={s.searchSidebarContent}>
-                 <div className={s.searchSidebarInputArea}>
-                    <Calendar size={20} className={s.footerIcon} />
-                    <div className={s.sidebarSearchInputBox}>
-                       <Search size={16} className={s.searchIcon} />
-                       <input type="text" placeholder="Search" />
-                    </div>
-                 </div>
-                 <div className={s.searchEmptyState}>Search for messages within {activeChat?.name || 'this chat'}.</div>
+                <div className={s.searchSidebarInputArea}>
+                  <Calendar size={20} className={s.footerIcon} />
+                  <div className={s.sidebarSearchInputBox}>
+                    <Search size={16} className={s.searchIcon} />
+                    <input type="text" placeholder="Search" />
+                  </div>
+                </div>
+                <div className={s.searchEmptyState}>
+                  Search for messages within {activeChat?.name || "this chat"}.
+                </div>
               </div>
             </motion.div>
           )}
@@ -1300,22 +1816,25 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
       {/* ─── New Chat Modal ──────────────────────────────────────────── */}
       <AnimatePresence>
         {showNewChatModal && (
-          <motion.div 
+          <motion.div
             className={s.modalOverlay}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowNewChatModal(false)}
           >
-            <motion.div 
+            <motion.div
               className={s.newChatModal}
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              onClick={e => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
             >
               <header className={s.modalHeader}>
-                <div className={s.backIcon} onClick={() => setShowNewChatModal(false)}>
+                <div
+                  className={s.backIcon}
+                  onClick={() => setShowNewChatModal(false)}
+                >
                   <ArrowLeft size={20} />
                 </div>
                 <h3>New Chat</h3>
@@ -1323,25 +1842,37 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
               <div className={s.modalSearch}>
                 <div className={s.modalSearchBox}>
                   <Search size={18} />
-                  <input 
-                    type="text" 
-                    placeholder="Search users by name or email..." 
+                  <input
+                    type="text"
+                    placeholder="Search users by name or email..."
                     value={newChatQuery}
-                    onChange={e => setNewChatQuery(e.target.value)}
+                    onChange={(e) => setNewChatQuery(e.target.value)}
                     autoFocus
                   />
                 </div>
               </div>
               <div className={s.modalResults}>
                 {searchingUsers ? (
-                  <div className={s.modalLoading}><div className={s.spinner} /></div>
+                  <div className={s.modalLoading}>
+                    <div className={s.spinner} />
+                  </div>
                 ) : searchResults.length > 0 ? (
-                  searchResults.map(u => (
-                    <div key={u.userId} className={s.userSearchItem} onClick={() => startChatWithUser(u)}>
+                  searchResults.map((u) => (
+                    <div
+                      key={u.userId}
+                      className={s.userSearchItem}
+                      onClick={() => startChatWithUser(u)}
+                    >
                       {u.avatarUrl ? (
-                        <img src={getAvatarUrl(u.avatarUrl)} alt="" className={s.avatar} />
+                        <img
+                          src={getAvatarUrl(u.avatarUrl)}
+                          alt=""
+                          className={s.avatar}
+                        />
                       ) : (
-                        <div className={s.avatarPlaceholder}>{getInitials(u.fullName)}</div>
+                        <div className={s.avatarPlaceholder}>
+                          {getInitials(u.fullName)}
+                        </div>
                       )}
                       <div className={s.userSearchInfo}>
                         <span className={s.userSearchName}>{u.fullName}</span>
@@ -1352,7 +1883,9 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                 ) : newChatQuery.length >= 2 ? (
                   <div className={s.modalEmpty}>No users found</div>
                 ) : (
-                  <div className={s.modalEmpty}>Type at least 2 characters to search</div>
+                  <div className={s.modalEmpty}>
+                    Type at least 2 characters to search
+                  </div>
                 )}
               </div>
             </motion.div>

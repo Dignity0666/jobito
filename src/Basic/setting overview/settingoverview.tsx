@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useJobitoAuth } from "../../context/AuthContext";
+import { useJobitoAuth } from "../../context/LinkContxt";
 import "./settingoverview.css";
 
 const API_BASE_URL =

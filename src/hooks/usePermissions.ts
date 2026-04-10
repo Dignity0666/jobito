@@ -1,4 +1,4 @@
-import { useJobitoAuth } from "../context/AuthContext";
+import { useJobitoAuth } from "../context/LinkContxt";
 
 export type Action = 'CREATE' | 'READ' | 'UPDATE' | 'DELETE';
 export type Entity = 'JOB' | 'USER' | 'COMPANY';

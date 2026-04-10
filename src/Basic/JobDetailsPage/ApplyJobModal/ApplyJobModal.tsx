@@ -1,36 +1,72 @@
-import React, { useState, Component, type ErrorInfo, type ReactNode } from "react";
-import { useJobitoAuth } from "../../../context/AuthContext";
+import React, {
+  useState,
+  Component,
+  type ErrorInfo,
+  type ReactNode,
+} from "react";
+import { useTranslation } from "../../../context/translation-context";
+import { useJobitoAuth } from "../../../context/LinkContxt";
 import styles from "./ApplyJobModal.module.css";
 
-class ErrorBoundary extends Component<{ children: ReactNode; onClose?: () => void }, { hasError: boolean; error: Error | null }> {
+class ErrorBoundary extends Component<
+  { children: ReactNode; onClose?: () => void },
+  { hasError: boolean; error: Error | null }
+> {
   constructor(props: { children: ReactNode; onClose?: () => void }) {
     super(props);
     this.state = { hasError: false, error: null };
   }
-  static getDerivedStateFromError(error: Error) { return { hasError: true, error }; }
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) { console.error("ErrorBoundary caught:", error, errorInfo); }
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("ErrorBoundary caught:", error, errorInfo);
+  }
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 9999
-        }}>
-          <div style={{
-            background: '#fff', borderRadius: '12px', padding: '32px',
-            maxWidth: '400px', textAlign: 'center', direction: 'rtl'
-          }}>
-            <h2 style={{ color: '#dc3545', marginBottom: '12px' }}>حدث خطأ غير متوقع</h2>
-            <p style={{ color: '#666', marginBottom: '20px' }}>عذراً، حدث خطأ أثناء تحميل نموذج التقديم.</p>
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              borderRadius: "12px",
+              padding: "32px",
+              maxWidth: "400px",
+              textAlign: "center",
+            }}
+          >
+            <h2 style={{ color: "#dc3545", marginBottom: "12px" }}>
+              {this.context && typeof this.context === 'object' && 't' in this.context ? (this.context as any).t("حدث خطأ غير متوقع") : "Unexpected Error"}
+            </h2>
+            <p style={{ color: "#666", marginBottom: "20px" }}>
+              {this.context && typeof this.context === 'object' && 't' in this.context ? (this.context as any).t("عذراً، حدث خطأ أثناء تحميل نموذج التقديم.") : "Sorry, an error occurred while loading the application form."}
+            </p>
             <button
               onClick={() => this.props.onClose?.()}
               style={{
-                padding: '10px 24px', background: '#4640de', color: '#fff',
-                border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px'
+                padding: "10px 24px",
+                background: "#4640de",
+                color: "#fff",
+                border: "none",
+                borderRadius: "8px",
+                cursor: "pointer",
+                fontSize: "14px",
               }}
             >
-              إغلاق
+              {this.context && typeof this.context === 'object' && 't' in this.context ? (this.context as any).t("إغلاق") : "Close"}
             </button>
           </div>
         </div>
@@ -40,13 +76,14 @@ class ErrorBoundary extends Component<{ children: ReactNode; onClose?: () => voi
   }
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 // Allowed file types and max size
 const ALLOWED_FILE_TYPES = [
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
 const MAX_FILE_SIZE_MB = 5;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
@@ -73,26 +110,35 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
   isOpen,
   onClose,
   jobId,
-  jobTitle = "وظيفة",
-  companyName = "شركة",
-  location = "عن بعد",
-  jobType = "دوام كامل",
+  jobTitle,
+  companyName,
+  location,
+  jobType,
   isActive = true,
   logoUrl,
 }) => {
+  const { t } = useTranslation();
   const { apiFetch, user } = useJobitoAuth();
+
+  const displayJobTitle = jobTitle || t("وظيفة");
+  const displayCompanyName = companyName || t("شركة");
+  const displayLocation = location || t("عن بعد");
+  const displayJobType = jobType || t("دوام كامل");
   const [portfolioUrl, setPortfolioUrl] = useState("");
   const [additionalInfo, setAdditionalInfo] = useState("");
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fileError, setFileError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
-  const [existingApplication, setExistingApplication] = useState<ApplicationStatus | null>(null);
+  const [existingApplication, setExistingApplication] =
+    useState<ApplicationStatus | null>(null);
 
   const fetchExistingStatus = async () => {
     if (!jobId || !isOpen) return;
     try {
-      const res = await apiFetch(`${API_BASE_URL}/applications/status/${jobId}`);
+      const res = await apiFetch(
+        `${API_BASE_URL}/applications/status/${jobId}`,
+      );
       if (res.ok) {
         const text = await res.text();
         if (text && text !== "null") {
@@ -120,10 +166,10 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
 
   const validateFile = (file: File): string | null => {
     if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-      return "يرجى رفع ملف بصيغة PDF أو Word فقط.";
+      return t("يرجى رفع ملف بصيغة PDF أو Word فقط.");
     }
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      return `حجم الملف يجب أن لا يتجاوز ${MAX_FILE_SIZE_MB} ميجابايت.`;
+      return `${t("حجم الملف يجب أن لا يتجاوز")} ${MAX_FILE_SIZE_MB} ${t("ميجابايت")}.`;
     }
     return null;
   };
@@ -152,7 +198,7 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
 
     try {
       setIsSubmitting(true);
-      
+
       let finalResumeUrl = "";
       // Only upload if we have a valid File object
       if (resumeFile && resumeFile instanceof File) {
@@ -171,7 +217,7 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
           const uploadData = await uploadRes.json();
           finalResumeUrl = uploadData.imageUrl || uploadData.url;
         } else {
-          setFormError("حدث خطأ أثناء رفع الملف. يرجى المحاولة مرة أخرى.");
+          setFormError(t("حدث خطأ أثناء رفع الملف. يرجى المحاولة مرة أخرى."));
           setIsSubmitting(false);
           return;
         }
@@ -189,7 +235,7 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
       });
 
       if (res.ok) {
-        alert("تم تقديم طلبك بنجاح! 🎉");
+        alert(t("تم تقديم طلبك بنجاح! 🎉"));
         // Reset form
         setPortfolioUrl("");
         setAdditionalInfo("");
@@ -206,7 +252,9 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
       }
     } catch (error: any) {
       console.error("Error submitting application:", error);
-      setFormError(error?.message || "حدث خطأ في الاتصال بالخادم. يرجى المحاولة لاحقاً.");
+      setFormError(
+        error?.message || "حدث خطأ في الاتصال بالخادم. يرجى المحاولة لاحقاً.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -218,277 +266,351 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
     <ErrorBoundary onClose={onClose}>
       <div className={styles.modalOverlay}>
         <div className={styles.modalContent}>
-        {!isActive && (
-          <div className={styles.closedOverlay}>
-            <div className={styles.closedMessage}>
-              <svg
-                width="48"
-                height="48"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#ff4d4f"
-                strokeWidth="2"
-              >
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="15" y1="9" x2="9" y2="15"></line>
-                <line x1="9" y1="9" x2="15" y2="15"></line>
-              </svg>
-              <h2>عذراً، تم إقفال هذه الوظيفة</h2>
-              <p>لم يعد بإمكانك التقديم على هذا المنصب حالياً</p>
-              <button className={(styles as any).submitButton} onClick={onClose}>
-                إغلاق
-              </button>
-            </div>
-          </div>
-        )}
-
-        {(existingApplication) && (
-          <div className={styles.closedOverlay}>
-            <div className={styles.closedMessage}>
-              <div style={{ color: '#56CDAD', marginBottom: '20px' }}>
-                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                  <polyline points="22 4 12 14.01 9 11.01" />
-                </svg>
-              </div>
-              <h2>تم التقديم مسبقاً</h2>
-              <p>لقد قمت بالتقديم على هذه الوظيفة بالفعل.</p>
-              <div style={{ 
-                background: '#f8f9fa', padding: '15px', borderRadius: '12px', 
-                marginBottom: '24px', border: '1px solid #e9ecef' 
-              }}>
-                <span style={{ fontSize: '14px', color: '#666' }}>حالة الطلب الحالية:</span>
-                <div style={{ 
-                  fontWeight: 700, color: '#4640de', marginTop: '5px', fontSize: '18px'
-                }}>
-                  {
-                    (existingApplication.status === 'applied' || existingApplication.status === 'reviewing') ? 'تحت المراجعة' :
-                    (existingApplication.status === 'shortlisted' || existingApplication.status === 'interviewed' || existingApplication.status === 'hired') ? 'مقبول ✅' : 
-                    (existingApplication.status === 'declined') ? 'مرفوض ❌' : 'تحت المراجعة'
-                  }
-                </div>
-              </div>
-              <button className={(styles as any).submitButton} onClick={onClose}>
-                حسناً
-              </button>
-            </div>
-          </div>
-        )}
-
-        <button
-          className={styles.closeButton}
-          onClick={onClose}
-          aria-label="إغلاق"
-        >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-
-        <div className={styles.modalHeader}>
-          <div className={styles.headerLeft}>
-            <div className={styles.companyLogo}>
-              {logoUrl ? (
-                <img
-                  src={logoUrl}
-                  alt={companyName}
-                  style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }}
-                />
-              ) : (
+          {!isActive && (
+            <div className={styles.closedOverlay}>
+              <div className={styles.closedMessage}>
                 <svg
-                  width="60"
-                  height="60"
-                  viewBox="0 0 60 60"
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
                   fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+                  stroke="#ff4d4f"
+                  strokeWidth="2"
                 >
-                  <path
-                    d="M30 5.5L52 18.2V43.6L30 56.3L8 43.6V18.2L30 5.5Z"
-                    fill="#56CDAD"
-                  />
-                  <path
-                    d="M8 18.2L30 30.9L52 18.2"
-                    stroke="white"
-                    strokeWidth="0"
-                  />
-                  <path d="M30 30.9L30 56.3" stroke="white" strokeWidth="0" />
-                  <path d="M30 5.5V56.3" fill="white" fillOpacity="0.2" />
-                  <path
-                    d="M8 18.2L30 30.9L52 18.2L30 5.5L8 18.2Z"
-                    fill="#78DDC2"
-                  />
-                  <path d="M8 18.2V43.6L30 56.3V30.9L8 18.2Z" fill="#46B496" />
-                  <path d="M30 30.9V56.3L52 43.6V18.2L30 30.9Z" fill="#56CDAD" />
-                  <path
-                    d="M22 23.5V41.5L28 36.5V28.5L38 41.5V23.5L32 28.5V36.5L22 23.5Z"
-                    fill="white"
-                  />
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="15" y1="9" x2="9" y2="15"></line>
+                  <line x1="9" y1="9" x2="15" y2="15"></line>
                 </svg>
-              )}
-            </div>
-            <div className={styles.headerTitles}>
-              <h2>{jobTitle}</h2>
-              <p>
-                {companyName} <span className={styles.dot}>•</span> {location}{" "}
-                <span className={styles.dot}>•</span> {jobType}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <hr className={styles.divider} />
-
-        <div className={styles.modalBody}>
-          <div className={styles.sectionHeader}>
-            <h3>أرسل طلبك</h3>
-            <p className={styles.subtitle}>
-              المعلومات التالية مطلوبة وسيتم مشاركتها فقط مع{" "}
-              {companyName}
-            </p>
-          </div>
-
-          <hr className={styles.divider} />
-
-          {formError && (
-            <div style={{
-              background: '#fff2f0', border: '1px solid #ffccc7', borderRadius: '12px',
-              padding: '12px 20px', marginBottom: '24px', color: '#dc3545',
-              fontSize: '14px', direction: 'rtl', display: 'flex', alignItems: 'center', gap: '10px',
-              boxShadow: '0 2px 8px rgba(220, 53, 69, 0.05)'
-            }}>
-              <i className="fa-solid fa-circle-exclamation"></i>
-              <span>{formError}</span>
+                <h2>{t("عذراً، تم إقفال هذه الوظيفة")}</h2>
+                <p>{t("لم يعد بإمكانك التقديم على هذا المنصب حالياً")}</p>
+                <button
+                  className={(styles as any).submitButton}
+                  onClick={onClose}
+                >
+                  {t("إغلاق")}
+                </button>
+              </div>
             </div>
           )}
 
-          <form className={styles.applyForm}>
-            <div className={styles.formGroup}>
-              <label>رابط الملف الشخصي (Portfolio)</label>
-              <input
-                type="text"
-                placeholder="أدخل رابط ملفك الشخصي..."
-                value={portfolioUrl}
-                onChange={(e) => setPortfolioUrl(e.target.value)}
-              />
-            </div>
-
-            <hr className={styles.divider} />
-
-            <div className={styles.formGroup}>
-              <label>معلومات إضافية</label>
-              <div className={styles.textareaWrapper}>
-                <textarea
-                  placeholder="أضف خطاب تقديم أو أي معلومات إضافية تريد مشاركتها..."
-                  value={additionalInfo}
-                  onChange={(e) => setAdditionalInfo(e.target.value)}
-                  maxLength={500}
-                />
-                <div className={styles.formattingToolbar}>
-                  <div className={styles.toolbarIcons}>
-                    <button type="button" className={styles.iconBtn}>
-                      <i className="fa-regular fa-face-smile"></i>
-                    </button>
-                    <button type="button" className={styles.iconBtn}>
-                      <span style={{ fontWeight: 800 }}>B</span>
-                    </button>
-                    <button type="button" className={styles.iconBtn}>
-                      <span
-                        style={{
-                          fontStyle: "italic",
-                          fontFamily: "serif",
-                          fontWeight: 600,
-                        }}
-                      >
-                        I
-                      </span>
-                    </button>
-                    <button type="button" className={styles.iconBtn}>
-                      <i className="fa-solid fa-list-ol"></i>
-                    </button>
-                    <button type="button" className={styles.iconBtn}>
-                      <i className="fa-solid fa-list-ul"></i>
-                    </button>
-                    <button type="button" className={styles.iconBtn}>
-                      <i className="fa-solid fa-link"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className={styles.textareaFooter}>
-                <span>الحد الأقصى 500 حرف</span>
-                <span>{additionalInfo.length} / 500</span>
-              </div>
-            </div>
-
-            <div className={styles.formGroupResume}>
-              <span className={styles.resumeLabel}>إرفاق السيرة الذاتية <span style={{fontSize: '13px', color: '#666', fontWeight: 'normal'}}>(اختياري)</span></span>
-              <p style={{ fontSize: '12px', color: '#888', margin: '4px 0 8px', lineHeight: '1.6' }}>
-                PDF أو Word — الحد الأقصى {MAX_FILE_SIZE_MB} ميجابايت. <br/>
-                <span style={{color: '#4640de'}}>ملاحظة:</span> سيتم استخدام سيرتك الذاتية السابقة تلقائياً إذا كانت موجودة ولم تقم بإرفاق ملف جديد.
-              </p>
-              <div className={styles.uploadBox}>
-                <input
-                  type="file"
-                  id="resumeUpload"
-                  accept=".pdf,.doc,.docx"
-                  style={{ display: "none" }}
-                  onChange={handleFileChange}
-                />
-                <label htmlFor="resumeUpload" className={styles.uploadButton}>
+          {existingApplication && (
+            <div className={styles.closedOverlay}>
+              <div className={styles.closedMessage}>
+                <div style={{ color: "#56CDAD", marginBottom: "20px" }}>
                   <svg
-                    width="18"
-                    height="18"
+                    width="60"
+                    height="60"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    style={{ marginLeft: "8px" }}
                   >
-                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
                   </svg>
-                  {resumeFile ? resumeFile.name : "إرفاق السيرة الذاتية"}
-                </label>
+                </div>
+                <h2>{t("تم التقديم مسبقاً")}</h2>
+                <p>{t("لقد قمت بالتقديم على هذه الوظيفة بالفعل.")}</p>
+                <div
+                  style={{
+                    background: "#f8f9fa",
+                    padding: "15px",
+                    borderRadius: "12px",
+                    marginBottom: "24px",
+                    border: "1px solid #e9ecef",
+                  }}
+                >
+                  <span style={{ fontSize: "14px", color: "#666" }}>
+                    {t("حالة الطلب الحالية:")}
+                  </span>
+                  <div
+                    style={{
+                      fontWeight: 700,
+                      color: "#4640de",
+                      marginTop: "5px",
+                      fontSize: "18px",
+                    }}
+                  >
+                    {existingApplication.status === "applied" ||
+                    existingApplication.status === "reviewing"
+                      ? t("تحت المراجعة")
+                      : existingApplication.status === "shortlisted" ||
+                          existingApplication.status === "interviewed" ||
+                          existingApplication.status === "hired"
+                        ? t("مقبول") + " ✅"
+                        : existingApplication.status === "declined"
+                          ? t("مرفوض") + " ❌"
+                          : t("تحت المراجعة")}
+                  </div>
+                </div>
+                <button
+                  className={(styles as any).submitButton}
+                  onClick={onClose}
+                >
+                  {t("حسناً")}
+                </button>
               </div>
-              {fileError && (
-                <p style={{ color: '#dc3545', fontSize: '13px', marginTop: '6px' }}>
-                  ⚠️ {fileError}
+            </div>
+          )}
+
+          <button
+            className={styles.closeButton}
+            onClick={onClose}
+            aria-label={t("إغلاق")}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+
+          <div className={styles.modalHeader}>
+            <div className={styles.headerLeft}>
+              <div className={styles.companyLogo}>
+                {logoUrl ? (
+                  <img
+                    src={logoUrl}
+                    alt={displayCompanyName}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                    }}
+                  />
+                ) : (
+                  <svg
+                    width="60"
+                    height="60"
+                    viewBox="0 0 60 60"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M30 5.5L52 18.2V43.6L30 56.3L8 43.6V18.2L30 5.5Z"
+                      fill="#56CDAD"
+                    />
+                    <path
+                      d="M8 18.2L30 30.9L52 18.2"
+                      stroke="white"
+                      strokeWidth="0"
+                    />
+                    <path d="M30 30.9L30 56.3" stroke="white" strokeWidth="0" />
+                    <path d="M30 5.5V56.3" fill="white" fillOpacity="0.2" />
+                    <path
+                      d="M8 18.2L30 30.9L52 18.2L30 5.5L8 18.2Z"
+                      fill="#78DDC2"
+                    />
+                    <path
+                      d="M8 18.2V43.6L30 56.3V30.9L8 18.2Z"
+                      fill="#46B496"
+                    />
+                    <path
+                      d="M30 30.9V56.3L52 43.6V18.2L30 30.9Z"
+                      fill="#56CDAD"
+                    />
+                    <path
+                      d="M22 23.5V41.5L28 36.5V28.5L38 41.5V23.5L32 28.5V36.5L22 23.5Z"
+                      fill="white"
+                    />
+                  </svg>
+                )}
+              </div>
+              <div className={styles.headerTitles}>
+                <h2>{t(displayJobTitle)}</h2>
+                <p>
+                  {t(displayCompanyName)} <span className={styles.dot}>•</span> {t(displayLocation)}{" "}
+                  <span className={styles.dot}>•</span> {t(displayJobType)}
                 </p>
-              )}
+              </div>
+            </div>
+          </div>
+
+          <hr className={styles.divider} />
+
+          <div className={styles.modalBody}>
+            <div className={styles.sectionHeader}>
+              <h3>{t("أرسل طلبك")}</h3>
+              <p className={styles.subtitle}>
+                {t("المعلومات التالية مطلوبة وسيتم مشاركتها فقط مع")} {t(displayCompanyName)}
+              </p>
             </div>
 
             <hr className={styles.divider} />
 
-            <div className={styles.submitSection}>
-              <button
-                type="button"
-                className={(styles as any).submitButton}
-                onClick={handleSubmit}
-                disabled={isSubmitting}
+            {formError && (
+              <div
+                style={{
+                  background: "#fff2f0",
+                  border: "1px solid #ffccc7",
+                  borderRadius: "12px",
+                  padding: "12px 20px",
+                  marginBottom: "24px",
+                  color: "#dc3545",
+                  fontSize: "14px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  boxShadow: "0 2px 8px rgba(220, 53, 69, 0.05)",
+                }}
               >
-                {isSubmitting ? "جاري التقديم..." : "إرسال الطلب"}
-              </button>
-              <p className={styles.termsText}>
-                بإرسال الطلب فإنك توافق على{" "}
-                <a href="#">شروط الخدمة</a> و{" "}
-                <a href="#">سياسة الخصوصية</a>
-              </p>
-            </div>
-          </form>
+                <i className="fa-solid fa-circle-exclamation"></i>
+                <span>{t(formError)}</span>
+              </div>
+            )}
+
+            <form className={styles.applyForm}>
+              <div className={styles.formGroup}>
+                <label>{t("رابط الملف الشخصي (Portfolio)")}</label>
+                <input
+                  type="text"
+                  placeholder={t("أدخل رابط ملفك الشخصي...")}
+                  value={portfolioUrl}
+                  onChange={(e) => setPortfolioUrl(e.target.value)}
+                />
+              </div>
+
+              <hr className={styles.divider} />
+
+              <div className={styles.formGroup}>
+                <label>{t("معلومات إضافية")}</label>
+                <div className={styles.textareaWrapper}>
+                  <textarea
+                    placeholder={t("أضف خطاب تقديم أو أي معلومات إضافية تريد مشاركتها...")}
+                    value={additionalInfo}
+                    onChange={(e) => setAdditionalInfo(e.target.value)}
+                    maxLength={500}
+                  />
+                  <div className={styles.formattingToolbar}>
+                    <div className={styles.toolbarIcons}>
+                      <button type="button" className={styles.iconBtn}>
+                        <i className="fa-regular fa-face-smile"></i>
+                      </button>
+                      <button type="button" className={styles.iconBtn}>
+                        <span style={{ fontWeight: 800 }}>B</span>
+                      </button>
+                      <button type="button" className={styles.iconBtn}>
+                        <span
+                          style={{
+                            fontStyle: "italic",
+                            fontFamily: "serif",
+                            fontWeight: 600,
+                          }}
+                        >
+                          I
+                        </span>
+                      </button>
+                      <button type="button" className={styles.iconBtn}>
+                        <i className="fa-solid fa-list-ol"></i>
+                      </button>
+                      <button type="button" className={styles.iconBtn}>
+                        <i className="fa-solid fa-list-ul"></i>
+                      </button>
+                      <button type="button" className={styles.iconBtn}>
+                        <i className="fa-solid fa-link"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.textareaFooter}>
+                  <span>{t("الحد الأقصى 500 حرف")}</span>
+                  <span>{additionalInfo.length} / 500</span>
+                </div>
+              </div>
+
+              <div className={styles.formGroupResume}>
+                <span className={styles.resumeLabel}>
+                  {t("إرفاق السيرة الذاتية")}{" "}
+                  <span
+                    style={{
+                      fontSize: "13px",
+                      color: "#666",
+                      fontWeight: "normal",
+                    }}
+                  >
+                    ({t("اختياري")})
+                  </span>
+                </span>
+                <p
+                  style={{
+                    fontSize: "12px",
+                    color: "#888",
+                    margin: "4px 0 8px",
+                    lineHeight: "1.6",
+                  }}
+                >
+                  {t("PDF أو Word — الحد الأقصى")} {MAX_FILE_SIZE_MB} {t("ميجابايت")}. <br />
+                  <span style={{ color: "#4640de" }}>{t("ملاحظة")}:</span> {t("سيتم استخدام سيرتك الذاتية السابقة تلقائياً إذا كانت موجودة ولم تقم بإرفاق ملف جديد.")}
+                </p>
+                <div className={styles.uploadBox}>
+                  <input
+                    type="file"
+                    id="resumeUpload"
+                    accept=".pdf,.doc,.docx"
+                    style={{ display: "none" }}
+                    onChange={handleFileChange}
+                  />
+                  <label htmlFor="resumeUpload" className={styles.uploadButton}>
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      style={{ marginLeft: "8px" }}
+                    >
+                      <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                    </svg>
+                    {resumeFile ? resumeFile.name : t("إرفاق السيرة الذاتية")}
+                  </label>
+                </div>
+                {fileError && (
+                  <p
+                    style={{
+                      color: "#dc3545",
+                      fontSize: "13px",
+                      marginTop: "6px",
+                    }}
+                  >
+                    ⚠️ {fileError}
+                  </p>
+                )}
+              </div>
+
+              <hr className={styles.divider} />
+
+              <div className={styles.submitSection}>
+                <button
+                  type="button"
+                  className={(styles as any).submitButton}
+                  onClick={handleSubmit}
+                   disabled={isSubmitting}
+                >
+                  {isSubmitting ? t("جاري التقديم...") : t("إرسال الطلب")}
+                </button>
+                <p className={styles.termsText}>
+                  {t("بإرسال الطلب فإنك توافق على")} <a href="#">{t("شروط الخدمة")}</a> {t("و")}{" "}
+                  <a href="#">{t("سياسة الخصوصية")}</a>
+                </p>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
     </ErrorBoundary>
   );
 };

@@ -1,18 +1,58 @@
 import { useState, useRef, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./Messagingapp.module.css";
-import { useJobitoAuth } from "../../context/AuthContext";
+import { useJobitoAuth } from "../../context/LinkContxt";
 
 const EMOJIS = [
-  "😊", "😂", "❤️", "👍", "🎉", "🔥", "✨", "💯", "😍", "🙏",
-  "👋", "😎", "🤔", "💪", "🥳", "😅", "🫡", "🤝", "💼", "✅",
-  "⭐", "📌", "🎯", "📎", "😇", "🥹", "😄",
+  "😊",
+  "😂",
+  "❤️",
+  "👍",
+  "🎉",
+  "🔥",
+  "✨",
+  "💯",
+  "😍",
+  "🙏",
+  "👋",
+  "😎",
+  "🤔",
+  "💪",
+  "🥳",
+  "😅",
+  "🫡",
+  "🤝",
+  "💼",
+  "✅",
+  "⭐",
+  "📌",
+  "🎯",
+  "📎",
+  "😇",
+  "🥹",
+  "😄",
 ];
 
 const avatarColors = [
-  "#3b5bdb", "#12b886", "#f03e3e", "#fab005", "#7950f2", "#e64980", "#1c7ed6", "#37b24d",
+  "#3b5bdb",
+  "#12b886",
+  "#f03e3e",
+  "#fab005",
+  "#7950f2",
+  "#e64980",
+  "#1c7ed6",
+  "#37b24d",
 ];
 
-function Avatar({ name, size = "md", color = "" }: { name: string; size?: string; color?: string }) {
+function Avatar({
+  name,
+  size = "md",
+  color = "",
+}: {
+  name: string;
+  size?: string;
+  color?: string;
+}) {
   const initials = name
     .split(" ")
     .map((w) => w[0])
@@ -101,14 +141,72 @@ export const MessagingApp: React.FC<MessagingAppProps> = ({
   setShowHeader,
 }) => {
   const { user } = useJobitoAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
   useEffect(() => {
     setShowHeader(false);
     return () => setShowHeader(true);
   }, [setShowHeader]);
 
-  const [contacts, setContacts] = useState(initialContacts);
-  const [activeId, setActiveId] = useState(1);
+  const [contacts, setContacts] = useState<any[]>(initialContacts);
+  const [activeId, setActiveId] = useState<number | string>(1);
   const [input, setInput] = useState("");
+  const processedRef = useRef(false);
+
+  useEffect(() => {
+    if (location.state?.preselectedUser) {
+      const pUser = location.state.preselectedUser;
+      const initialMessage = location.state.initialMessage;
+
+      setContacts((prev) => {
+        const existingIndex = prev.findIndex((c) => c.name === pUser.fullName);
+        const targetId = existingIndex >= 0 ? prev[existingIndex].id : Date.now();
+        
+        // Deep copy the array to force React to re-render properly
+        const newContacts = prev.map(c => 
+          c.id === targetId ? { ...c, messages: [...c.messages] } : c
+        );
+
+        if (existingIndex < 0) {
+          const newContact = {
+            id: targetId,
+            name: pUser.fullName,
+            role: "متقدم لوظيفة",
+            online: true,
+            time: "الآن",
+            messages: [],
+          };
+          newContacts.unshift(newContact);
+        }
+
+        const targetContact = newContacts.find(c => c.id === targetId);
+
+        if (initialMessage && targetContact) {
+          const hasSent = targetContact.messages.some(
+            (m: any) => m.text === initialMessage
+          );
+          if (!hasSent) {
+            const nowStr = new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+            targetContact.messages.push({
+              id: Date.now() + Math.random(),
+              from: "me",
+              text: initialMessage,
+              time: nowStr,
+            });
+            targetContact.time = nowStr;
+            console.log("📨 Auto-sent initial message to", pUser.fullName);
+          }
+        }
+
+        setActiveId(targetId);
+        return newContacts;
+      });
+    }
+  }, [location.state]);
   const [search, setSearch] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
   const [starred, setStarred] = useState<{ [key: number]: boolean }>({});
@@ -168,7 +266,6 @@ export const MessagingApp: React.FC<MessagingAppProps> = ({
   return (
     <div
       className={styles.app}
-      style={{ direction: "rtl" }}
       onClick={() => showEmoji && setShowEmoji(false)}
     >
       {/* SIDEBAR */}
@@ -262,9 +359,7 @@ export const MessagingApp: React.FC<MessagingAppProps> = ({
                 <Avatar name={active.name} size="lg" />
               </div>
               <div className={styles.introName}>{active.name}</div>
-              <div className={styles.introRole}>
-                {active.role}
-              </div>
+              <div className={styles.introRole}>{active.role}</div>
               <div className={styles.introDesc}>
                 هذه بداية محادثتك مع <b>{active.name}</b>
               </div>
@@ -313,7 +408,11 @@ export const MessagingApp: React.FC<MessagingAppProps> = ({
                   {isOut &&
                     (isLast ? (
                       <div className={styles.msgAvatar}>
-                        <Avatar name={user?.name || "أنت"} size="sm" color="#495057" />
+                        <Avatar
+                          name={user?.name || "أنت"}
+                          size="sm"
+                          color="#495057"
+                        />
                       </div>
                     ) : (
                       <div className={styles.msgAvatarPlaceholder} />
@@ -323,14 +422,14 @@ export const MessagingApp: React.FC<MessagingAppProps> = ({
 
               if (isLast) {
                 acc.push(
-                  <div
-                    key={`meta-${msg.id}`}
-                    className={styles.msgMeta}
-                    style={{
-                      textAlign: isOut ? "left" : "right",
-                      paddingRight: isOut ? 0 : "44px",
-                    }}
-                  >
+                    <div
+                      key={`meta-${msg.id}`}
+                      className={styles.msgMeta}
+                      style={{
+                        textAlign: isOut ? "left" : "left",
+                        paddingLeft: isOut ? "44px" : "44px",
+                      }}
+                    >
                     {isOut
                       ? `أنت · ${msg.time}`
                       : `${active.name.split(" ")[0]} · ${msg.time}`}

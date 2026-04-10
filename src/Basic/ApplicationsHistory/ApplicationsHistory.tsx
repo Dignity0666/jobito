@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import "./ApplicationsHistory.css";
-import { useJobitoAuth } from "../../context/AuthContext";
+import { useJobitoAuth } from "../../context/LinkContxt";
+import { useTranslation } from "../../context/translation-context";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 interface Application {
   applicationId: string | number;
@@ -21,6 +23,7 @@ interface Application {
 
 export const ApplicationsHistory = () => {
   const { user, apiFetch } = useJobitoAuth();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("all");
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,17 +31,18 @@ export const ApplicationsHistory = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const getFullImageUrl = (url?: string) => {
-    if (!url) return `https://api.dicebear.com/7.x/identicon/svg?seed=${Math.random().toString(36).substring(7)}`;
+    if (!url)
+      return `https://api.dicebear.com/7.x/identicon/svg?seed=${Math.random().toString(36).substring(7)}`;
     if (url.startsWith("http")) return url;
     return `${API_BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`;
   };
-  
+
   const tabs = [
-    { id: "all", label: "الكل" },
-    { id: "applied", label: "الانتظار" },
-    { id: "reviewing", label: "قيد المراجعة" },
-    { id: "hired", label: "تم التوظيف" },
-    { id: "declined", label: "مرفوض" },
+    { id: "all", label: t("الكل") },
+    { id: "applied", label: t("الانتظار") },
+    { id: "reviewing", label: t("قيد المراجعة") },
+    { id: "hired", label: t("تم التوظيف") },
+    { id: "declined", label: t("مرفوض") },
   ];
 
   useEffect(() => {
@@ -47,10 +51,10 @@ export const ApplicationsHistory = () => {
         setLoading(true);
         const response = await apiFetch(`${API_BASE_URL}/applications/my`);
         if (!response.ok) throw new Error("Failed to fetch applications");
-        
+
         const data = await response.json();
         // Defensively ensure data is an array before setting
-        const applicationsList = Array.isArray(data) ? data : (data.data || []);
+        const applicationsList = Array.isArray(data) ? data : data.data || [];
         setApplications(applicationsList);
       } catch (err) {
         console.error("Error fetching applications:", err);
@@ -65,42 +69,65 @@ export const ApplicationsHistory = () => {
     }
   }, [user, apiFetch]);
 
-  const filteredApplications = applications.filter(app => {
+  const filteredApplications = applications.filter((app) => {
     const status = (app.status || "applied").toLowerCase();
-    const tabMatch = activeTab === "all" || 
-                     status === activeTab || 
-                     (activeTab === "applied" && status === "waitlisted");
-    
-    const searchMatch = searchQuery === "" || 
-      (app.job?.title?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
-      (app.job?.company?.name?.toLowerCase() || "").includes(searchQuery.toLowerCase());
+    const tabMatch =
+      activeTab === "all" ||
+      status === activeTab ||
+      (activeTab === "applied" && status === "waitlisted");
+
+    const searchMatch =
+      searchQuery === "" ||
+      (app.job?.title?.toLowerCase() || "").includes(
+        searchQuery.toLowerCase(),
+      ) ||
+      (app.job?.company?.name?.toLowerCase() || "").includes(
+        searchQuery.toLowerCase(),
+      );
     return tabMatch && searchMatch;
   });
 
   const getStatusLabel = (status: string) => {
     const s = status.toLowerCase();
     switch (s) {
-      case "applied": return "الانتظار";
-      case "waitlisted": return "في الانتظار";
-      case "reviewing": return "قيد المراجعة";
-      case "hired": return "تم التوظيف";
-      case "declined": return "مرفوض";
-      default: return status;
+      case "applied":
+        return t("الانتظار");
+      case "waitlisted":
+        return t("في الانتظار");
+      case "reviewing":
+        return t("قيد المراجعة");
+      case "hired":
+        return t("تم التوظيف");
+      case "declined":
+        return t("مرفوض");
+      default:
+        return status;
     }
   };
 
   return (
-    <div className="ah-page" style={{ direction: "rtl" }}>
+    <div className="ah-page">
       <div className="ah-header-section">
         <div className="ah-header-content">
           <div>
-            <h1 className="ah-title">استمر في العمل الجيد، {user?.name || "الملف الشخصي"}</h1>
+            <h1 className="ah-title">
+              {t("استمر في العمل الجيد،")} {user?.name || t("الملف الشخصي")}
+            </h1>
             <p className="ah-subtitle">
-              إليك ما يحدث مع طلباتك اعتباراً من {new Date().toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' })}.
+              {t("إليك ما يحدث مع طلباتك اعتباراً من")}{" "}
+              {new Date().toLocaleDateString(undefined, {
+                month: "short",
+                day: "numeric",
+              })}
+              .
             </p>
           </div>
           <button className="ah-date-btn">
-            {new Date().toLocaleDateString('ar-EG', { month: 'short', day: 'numeric', year: 'numeric' })}
+            {new Date().toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
             <svg
               width="16"
               height="16"
@@ -138,43 +165,58 @@ export const ApplicationsHistory = () => {
         {/* Table Area */}
         <div className="ah-table-container">
           <div className="ah-table-header">
-            <h2 className="ah-table-title">سجل التقديم</h2>
+            <h2 className="ah-table-title">{t("سجل التقديم")}</h2>
             <div className="ah-table-actions">
               {showSearch ? (
-                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <div
+                  style={{
+                    position: "relative",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
                   <input
                     type="text"
-                    placeholder="ابحث عن شركة، وظيفة..."
+                    placeholder={t("ابحث عن شركة، وظيفة...")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     style={{
-                      padding: '10px 16px 10px 40px',
-                      borderRadius: '4px',
-                      border: '1px solid #d6ddeb',
-                      outline: 'none',
-                      fontSize: '14px',
-                      width: '250px'
+                      padding: "10px 16px 10px 40px",
+                      borderRadius: "4px",
+                      border: "1px solid #d6ddeb",
+                      outline: "none",
+                      fontSize: "14px",
+                      width: "250px",
                     }}
                     autoFocus
                   />
-                  <button 
+                  <button
                     onClick={() => {
-                        setShowSearch(false);
-                        setSearchQuery("");
+                      setShowSearch(false);
+                      setSearchQuery("");
                     }}
                     style={{
-                      position: 'absolute',
-                      left: '12px',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      color: '#7c8493',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
+                      position: "absolute",
+                      left: "12px",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "#7c8493",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <line x1="18" y1="6" x2="6" y2="18"></line>
                       <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
@@ -200,7 +242,7 @@ export const ApplicationsHistory = () => {
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                   </svg>
-                  بحث
+                  {t("بحث")}
                 </button>
               )}
             </div>
@@ -210,21 +252,31 @@ export const ApplicationsHistory = () => {
             <thead>
               <tr>
                 <th style={{ width: "5%" }}>#</th>
-                <th style={{ width: "25%" }}>اسم الشركة</th>
-                <th style={{ width: "25%" }}>المسمى الوظيفي</th>
-                <th style={{ width: "20%" }}>تاريخ التقديم</th>
-                <th style={{ width: "15%" }}>الحالة</th>
+                <th style={{ width: "25%" }}>{t("اسم الشركة")}</th>
+                <th style={{ width: "25%" }}>{t("المسمى الوظيفي")}</th>
+                <th style={{ width: "20%" }}>{t("تاريخ التقديم")}</th>
+                <th style={{ width: "15%" }}>{t("الحالة")}</th>
                 <th style={{ width: "10%", textAlign: "left" }}></th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', padding: '20px' }}>جاري التحميل...</td>
+                  <td
+                    colSpan={6}
+                    style={{ textAlign: "center", padding: "20px" }}
+                  >
+                    {t("جاري التحميل...")}
+                  </td>
                 </tr>
               ) : filteredApplications.length === 0 ? (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', padding: '20px' }}>لم يتم العثور على طلبات.</td>
+                  <td
+                    colSpan={6}
+                    style={{ textAlign: "center", padding: "20px" }}
+                  >
+                    {t("لم يتم العثور على طلبات.")}
+                  </td>
                 </tr>
               ) : (
                 filteredApplications.map((app, index) => (
@@ -232,24 +284,37 @@ export const ApplicationsHistory = () => {
                     <td>{index + 1}</td>
                     <td>
                       <div className="ah-company">
-                        <img 
-                          src={getFullImageUrl(app.job?.company?.logoUrl)} 
-                          alt={app.job?.company?.name || "Company Logo"} 
+                        <img
+                          src={getFullImageUrl(app.job?.company?.logoUrl)}
+                          alt={app.job?.company?.name || "Company Logo"}
                           className="ah-company-logo"
                         />
-                        <span>{app.job?.company?.name || "Unknown Company"}</span>
+                        <span>
+                          {app.job?.company?.name || "Unknown Company"}
+                        </span>
                       </div>
                     </td>
-                    <td className="ah-role">{app.job?.title || "Unknown Role"}</td>
-                    <td>{new Date(app.appliedAt).toLocaleDateString('ar-EG')}</td>
+                    <td className="ah-role">
+                      {app.job?.title || "Unknown Role"}
+                    </td>
                     <td>
-                      <span className={`ah-status-badge ${app.status.toLowerCase()}`}>
+                      {new Date(app.appliedAt).toLocaleDateString()}
+                    </td>
+                    <td>
+                      <span
+                        className={`ah-status-badge ${app.status.toLowerCase()}`}
+                      >
                         {getStatusLabel(app.status)}
                       </span>
                     </td>
                     <td style={{ textAlign: "left" }}>
                       <button className="ah-more-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
                           <circle cx="12" cy="7" r="1.5" />
                           <circle cx="12" cy="12" r="1.5" />
                           <circle cx="12" cy="17" r="1.5" />

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import styles from "./JobsSection.module.css";
+import { useTranslation } from "../../../context/translation-context";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
@@ -30,6 +31,7 @@ interface Job {
 }
 
 const JobsSection = () => {
+  const { t } = useTranslation();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -78,11 +80,11 @@ const JobsSection = () => {
 
   const getTranslatedTag = (tag: string) => {
     const lowerTag = tag.toLowerCase();
-    if (lowerTag.includes("marketing")) return "تسويق";
-    if (lowerTag.includes("design")) return "تصميم";
-    if (lowerTag.includes("sales") || lowerTag.includes("business")) return "مبيعات";
-    if (lowerTag.includes("technology") || lowerTag.includes("development")) return "تكنولوجيا";
-    return tag;
+    if (lowerTag.includes("marketing")) return t("تسويق");
+    if (lowerTag.includes("design")) return t("تصميم");
+    if (lowerTag.includes("sales") || lowerTag.includes("business")) return t("مبيعات");
+    if (lowerTag.includes("technology") || lowerTag.includes("development")) return t("تكنولوجيا");
+    return t(tag);
   };
 
   const getTagClass = (tag: string) => {
@@ -104,17 +106,17 @@ const JobsSection = () => {
     >
       <motion.div className={styles.sectionHeader} variants={cardVariants}>
         <h2>
-          الوظائف <span>المميزة</span>
+          {t("الوظائف")} <span>{t("المميزة")}</span>
         </h2>
-        <Link to="/Browse jobs" className={styles.showAllLink}>
-          تصفح جميع الوظائف ←
+        <Link to="/Find Jobs" className={styles.showAllLink}>
+          {t("تصفح جميع الوظائف ←")}
         </Link>
       </motion.div>
 
       {isLoading ? (
-        <div className={styles.loader}>جاري التحميل...</div>
+        <div className={styles.loader}>{t("جاري التحميل...")}</div>
       ) : error ? (
-        <div className={styles.error}>{error}</div>
+        <div className={styles.error}>{t(error)}</div>
       ) : (
         <motion.div className={styles.featuredGrid} variants={containerVariants}>
           {jobs.map((job) => (
@@ -131,20 +133,20 @@ const JobsSection = () => {
                 <div className={styles.logo}>
                   <img
                     src={getFullImageUrl(job.company?.logoUrl || job.company?.logo, job.company?.name || job.jobId?.toString())}
-                    alt={job.company?.name || "Company Logo"}
+                    alt={t(job.company?.name || "Company Logo")}
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = `https://api.dicebear.com/7.x/identicon/svg?seed=${job.company?.name || job.jobId}`;
                     }}
                   />
                 </div>
                 <span className={styles.badge}>
-                  {job.jobType === "Full Time" ? "دوام كامل" : job.jobType === "Part Time" ? "دوام جزئي" : job.jobType === "Contract" ? "عقد" : job.jobType === "Internship" ? "تدريب" : "دوام كامل"}
+                  {job.jobType === "Full Time" ? t("دوام كامل") : job.jobType === "Part Time" ? t("دوام جزئي") : job.jobType === "Contract" ? t("عقد") : job.jobType === "Internship" ? t("تدريب") : t("دوام كامل")}
                 </span>
               </div>
 
-              <h3>{job.title}</h3>
+              <h3>{t(job.title)}</h3>
               <p>
-                {job.company?.name || "Jobito Ltd"} · {job.address}
+                {t(job.company?.name || "Jobito Ltd")} · {t(job.address)}
               </p>
 
               <div className={styles.tags}>
@@ -155,7 +157,7 @@ const JobsSection = () => {
                 )}
                 {!job.category?.name && (
                    <span className={`${styles.tag} ${styles.technology}`}>
-                    تكنولوجيا
+                    {t("تكنولوجيا")}
                    </span>
                 )}
               </div>
@@ -168,5 +170,3 @@ const JobsSection = () => {
 };
 
 export default JobsSection;
-
-

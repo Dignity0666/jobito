@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { useJobitoAuth } from "../../context/AuthContext";
+import { useJobitoAuth } from "../../context/LinkContxt";
 import styles from "./Help.module.css";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 interface HelpArticle {
   articleId: number;
@@ -25,7 +26,9 @@ const HelpCenter = () => {
   const { apiFetch } = useJobitoAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [categories, setCategories] = useState<HelpCategory[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<HelpCategory | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<HelpCategory | null>(
+    null,
+  );
   const [articles, setArticles] = useState<HelpArticle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [feedback, setFeedback] = useState<Record<number, string>>({});
@@ -56,7 +59,12 @@ const HelpCenter = () => {
     setArticles(cat.articles || []);
   };
 
-  const getDisplayName = (item: { name?: string; nameEn?: string; title?: string; titleEn?: string }) => {
+  const getDisplayName = (item: {
+    name?: string;
+    nameEn?: string;
+    title?: string;
+    titleEn?: string;
+  }) => {
     return item.name || item.title;
   };
 
@@ -73,7 +81,9 @@ const HelpCenter = () => {
 
   const filteredArticles = articles.filter(
     (article) =>
-      getDisplayName(article)?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      getDisplayName(article)
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
       getContent(article)?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 

@@ -6,8 +6,10 @@ import img3 from "../../../assets/WhatsApp Image 2026-02-20 at 12.16.48 AM (1).j
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "../../../context/translation-context";
 
 const HiringBanner: React.FC = () => {
+  const { t } = useTranslation();
   const containerVariants: Variants = {
     hidden: { opacity: 0, scale: 0.95 },
     visible: {
@@ -52,15 +54,15 @@ const HiringBanner: React.FC = () => {
         {/* Left Side: Illustration & Text */}
         <div className={styles.leftContent}>
           <motion.div className={styles.illustration} variants={imageVariants}>
-            <img src={img1} alt="Hiring" />
+            <img src={img1} alt={t("Hiring")} />
           </motion.div>
 
-          <motion.span className={styles.weAreLabel} variants={itemVariants}>نحن</motion.span>
-          <motion.h2 className={styles.hiringTitle} variants={itemVariants}>نوظف!</motion.h2>
+          <motion.span className={styles.weAreLabel} variants={itemVariants}>{t("نحن")}</motion.span>
+          <motion.h2 className={styles.hiringTitle} variants={itemVariants}>{t("نوظف!")}</motion.h2>
           <motion.p className={styles.description} variants={itemVariants}>
-            دعنا نعمل معا
+            {t("دعنا نعمل معا")}
             <br />&{" "}
-            <span className={styles.mutedText}>واستكشف الفرص</span>
+            <span className={styles.mutedText}>{t("واستكشف الفرص")}</span>
           </motion.p>
         </div>
 
@@ -88,15 +90,15 @@ const HiringBanner: React.FC = () => {
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            قدم الآن
+            {t("قدم الآن")}
           </motion.button>
 
           <div className={styles.teamIllustrations}>
             <motion.div className={styles.teamImgSmall} variants={imageVariants}>
-              <img src={img2} alt="team" />
+              <img src={img2} alt={t("team")} />
             </motion.div>
             <motion.div className={styles.teamImgTall} variants={imageVariants}>
-              <img src={img3} alt="team" />
+              <img src={img3} alt={t("team")} />
             </motion.div>
           </div>
         </div>

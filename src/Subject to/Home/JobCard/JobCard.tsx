@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import styles from "./JobCard.module.css";
+import { useTranslation } from "../../../context/translation-context";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
@@ -36,6 +37,7 @@ const stripMarkdown = (text: string) => {
 };
 
 const useTimeAgo = () => {
+  const { t } = useTranslation();
   return (date: string) => {
     const now = new Date();
     const past = new Date(date);
@@ -43,15 +45,16 @@ const useTimeAgo = () => {
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     const diffMonths = Math.floor(diffDays / 30);
 
-    if (diffMonths > 0) return `منذ ${diffMonths} أطلب`;
-    if (diffDays > 0) return `منذ ${diffDays} أيام`;
-    return "اليوم";
+    if (diffMonths > 0) return `${t("منذ")} ${diffMonths} ${t("أشهر")}`;
+    if (diffDays > 0) return `${t("منذ")} ${diffDays} ${t("أيام")}`;
+    return t("اليوم");
   };
 };
 
 const JobCard: React.FC<{ job: Job; variants: Variants }> = ({ job, variants }) => {
+  const { t } = useTranslation();
   const timeAgo = useTimeAgo();
-  const cleanDescription = stripMarkdown(job.description || "نحن نبحث عن شخص موهوب للانضمام إلى فريقنا. هذه فرصة رائعة لتطوير مسيرتك المهنية.");
+  const cleanDescription = stripMarkdown(job.description || t("نحن نبحث عن شخص موهوب للانضمام إلى فريقنا. هذه فرصة رائعة لتطوير مسيرتك المهنية."));
   
   return (
     <motion.div 
@@ -72,7 +75,7 @@ const JobCard: React.FC<{ job: Job; variants: Variants }> = ({ job, variants }) 
             />
           </div>
           <div>
-            <h3 className={styles.companyName}>{job.company?.name || "Jobito Ltd"}</h3>
+            <h3 className={styles.companyName}>{job.company?.name || t("Jobito Ltd")}</h3>
             <p className={styles.location}>
               <span className={styles.locIcon}>📍</span> {job.address}
             </p>
@@ -81,7 +84,7 @@ const JobCard: React.FC<{ job: Job; variants: Variants }> = ({ job, variants }) 
         <span className={styles.flash}>⚡</span>
       </div>
  
-      <h2 className={styles.jobTitle}>{job.title}</h2>
+      <h2 className={styles.jobTitle}>{t(job.title)}</h2>
  
       <div className={styles.meta}>
         <span className={styles.metaItem}>💼 {job.jobType}</span>
@@ -89,24 +92,24 @@ const JobCard: React.FC<{ job: Job; variants: Variants }> = ({ job, variants }) 
       </div>
  
       <p className={styles.description}>
-        {cleanDescription.length > 100 ? cleanDescription.substring(0, 100) + "..." : cleanDescription}
+        {cleanDescription.length > 100 ? t(cleanDescription.substring(0, 100)) + "..." : t(cleanDescription)}
       </p>
  
       <div className={styles.tags}>
         {job.category?.name && (
           <span className={styles.tag}>
-            {job.category.name}
+            {t(job.category.name)}
           </span>
         )}
       </div>
  
       <div className={styles.footer}>
         <p className={styles.price}>
-          ${job.salary || "قابل للتفاوض"}
-          {job.salary && <span className={styles.perHour}>/ ساعة</span>}
+          ${job.salary || t("قابل للتفاوض")}
+          {job.salary && <span className={styles.perHour}>/ {t("ساعة")}</span>}
         </p>
         <Link to="/Job details" state={{ jobId: job.jobId }} className={styles.applyBtn}>
-          قدم الآن
+          {t("قدم الآن")}
         </Link>
       </div>
     </motion.div>
@@ -114,6 +117,7 @@ const JobCard: React.FC<{ job: Job; variants: Variants }> = ({ job, variants }) 
 };
 
 export default function JobsDashboard() {
+  const { t } = useTranslation();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -178,18 +182,18 @@ export default function JobsDashboard() {
       <div className={styles.container}>
         {/* Header */}
         <motion.div className={styles.header} variants={cardVariants}>
-          <h1 className={styles.title}>وظائف اليوم</h1>
-          <p className={styles.subtitle}>تصفح أحدث الفرص المتاحة التي تم نشرها اليوم.</p>
+          <h1 className={styles.title}>{t("وظائف اليوم")}</h1>
+          <p className={styles.subtitle}>{t("تصفح أحدث الفرص المتاحة التي تم نشرها اليوم.")}</p>
         </motion.div>
 
         {/* Jobs Grid */}
         {loading ? (
-          <div className={styles.loading}>جاري التحميل...</div>
+          <div className={styles.loading}>{t("جاري التحميل...")}</div>
         ) : error ? (
-          <div className={styles.error}>{error}</div>
+          <div className={styles.error}>{t(error)}</div>
         ) : jobs.length === 0 ? (
           <div className={styles.emptyState} style={{textAlign: "center", color: "#6b7280", padding: "40px"}}>
-             لا توجد وظائف جديدة تم نشرها في هذا اليوم بعد.
+             {t("لا توجد وظائف جديدة تم نشرها في هذا اليوم بعد.")}
           </div>
         ) : (
           <motion.div className={styles.grid} variants={containerVariants}>

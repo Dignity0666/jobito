@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import styles from "./Categories.module.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "../../../context/translation-context";
 import { 
   FiLayout, 
   FiBarChart2, 
@@ -35,13 +36,15 @@ interface Category {
 const CATEGORY_MAP: Record<string, { icon: React.ReactNode; color: string }> = {
   "تقني": { icon: <FiCpu />, color: "#4f46e5" },
   "غير تقني": { icon: <FiUsers />, color: "#f59e0b" },
-  "حرفي": { icon: <FiTool />, color: "#f97316" }, 
+  "خدمات": { icon: <FiTool />, color: "#f97316" }, 
 };
 
 const Categories = () => {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -55,13 +58,19 @@ const Categories = () => {
         const priority: Record<string, number> = {
           "تقني": 3,
           "غير تقني": 2,
-          "حرفي": 1,
+          "خدمات": 1,
         };
 
-        const filtered = data.filter((c: Category) => priority[c.name.trim()] !== undefined);
+        // Normalize names (Map legacy names to 'خدمات') and filter
+        const processed = data.map((c: Category) => ({
+          ...c,
+          name: (c.name.trim() === "حرفي" || c.name.trim() === "صنيعي") ? "خدمات" : c.name.trim()
+        }));
+
+        const filtered = processed.filter((c: Category) => priority[c.name] !== undefined);
         const sorted = filtered.sort((a: Category, b: Category) => {
-          const pA = priority[a.name.trim()] || 0;
-          const pB = priority[b.name.trim()] || 0;
+          const pA = priority[a.name] || 0;
+          const pB = priority[b.name] || 0;
           return pB - pA;
         });
 
@@ -103,7 +112,6 @@ const Categories = () => {
   return (
     <motion.div 
       className={styles.pageContainer} 
-      style={{ direction: "rtl" }}
       initial="hidden"
       whileInView="visible"
       viewport={{ margin: "-100px" }}
@@ -112,18 +120,18 @@ const Categories = () => {
       {/* Header */}
       <motion.div className={styles.sectionHeader} variants={cardVariants}>
         <h2>
-          استكشف حسب <span>الفئات</span>
+          {t("استكشف حسب")} <span>{t("الفئات")}</span>
         </h2>
         <Link to="/Find Jobs" className={styles.showAll}>
-          عرض كل الوظائف ←
+          {t("عرض كل الوظائف ←")}
         </Link>
       </motion.div>
 
       {/* Categories Grid */}
       {loading ? (
-        <div className={styles.loading}>جاري التحميل...</div>
+        <div className={styles.loading}>{t("جاري التحميل...")}</div>
       ) : error ? (
-        <div className={styles.error}>{error}</div>
+        <div className={styles.error}>{t(error)}</div>
       ) : (
         <motion.div className={styles.categoriesGrid} variants={containerVariants}>
           {categories.map((cat) => {
@@ -133,6 +141,8 @@ const Categories = () => {
                 key={cat.categoryId} 
                 className={styles.categoryCard}
                 variants={cardVariants}
+                style={{ cursor: "pointer" }}
+                onClick={() => navigate(`/Find Jobs?category=${encodeURIComponent(cat.name)}`)}
                 whileHover={{ 
                   scale: 1.05, 
                   boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
@@ -140,8 +150,8 @@ const Categories = () => {
                 }}
               >
                 <div className={styles.content}>
-                  <h3>{cat.name}</h3>
-                  <p>{cat.jobCount || 0} وظيفة متاحة</p>
+                  <h3>{t(cat.name)}</h3>
+                  <p>{cat.jobCount || 0} {t("وظيفة متاحة")}</p>
                 </div>
                 <div 
                   className={styles.icon}

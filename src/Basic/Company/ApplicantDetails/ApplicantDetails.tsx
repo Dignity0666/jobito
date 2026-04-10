@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useJobitoAuth } from "../../../context/AuthContext";
+import { useJobitoAuth } from "../../../context/LinkContxt";
+import { useTranslation } from "../../../context/translation-context";
 import "./ApplicantDetails.css";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 interface Applicant {
   applicationId: number;
@@ -43,6 +45,7 @@ interface Applicant {
 }
 
 export default function ApplicantDetails() {
+  const { t, language } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { apiFetch } = useJobitoAuth();
@@ -56,11 +59,11 @@ export default function ApplicantDetails() {
       try {
         setLoading(true);
         const res = await apiFetch(`${API_BASE_URL}/applications/${id}`);
-        if (!res.ok) throw new Error("فشل في جلب بيانات المتقدم");
+        if (!res.ok) throw new Error(t("فشل في جلب بيانات المتقدم"));
         const data = await res.json();
         setApp(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "خطأ غير متوقع");
+        setError(err instanceof Error ? t(err.message) : t("خطأ غير متوقع"));
       } finally {
         setLoading(false);
       }
@@ -70,14 +73,17 @@ export default function ApplicantDetails() {
 
   // Auto-update status to 'reviewing' if it's 'applied'
   useEffect(() => {
-    if (app && app.status === 'applied') {
+    if (app && app.status === "applied") {
       const updateToReviewing = async () => {
         try {
-          const res = await apiFetch(`${API_BASE_URL}/applications/${id}/status`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ status: "reviewing" }),
-          });
+          const res = await apiFetch(
+            `${API_BASE_URL}/applications/${id}/status`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ status: "reviewing" }),
+            },
+          );
           if (res.ok) {
             setApp((prev) => (prev ? { ...prev, status: "reviewing" } : null));
           }
@@ -100,20 +106,26 @@ export default function ApplicantDetails() {
         },
         body: JSON.stringify({ status: newStatus }),
       });
-      if (!res.ok) throw new Error("فشل في تحديث الحالة");
+      if (!res.ok) throw new Error(t("فشل في تحديث الحالة"));
       setApp((prev) => (prev ? { ...prev, status: newStatus } : null));
-      alert(`تم تحديث الحالة إلى: ${newStatus === 'hired' ? 'مقبول' : newStatus === 'declined' ? 'مرفوض' : 'في الانتظار'}`);
+      const statusText =
+        newStatus === "hired"
+          ? t("مقبول")
+          : newStatus === "declined"
+            ? t("مرفوض")
+            : t("في الانتظار");
+      alert(`${t("تم تحديث الحالة إلى:")} ${statusText}`);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "خطأ");
+      alert(err instanceof Error ? t(err.message) : t("خطأ"));
     }
   };
 
   const handleDownloadCV = async (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     if (!app?.resumeUrl) return;
-    
-    const url = app.resumeUrl.startsWith("http") 
-      ? app.resumeUrl 
+
+    const url = app.resumeUrl.startsWith("http")
+      ? app.resumeUrl
       : `${API_BASE_URL}${app.resumeUrl.startsWith("/") ? "" : "/"}${app.resumeUrl}`;
 
     try {
@@ -121,7 +133,7 @@ export default function ApplicantDetails() {
       if (!response.ok) throw new Error("Network response was not ok");
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
-      
+
       const link = document.createElement("a");
       link.href = blobUrl;
       const cleanName = u.fullName.split(" ")[0] || "Applicant";
@@ -140,42 +152,55 @@ export default function ApplicantDetails() {
 
   const handleGoToChat = () => {
     if (!u) return;
-    navigate('/Messagingapp', {
+    navigate("/Messagingapp", {
       state: {
         preselectedUser: {
           userId: u.userId,
           fullName: u.fullName,
           avatarUrl: u.avatarUrl || null,
-          email: u.email
-        }
-      }
+          email: u.email,
+        },
+        initialMessage: `${t("مرحباً")} ${u.fullName.split(" ")[0]}، ${t("بخصوص تقديمك على وظيفة")} ${t(app?.job?.title || "المتاحة")}، ${t("نحن مهتمون بملفك ونتمنى التواصل معك قريباً.")}`,
+      },
     });
   };
 
-  if (loading) return <div className="details-loading">جاري التحميل...</div>;
-  if (error || !app) return <div className="details-error">⚠️ {error || "المتقدم غير موجود"}</div>;
+  if (loading) return <div className="details-loading">{t("جاري التحميل...")}</div>;
+  if (error || !app)
+    return (
+      <div className="details-error">⚠️ {t(error || "المتقدم غير موجود")}</div>
+    );
   const u = app.user;
   const avatar = u.avatarUrl
-    ? u.avatarUrl.startsWith("http") ? u.avatarUrl : `${API_BASE_URL}${u.avatarUrl}`
+    ? u.avatarUrl.startsWith("http")
+      ? u.avatarUrl
+      : `${API_BASE_URL}${u.avatarUrl}`
     : "https://via.placeholder.com/150";
 
   const getAppliedSince = (dateStr: string) => {
     const diff = new Date().getTime() - new Date(dateStr).getTime();
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    if (days === 0) return "اليوم";
-    if (days === 1) return "منذ يوم";
-    if (days === 2) return "منذ يومين";
-    return `منذ ${days} أيام`;
+    if (days === 0) return t("اليوم");
+    if (days === 1) return t("منذ يوم");
+    if (days === 2) return t("منذ يومين");
+    return `${t("منذ")} ${days} ${t("أيام")}`;
   };
 
   return (
     <div className="applicant-details-view">
       <div className="details-header">
         <button className="back-btn" onClick={() => navigate(-1)}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+          >
             <polyline points="9 18 15 12 9 6"></polyline>
           </svg>
-          تفاصيل المتقدم
+          {t("تفاصيل المتقدم")}
         </button>
       </div>
 
@@ -184,8 +209,8 @@ export default function ApplicantDetails() {
           <div className="sidebar-card profile-main-card">
             <div className="profile-top">
               <div className="profile-info-text">
-                <h2 className="profile-name">{u.fullName}</h2>
-                <p className="profile-role">{u.skills?.[0] || "متخصص"}</p>
+                <h2 className="profile-name">{t(u.fullName)}</h2>
+                <p className="profile-role">{t(u.skills?.[0] || "متخصص")}</p>
               </div>
               <img src={avatar} alt={u.fullName} className="large-avatar" />
             </div>
@@ -194,21 +219,37 @@ export default function ApplicantDetails() {
 
             <div className="sidebar-section">
               <div className="info-header">
-                <span className="applied-time">{getAppliedSince(app.appliedAt)}</span>
-                <span className="info-label">الوظيفة المتقدم لها</span>
+                <span className="applied-time">
+                  {getAppliedSince(app.appliedAt)}
+                </span>
+                <span className="info-label">{t("الوظيفة المتقدم لها")}</span>
               </div>
-              <h2 className="applied-job-title">{app.job?.title || "بدون عنوان"}</h2>
+              <h2 className="applied-job-title">
+                {t(app.job?.title || "بدون عنوان")}
+              </h2>
               <div className="applied-job-meta">
-                {app.job?.category?.name || "عام"} • {app.job?.jobType || "دوام كامل"}
+                {t(app.job?.category?.name || "عام")} •{" "}
+                {t(app.job?.jobType || "دوام كامل")}
               </div>
             </div>
 
             <div className="sidebar-divider" />
 
             {app.resumeUrl ? (
-              <div className={`cv-file-box clickable ${isDownloaded ? 'downloaded' : ''}`} onClick={handleDownloadCV}>
+              <div
+                className={`cv-file-box clickable ${isDownloaded ? "downloaded" : ""}`}
+                onClick={handleDownloadCV}
+              >
                 <div className="cv-icon-wrapper">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="cv-main-icon">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    className="cv-main-icon"
+                  >
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                     <polyline points="14 2 14 8 20 8"></polyline>
                   </svg>
@@ -216,11 +257,21 @@ export default function ApplicantDetails() {
                 </div>
                 <div className="cv-info-row">
                   <div className="cv-details-text">
-                    <span className="cv-filename">{app.resumeUrl.split('/').pop() || `${u.fullName.split(' ')[0]}_CV.pdf`}</span>
-                    <span className="cv-filesize">سيرة ذاتية احترافية</span>
+                    <span className="cv-filename">
+                      {app.resumeUrl.split("/").pop() ||
+                        `${u.fullName.split(" ")[0]}_CV.pdf`}
+                    </span>
+                    <span className="cv-filesize">{t("سيرة ذاتية احترافية")}</span>
                   </div>
                   <div className="cv-dl-action">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                       <polyline points="7 10 12 15 17 10"></polyline>
                       <line x1="12" y1="15" x2="12" y2="3"></line>
@@ -229,17 +280,36 @@ export default function ApplicantDetails() {
                 </div>
               </div>
             ) : (
-              <div className="cv-file-box" style={{ opacity: 0.6, cursor: "not-allowed" }}>
-                <div className="cv-icon-wrapper" style={{ background: "rgba(255, 255, 255, 0.1)", boxShadow: "none" }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="cv-main-icon">
+              <div
+                className="cv-file-box"
+                style={{ opacity: 0.6, cursor: "not-allowed" }}
+              >
+                <div
+                  className="cv-icon-wrapper"
+                  style={{
+                    background: "rgba(255, 255, 255, 0.1)",
+                    boxShadow: "none",
+                  }}
+                >
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    className="cv-main-icon"
+                  >
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                     <polyline points="14 2 14 8 20 8"></polyline>
                   </svg>
                 </div>
                 <div className="cv-info-row">
                   <div className="cv-details-text">
-                    <span className="cv-filename" style={{ color: "#94a3b8" }}>بدون ملف CV</span>
-                    <span className="cv-filesize">لم يقم المتقدم برفع ملف</span>
+                    <span className="cv-filename" style={{ color: "#94a3b8" }}>
+                      {t("بدون ملف CV")}
+                    </span>
+                    <span className="cv-filesize">{t("لم يقم المتقدم برفع ملف")}</span>
                   </div>
                 </div>
               </div>
@@ -247,151 +317,261 @@ export default function ApplicantDetails() {
 
             <div className="sidebar-divider" />
             <div className="sidebar-actions multi-actions">
-              {app.status === 'hired' ? (
+              {app.status === "hired" ? (
                 <div className="status-result status-hired">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                   </svg>
-                  تم التوظيف
+                  {t("تم التوظيف")}
                 </div>
-              ) : app.status === 'declined' ? (
+              ) : app.status === "declined" ? (
                 <div className="status-result status-declined">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="15" y1="9" x2="9" y2="15"></line>
                     <line x1="9" y1="9" x2="15" y2="15"></line>
                   </svg>
-                  تم الرفض
+                  {t("تم الرفض")}
                 </div>
-              ) : app.status === 'waitlisted' ? (
+              ) : app.status === "waitlisted" ? (
                 <div className="status-result status-waitlisted">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
-                  في الانتظار
+                  {t("في الانتظار")}
                 </div>
               ) : (
                 <>
-                  <button className="accept-btn" onClick={() => handleStatusUpdate('hired')}>قبول</button>
-                  <button className="reject-btn" onClick={() => handleStatusUpdate('declined')}>رفض</button>
-                  <button className="waitlist-btn" onClick={() => handleStatusUpdate('waitlisted')}>انتظار</button>
+                  <button
+                    className="accept-btn"
+                    onClick={() => handleStatusUpdate("hired")}
+                  >
+                    {t("قبول")}
+                  </button>
+                  <button
+                    className="reject-btn"
+                    onClick={() => handleStatusUpdate("declined")}
+                  >
+                    {t("رفض")}
+                  </button>
+                  <button
+                    className="waitlist-btn"
+                    onClick={() => handleStatusUpdate("waitlisted")}
+                  >
+                    {t("انتظار")}
+                  </button>
                 </>
               )}
             </div>
           </div>
 
           <div className="sidebar-card contact-card">
-            <div className="sidebar-section-title">بيانات التواصل</div>
-            
-            <button 
-               onClick={handleGoToChat}
-               style={{
-                  width: '100%',
-                  padding: '12px',
-                  backgroundColor: '#4640de',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  marginBottom: '16px',
-                  transition: 'background-color 0.2s'
-               }}
-               onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#3b35bd'}
-               onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#4640de'}
+            <div className="sidebar-section-title">{t("بيانات التواصل")}</div>
+
+            <button
+              onClick={handleGoToChat}
+              style={{
+                width: "100%",
+                padding: "12px",
+                backgroundColor: "#4640de",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                fontWeight: 600,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+                marginBottom: "16px",
+                transition: "background-color 0.2s",
+              }}
+              onMouseOver={(e) =>
+                (e.currentTarget.style.backgroundColor = "#3b35bd")
+              }
+              onMouseOut={(e) =>
+                (e.currentTarget.style.backgroundColor = "#4640de")
+              }
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
               </svg>
-              مراسلة المتقدم
+              {t("مراسلة المتقدم")}
             </button>
 
             <div className="contact-item">
               <div className="item-icon green-bg">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                   <polyline points="22,6 12,13 2,6"></polyline>
                 </svg>
               </div>
               <div className="item-val">
-                <span className="item-label">البريد الإلكتروني</span>
-                <span className="item-text">{u.email}</span>
+                <span className="item-label">{t("البريد الإلكتروني")}</span>
+                <span className="item-text">{t(u.email)}</span>
               </div>
             </div>
             {u.phone && (
               <div className="contact-item">
                 <div className="item-icon blue-bg">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                   </svg>
                 </div>
                 <div className="item-val">
-                  <span className="item-label">الهاتف</span>
-                  <span className="item-text">{u.phone}</span>
+                  <span className="item-label">{t("الهاتف")}</span>
+                  <span className="item-text">{t(u.phone)}</span>
                 </div>
               </div>
             )}
             {u.socialLinks?.linkedin && (
               <div className="contact-item">
                 <div className="item-icon blue-bg">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
                     <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
                     <rect x="2" y="9" width="4" height="12"></rect>
                     <circle cx="4" cy="4" r="2"></circle>
                   </svg>
                 </div>
                 <div className="item-val">
-                  <span className="item-label">لينكد إن</span>
-                  <span className="item-text">linkedin.com/in/{u.socialLinks.linkedin}</span>
+                  <span className="item-label">{t("لينكد إن")}</span>
+                  <span className="item-text">
+                    linkedin.com/in/{u.socialLinks.linkedin}
+                  </span>
                 </div>
               </div>
             )}
             {u.socialLinks?.instagram && (
               <div className="contact-item">
                 <div className="item-icon purple-bg">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <rect
+                      x="2"
+                      y="2"
+                      width="20"
+                      height="20"
+                      rx="5"
+                      ry="5"
+                    ></rect>
                     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                     <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
                   </svg>
                 </div>
                 <div className="item-val">
-                  <span className="item-label">إنستجرام</span>
-                  <span className="item-text">instagram.com/{u.socialLinks.instagram}</span>
+                  <span className="item-label">{t("إنستجرام")}</span>
+                  <span className="item-text">
+                    instagram.com/{u.socialLinks.instagram}
+                  </span>
                 </div>
               </div>
             )}
             {u.socialLinks?.twitter && (
               <div className="contact-item">
                 <div className="item-icon dark-bg">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
                     <path d="M4 4l11.733 16h4.267l-11.733-16h-4.267zM4 20l6.768-6.768m2.464-2.464l6.768-6.768"></path>
                   </svg>
                 </div>
                 <div className="item-val">
-                  <span className="item-label">إكس (تويتر)</span>
-                  <span className="item-text">x.com/{u.socialLinks.twitter}</span>
+                  <span className="item-label">{t("إكس (تويتر)")}</span>
+                  <span className="item-text">
+                    x.com/{u.socialLinks.twitter}
+                  </span>
                 </div>
               </div>
             )}
             {u.socialLinks?.website && (
               <div className="contact-item">
                 <div className="item-icon blue-bg">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="2" y1="12" x2="22" y2="12"></line>
                     <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
                   </svg>
                 </div>
                 <div className="item-val">
-                  <span className="item-label">الموقع الشخصي</span>
-                  <span className="item-text">{u.socialLinks.website}</span>
+                  <span className="item-label">{t("الموقع الشخصي")}</span>
+                  <span className="item-text">{t(u.socialLinks.website)}</span>
                 </div>
               </div>
             )}
@@ -400,35 +580,44 @@ export default function ApplicantDetails() {
 
         <div className="details-main">
           <div className="main-tabs">
-            <div className="tab active">ملف المتقدم</div>
+            <div className="tab active">{t("ملف المتقدم")}</div>
           </div>
 
           <div className="main-card">
             <div className="main-section">
-              <h3 className="section-title">المعلومات الشخصية</h3>
+              <h3 className="section-title">{t("المعلومات الشخصية")}</h3>
               <div className="info-grid">
                 <div className="info-cell">
-                  <span className="cell-label">الاسم الكامل</span>
-                  <span className="cell-val">{u.fullName}</span>
+                  <span className="cell-label">{t("الاسم الكامل")}</span>
+                  <span className="cell-val">{t(u.fullName)}</span>
                 </div>
                 <div className="info-cell">
-                  <span className="cell-label">الجنس</span>
-                  <span className="cell-val">{u.gender || "لم يحدد"}</span>
+                  <span className="cell-label">{t("الجنس")}</span>
+                  <span className="cell-val">{t(u.gender || "لم يحدد")}</span>
                 </div>
                 <div className="info-cell">
-                  <span className="cell-label">تاريخ الميلاد</span>
+                  <span className="cell-label">{t("تاريخ الميلاد")}</span>
                   <span className="cell-val">
-                    {u.dob ? new Date(u.dob).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' }) : "غير متوفر"}
-                    {u.dob && ` (${new Date().getFullYear() - new Date(u.dob).getFullYear()} سنة)`}
+                    {u.dob
+                      ? new Date(u.dob).toLocaleDateString(language === "ar" ? "ar-EG" : "en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })
+                      : t("غير متوفر")}
+                    {u.dob &&
+                      ` (${new Date().getFullYear() - new Date(u.dob).getFullYear()} ${t("سنة")})`}
                   </span>
                 </div>
                 <div className="info-cell">
-                  <span className="cell-label">اللغات</span>
-                  <span className="cell-val">{u.languages?.length ? u.languages.join('، ') : "العربية"}</span>
+                  <span className="cell-label">{t("اللغات")}</span>
+                  <span className="cell-val">
+                    {u.languages?.length ? u.languages.map(l => t(l)).join("، ") : t("العربية")}
+                  </span>
                 </div>
                 <div className="info-cell full-width">
-                  <span className="cell-label">العنوان</span>
-                  <span className="cell-val">{u.location || "غير محدد"}</span>
+                  <span className="cell-label">{t("العنوان")}</span>
+                  <span className="cell-val">{t(u.location || "غير محدد")}</span>
                 </div>
               </div>
             </div>
@@ -436,33 +625,43 @@ export default function ApplicantDetails() {
             <div className="main-divider" />
 
             <div className="main-section">
-              <h3 className="section-title">المعلومات المهنية</h3>
+              <h3 className="section-title">{t("المعلومات المهنية")}</h3>
               <div className="about-me-sect">
-                <h4 className="item-label">نبذة عني</h4>
+                <h4 className="item-label">{t("نبذة عني")}</h4>
                 <p className="about-text">
-                  {u.bio || "لا يوجد نبذة تعريفية متاحة لهذا المتقدم."}
+                  {t(u.bio || "لا يوجد نبذة تعريفية متاحة لهذا المتقدم.")}
                 </p>
               </div>
 
               <div className="info-grid">
                 <div className="info-cell">
-                  <span className="cell-label">الوظيفة الحالية</span>
-                  <span className="cell-val">{u.skills?.[0] || "متخصص"}</span>
+                  <span className="cell-label">{t("الوظيفة الحالية")}</span>
+                  <span className="cell-val">{t(u.skills?.[0] || "متخصص")}</span>
                 </div>
                 <div className="info-cell">
-                  <span className="cell-label">سنوات الخبرة</span>
-                  <span className="cell-val text-primary">{u.experience || 0} سنوات</span>
+                  <span className="cell-label">{t("سنوات الخبرة")}</span>
+                  <span className="cell-val text-primary">
+                    {u.experience || 0} {t("سنوات")}
+                  </span>
                 </div>
                 <div className="info-cell">
-                  <span className="cell-label">أعلى مؤهل علمي</span>
-                  <span className="cell-val">{u.educations?.[0]?.degree || "غير متوفر"}</span>
+                  <span className="cell-label">{t("أعلى مؤهل علمي")}</span>
+                  <span className="cell-val">
+                    {t(u.educations?.[0]?.degree || "غير متوفر")}
+                  </span>
                 </div>
                 <div className="info-cell">
-                  <span className="cell-label">المهارات</span>
+                  <span className="cell-label">{t("المهارات")}</span>
                   <div className="skill-tags">
-                    {u.skills?.length ? u.skills.map((s, idx) => (
-                      <span key={idx} className="skill-tag">{s}</span>
-                    )) : <span className="skill-tag">لا توجد مهارات مسجلة</span>}
+                    {u.skills?.length ? (
+                      u.skills.map((s, idx) => (
+                        <span key={idx} className="skill-tag">
+                          {t(s)}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="skill-tag">{t("لا توجد مهارات مسجلة")}</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -472,20 +671,56 @@ export default function ApplicantDetails() {
               <>
                 <div className="main-divider" />
                 <div className="main-section">
-                  <h3 className="section-title">السيرة الذاتية المرفقة</h3>
-                  {app.resumeUrl.toLowerCase().endsWith('.pdf') ? (
-                    <iframe 
-                      src={app.resumeUrl.startsWith("http") ? app.resumeUrl : `${API_BASE_URL}${app.resumeUrl.startsWith("/") ? "" : "/"}${app.resumeUrl}`} 
-                      width="100%" 
-                      height="800px" 
-                      style={{ border: "1px solid #e2e8f0", borderRadius: "12px", marginTop: "16px" }} 
-                      title="CV"
+                  <h3 className="section-title">{t("السيرة الذاتية المرفقة")}</h3>
+                  {app.resumeUrl.toLowerCase().endsWith(".pdf") ? (
+                    <iframe
+                      src={
+                        app.resumeUrl.startsWith("http")
+                          ? app.resumeUrl
+                          : `${API_BASE_URL}${app.resumeUrl.startsWith("/") ? "" : "/"}${app.resumeUrl}`
+                      }
+                      width="100%"
+                      height="800px"
+                      style={{
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "12px",
+                        marginTop: "16px",
+                      }}
+                      title={t("CV")}
                     />
                   ) : (
-                    <div style={{ padding: '30px', background: '#f8fafc', borderRadius: '12px', textAlign: 'center', marginTop: "16px", border: "1px dashed #cbd5e1" }}>
-                      <p style={{ color: '#475569', marginBottom: '16px', fontSize: '15px' }}>السيرة الذاتية متوفرة بصيغة قابلة للتحميل المباشر وليست PDF.</p>
-                      <button onClick={handleDownloadCV} style={{ padding: '10px 24px', background: '#4640de', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}>
-                        تحميل السيرة الذاتية
+                    <div
+                      style={{
+                        padding: "30px",
+                        background: "#f8fafc",
+                        borderRadius: "12px",
+                        textAlign: "center",
+                        marginTop: "16px",
+                        border: "1px dashed #cbd5e1",
+                      }}
+                    >
+                      <p
+                        style={{
+                          color: "#475569",
+                          marginBottom: "16px",
+                          fontSize: "15px",
+                        }}
+                      >
+                        {t("السيرة الذاتية متوفرة بصيغة قابلة للتحميل المباشر وليست PDF.")}
+                      </p>
+                      <button
+                        onClick={handleDownloadCV}
+                        style={{
+                          padding: "10px 24px",
+                          background: "#4640de",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "8px",
+                          cursor: "pointer",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {t("تحميل السيرة الذاتية")}
                       </button>
                     </div>
                   )}

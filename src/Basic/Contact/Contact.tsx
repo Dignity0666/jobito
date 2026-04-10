@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { useTranslation } from "../../context/translation-context";
 import ImgMapComponent from "../../assets/WhatsApp Image 2026-03-22 at 8.08.17 PM.jpeg";
 import styles from "./Contact.module.css";
-import { useJobitoAuth } from "../../context/AuthContext";
+import { useJobitoAuth } from "../../context/LinkContxt";
 
 interface FormData {
   name: string;
@@ -24,6 +25,7 @@ const API_BASE_URL =
 
 export default function ContactPage() {
   const { apiFetch } = useJobitoAuth();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
@@ -69,7 +71,7 @@ export default function ContactPage() {
         setFormStatus({
           submitted: true,
           success: true,
-          message: result.message || "تم إرسال رسالتك بنجاح!",
+          message: result.message || t("تم إرسال رسالتك بنجاح!"),
         });
         setFormData({
           name: "",
@@ -87,7 +89,7 @@ export default function ContactPage() {
       setFormStatus({
         submitted: true,
         success: false,
-        message: "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+        message: t("حدث خطأ ما. يرجى المحاولة مرة أخرى."),
       });
     } finally {
       setLoading(false);
@@ -102,9 +104,9 @@ export default function ContactPage() {
   ];
 
   const quickLinks = [
-    { title: "الرئيسية", path: "/" },
-    { title: "عن جوبيتو", path: "/about" },
-    { title: "تصفح الشركات", path: "/Browse Companies" },
+    { title: t("الرئيسية"), path: "/" },
+    { title: t("عن جوبيتو"), path: "/about" },
+    { title: t("تصفح الشركات"), path: "/Browse Companies" },
   ];
 
   return (
@@ -114,14 +116,14 @@ export default function ContactPage() {
         <div className={styles.heroOverlay}></div>
         <div className={styles.heroPattern}></div>
         <div className={styles.heroContent}>
-          <h1>اتصل بنا</h1>
+          <h1>{t("اتصل بنا")}</h1>
           <p className={styles.heroSubtitle}>
-            نحن هنا لمساعدتك في أي استفسار أو مشكلة.
+            {t("نحن هنا لمساعدتك في أي استفسار أو مشكلة.")}
           </p>
           <div className={styles.replyBadge}>
             <span className={styles.pulseDot}></span>
             <span style={{ fontSize: "14px", fontWeight: 600 }}>
-              نرد عادة خلال 24 ساعة
+              {t("نرد عادة خلال 24 ساعة")}
             </span>
           </div>
         </div>
@@ -131,10 +133,10 @@ export default function ContactPage() {
       <div className={styles.mainLayout}>
         <div className={styles.statsGrid}>
           {[
-            { label: "عميل سعيد", value: "10K+", icon: "😊" },
-            { label: "جلسة مكتملة", value: "25K+", icon: "📊" },
-            { label: "خبير", value: "50+", icon: "👥" },
-            { label: "عام من الخبرة", value: "15+", icon: "⭐" },
+            { label: t("عميل سعيد"), value: "10K+", icon: "😊" },
+            { label: t("جلسة مكتملة"), value: "25K+", icon: "📊" },
+            { label: t("خبير"), value: "50+", icon: "👥" },
+            { label: t("عام من الخبرة"), value: "15+", icon: "⭐" },
           ].map((stat, index) => (
             <div key={index} className={styles.statCard}>
               <span className={styles.statIcon}>{stat.icon}</span>
@@ -148,9 +150,9 @@ export default function ContactPage() {
           {/* Left Column - Contact Form */}
           <div className={styles.formCol}>
             <div className={styles.formCard}>
-              <h3>أرسل لنا رسالة</h3>
+              <h3>{t("أرسل لنا رسالة")}</h3>
               <p className={styles.formHeaderDesc}>
-                املأ النموذج أدناه وسنعاود الاتصال بك في أقرب وقت ممكن.
+                {t("املأ النموذج أدناه وسنعاود الاتصال بك في أقرب وقت ممكن.")}
               </p>
 
               {formStatus.submitted && formStatus.success && (
@@ -204,7 +206,7 @@ export default function ContactPage() {
               >
                 <div className={styles.formGrid}>
                   <div>
-                    <label className={styles.formLabel}>الاسم الكامل</label>
+                    <label className={styles.formLabel}>{t("الاسم الكامل")}</label>
                     <input
                       type="text"
                       name="name"
@@ -212,12 +214,12 @@ export default function ContactPage() {
                       onChange={handleChange}
                       required
                       className={styles.inputField}
-                      placeholder="أدخل اسمك الكامل"
+                      placeholder={t("أدخل اسمك الكامل")}
                     />
                   </div>
                   <div>
                     <label className={styles.formLabel}>
-                      البريد الإلكتروني
+                      {t("البريد الإلكتروني")}
                     </label>
                     <input
                       type="email"
@@ -233,7 +235,7 @@ export default function ContactPage() {
 
                 <div className={styles.formGrid}>
                   <div>
-                    <label className={styles.formLabel}>الموضوع</label>
+                    <label className={styles.formLabel}>{t("الموضوع")}</label>
                     <input
                       type="text"
                       name="subject"
@@ -241,11 +243,11 @@ export default function ContactPage() {
                       onChange={handleChange}
                       required
                       className={styles.inputField}
-                      placeholder="كيف يمكننا مساعدتك؟"
+                      placeholder={t("كيف يمكننا مساعدتك؟")}
                     />
                   </div>
                   <div>
-                    <label className={styles.formLabel}>رقم الهاتف</label>
+                    <label className={styles.formLabel}>{t("رقم الهاتف")}</label>
                     <input
                       type="tel"
                       name="phone"
@@ -258,14 +260,14 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label className={styles.formLabel}>الرسالة</label>
+                  <label className={styles.formLabel}>{t("الرسالة")}</label>
                   <textarea
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
                     required
                     className={styles.textareaField}
-                    placeholder="اكتب رسالتك هنا..."
+                    placeholder={t("اكتب رسالتك هنا...")}
                   ></textarea>
                 </div>
 
@@ -291,10 +293,10 @@ export default function ContactPage() {
                         d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
                       />
                     </svg>
-                    {loading ? "جاري الإرسال..." : "إرسال الرسالة"}
+                    {loading ? t("جاري الإرسال...") : t("إرسال الرسالة")}
                   </button>
                   <span style={{ fontSize: "12px", color: "#8892a4" }}>
-                    * جميع الحقول مطلوبة
+                    * {t("جميع الحقول مطلوبة")}
                   </span>
                 </div>
               </form>
@@ -304,7 +306,7 @@ export default function ContactPage() {
           {/* Right Column - Contact Info */}
           <div className={styles.infoCol}>
             <div className={styles.infoCard}>
-              <h4>معلومات التواصل</h4>
+              <h4>{t("معلومات التواصل")}</h4>
               <div className={styles.contactItem}>
                 <div className={styles.contactIcon}>
                   <svg
@@ -324,7 +326,7 @@ export default function ContactPage() {
                       fontWeight: 800,
                     }}
                   >
-                    اتصل بنا
+                    {t("اتصل بنا")}
                   </h5>
                   <p style={{ color: "#3b5bdb", fontWeight: 700, margin: 0 }}>
                     +20 1015466210
@@ -337,7 +339,7 @@ export default function ContactPage() {
                       margin: 0,
                     }}
                   >
-                    الأحد - الخميس (9ص - 6م)
+                    {t("الأحد - الخميس (9ص - 6م)")}
                   </p>
                 </div>
               </div>
@@ -362,7 +364,7 @@ export default function ContactPage() {
                       fontWeight: 800,
                     }}
                   >
-                    راسلنا
+                    {t("راسلنا")}
                   </h5>
                   <p style={{ color: "#3b5bdb", fontWeight: 700, margin: 0 }}>
                     mohamednasseremam380@gmail.com
@@ -375,7 +377,7 @@ export default function ContactPage() {
                       margin: 0,
                     }}
                   >
-                    دعم على مدار الساعة
+                    {t("دعم على مدار الساعة")}
                   </p>
                 </div>
               </div>
@@ -393,40 +395,6 @@ export default function ContactPage() {
                 ))}
               </div>
             </div>
-
-            <div
-              className={styles.infoCard}
-              style={{
-                background: "linear-gradient(135deg, #3b5bdb 0%, #2f4ac7 100%)",
-                color: "#ffffff",
-              }}
-            >
-              <h4 style={{ color: "#ffffff", fontSize: "20px" }}>
-                روابط سريعة
-              </h4>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(2, 1fr)",
-                  gap: "12px",
-                }}
-              >
-                {quickLinks.slice(0, 8).map((link, idx) => (
-                  <a
-                    key={idx}
-                    href={link.path}
-                    style={{
-                      color: "#ffffff",
-                      fontSize: "13px",
-                      textDecoration: "none",
-                      opacity: 0.8,
-                    }}
-                  >
-                    • {link.title}
-                  </a>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -436,7 +404,7 @@ export default function ContactPage() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <img src={ImgMapComponent} alt="موقعنا على الخريطة" />
+          <img src={ImgMapComponent} alt={t("موقعنا على الخريطة")} />
         </a>
       </div>
     </div>

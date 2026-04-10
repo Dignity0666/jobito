@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "../../context/translation-context";
 
 const AVATAR_COLORS = [
   ["#6366f1", "#818cf8"],
@@ -31,7 +32,7 @@ interface Column {
   applicants: Applicant[];
 }
 
-const INITIAL_COLS = (): Column[] => [
+const INITIAL_COLS = (t: any): Column[] => [
   {
     id: "review",
     label: "قيد المراجعة",
@@ -297,10 +298,62 @@ function StarRating({ score }: { score: number }) {
 
 // App
 export default function Applicants() {
-  const [cols, setCols] = useState<Column[]>(() => INITIAL_COLS());
+  const { t } = useTranslation();
+  const [cols, setCols] = useState<Column[]>(() => [
+    {
+      id: "review",
+      label: t("قيد المراجعة"),
+      color: "#f59e0b",
+      bg: "#fffbeb",
+      applicants: [
+        { id: 1, name: "Jake Gyll", score: 4.0, date: t("13 يوليو, 2021"), color: 0 },
+        { id: 2, name: "Jenny Wilson", score: 0.0, date: t("13 يوليو, 2021"), color: 1 },
+        { id: 3, name: "Jacob Jones", score: 0.0, date: t("13 يوليو, 2021"), color: 2 },
+        { id: 4, name: "Wade Warren", score: 0.0, date: t("13 يوليو, 2021"), color: 8 },
+      ],
+    },
+    {
+      id: "shortlisted",
+      label: t("تم الاختيار"),
+      color: "#6366f1",
+      bg: "#f5f3ff",
+      applicants: [
+        { id: 5, name: "Jane Cooper", score: 0.0, date: t("13 يوليو, 2021"), color: 3 },
+        { id: 6, name: "Courtney Henry", score: 0.0, date: t("13 يوليو, 2021"), color: 4 },
+      ],
+    },
+    {
+      id: "interview",
+      label: t("تمت المقابلة"),
+      color: "#06b6d4",
+      bg: "#ecfeff",
+      applicants: [
+        { id: 7, name: "Floyd Miles", score: 0.0, date: t("13 يوليو, 2021"), color: 5 },
+        { id: 8, name: "Devon Lane", score: 0.0, date: t("13 يوليو, 2021"), color: 6 },
+        {
+          id: 9,
+          name: "Marvin McKin...",
+          score: 0.0,
+          date: t("13 يوليو, 2021"),
+          color: 7,
+        },
+      ],
+    },
+    {
+      id: "hired",
+      label: t("تم التوظيف"),
+      color: "#10b981",
+      bg: "#ecfdf5",
+      applicants: [
+        { id: 10, name: "Annette Black", score: 0.0, date: t("13 يوليو, 2021"), color: 0 },
+        { id: 11, name: "Brooklyn Sim...", score: 0.0, date: t("13 يوليو, 2021"), color: 1 },
+        { id: 12, name: "Ronald Richa...", score: 0.0, date: t("13 يوليو, 2021"), color: 2 },
+      ],
+    },
+  ]);
   const [view, setView] = useState("pipeline");
   const [search, setSearch] = useState("");
-  const [activeTab, setActiveTab] = useState("المتقدمون");
+  const [activeTab, setActiveTab] = useState(t("المتقدمون"));
   const [profileModal, setProfileModal] = useState<Applicant | null>(null);
   const [dragState, setDragState] = useState<{ cardId: number | null; fromColId: string | null }>({
     cardId: null,
@@ -376,7 +429,7 @@ export default function Applicants() {
           <div className="brand">
             <div className="brand-logo">N</div>
             <div className="brand-info">
-              <div className="brand-company">الشركة</div>
+              <div className="brand-company">{t("الشركة")}</div>
               <div className="brand-name">
                 Nomad <span style={{ fontSize: 10, color: "#9ca3af" }}>\u25be</span>
               </div>
@@ -403,7 +456,7 @@ export default function Applicants() {
                   strokeLinecap="round"
                 />
               </svg>
-              نشر وظيفة
+              {t("نشر وظيفة")}
             </button>
           </div>
         </div>
@@ -420,18 +473,18 @@ export default function Applicants() {
                 strokeLinejoin="round"
               />
             </svg>
-            العودة
+            {t("العودة")}
           </button>
           <div className="subheader-row">
             <div>
-              <div className="job-title">مساعد تسويق عبر وسائل التواصل</div>
+              <div className="job-title">{t("مساعد تسويق عبر وسائل التواصل")}</div>
               <div className="job-meta">
-                <span>التصميم</span>
+                <span>{t("التصميم")}</span>
                 <span className="job-meta-dot">•</span>
-                <span>دوام كامل</span>
+                <span>{t("دوام كامل")}</span>
                 <span className="job-meta-dot">•</span>
                 <span>
-                  4 / <span className="hired-badge">11 تم توظيفهم</span>
+                  4 / <span className="hired-badge">11 {t("تم توظيفهم")}</span>
                 </span>
               </div>
             </div>
@@ -445,7 +498,7 @@ export default function Applicants() {
                   strokeLinejoin="round"
                 />
               </svg>
-              إجراءات إضافية
+              {t("إجراءات إضافية")}
             </button>
           </div>
         </div>
@@ -453,9 +506,9 @@ export default function Applicants() {
         {/* Tabs */}
         <div className="tabs">
           {[
-            "المتقدمون",
-            "تفاصيل الوظيفة",
-            "الإعدادات",
+            t("المتقدمون"),
+            t("تفاصيل الوظيفة"),
+            t("الإعدادات"),
           ].map((tab) => (
             <button
               key={tab}
@@ -470,7 +523,7 @@ export default function Applicants() {
         {/* Toolbar */}
         <div className="toolbar">
           <div className="total-label">
-            إجمالي المتقدمين : <span>{totalApplicants}</span>
+            {t("إجمالي المتقدمين")} : <span>{totalApplicants}</span>
           </div>
           <div className="toolbar-right">
             <div className="search-wrap">
@@ -501,20 +554,20 @@ export default function Applicants() {
                   strokeLinecap="round"
                 />
               </svg>
-              تصفية
+              {t("تصفية")}
             </button>
             <div className="view-toggle">
               <button
                 className={`view-btn ${view === "pipeline" ? "active" : ""}`}
                 onClick={() => setView("pipeline")}
               >
-                عرض المسار
+                {t("عرض المسار")}
               </button>
               <button
                 className={`view-btn ${view === "table" ? "active" : ""}`}
                 onClick={() => setView("table")}
               >
-                عرض الجدول
+                {t("عرض الجدول")}
               </button>
             </div>
           </div>
@@ -588,17 +641,17 @@ export default function Applicants() {
                                   })
                                 }
                               >
-                                عرض الملف الشخصي
+                                {t("عرض الملف الشخصي")}
                               </div>
                             </div>
                           </div>
                           <div className="app-card-footer">
                             <div>
-                              <div className="app-meta">تاريخ التقديم</div>
+                              <div className="app-meta">{t("تاريخ التقديم")}</div>
                               <div className="app-meta-val">{app.date}</div>
                             </div>
                             <div>
-                              <div className="app-meta">التقييم</div>
+                              <div className="app-meta">{t("التقييم")}</div>
                               <div className="app-score">
                                 <svg
                                   width="12"
@@ -623,7 +676,7 @@ export default function Applicants() {
                             strokeLinecap="round"
                           />
                         </svg>
-                        إضافة متقدم
+                        {t("إضافة متقدم")}
                       </button>
                     </div>
                   </div>
@@ -639,11 +692,11 @@ export default function Applicants() {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>الاسم الكامل</th>
-                  <th>مرحلة التوظيف</th>
-                  <th>تاريخ التقديم</th>
-                  <th>التقييم</th>
-                  <th>الإجراء</th>
+                  <th>{t("الاسم الكامل")}</th>
+                  <th>{t("مرحلة التوظيف")}</th>
+                  <th>{t("تاريخ التقديم")}</th>
+                  <th>{t("التقييم")}</th>
+                  <th>{t("الإجراء")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -655,7 +708,7 @@ export default function Applicants() {
                         <div>
                           <div className="table-name">{app.name}</div>
                           <div style={{ fontSize: 11, color: "#9ca3af" }}>
-                            قيد المراجعة
+                            {t("قيد المراجعة")}
                           </div>
                         </div>
                       </div>
@@ -705,7 +758,7 @@ export default function Applicants() {
                           }}
                           onClick={() => setProfileModal({ ...app })}
                         >
-                          عرض
+                          {t("عرض")}
                         </button>
                         <select
                           className="stage-select"
@@ -733,7 +786,7 @@ export default function Applicants() {
                         fontSize: 14,
                       }}
                     >
-                      لا يوجد متقدمون يطابقون بحثك
+                      {t("لا يوجد متقدمون يطابقون بحثك")}
                     </td>
                   </tr>
                 )}
@@ -748,7 +801,7 @@ export default function Applicants() {
         <div className="modal-backdrop" onClick={() => setProfileModal(null)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-head">
-              <div className="modal-title">عرض الملف الشخصي</div>
+              <div className="modal-title">{t("عرض الملف الشخصي")}</div>
               <button className="modal-close" onClick={() => setProfileModal(null)}>
                 \u00d7
               </button>
@@ -758,33 +811,33 @@ export default function Applicants() {
                 <AvatarComponent name={profileModal.name} colorIdx={profileModal.color} size={64} />
                 <div>
                   <div className="modal-info-name">{profileModal.name}</div>
-                  <div className="modal-info-role">متقدم لوظيفة مساعد تسويق</div>
+                  <div className="modal-info-role">{t("متقدم لوظيفة مساعد تسويق")}</div>
                 </div>
               </div>
 
-              <div className="modal-section-title">تفاصيل الطلب</div>
+              <div className="modal-section-title">{t("تفاصيل الطلب")}</div>
               {[
-                { label: "تاريخ التقديم", value: profileModal.date },
+                { label: t("تاريخ التقديم"), value: profileModal.date },
                 {
-                  label: "مرحلة التوظيف",
+                  label: t("مرحلة التوظيف"),
                   value: profileModal.stageLabel || "",
                 },
                 {
-                  label: "التقييم",
+                  label: t("التقييم"),
                   value: `${(scores[profileModal.id] ?? profileModal.score).toFixed(
                     1,
                   )} / 5.0`,
                 },
               ].map((r) => (
                 <div key={r.label} className="modal-detail-row">
-                  <span className="modal-detail-label">{r.label}</span>
-                  <span className="modal-detail-val">{r.value}</span>
+                  <span className="modal-detail-label">{t(r.label)}</span>
+                  <span className="modal-detail-val">{t(r.value)}</span>
                 </div>
               ))}
 
               <div style={{ marginTop: 16 }}>
                 <div className="modal-section-title" style={{ marginBottom: 8 }}>
-                  تقييم المتقدم
+                  {t("تقييم المتقدم")}
                 </div>
                 <div style={{ display: "flex", gap: 6 }}>
                   {[1, 2, 3, 4, 5].map((s) => (
@@ -810,8 +863,8 @@ export default function Applicants() {
               </div>
 
               <div className="modal-actions">
-                <button className="modal-action-btn btn-primary">إرسال رسالة</button>
-                <button className="modal-action-btn btn-secondary">تحميل السيرة الذاتية</button>
+                <button className="modal-action-btn btn-primary">{t("إرسال رسالة")}</button>
+                <button className="modal-action-btn btn-secondary">{t("تحميل السيرة الذاتية")}</button>
               </div>
             </div>
           </div>

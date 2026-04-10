@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Search, Building2 } from "lucide-react";
 import { motion, type Variants } from "framer-motion";
 import styles from "./CompaniesJobs.module.css";
+import { useTranslation } from "../../context/translation-context";
 
 
 
@@ -55,7 +56,7 @@ const searchBarVariant: Variants = {
 };
 
 const CompaniesJobs = () => {
-
+  const { t, language } = useTranslation();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -78,7 +79,7 @@ const CompaniesJobs = () => {
         const response = await fetch(`${API_BASE_URL}/companies?${params.toString()}`);
 
         if (!response.ok) {
-          throw new Error(`Server error: ${response.status}`);
+          throw new Error(t("خطأ في الخادم:") + ` ${response.status}`);
         }
 
         const rawData = await response.json();
@@ -121,7 +122,7 @@ const CompaniesJobs = () => {
             });
 
             let description =
-              item.description || "شركة رائدة في مجالها.";
+              item.description || t("شركة رائدة في مجالها.");
             if (
               description.includes("figmeta") ||
               description.includes("figma")
@@ -159,7 +160,7 @@ const CompaniesJobs = () => {
       } catch (err) {
         console.error("Error fetching companies:", err);
         if (isMounted) {
-          setError("تعذر تحميل البيانات.");
+          setError(t("تعذر تحميل البيانات."));
         }
       } finally {
         if (isMounted) {
@@ -220,7 +221,7 @@ const CompaniesJobs = () => {
   };
 
   return (
-    <div style={{ direction: "rtl" }}>
+    <div>
       <section className={styles.heroSection}>
         <div className={styles.container}>
           <motion.div
@@ -230,14 +231,14 @@ const CompaniesJobs = () => {
             animate="visible"
           >
             <motion.h1 className={styles.title} variants={fadeUp}>
-              ابحث عن{" "}
+              {t("ابحث عن")}{" "}
               <span className={styles.purpleText}>
-                الشركات التي تحلم بها
+                {t("الشركات التي تحلم بها")}
               </span>
             </motion.h1>
 
             <motion.p className={styles.description} variants={fadeUp}>
-              اكتشف أفضل الشركات وبيئات العمل المثالية لمستقبلك المهني.
+              {t("اكتشف أفضل الشركات وبيئات العمل المثالية لمستقبلك المهني.")}
             </motion.p>
 
             <motion.div
@@ -248,7 +249,7 @@ const CompaniesJobs = () => {
                 <Search className={styles.icon} size={20} />
                 <input
                   type="text"
-                  placeholder="ابحث عن شركة..."
+                  placeholder={t("ابحث عن شركة...")}
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
@@ -261,7 +262,7 @@ const CompaniesJobs = () => {
                 className={styles.searchBtn}
                 onClick={handleSearchClick}
               >
-                بحث
+                {t("بحث")}
               </button>
             </motion.div>
           </motion.div>
@@ -271,7 +272,7 @@ const CompaniesJobs = () => {
       <div className={styles.Companiespage}>
         <aside className={styles.sidebar}>
           <div className={styles.filterSection}>
-            <h4 className={styles.filterTitle}>التصنيف</h4>
+            <h4 className={styles.filterTitle}>{t("التصنيف")}</h4>
             <div className={styles.filterList}>
               {Object.entries(industryCounts).map(([ind, count]) => (
                 <label key={ind} className={styles.checkboxLabel}>
@@ -282,12 +283,12 @@ const CompaniesJobs = () => {
                     onChange={() => handleIndustryChange(ind)}
                   />
                   <span className={styles.labelSpan}>
-                    {ind} <span className={styles.countText}>({count})</span>
+                    {t(ind)} <span className={styles.countText}>({count})</span>
                   </span>
                 </label>
               ))}
               {Object.keys(industryCounts).length === 0 && !isLoading && (
-                <p className={styles.emptyText}>لا توجد قطاعات.</p>
+                <p className={styles.emptyText}>{t("لا توجد قطاعات.")}</p>
               )}
             </div>
           </div>
@@ -296,9 +297,9 @@ const CompaniesJobs = () => {
         <main className={styles.Companiespagemu}>
           <div className={styles.CompaniesHeader}>
             <div>
-              <h2>جميع الشركات</h2>
+              <h2>{t("جميع الشركات")}</h2>
               <p>
-                إجمالي الشركات المدرجة: {filteredCompanies.length}
+                {t("إجمالي الشركات المدرجة:")} {filteredCompanies.length}
               </p>
             </div>
           </div>
@@ -306,7 +307,7 @@ const CompaniesJobs = () => {
           {isLoading ? (
             <div className={styles.loaderContainer}>
               <div className={styles.spinner}></div>
-              <p>جاري التحميل...</p>
+              <p>{t("جاري التحميل...")}</p>
             </div>
           ) : error ? (
             <div className={styles.errorContainer}>
@@ -319,7 +320,7 @@ const CompaniesJobs = () => {
                   cursor: "pointer",
                 }}
               >
-                إعادة المحاولة
+                {t("إعادة المحاولة")}
               </button>
             </div>
           ) : filteredCompanies.length > 0 ? (
@@ -354,12 +355,12 @@ const CompaniesJobs = () => {
                         )}
                       </div>
                       <span className={styles.Jobscount}>
-                        {company.jobsCount} وظائف شاغرة
+                        {company.jobsCount} {t("وظائف شاغرة")}
                       </span>
                     </div>
 
-                    <h3>{company.name}</h3>
-                    <p className={styles.desc}>{company.desc}</p>
+                    <h3>{t(company.name)}</h3>
+                    <p className={styles.desc}>{t(company.desc)}</p>
 
                     <div className={styles.tags}>
                       {company.tags.length > 0 ? (
@@ -369,11 +370,11 @@ const CompaniesJobs = () => {
                             className={styles.tag}
                             style={{ background: "#eef2ff", color: "#4640de" }}
                           >
-                            {tag}
+                            {t(tag)}
                           </span>
                         ))
                       ) : (
-                        <span className={styles.noTag}>خدمات عامة</span>
+                        <span className={styles.noTag}>{t("خدمات عامة")}</span>
                       )}
                     </div>
                   </div>
@@ -418,8 +419,8 @@ const CompaniesJobs = () => {
             </>
           ) : (
             <div className={styles.noResults}>
-              <h3>لم يتم العثور على نتائج.</h3>
-              <p>حاول البحث بكلمات أخرى.</p>
+              <h3>{t("لم يتم العثور على نتائج.")}</h3>
+              <p>{t("حاول البحث بكلمات أخرى.")}</p>
             </div>
           )}
         </main>

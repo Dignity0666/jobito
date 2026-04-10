@@ -2,7 +2,8 @@ import React, { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./PostJob.module.css";
-import { useJobitoAuth } from "../../../context/AuthContext";
+import { useJobitoAuth } from "../../../context/LinkContxt";
+import { useTranslation } from "../../../context/translation-context";
 
 type Step = 1 | 2 | 3;
 
@@ -28,7 +29,7 @@ interface JobFormData {
   benefits: Benefit[];
   slotsAvailable: number;
   expiresAt: string;
-  classification: "تقني" | "غير تقني" | "صنيعي" | "";
+  classification: "تقني" | "غير تقني" | "خدمات" | "";
 }
 
 const PlusIcon = () => (
@@ -60,7 +61,7 @@ const XIcon = () => (
     <line x1="18" y1="6" x2="6" y2="18" />
     <line x1="6" y1="6" x2="18" y2="18" />
   </svg>
-)
+);
 
 const STEPS = [
   { n: 1, label: "معلومات الوظيفة" },
@@ -78,41 +79,84 @@ function StepBar({
   current: Step;
   onStepClick: (s: Step) => void;
 }) {
+  const { t } = useTranslation();
+  const steps = [
+    { n: 1, label: t("معلومات الوظيفة") },
+    { n: 2, label: t("وصف الوظيفة") },
+    { n: 3, label: t("المزايا والفوائد") },
+  ];
+
   return (
     <div className={styles.stepBar}>
-      {STEPS.map((s, i) => (
+      {steps.map((s, i) => (
         <div key={s.n} className={styles.stepItem}>
           <div
             className={`${styles.stepCircle} ${current >= s.n ? styles.stepDone : ""} ${current === s.n ? styles.stepActive : ""}`}
             onClick={() => current > s.n && onStepClick(s.n as Step)}
           >
             {current > s.n ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
             ) : s.n === 1 ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
                 <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path>
               </svg>
             ) : s.n === 2 ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path>
                 <polyline points="14 2 14 8 20 8"></polyline>
                 <line x1="16" y1="13" x2="8" y2="13"></line>
                 <line x1="16" y1="17" x2="8" y2="17"></line>
               </svg>
             ) : (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
               </svg>
             )}
           </div>
           <div className={styles.stepText}>
-            <span className={styles.stepNum}>الخطوة {s.n}/3</span>
-            <span className={styles.stepLabel}>{s.label}</span>
+            <span className={styles.stepNum}>{t("الخطوة")} {s.n}/3</span>
+            <span className={styles.stepLabel}>{t(s.label)}</span>
           </div>
-          {i < STEPS.length - 1 && (
+          {i < steps.length - 1 && (
             <div
               className={`${styles.stepLine} ${current > s.n ? styles.stepLineDone : ""}`}
             />
@@ -145,6 +189,7 @@ function Step1({
   updateData: (d: Partial<JobFormData>) => void;
   onNext: () => void;
 }) {
+  const { t } = useTranslation();
   const [skillInput, setSkillInput] = useState("");
   const [showSkillInput, setShowSkillInput] = useState(false);
 
@@ -167,46 +212,46 @@ function Step1({
   return (
     <div className={styles.stepContent}>
       <div className={styles.sectionHeader}>
-        <h2>المعلومات الأساسية</h2>
-        <p>هذه المعلومات ستظهر للعامة</p>
+        <h2>{t("المعلومات الأساسية")}</h2>
+        <p>{t("هذه المعلومات ستظهر للعامة")}</p>
       </div>
       <div className={styles.divider} />
 
       <div className={styles.fieldRow}>
         <div className={styles.rowLabel}>
-          <strong>عنوان الوظيفة</strong>
-          <span>يجب أن يصف العنوان وظيفة واحدة فقط</span>
+          <strong>{t("عنوان الوظيفة")}</strong>
+          <span>{t("يجب أن يصف العنوان وظيفة واحدة فقط")}</span>
         </div>
         <div className={styles.rowContent}>
           <input
             type="text"
-            placeholder="مثال: مهندس برمجيات"
+            placeholder={t("مثال: مهندس برمجيات")}
             className={styles.textInput}
             value={data.title}
             onChange={(e) => updateData({ title: e.target.value })}
           />
-          <div className={styles.hint}>على الأقل 80 حرفاً</div>
+          <div className={styles.hint}>{t("على الأقل 80 حرفاً")}</div>
         </div>
       </div>
       <div className={styles.divider} />
 
       <div className={styles.fieldRow}>
         <div className={styles.rowLabel}>
-          <strong>نوع التوظيف</strong>
-          <span>يمكنك اختيار أكثر من نوع</span>
+          <strong>{t("نوع التوظيف")}</strong>
+          <span>{t("يمكنك اختيار أكثر من نوع")}</span>
         </div>
         <div className={styles.rowContent}>
           <div
             style={{ display: "flex", flexDirection: "column", gap: "10px" }}
           >
-            {EMPLOYMENT_TYPES.map((t) => (
-              <label key={t} className={styles.checkRow}>
+            {EMPLOYMENT_TYPES.map((type) => (
+              <label key={type} className={styles.checkRow}>
                 <input
                   type="checkbox"
-                  checked={data.jobTypes.includes(t)}
-                  onChange={() => toggleEmp(t)}
+                  checked={data.jobTypes.includes(type)}
+                  onChange={() => toggleEmp(type)}
                 />
-                {t}
+                {t(type)}
               </label>
             ))}
           </div>
@@ -216,8 +261,8 @@ function Step1({
 
       <div className={styles.fieldRow}>
         <div className={styles.rowLabel}>
-          <strong>الراتب (بالجنيه)</strong>
-          <span>يرجى تحديد الراتب المتوقع.</span>
+          <strong>{t("الراتب (بالجنيه)")}</strong>
+          <span>{t("يرجى تحديد الراتب المتوقع.")}</span>
         </div>
         <div className={styles.rowContent}>
           <div className={styles.salaryRow}>
@@ -231,7 +276,7 @@ function Step1({
                   updateData({ salary: val });
                 }}
                 className={styles.salaryInputInner}
-                placeholder="مثال: 10000"
+                placeholder={t("مثال: 10000")}
               />
             </div>
           </div>
@@ -240,8 +285,8 @@ function Step1({
       <div className={styles.divider} />
       <div className={styles.fieldRow}>
         <div className={styles.rowLabel}>
-          <strong>العدد المطلوب</strong>
-          <span>حدد عدد المقاعد المتاحة لهذا المتصب</span>
+          <strong>{t("العدد المطلوب")}</strong>
+          <span>{t("حدد عدد المقاعد المتاحة لهذا المتصب")}</span>
         </div>
         <div className={styles.rowContent}>
           <input
@@ -258,12 +303,12 @@ function Step1({
       <div className={styles.divider} />
       <div className={styles.fieldRow}>
         <div className={styles.rowLabel}>
-          <strong>التصنيف</strong>
-          <span>حدد تصنيف الوظيفة</span>
+          <strong>{t("التصنيف")}</strong>
+          <span>{t("حدد تصنيف الوظيفة")}</span>
         </div>
         <div className={styles.rowContent}>
           <div style={{ display: "flex", gap: "20px" }}>
-            {["تقني", "غير تقني", "صنيعي"].map((cls) => (
+            {["تقني", "غير تقني", "خدمات"].map((cls) => (
               <label key={cls} className={styles.checkRow}>
                 <input
                   type="radio"
@@ -271,7 +316,7 @@ function Step1({
                   checked={data.classification === cls}
                   onChange={() => updateData({ classification: cls as any })}
                 />
-                {cls}
+                {t(cls)}
               </label>
             ))}
           </div>
@@ -281,16 +326,18 @@ function Step1({
 
       <div className={styles.fieldRow}>
         <div className={styles.rowLabel}>
-          <strong>البحث في الأقسام</strong>
-          <span>يمكنك اختيار فئة الوظيفة المناسبة</span>
+          <strong>{t("البحث في الأقسام")}</strong>
+          <span>{t("يمكنك اختيار فئة الوظيفة المناسبة")}</span>
         </div>
         <div className={styles.rowContent}>
           <div className={styles.categorySelectionBox}>
-            <label className={styles.categorySelectionLabel}>اختر فئة الوظيفة</label>
+            <label className={styles.categorySelectionLabel}>
+              {t("اختر فئة الوظيفة")}
+            </label>
             <input
               type="text"
               className={styles.textInput}
-              placeholder="مثال: هندسة، تسويق، تصميم..."
+              placeholder={t("مثال: هندسة، تسويق، تصميم...")}
               value={data.categoryName || ""}
               onChange={(e) => updateData({ categoryName: e.target.value })}
               required
@@ -302,8 +349,8 @@ function Step1({
 
       <div className={styles.fieldRow}>
         <div className={styles.rowLabel}>
-          <strong>المهارات المطلوبة</strong>
-          <span>أضف المهارات اللازمة للوظيفة</span>
+          <strong>{t("المهارات المطلوبة")}</strong>
+          <span>{t("أضف المهارات اللازمة للوظيفة")}</span>
         </div>
         <div className={styles.rowContent}>
           <div className={styles.skillInputRow}>
@@ -313,13 +360,13 @@ function Step1({
                 className={styles.addSkillBtn}
                 onClick={() => setShowSkillInput(true)}
               >
-                <PlusIcon /> أضف مهارات
+                <PlusIcon /> {t("أضف مهارات")}
               </button>
             ) : (
               <div style={{ display: "flex", gap: "8px", width: "100%" }}>
                 <input
                   type="text"
-                  placeholder="اكتب المهارة واضغط Enter"
+                  placeholder={t("اكتب المهارة واضغط Enter")}
                   value={skillInput}
                   onChange={(e) => setSkillInput(e.target.value)}
                   onKeyDown={(e) => {
@@ -336,7 +383,7 @@ function Step1({
                   className={styles.primaryBtn}
                   onClick={addSkill}
                 >
-                  إضافة
+                  {t("إضافة")}
                 </button>
                 <button
                   type="button"
@@ -344,7 +391,7 @@ function Step1({
                   style={{ backgroundColor: "#e5e7eb", color: "#333" }}
                   onClick={() => setShowSkillInput(false)}
                 >
-                  إلغاء
+                  {t("إلغاء")}
                 </button>
               </div>
             )}
@@ -370,8 +417,8 @@ function Step1({
 
       <div className={styles.fieldRow}>
         <div className={styles.rowLabel}>
-          <strong>تاريخ انتهاء التقديم</strong>
-          <span>متى سيغلق باب التقديم؟</span>
+          <strong>{t("تاريخ انتهاء التقديم")}</strong>
+          <span>{t("متى سيغلق باب التقديم؟")}</span>
         </div>
         <div className={styles.rowContent}>
           <input
@@ -391,7 +438,7 @@ function Step1({
           whileHover={{ y: -2, boxShadow: "0 8px 20px rgba(70,64,222,0.35)" }}
           whileTap={{ scale: 0.97 }}
         >
-          الخطوة التالية 
+          {t("الخطوة التالية")}
         </motion.button>
       </div>
     </div>
@@ -407,6 +454,7 @@ function CheckmarkList({
   onChange: (val: string[]) => void;
   placeholder?: string;
 }) {
+  const { t } = useTranslation();
   const addItem = () => onChange([...items, ""]);
   const removeItem = (index: number) => {
     const newItems = items.filter((_, i) => i !== index);
@@ -417,7 +465,7 @@ function CheckmarkList({
     newItems[index] = val;
     onChange(newItems);
   };
-
+ 
   return (
     <div className={styles.respList}>
       {items.map((item, index) => (
@@ -439,7 +487,7 @@ function CheckmarkList({
             className={styles.respInput}
             value={item}
             onChange={(e) => updateItem(index, e.target.value)}
-            placeholder={placeholder}
+            placeholder={t(placeholder)}
           />
           {items.length > 1 && (
             <button
@@ -453,12 +501,12 @@ function CheckmarkList({
         </div>
       ))}
       <button type="button" className={styles.respAddBtn} onClick={addItem}>
-        <PlusIcon /> إضافة نقطة أخرى
+        <PlusIcon /> {t("إضافة نقطة أخرى")}
       </button>
     </div>
   );
 }
-
+ 
 function Step2({
   data,
   updateData,
@@ -470,6 +518,7 @@ function Step2({
   onNext: () => void;
   onPrev: () => void;
 }) {
+  const { t } = useTranslation();
   const listFields = [
     "description",
     "responsibilities",
@@ -479,20 +528,20 @@ function Step2({
   const filledCount = listFields.filter((f) =>
     data[f].some((r) => r.trim()),
   ).length;
-
+ 
   const totalFields = 4;
-
+ 
   return (
     <div className={styles.stepContent}>
       <div className={styles.sectionHeader}>
         <div className={styles.headerWithBack}>
-          <h2>التفاصيل</h2>
+          <h2>{t("التفاصيل")}</h2>
         </div>
         <p>
-          أضف وصف الوظيفة، المسؤوليات، المؤهلات المطلوبة، والمميزات الإضافية.
+          {t("أضف وصف الوظيفة، المسؤوليات، المؤهلات المطلوبة، والمميزات الإضافية.")}
         </p>
       </div>
-
+ 
       <div className={styles.completionRow}>
         {listFields.map((fid) => {
           const isFilled = data[fid].some((r) => r.trim());
@@ -504,60 +553,62 @@ function Step2({
           );
         })}
         <span className={styles.completionLabel}>
-          تم ملء <strong>{filledCount}</strong> من أصل {totalFields} أقسام
+          {t("تم ملء")} <strong>{filledCount}</strong> {t("من أصل")} {totalFields} {t("أقسام")}
         </span>
       </div>
-
+ 
       <div className={styles.divider} />
-
+ 
       <div className={styles.fieldsGrid}>
         <div className={styles.richFieldStep2}>
           <div className={styles.rowLabel}>
-            <strong>الوصف</strong>
-            <span>قدم ملخصاً للدور الوظيفي</span>
+            <strong>{t("الوصف")}</strong>
+            <span>{t("قدم ملخصاً للدور الوظيفي")}</span>
           </div>
           <CheckmarkList
             items={data.description}
-            placeholder="مثال: نحن نبحث عن مصمم مبدع..."
+            placeholder={t("مثال: نحن نبحث عن مصمم مبدع...")}
             onChange={(val) => updateData({ description: val })}
           />
         </div>
-
+ 
         <div className={styles.richFieldStep2}>
           <div className={styles.rowLabel}>
-            <strong>المسؤوليات</strong>
-            <span>حدد المسؤوليات الأساسية لهذا المنصب</span>
+            <strong>{t("المسؤوليات")}</strong>
+            <span>{t("حدد المسؤوليات الأساسية لهذا المنصب")}</span>
           </div>
           <CheckmarkList
             items={data.responsibilities}
             onChange={(val) => updateData({ responsibilities: val })}
           />
         </div>
-
+ 
         <div className={styles.richFieldStep2}>
           <div className={styles.rowLabel}>
-            <strong>المؤهلات المطلوبة</strong>
-            <span>أضف المؤهلات التي تفضلها في المرشحين</span>
+            <strong>{t("المؤهلات المطلوبة")}</strong>
+            <span>{t("أضف المؤهلات التي تفضلها في المرشحين")}</span>
           </div>
           <CheckmarkList
             items={data.whoYouAre}
-            placeholder="مثال: أنت مسوق نمو وتعرف كيف..."
+            placeholder={t("مثال: أنت مسوق نمو وتعرف كيف...")}
             onChange={(val) => updateData({ whoYouAre: val })}
           />
         </div>
-
+ 
         <div className={styles.richFieldStep2}>
           <div className={styles.rowLabel}>
-            <strong>مزايا إضافية (Nice-To-Haves)</strong>
-            <span>شجع مجموعة متنوعة من المرشحين على التقديم</span>
+            <strong>{t("مزايا إضافية (Nice-To-Haves)")}</strong>
+            <span>{t("شجع مجموعة متنوعة من المرشحين على التقديم")}</span>
           </div>
           <CheckmarkList
             items={data.niceToHaves}
-            placeholder="مثال: طلاقة في اللغة الإنجليزية، إدارة المشاريع..."
+            placeholder={t("مثال: طلاقة في اللغة الإنجليزية، إدارة المشاريع...")}
             onChange={(val) => updateData({ niceToHaves: val })}
           />
         </div>
       </div>
+
+
 
       <div className={styles.footerNav}>
         <button className={styles.backBtnInline} onClick={onPrev}>
@@ -570,40 +621,40 @@ function Step2({
               strokeLinejoin="round"
             />
           </svg>
-          السابق
+          {t("السابق")}
         </button>
-        <span className={styles.stepIndicator}>الخطوة 2 من 3</span>
+        <span className={styles.stepIndicator}>{t("الخطوة")} 2 {t("من")} 3</span>
         <motion.button
           className={styles.nextBtn}
           onClick={onNext}
           whileHover={{ y: -2, boxShadow: "0 8px 20px rgba(70,64,222,0.35)" }}
           whileTap={{ scale: 0.97 }}
         >
-          الخطوة التالية 
+          {t("الخطوة التالية")}
         </motion.button>
       </div>
     </div>
   );
 }
 
-const DEFAULT_BENEFITS: Benefit[] = [
+const getDefaultBenefits = (t: any): Benefit[] => [
   {
     id: "1",
     icon: "🏥",
-    title: "رعاية صحية كاملة",
-    desc: "نحن نؤمن بازدهار المجتمعات وهذا يبدأ بكون فريقنا سعيداً وبصحة جيدة.",
+    title: t("رعاية صحية كاملة"),
+    desc: t("نحن نؤمن بازدهار المجتمعات وهذا يبدأ بكون فريقنا سعيداً وبصحة جيدة."),
   },
   {
     id: "2",
     icon: "🏖️",
-    title: "إجازات غير محدودة",
-    desc: "نحن نؤمن بأنه يجب أن يكون لديك جدول مرن يفسح المجال للعائلة والرفاهية والمرح.",
+    title: t("إجازات غير محدودة"),
+    desc: t("نحن نؤمن بأنه يجب أن يكون لديك جدول مرن يفسح المجال للعائلة والرفاهية والمرح."),
   },
   {
     id: "3",
     icon: "🧠",
-    title: "تطوير المهارات",
-    desc: "نحن نؤمن دائماً بالتعلم ورفع مستوى مهاراتنا، سواء كان ذلك من خلال مؤتمر أو دورة تدريبية.",
+    title: t("تطوير المهارات"),
+    desc: t("نحن نؤمن دائماً بالتعلم ورفع مستوى مهاراتنا، سواء كان ذلك من خلال مؤتمر أو دورة تدريبية."),
   },
 ];
 
@@ -618,6 +669,7 @@ function Step3({
   onDone: () => void;
   isSubmitting: boolean;
 }) {
+  const { t } = useTranslation();
   const location = useLocation();
   const [showAddForm, setShowAddForm] = useState(false);
   const [newBTitle, setNewBTitle] = useState("");
@@ -640,8 +692,8 @@ function Step3({
   return (
     <div className={styles.stepContent}>
       <div className={styles.sectionHeader}>
-        <h2>المزايا والفوائد</h2>
-        <p>هذه الوظيفة تأتي مع العديد من المزايا والفوائد</p>
+        <h2>{t("المزايا والفوائد")}</h2>
+        <p>{t("هذه الوظيفة تأتي مع العديد من المزايا والفوائد")}</p>
       </div>
       <div className={styles.divider} style={{ marginBottom: "24px" }} />
 
@@ -660,8 +712,8 @@ function Step3({
                 exit={{ opacity: 0, scale: 0.9 }}
                 layout
               >
-                <strong>{b.title}</strong>
-                <p>{b.desc}</p>
+                <strong>{t(b.title)}</strong>
+                <p>{t(b.desc)}</p>
                 <button
                   className={styles.benefitRemove}
                   onClick={() =>
@@ -681,7 +733,7 @@ function Step3({
               className={styles.addBenefitCard}
               onClick={() => setShowAddForm(true)}
             >
-              <PlusIcon /> إضافة ميزة
+              <PlusIcon /> {t("إضافة ميزة")}
             </button>
           ) : (
             <motion.div
@@ -697,14 +749,14 @@ function Step3({
             >
               <input
                 type="text"
-                placeholder="عنوان الميزة"
+                placeholder={t("عنوان الميزة")}
                 value={newBTitle}
                 onChange={(e) => setNewBTitle(e.target.value)}
                 className={styles.textInput}
                 style={{ padding: "6px" }}
               />
               <textarea
-                placeholder="وصف الميزة"
+                placeholder={t("وصف الميزة")}
                 value={newBDesc}
                 onChange={(e) => setNewBDesc(e.target.value)}
                 className={styles.textArea}
@@ -717,7 +769,7 @@ function Step3({
                   className={styles.primaryBtn}
                   style={{ flex: 1, padding: "6px" }}
                 >
-                  إضافة
+                  {t("إضافة")}
                 </button>
                 <button
                   onClick={() => setShowAddForm(false)}
@@ -729,7 +781,7 @@ function Step3({
                     color: "#333",
                   }}
                 >
-                  إلغاء
+                  {t("إلغاء")}
                 </button>
               </div>
             </motion.div>
@@ -745,7 +797,11 @@ function Step3({
           whileHover={{ y: -2, boxShadow: "0 8px 20px rgba(70,64,222,0.35)" }}
           whileTap={{ scale: 0.97 }}
         >
-          {isSubmitting ? "جاري الحفظ..." : (location.state as any)?.editJob ? "تحديث الوظيفة" : "انشر الوظيفة الآن 🎉"}
+          {isSubmitting
+            ? t("جاري الحفظ...")
+            : (location.state as any)?.editJob
+              ? t("تحديث الوظيفة")
+              : t("انشر الوظيفة الآن 🎉")}
         </motion.button>
       </div>
     </div>
@@ -755,6 +811,7 @@ function Step3({
 export default function PostJob() {
   const location = useLocation() as { state: { editJob?: any } | null };
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [step, setStep] = useState<Step>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { role, isAuthenticated, apiFetch } = useJobitoAuth();
@@ -767,8 +824,8 @@ export default function PostJob() {
     responsibilities: [""],
     whoYouAre: [""],
     niceToHaves: [""],
-    skills: ["التصميم الجرافيكي", "التواصل", "اللغة الإنجليزية"],
-    benefits: DEFAULT_BENEFITS,
+    skills: [t("التصميم الجرافيكي"), t("التواصل"), t("اللغة الإنجليزية")],
+    benefits: getDefaultBenefits(t),
     slotsAvailable: 1,
     expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
       .toISOString()
@@ -776,7 +833,6 @@ export default function PostJob() {
     categoryName: "",
     classification: "",
   });
-
 
   // Categories are now handled via text input and backend resolution
   useEffect(() => {
@@ -789,14 +845,14 @@ export default function PostJob() {
           "وصف الوظيفة": [],
           "Job Description": [],
           "المؤهلات المطلوبة": [],
-          "Required": [],
+          Required: [],
           "مزايا إضافية": [],
           "Nice-To-Haves": [],
-          "المسؤوليات": [],
-          "Responsibilities": [],
-          "المهارات": [],
-          "Skills": [],
-          "التصنيف": [],
+          المسؤوليات: [],
+          Responsibilities: [],
+          المهارات: [],
+          Skills: [],
+          التصنيف: [],
         };
 
         let currentSection = "";
@@ -812,8 +868,13 @@ export default function PostJob() {
           } else {
             const content = trimmedLine.replace(/^•\s*/, "").trim();
             if (currentSection === "المهارات" || currentSection === "Skills") {
-              const skills = content.split(",").map((s) => s.trim()).filter(Boolean);
-              sections["Skills"] = [...new Set([...(sections["Skills"] || []), ...skills])];
+              const skills = content
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean);
+              sections["Skills"] = [
+                ...new Set([...(sections["Skills"] || []), ...skills]),
+              ];
             } else if (sections[currentSection]) {
               sections[currentSection].push(content);
             }
@@ -831,41 +892,61 @@ export default function PostJob() {
         };
 
         setFormData({
-          title: job.title || "",
+          title: t(job.title || ""),
           jobTypes: job.jobType
             ? [
                 Object.keys(JOB_TYPE_MAP).find(
-                  (k) => JOB_TYPE_MAP[k] === job.jobType.toLowerCase()
+                  (k) => JOB_TYPE_MAP[k] === job.jobType.toLowerCase(),
                 ) || job.jobType,
               ]
             : [],
           salary: job.salaryMin || job.salary || 0,
-          address: job.address || "Remote",
-          description: (sections["وصف الوظيفة"].length ? sections["وصف الوظيفة"] : sections["Job Description"]).length
-            ? (sections["وصف الوظيفة"].length ? sections["وصف الوظيفة"] : sections["Job Description"])
+          address: t(job.address || "") || t("Remote"),
+          description: (sections["وصف الوظيفة"].length
+            ? sections["وصف الوظيفة"]
+            : sections["Job Description"]
+          ).length
+            ? sections["وصف الوظيفة"].length
+              ? sections["وصف الوظيفة"].map((s) => t(s))
+              : sections["Job Description"].map((s) => t(s))
             : [""],
-          responsibilities: (sections["المسؤوليات"].length ? sections["المسؤوليات"] : sections["Responsibilities"]).length
-            ? (sections["المسؤوليات"].length ? sections["المسؤوليات"] : sections["Responsibilities"])
+          responsibilities: (sections["المسؤوليات"].length
+            ? sections["المسؤوليات"]
+            : sections["Responsibilities"]
+          ).length
+            ? sections["المسؤوليات"].length
+              ? sections["المسؤوليات"].map((s) => t(s))
+              : sections["Responsibilities"].map((s) => t(s))
             : [""],
-          whoYouAre: (sections["المؤهلات المطلوبة"].length ? sections["المؤهلات المطلوبة"] : sections["Required"]).length 
-            ? (sections["المؤهلات المطلوبة"].length ? sections["المؤهلات المطلوبة"] : sections["Required"]) 
+          whoYouAre: (sections["المؤهلات المطلوبة"].length
+            ? sections["المؤهلات المطلوبة"]
+            : sections["Required"]
+          ).length
+            ? sections["المؤهلات المطلوبة"].length
+              ? sections["المؤهلات المطلوبة"].map((s) => t(s))
+              : sections["Required"].map((s) => t(s))
             : [""],
-          niceToHaves: (sections["مزايا إضافية"].length ? sections["مزايا إضافية"] : sections["Nice-To-Haves"]).length
-            ? (sections["مزايا إضافية"].length ? sections["مزايا إضافية"] : sections["Nice-To-Haves"])
+          niceToHaves: (sections["مزايا إضافية"].length
+            ? sections["مزايا إضافية"]
+            : sections["Nice-To-Haves"]
+          ).length
+            ? sections["مزايا إضافية"].length
+              ? sections["مزايا إضافية"].map((s) => t(s))
+              : sections["Nice-To-Haves"].map((s) => t(s))
             : [""],
-          skills: sections["Skills"]?.length ? sections["Skills"] : [],
-          benefits: job.benefits || job.company?.benefits || DEFAULT_BENEFITS,
+          skills: sections["Skills"]?.length ? sections["Skills"].map((s) => t(s)) : [],
+          benefits: job.benefits || job.company?.benefits || getDefaultBenefits(t),
           slotsAvailable: job.slotsAvailable || 1,
           categoryId: job.categoryId,
-          categoryName: job.category?.name || "",
+          categoryName: t(job.category?.name || ""),
           expiresAt: safeDate(job.expiresAt),
-          classification: (sections["التصنيف"]?.[0] || "") as any,
+          classification: t((sections["التصنيف"]?.[0] || "")) as any,
         });
       } catch (err) {
         console.error("Error hydrating form for edit mode:", err);
       }
     }
-  }, [location.state]);
+  }, [location.state, t]);
 
   const updateData = (newData: Partial<JobFormData>) => {
     setFormData((prev) => ({ ...prev, ...newData }));
@@ -875,16 +956,14 @@ export default function PostJob() {
   const getAuthToken = useCallback((): string => {
     const token = localStorage.getItem("token");
     if (!token) {
-      throw new Error(
-        "أنت غير مسجل دخول. يرجى تسجيل الدخول أولاً لنشر وظيفة.",
-      );
+      throw new Error(t("أنت غير مسجل دخول. يرجى تسجيل الدخول أولاً لنشر وظيفة."));
     }
     // Role check — ensure user is a company
     try {
       const payload = JSON.parse(atob(token.split(".")[1]));
       if (payload.role !== "company") {
         throw new Error(
-          "يمكن لحسابات الشركات فقط نشر الوظائف. أنت مسجل دخول كحساب '" +
+          t("يمكن لحسابات الشركات فقط نشر الوظائف. أنت مسجل دخول كحساب '") +
             payload.role +
             "'.",
         );
@@ -896,10 +975,10 @@ export default function PostJob() {
       ) {
         throw e;
       }
-      throw new Error("رمز التحقق غير صالح. يرجى تسجيل الدخول مرة أخرى.");
+      throw new Error(t("رمز التحقق غير صالح. يرجى تسجيل الدخول مرة أخرى."));
     }
     return token;
-  }, []);
+  }, [t]);
 
   const handleSubmit = async () => {
     try {
@@ -972,20 +1051,18 @@ ${formData.classification}`;
       );
 
       if (response.ok) {
-        alert(
-          isEdit ? "تم تحديث الوظيفة بنجاح!" : "تم نشر الوظيفة بنجاح!",
-        );
+        alert(isEdit ? t("تم تحديث الوظيفة بنجاح!") : t("تم نشر الوظيفة بنجاح!"));
         navigate("/JobListing");
       } else {
         const err = await response.json();
         if (response.status === 401) {
-          throw new Error("انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.");
+          throw new Error(t("انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى."));
         } else if (response.status === 403) {
           throw new Error(
-            "ليس لديك إذن بنشر الوظائف. يمكن لحسابات الشركات فقط النشر.",
+            t("ليس لديك إذن بنشر الوظائف. يمكن لحسابات الشركات فقط النشر."),
           );
         }
-        throw new Error(err.message || "فشل في نشر الوظيفة");
+        throw new Error(err.message || t("فشل في نشر الوظيفة"));
       }
     } catch (err: unknown) {
       const errorMessage =
@@ -999,7 +1076,7 @@ ${formData.classification}`;
   // Guard: Show message if not authenticated or not a company
   if (!isAuthenticated) {
     return (
-      <div className={styles.page} dir="rtl">
+      <div className={styles.page}>
         <div
           style={{
             textAlign: "center",
@@ -1011,10 +1088,10 @@ ${formData.classification}`;
           <h2
             style={{ fontSize: "24px", marginBottom: "12px", color: "#1a1a2e" }}
           >
-            🔒 تسجيل الدخول مطلوب
+            {t("🔒 تسجيل الدخول مطلوب")}
           </h2>
           <p style={{ color: "#666", marginBottom: "24px" }}>
-            يجب عليك تسجيل الدخول لتتمكن من نشر وظيفة.
+            {t("يجب عليك تسجيل الدخول لتتمكن من نشر وظيفة.")}
           </p>
           <a
             href="/login"
@@ -1028,7 +1105,7 @@ ${formData.classification}`;
               fontWeight: "600",
             }}
           >
-            تنسجيل الدخول
+            {t("تسجيل الدخول")}
           </a>
         </div>
       </div>
@@ -1037,7 +1114,7 @@ ${formData.classification}`;
 
   if (role !== "company") {
     return (
-      <div className={styles.page} dir="rtl">
+      <div className={styles.page}>
         <div
           style={{
             textAlign: "center",
@@ -1049,13 +1126,13 @@ ${formData.classification}`;
           <h2
             style={{ fontSize: "24px", marginBottom: "12px", color: "#1a1a2e" }}
           >
-            🏢 حساب شركة مطلوب
+            {t("🏢 حساب شركة مطلوب")}
           </h2>
           <p style={{ color: "#666", marginBottom: "24px" }}>
-            يمكن لحسابات الشركات فقط نشر الوظائف. أنت مسجل دخول حالياً كحساب <strong>{role}</strong>.
+            {t("يمكن لحسابات الشركات فقط نشر الوظائف. أنت مسجل دخول حالياً كحساب")} <strong>{role}</strong>.
           </p>
           <p style={{ color: "#999", fontSize: "14px" }}>
-            يرجى تسجيل حساب شركة أو التبديل إليه لنشر الوظائف.
+            {t("يرجى تسجيل حساب شركة أو التبديل إليه لنشر الوظائف.")}
           </p>
         </div>
       </div>
@@ -1063,7 +1140,7 @@ ${formData.classification}`;
   }
 
   return (
-    <div className={styles.page} dir="rtl">
+    <div className={styles.page}>
       <StepBar current={step} onStepClick={(s) => setStep(s)} />
 
       <AnimatePresence mode="wait">

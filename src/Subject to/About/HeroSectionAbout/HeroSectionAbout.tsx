@@ -3,6 +3,7 @@ import styles from "./HeroSectionAbout.module.css";
 import { useEffect, useRef, useState } from "react";
 import { motion, type Variants } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "../../../context/translation-context";
 
 const containerVariants: Variants = {
   hidden: {},
@@ -39,6 +40,7 @@ export const HeroSectionAbout = () => {
   const [isVisible, setIsVisible] = useState<any>({});
   const sectionRefs = useRef<any>({});
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const observers: any = {};
@@ -105,16 +107,16 @@ export const HeroSectionAbout = () => {
           {/* ✅ Badge */}
           <motion.div className={styles.badge} variants={fadeLeft}>
             <Sparkles size={16} />
-            <span>مرحباً بكم في جوبيتو</span>
+            <span>{t("مرحباً بكم في جوبيتو")}</span>
           </motion.div>
 
           {/* ✅ Title */}
           <motion.h1 className={styles.title} variants={fadeUp}>
-            <span className={styles.servicesWord}>خدماتنا</span>
+            <span className={styles.servicesWord}>{t("خدماتنا")}</span>
             <span className={styles.titleLine}>
-              <span className={styles.purpleText}>نحن</span>
+              <span className={styles.purpleText}>{t("نحن")}</span>
               <span className={styles.blueText}>
-                نقدم الأفضل
+                {t("نقدم الأفضل")}
                 <svg className={styles.underline} viewBox="0 0 300 20">
                   <motion.path
                     d="M5 15 Q 40 5, 80 15 T 160 15 T 240 15 T 300 15"
@@ -132,7 +134,7 @@ export const HeroSectionAbout = () => {
 
           {/* ✅ Description */}
           <motion.p className={styles.description} variants={fadeUp}>
-            نحن نساعدك في العثور على الوظيفة المثالية أو اكتشاف المواهب المناسبة لشركتك. جوبيتو هو شريكك الموثوق في رحلة النجاح المهني.
+            {t("نحن نساعدك في العثور على الوظيفة المثالية أو اكتشاف المواهب المناسبة لشركتك. جوبيتو هو شريكك الموثوق في رحلة النجاح المهني.")}
           </motion.p>
 
           <motion.div className={styles.heroButtons} variants={buttonsVariant}>
@@ -143,7 +145,7 @@ export const HeroSectionAbout = () => {
               whileTap={{ scale: 0.96 }}
               transition={{ type: "spring", stiffness: 400, damping: 15 }}
             >
-              ابدأ الآن
+              {t("ابدأ الآن")}
               <ArrowRight size={18} />
             </motion.button>
           </motion.div>

@@ -1,10 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { useJobitoAuth } from "../../../context/AuthContext";
+import { useJobitoAuth } from "../../../context/LinkContxt";
 import styles from "./HeaderActionscompany.module.css";
+import { useTranslation } from "../../../context/translation-context";
 
 export const HeaderActionscompany = () => {
   const { logout } = useJobitoAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleLogout = () => {
     logout();
@@ -18,7 +20,7 @@ export const HeaderActionscompany = () => {
   return (
     <section className={styles.section}>
       <button className={styles.primaryBtn} onClick={handlePostJob}>
-        نشر وظيفة
+        {t("نشر وظيفة")}
         <svg
           width="24"
           height="24"
@@ -52,7 +54,7 @@ export const HeaderActionscompany = () => {
         <button
           className={styles.logoutBtn}
           onClick={handleLogout}
-          title="تسجيل الخروج"
+          title={t("تسجيل الخروج")}
         >
           <i className="fa-solid fa-right-from-bracket"></i>
         </button>

@@ -2,6 +2,7 @@ import styles from "./BannerSection.module.css";
 import image2 from "../.../../../../assets/Img/Gemini_Generated_Image_lk4biqlk4biqlk4b.png";
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "../../../context/translation-context";
 
 // ✅ Hook الـ Typewriter
 function useTypewriter(text: string, speed = 28, startDelay = 0) {
@@ -66,6 +67,7 @@ function TypewriterText({
 export const BannerSection = () => {
   const sectionRef = useRef(null);
   const inView = useInView(sectionRef, { once: true, amount: 0.2 });
+  const { t } = useTranslation();
 
   return (
     <section className={styles.helpoutercontainer} ref={sectionRef}>
@@ -81,13 +83,13 @@ export const BannerSection = () => {
 
             <TypewriterText
               tag="h2"
-              text="نحن نؤمن بالابتكار الرقمي"
+              text={t("نحن نؤمن بالابتكار الرقمي")}
               speed={60}
               startDelay={300}
             />
 
             <TypewriterText
-              text="مهمتنا هي تمكين كل فرد من الوصول إلى الفرصة التي يستحقها، من خلال تقنيات حديثة وتواصل فعال يكسر الحواجز."
+              text={t("مهمتنا هي تمكين كل فرد من الوصول إلى الفرصة التي يستحقها، من خلال تقنيات حديثة وتواصل فعال يكسر الحواجز.")}
               speed={18}
               startDelay={1400}
               className={styles.description}
@@ -99,7 +101,7 @@ export const BannerSection = () => {
               animate={inView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.6, delay: 2.2, ease: "easeOut" }}
             >
-              <strong>Farah Mody</strong> - مديرة العمليات
+              <strong>Farah Mody</strong> - {t("مديرة العمليات")}
             </motion.div>
 
           </div>

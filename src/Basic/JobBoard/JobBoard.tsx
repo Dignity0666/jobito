@@ -3,6 +3,7 @@ import Styles from "./JobBoard.module.css";
 import AllJobs from "../../Subject to/JobBoard/AllJobs/AllJobs";
 import { motion, type Variants } from "framer-motion";
 import { useState } from "react";
+import { useTranslation } from "../../context/translation-context";
 
 const heroContainer = {
   hidden: {},
@@ -45,6 +46,7 @@ const sectionVariant: Variants = {
 export default function JobBoard() {
   const [search, setSearch] = useState("");
   const [location, setLocation] = useState("");
+  const { t } = useTranslation();
 
   const [appliedFilters, setAppliedFilters] = useState({
     search: "",
@@ -56,7 +58,7 @@ export default function JobBoard() {
   };
 
   return (
-    <div className={Styles.page} style={{ direction: "rtl" }}>
+    <div className={Styles.page}>
       {/* ── Hero Section ── */}
       <section className={Styles.heroSection}>
         <div className={Styles.container}>
@@ -68,14 +70,14 @@ export default function JobBoard() {
           >
             {/* Title */}
             <motion.h1 className={Styles.title} variants={fadeUp}>
-              ابحث عن{" "}
+              {t("ابحث عن")}{" "}
               <span className={Styles.purpleText}>
-                وظيفة أحلامك{" "}
+                {t("وظيفة أحلامك")}{" "}
               </span>
             </motion.h1>
 
             <motion.p className={Styles.description} variants={fadeUp}>
-              الآلاف من فرص العمل في انتظارك. ابدأ مسيرتك المهنية اليوم.
+              {t("الآلاف من فرص العمل في انتظارك. ابدأ مسيرتك المهنية اليوم.")}
             </motion.p>
 
             {/* Search Bar */}
@@ -87,7 +89,7 @@ export default function JobBoard() {
                 <Search className={Styles.icon} size={20} />
                 <input
                   type="text"
-                  placeholder="مسمى الوظيفة أو الكلمة الرئيسية..."
+                  placeholder={t("مسمى الوظيفة أو الكلمة الرئيسية...")}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSearch()}
@@ -102,14 +104,14 @@ export default function JobBoard() {
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                 >
-                  <option value="">أي مكان</option>
-                  <option value="Cairo">القاهرة، مصر</option>
-                  <option value="Alexandria">الإسكندرية، مصر</option>
+                  <option value="">{t("أي مكان")}</option>
+                  <option value="Cairo">{t("القاهرة، مصر")}</option>
+                  <option value="Alexandria">{t("الإسكندرية، مصر")}</option>
                 </select>
               </div>
 
               <button className={Styles.searchBtn} onClick={handleSearch}>
-                بحث
+                {t("بحث")}
               </button>
             </motion.div>
           </motion.div>

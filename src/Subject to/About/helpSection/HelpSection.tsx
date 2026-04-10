@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import styles from "./HelpSection.module.css";
+import { useTranslation } from "../../../context/translation-context";
 import image from "../../../assets/Img/Gemini_Generated_Image_lk4biqlk4biqlk4b.png";
 import { CheckCircle, Smile, Users, Award } from "lucide-react";
 
@@ -12,6 +13,7 @@ interface MappedStat {
 export const HelpSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement | null>(null);
+  const { t } = useTranslation();
   const iconMap: Record<string, JSX.Element> = useMemo(() => ({
     "smile": <Smile size={20} />,
     "check-circle": <CheckCircle size={20} />,
@@ -21,10 +23,10 @@ export const HelpSection = () => {
 
   const stats: MappedStat[] = useMemo(() => {
     const MOCK_STATS_DATA = [
-      { label: "عميل سعيد", value: "500+", icon: "smile" },
-      { label: "وظيفة مكتملة", value: "1,200+", icon: "check-circle" },
-      { label: "مستخدم نشط", value: "10k+", icon: "users" },
-      { label: "جائزة تميز", value: "15", icon: "award" },
+      { label: t("عميل سعيد"), value: "500+", icon: "smile" },
+      { label: t("وظيفة مكتملة"), value: "1,200+", icon: "check-circle" },
+      { label: t("مستخدم نشط"), value: "10k+", icon: "users" },
+      { label: t("جائزة تميز"), value: "15", icon: "award" },
     ];
 
     return MOCK_STATS_DATA.map((s) => ({
@@ -63,15 +65,15 @@ export const HelpSection = () => {
           <div className={styles.helpTextSide}>
             <div className={styles.helpBadge}>
               <CheckCircle size={18} />
-              <span>موثوق به</span>
+              <span>{t("موثوق به")}</span>
             </div>
 
             <h2>
-              نحن نؤمن <span>بالابتكار الرقمي</span>
+              {t("نحن نؤمن")} <span>{t("بالابتكار الرقمي")}</span>
             </h2>
 
             <p>
-              مهمتنا هي تمكين كل فرد من الوصول إلى الفرصة التي يستحقها، من خلال تقنيات حديثة وتواصل فعال يكسر الحواجز.
+              {t("مهمتنا هي تمكين كل فرد من الوصول إلى الفرصة التي يستحقها، من خلال تقنيات حديثة وتواصل فعال يكسر الحواجز.")}
             </p>
 
             <div className={styles.helpStats}>
@@ -90,7 +92,7 @@ export const HelpSection = () => {
               </div>
               <div className={styles.authorDetails}>
                 <strong>Farah Mody</strong>
-                <span>مديرة العمليات</span>
+                <span>{t("مديرة العمليات")}</span>
               </div>
             </div>
           </div>
@@ -102,7 +104,7 @@ export const HelpSection = () => {
               </div>
               <div className={styles.experienceBadge}>
                 <span className={styles.expNumber}>10+</span>
-                <span>سنوات من التميز</span>
+                <span>{t("سنوات من التميز")}</span>
               </div>
             </div>
           </div>

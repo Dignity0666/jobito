@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import styles from "./Profilepage.module.css";
-import { useJobitoAuth } from "../../context/AuthContext";
+import { useJobitoAuth } from "../../context/LinkContxt";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "../../context/translation-context";
 import type {
   ExperienceItem as Experience,
   EducationItem as Education,
-} from "../../context/AuthContext";
+} from "../../context/LinkContxt";
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
@@ -158,6 +159,7 @@ const getAvatarUrl = (path: string | undefined | null) => {
 export default function ProfilePage() {
   const { user, apiFetch } = useJobitoAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [profile, setProfile] = useState<any>(null);
   const [aboutExpanded, setAboutExpanded] = useState(false);
   const [showMoreExp, setShowMoreExp] = useState(false);
@@ -191,10 +193,10 @@ export default function ProfilePage() {
   };
 
   const displayName =
-    profileUser?.fullName || profileUser?.name || "اسم المستخدم";
+    t(profileUser?.fullName || "") || t(profileUser?.name || "") || t("اسم المستخدم");
   const displayAvatar = profileUser?.avatarUrl || profileUser?.avatar;
-  const displayBio = profileUser?.bio || "أضف نبذة عن نفسك...";
-  const displayLocation = profileUser?.location || "الموقع غير محدد";
+  const displayBio = t(profileUser?.bio || "") || t("أضف نبذة عن نفسك...");
+  const displayLocation = t(profileUser?.location || "") || t("الموقع غير محدد");
 
   return (
     <div className={styles.page}>
@@ -218,7 +220,7 @@ export default function ProfilePage() {
             <div className={styles.heroInfo}>
               <div className={styles.heroName}>{displayName}</div>
               <div className={styles.heroRole}>
-                {profileUser?.role === "company" ? "حساب شركة" : "باحث عن عمل"}
+                {profileUser?.role === "company" ? t("حساب شركة") : t("باحث عن عمل")}
               </div>
               <div className={styles.heroLoc}>
                 <svg
@@ -229,9 +231,9 @@ export default function ProfilePage() {
                   stroke="currentColor"
                   strokeWidth="2"
                 >
-                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                 </svg>
-                {displayLocation}
+                {t(displayLocation)}
               </div>
             </div>
             <div className={styles.heroActions}>
@@ -239,11 +241,11 @@ export default function ProfilePage() {
                 className={styles.editProfileBtn}
                 onClick={() => navigate("/edit-profile")}
               >
-                تعديل الملف الشخصي
+                {t("تعديل الملف الشخصي")}
               </button>
               <div className={styles.openBadge}>
                 <div className={styles.openDot} />
-                متاح للفرص
+                {t("متاح للفرص")}
               </div>
             </div>
           </div>
@@ -253,7 +255,7 @@ export default function ProfilePage() {
         <div className={styles.card}>
           <div className={styles.cardBody}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>نبذة عني</span>
+              <span className={styles.cardTitle}>{t("نبذة عني")}</span>
             </div>
             <div
               className={`${styles.aboutText} ${aboutExpanded ? styles.expanded : styles.collapsed}`}
@@ -264,7 +266,7 @@ export default function ProfilePage() {
               className={styles.showMore}
               onClick={() => setAboutExpanded((e) => !e)}
             >
-              {aboutExpanded ? "عرض أقل ↑" : "عرض المزيد ↓"}
+              {aboutExpanded ? t("عرض أقل ↑") : t("عرض المزيد ↓")}
             </button>
           </div>
         </div>
@@ -273,12 +275,12 @@ export default function ProfilePage() {
         <div className={styles.card}>
           <div className={styles.cardBody}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>الخبرات</span>
+              <span className={styles.cardTitle}>{t("الخبرات")}</span>
               <button className={styles.plusBtn}>
                 <PlusIcon />
               </button>
             </div>
-            {experiences
+             {experiences
               .slice(0, showMoreExp ? undefined : 4)
               .map((exp, idx) => (
                 <div className={styles.expItem} key={idx}>
@@ -288,13 +290,13 @@ export default function ProfilePage() {
                   <div className={styles.expContent}>
                     <div className={styles.expTop}>
                       <div>
-                        <div className={styles.expTitle}>{exp.role}</div>
-                        <div className={styles.expCompany}>{exp.period}</div>
-                        <div className={styles.expLoc}>{exp.location}</div>
+                        <div className={styles.expTitle}>{t(exp.role || "")}</div>
+                        <div className={styles.expCompany}>{t(exp.period || "")}</div>
+                        <div className={styles.expLoc}>{t(exp.location || "")}</div>
                       </div>
                     </div>
                     {exp.desc && (
-                      <div className={styles.expDesc}>{exp.desc}</div>
+                      <div className={styles.expDesc}>{t(exp.desc)}</div>
                     )}
                   </div>
                 </div>
@@ -306,12 +308,12 @@ export default function ProfilePage() {
         <div className={styles.card}>
           <div className={styles.cardBody}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>التعليم</span>
+              <span className={styles.cardTitle}>{t("التعليم")}</span>
               <button className={styles.plusBtn}>
                 <PlusIcon />
               </button>
             </div>
-            {educations
+             {educations
               .slice(0, showMoreEdu ? undefined : 4)
               .map((edu, idx) => (
                 <div className={styles.eduItem} key={idx}>
@@ -321,13 +323,13 @@ export default function ProfilePage() {
                   <div style={{ flex: 1 }}>
                     <div className={styles.expTop}>
                       <div>
-                        <div className={styles.eduSchool}>{edu.school}</div>
-                        <div className={styles.eduDegree}>{edu.degree}</div>
-                        <div className={styles.eduPeriod}>{edu.period}</div>
+                        <div className={styles.eduSchool}>{t(edu.school || "")}</div>
+                        <div className={styles.eduDegree}>{t(edu.degree || "")}</div>
+                        <div className={styles.eduPeriod}>{t(edu.period || "")}</div>
                       </div>
                     </div>
                     {edu.desc && (
-                      <div className={styles.eduDesc}>{edu.desc}</div>
+                      <div className={styles.eduDesc}>{t(edu.desc)}</div>
                     )}
                   </div>
                 </div>
@@ -338,17 +340,17 @@ export default function ProfilePage() {
         <div className={styles.card}>
           <div className={styles.cardBody}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>المهارات</span>
+              <span className={styles.cardTitle}>{t("المهارات")}</span>
               <div style={{ display: "flex", gap: "8px" }}>
                 <button className={styles.plusBtn}>
                   <PlusIcon />
                 </button>
               </div>
             </div>
-            <div className={styles.skillsWrap}>
+             <div className={styles.skillsWrap}>
               {skills.map((s) => (
                 <div className={styles.skillTag} key={s}>
-                  {s}
+                  {t(s || "")}
                 </div>
               ))}
             </div>
@@ -359,7 +361,7 @@ export default function ProfilePage() {
         <div className={styles.card}>
           <div className={styles.cardBody}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>المعرض</span>
+              <span className={styles.cardTitle}>{t("المعرض")}</span>
               <button className={styles.plusBtn}>
                 <PlusIcon />
               </button>
@@ -385,23 +387,25 @@ export default function ProfilePage() {
         <div className={styles.card}>
           <div className={styles.cardBody}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>تفاصيل إضافية</span>
+              <span className={styles.cardTitle}>{t("تفاصيل إضافية")}</span>
             </div>
             {[
               {
                 icon: <MailIcon />,
-                label: "البريد الإلكتروني",
-                val: profileUser?.email || "غير محدد",
+                label: t("البريد الإلكتروني"),
+                val: t(profileUser?.email || "") || t("غير محدد"),
               },
               {
                 icon: <PhoneIcon />,
-                label: "الهاتف",
-                val: profileUser?.phone || "غير محدد",
+                label: t("الهاتف"),
+                val: t(profileUser?.phone || "") || t("غير محدد"),
               },
               {
                 icon: <GlobeIcon />,
-                label: "اللغات",
-                val: profileUser?.languages?.join(", ") || "غير محدد",
+                label: t("اللغات"),
+                val:
+                  profileUser?.languages?.map((l: string) => t(l)).join(", ") ||
+                  t("غير محدد"),
               },
             ].map((d) => (
               <div className={styles.detailRow} key={d.label}>
@@ -419,23 +423,23 @@ export default function ProfilePage() {
         <div className={styles.card}>
           <div className={styles.cardBody}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>روابط التواصل الاجتماعي</span>
+              <span className={styles.cardTitle}>{t("روابط التواصل الاجتماعي")}</span>
             </div>
             {[
               {
                 icon: <InstagramIcon />,
-                label: "إنستجرام",
-                link: socialLinks.instagram || "غير محدد",
+                label: t("إنستجرام"),
+                link: t(socialLinks.instagram || "") || t("غير محدد"),
               },
               {
                 icon: <TwitterIcon />,
-                label: "تويتر",
-                link: socialLinks.twitter || "غير محدد",
+                label: t("تويتر"),
+                link: t(socialLinks.twitter || "") || t("غير محدد"),
               },
               {
                 icon: <GlobeIcon />,
-                label: "الموقع الإلكتروني",
-                link: socialLinks.website || "غير محدد",
+                label: t("الموقع الإلكتروني"),
+                link: t(socialLinks.website || "") || t("غير محدد"),
               },
             ].map((s) => (
               <div className={styles.socialRow} key={s.label}>
@@ -444,7 +448,7 @@ export default function ProfilePage() {
                   <div className={styles.socialLabel}>{s.label}</div>
                   <a
                     className={styles.socialLink}
-                    href={s.link !== "غير محدد" ? `https://${s.link}` : "#"}
+                    href={s.link !== t("غير محدد") ? `https://${s.link}` : "#"}
                     target="_blank"
                     rel="noreferrer"
                   >

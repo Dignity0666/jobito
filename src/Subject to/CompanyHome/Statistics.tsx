@@ -12,7 +12,8 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { Eye, ClipboardList, ChevronUp, ChevronDown } from "lucide-react";
-import { useJobitoAuth } from "../../context/AuthContext";
+import { useJobitoAuth } from "../../context/LinkContxt";
+import { useTranslation } from "../../context/translation-context";
 import styles from "./Statistics.module.css";
 
 ChartJS.register(
@@ -93,6 +94,7 @@ export default function Statistics({
   companyId: number | null;
 }) {
   const { apiFetch } = useJobitoAuth();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("Overview");
   const [activePeriod, setActivePeriod] = useState<"Week" | "Month" | "Year">(
     "Week",
@@ -122,7 +124,15 @@ export default function Statistics({
         // Fallback to demo data...
         if (isMounted) {
           setData({
-            labels: ["الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت", "الأحد"],
+            labels: [
+              t("الاثنين"),
+              t("الثلاثاء"),
+              t("الأربعاء"),
+              t("الخميس"),
+              t("الجمعة"),
+              t("السبت"),
+              t("الأحد"),
+            ],
             views: [0, 0, 0, 0, 0, 0, 0],
             applied: [0, 0, 0, 0, 0, 0, 0],
             summary: {
@@ -144,7 +154,7 @@ export default function Statistics({
     return () => {
       isMounted = false;
     };
-  }, [activePeriod, companyId, apiFetch]);
+  }, [activePeriod, companyId, apiFetch, t]);
 
   // Handle Initial Loading
   if (!data && isLoading) {
@@ -153,7 +163,7 @@ export default function Statistics({
         <div
           style={{ padding: "100px", textAlign: "center", color: "#578BC7" }}
         >
-          جاري تحميل إحصائيات المشروع...
+          {t("جاري تحميل إحصائيات المشروع...")}
         </div>
       </div>
     );
@@ -165,15 +175,15 @@ export default function Statistics({
   const periods = ["Week", "Month", "Year"];
 
   const tabLabels: Record<string, string> = {
-    "Overview": "نظرة عامة",
-    "Jobs View": "مشاهدات الوظائف",
-    "Jobs Applied": "طلبات التقديم"
+    Overview: t("نظرة عامة"),
+    "Jobs View": t("مشاهدات الوظائف"),
+    "Jobs Applied": t("طلبات التقديم"),
   };
 
   const periodLabels: Record<string, string> = {
-    "Week": "أسبوع",
-    "Month": "شهر",
-    "Year": "سنة"
+    Week: t("أسبوع"),
+    Month: t("شهر"),
+    Year: t("سنة"),
   };
 
   const summary = data.summary;
@@ -187,7 +197,7 @@ export default function Statistics({
 
   if (activeTab === "Overview" || activeTab === "Jobs Applied") {
     datasets.push({
-      label: "طلبات التقديم",
+      label: t("طلبات التقديم"),
       data: data.applied,
       backgroundColor: "#5484C4",
       borderRadius: activeTab === "Jobs Applied" ? 4 : 0,
@@ -198,7 +208,7 @@ export default function Statistics({
 
   if (activeTab === "Overview" || activeTab === "Jobs View") {
     datasets.push({
-      label: "مشاهدات الوظائف",
+      label: t("مشاهدات الوظائف"),
       data: data.views,
       backgroundColor: "#FFA524",
       borderRadius: {
@@ -214,29 +224,29 @@ export default function Statistics({
 
   const chartLabelsMap: Record<string, string> = {
     // Week days
-    "Mon": "الأثنين",
-    "Tue": "الثلاثاء",
-    "Wed": "الأربعاء",
-    "Thu": "الخميس",
-    "Fri": "الجمعة",
-    "Sat": "السبت",
-    "Sun": "الأحد",
+    Mon: t("الأثنين"),
+    Tue: t("الثلاثاء"),
+    Wed: t("الأربعاء"),
+    Thu: t("الخميس"),
+    Fri: t("الجمعة"),
+    Sat: t("السبت"),
+    Sun: t("الأحد"),
     // Weeks
-    "W1": "الأسبوع 1",
-    "W2": "الأسبوع 2",
-    "W3": "الأسبوع 3",
-    "W4": "الأسبوع 4",
+    W1: t("الأسبوع 1"),
+    W2: t("الأسبوع 2"),
+    W3: t("الأسبوع 3"),
+    W4: t("الأسبوع 4"),
     // Months
-    "Jan": "يناير",
-    "Mar": "مارس",
-    "May": "مايو",
-    "Jul": "يوليو",
-    "Sep": "سبتمبر",
-    "Nov": "نوفمبر"
+    Jan: t("يناير"),
+    Mar: t("مارس"),
+    May: t("مايو"),
+    Jul: t("يوليو"),
+    Sep: t("سبتمبر"),
+    Nov: t("نوفمبر"),
   };
 
   const chartData: ChartData<"bar"> = {
-    labels: data.labels.map(l => chartLabelsMap[l] || l),
+    labels: data.labels.map((l) => chartLabelsMap[l] || l),
     datasets: datasets,
   };
 
@@ -250,9 +260,9 @@ export default function Statistics({
         <div className={styles.statisticsCard}>
           <div className={styles.cardHeader}>
             <div className={styles.titleArea}>
-              <h2 className={styles.title}>إحصائيات الوظائف</h2>
+              <h2 className={styles.title}>{t("إحصائيات الوظائف")}</h2>
               <p className={styles.subtitle}>
-                عرض {tabLabels[activeTab]} لـ {periodLabels[activePeriod]}
+                {t("عرض")} {tabLabels[activeTab]} {t("لـ")} {periodLabels[activePeriod]}
               </p>
             </div>
             <div className={styles.periodSwitcher}>
@@ -299,13 +309,13 @@ export default function Statistics({
                     <span
                       className={`${styles.legendDot} ${styles.dotOrange}`}
                     />
-                    <span className={styles.legendLabel}>مشاهدات الوظائف</span>
+                    <span className={styles.legendLabel}>{t("مشاهدات الوظائف")}</span>
                   </div>
                 )}
                 {(activeTab === "Overview" || activeTab === "Jobs Applied") && (
                   <div className={styles.legendItem}>
                     <span className={`${styles.legendDot} ${styles.dotBlue}`} />
-                    <span className={styles.legendLabel}>طلبات التقديم</span>
+                    <span className={styles.legendLabel}>{t("طلبات التقديم")}</span>
                   </div>
                 )}
               </div>
@@ -315,20 +325,20 @@ export default function Statistics({
               <div className={styles.miniStatCard}>
                 <div className={styles.miniStatHeader}>
                   <div className={styles.miniStatInfo}>
-                    <p className={styles.miniStatLabel}>مشاهدات الوظائف</p>
+                    <p className={styles.miniStatLabel}>{t("مشاهدات الوظائف")}</p>
                     <h3 className={styles.miniStatValue}>
-                      {summary.views.total}
+                      {t(summary.views.total)}
                     </h3>
                     <div className={styles.miniStatTrend}>
                       <span className={styles.trendLabel}>
-                        هذا الـ {periodLabels[activePeriod]}
+                        {t("هذا الـ")} {periodLabels[activePeriod]}
                       </span>
                       <span
                         className={
                           summary.views.isUp ? styles.trendUp : styles.trendDown
                         }
                       >
-                        {summary.views.trend}{" "}
+                        {t(summary.views.trend)}{" "}
                         {summary.views.isUp ? (
                           <ChevronUp size={12} />
                         ) : (
@@ -348,13 +358,13 @@ export default function Statistics({
               <div className={styles.miniStatCard}>
                 <div className={styles.miniStatHeader}>
                   <div className={styles.miniStatInfo}>
-                    <p className={styles.miniStatLabel}>طلبات التقديم</p>
+                    <p className={styles.miniStatLabel}>{t("طلبات التقديم")}</p>
                     <h3 className={styles.miniStatValue}>
-                      {summary.applied.total}
+                      {t(summary.applied.total)}
                     </h3>
                     <div className={styles.miniStatTrend}>
                       <span className={styles.trendLabel}>
-                        هذا الـ {periodLabels[activePeriod]}
+                        {t("هذا الـ")} {periodLabels[activePeriod]}
                       </span>
                       <span
                         className={
@@ -363,7 +373,7 @@ export default function Statistics({
                             : styles.trendDown
                         }
                       >
-                        {summary.applied.trend}{" "}
+                        {t(summary.applied.trend)}{" "}
                         {summary.applied.isUp ? (
                           <ChevronUp size={12} />
                         ) : (
@@ -386,18 +396,18 @@ export default function Statistics({
         {/* RIGHT COLUMN */}
         <div className={styles.rightColumn}>
           <div className={styles.sideCard}>
-            <p className={styles.sideCardLabel}>الوظائف المفتوحة</p>
+            <p className={styles.sideCardLabel}>{t("الوظائف المفتوحة")}</p>
             <div className={styles.sideCardValueRow}>
-              <span className={styles.sideCardValue}>{summary.jobOpen}</span>
-              <span className={styles.sideCardUnit}>وظيفة مفتوحة</span>
+              <span className={styles.sideCardValue}>{t(summary.jobOpen.toString())}</span>
+              <span className={styles.sideCardUnit}>{t("وظيفة مفتوحة")}</span>
             </div>
           </div>
 
           <div className={`${styles.sideCard} ${styles.applicantsSummaryCard}`}>
-            <h3 className={styles.sideCardHeaderTitle}>ملخص المتقدمين</h3>
+            <h3 className={styles.sideCardHeaderTitle}>{t("ملخص المتقدمين")}</h3>
             <div className={styles.sumValueArea}>
-              <span className={styles.sumHugeNumber}>{totalApplicants}</span>
-              <span className={styles.sumLabelText}>متقدم</span>
+              <span className={styles.sumHugeNumber}>{t(totalApplicants.toString())}</span>
+              <span className={styles.sumLabelText}>{t("متقدم")}</span>
             </div>
 
             <div className={styles.progressBar}>
@@ -414,22 +424,23 @@ export default function Statistics({
             </div>
 
             <div className={styles.applicantsLegendGrid}>
-              {applicantTypes.map((t, idx) => {
+              {applicantTypes.map((tItem, idx) => {
                 const arabicLabels: Record<string, string> = {
-                   'Full Time': 'دوام كامل',
-                   'Part-Time': 'دوام جزئي',
-                   'Remote': 'عن بعد',
-                   'Internship': 'تدريب',
-                   'Contract': 'عقد'
+                  "Full Time": t("دوام كامل"),
+                  "Part-Time": t("دوام جزئي"),
+                  Remote: t("عن بعد"),
+                  Internship: t("تدريب"),
+                  Contract: t("عقد"),
                 };
                 return (
                   <div key={idx} className={styles.applicantLegendItem}>
                     <span
                       className={styles.applicantLegendBox}
-                      style={{ backgroundColor: t.color }}
+                      style={{ backgroundColor: tItem.color }}
                     />
                     <span className={styles.applicantLegendLabel}>
-                      {arabicLabels[t.label] || t.label} : <strong>{t.count}</strong>
+                      {arabicLabels[tItem.label] || t(tItem.label)} :{" "}
+                      <strong>{t(tItem.count.toString())}</strong>
                     </span>
                   </div>
                 );
