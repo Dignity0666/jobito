@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import styles from "./Partners.module.css";
 import { useTranslation } from "../../../context/translation-context";
@@ -19,11 +19,22 @@ interface BackendCompany {
   logoUrl?: string;
 }
 
+// Egyptian companies as featured partners
+const EGYPTIAN_PARTNERS: Partner[] = [
+  { id: -1, name: "فودافون مصر", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Vodafone_icon.svg/239px-Vodafone_icon.svg.png" },
+  { id: -2, name: "اتصالات مصر", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Etisalat_logo.svg/2560px-Etisalat_logo.svg.png" },
+  { id: -3, name: "البنك الأهلي المصري", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/National_Bank_of_Egypt.svg/1200px-National_Bank_of_Egypt.svg.png" },
+  { id: -4, name: "أورانج مصر", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Orange_logo.svg/2048px-Orange_logo.svg.png" },
+  { id: -5, name: "طلبات", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Talabat_logo.svg/2560px-Talabat_logo.svg.png" },
+  { id: -6, name: "سويفل", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Swvl_logo.png/800px-Swvl_logo.png" },
+  { id: -7, name: "فوري", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Fawry_logo.png/1200px-Fawry_logo.png" },
+  { id: -8, name: "WE", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Telecom_Egypt_We_logo.svg/2560px-Telecom_Egypt_We_logo.svg.png" },
+];
+
 export default function Partners() {
   const { t } = useTranslation();
-  const [partners, setPartners] = useState<Partner[]>([]);
+  const [partners, setPartners] = useState<Partner[]>(EGYPTIAN_PARTNERS);
   const [isLoading, setIsLoading] = useState(true);
-  const firstRowRef = useRef(null);
 
   useEffect(() => {
     const fetchPartners = async () => {
@@ -33,7 +44,6 @@ export default function Partners() {
         if (!response.ok) throw new Error("Failed to fetch partners");
         const result = await response.json();
         
-        // Handle NestJS response format: { data: BackendCompany[], ... }
         const data: BackendCompany[] = Array.isArray(result) ? result : (result.data || []);
 
         const mappedPartners = data.map((c) => ({
@@ -41,31 +51,16 @@ export default function Partners() {
           name: c.name,
           logo: c.logoUrl 
             ? (c.logoUrl.startsWith("http") ? c.logoUrl : `${API_BASE_URL}${c.logoUrl}`)
-            : undefined, // Set to undefined if no logo to trigger fallback
+            : undefined,
         }));
 
-        // Default "Featured" Partners
-        const featured: Partner[] = [
-          { id: -1, name: "Google", logo: "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" },
-          { id: -2, name: "Meta", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Meta_Platforms_Inc._logo.svg/2560px-Meta_Platforms_Inc._logo.svg.png" },
-          { id: -3, name: "Microsoft", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/2048px-Microsoft_logo.svg.png" },
-          { id: -4, name: "Spotify", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_with_text.svg/2560px-Spotify_logo_with_text.svg.png" },
-          { id: -5, name: "Amazon", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/2560px-Amazon_logo.svg.png" },
-          { id: -6, name: "Netflix", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/2560px-Netflix_2015_logo.svg.png" },
-        ];
-
-        // Combine DB results with featured partners for a fuller list
-        const combined = [...mappedPartners, ...featured.slice(0, Math.max(0, 8 - mappedPartners.length))];
+        // Combine DB results with Egyptian partners
+        const combined = [...mappedPartners, ...EGYPTIAN_PARTNERS.slice(0, Math.max(0, 10 - mappedPartners.length))];
         setPartners(combined);
 
       } catch (err) {
         console.error("Error loading partners:", err);
-        // Fallback to featured on error
-        setPartners([
-          { id: -1, name: "Google", logo: "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" },
-          { id: -2, name: "Meta", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Meta_Platforms_Inc._logo.svg/2560px-Meta_Platforms_Inc._logo.svg.png" },
-          { id: -3, name: "Microsoft", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/2048px-Microsoft_logo.svg.png" },
-        ]);
+        setPartners(EGYPTIAN_PARTNERS);
       } finally {
         setIsLoading(false);
       }
@@ -84,10 +79,8 @@ export default function Partners() {
     </figure>
   );
 
-  // Marquee needs at least a few items to look good
-  const shouldAnimate = partners.length > 3;
-  // Duplicate for seamless scroll
-  const displayPartners = shouldAnimate ? [...partners, ...partners, ...partners] : partners;
+  // We always duplicate for seamless infinite scroll
+  const row = [...partners, ...partners];
 
   if (isLoading && partners.length === 0) {
     return (
@@ -121,17 +114,30 @@ export default function Partners() {
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.4 }}
       >
-        <div
-          ref={firstRowRef}
-          className={`${styles.marquee} ${!shouldAnimate ? styles.pause : ""}`}
-        >
-          {displayPartners.map((partner, idx) => (
-            <ReviewCard
-              key={`${partner.id}-${idx}`}
-              logo={partner.logo}
-              name={partner.name}
-            />
-          ))}
+        {/* Row 1: scrolls left */}
+        <div className={styles.marquee}>
+          <div className={styles.marqueeInner}>
+            {row.map((partner, idx) => (
+              <ReviewCard
+                key={`row1-${partner.id}-${idx}`}
+                logo={partner.logo}
+                name={partner.name}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Row 2: scrolls right (reverse) */}
+        <div className={`${styles.marquee} ${styles.marqueeReverse}`}>
+          <div className={`${styles.marqueeInner} ${styles.marqueeInnerReverse}`}>
+            {row.map((partner, idx) => (
+              <ReviewCard
+                key={`row2-${partner.id}-${idx}`}
+                logo={partner.logo}
+                name={partner.name}
+              />
+            ))}
+          </div>
         </div>
       </motion.div>
     </motion.div>

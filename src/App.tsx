@@ -31,6 +31,7 @@ import PostJobStep3 from "./Basic/Company/Perks & Benefits/Perks&Benefits";
 import PostJob from "./Basic/Company/post job/PostJobForm";
 import { AuthProvider, useJobitoAuth } from "./context/LinkContxt";
 import { TranslationProvider } from "./context/TranslationContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import ProfilepageCompany from "./Basic/Company/ProfilepageCompany/ProfilepageCompany";
 import JobListing from "./Basic/Company/Job Listing/Job Listing";
 import CompanyHome from "./Basic/Company/CompanyHome/CompanyHome";
@@ -94,8 +95,8 @@ const SplashScreen = () => (
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      background: "#ffffff",
-      color: "#0f172a",
+      background: "var(--color-bg)",
+      color: "var(--color-text)",
     }}
   >
     <motion.div
@@ -112,7 +113,7 @@ const SplashScreen = () => (
       style={{
         width: 80,
         height: 80,
-        background: "linear-gradient(135deg, #38bdf8 0%, #818cf8 100%)",
+        background: "linear-gradient(135deg, #4A6ED1 0%, #FF7A2A 100%)",
         marginBottom: 32,
         boxShadow:
           "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
@@ -125,7 +126,7 @@ const SplashScreen = () => (
         fontSize: 24,
         fontWeight: "bold",
         letterSpacing: 8,
-        color: "#0f172a",
+        color: "var(--color-text)",
       }}
     >
       JOBITO
@@ -450,10 +451,12 @@ function RootInner() {
 
 export default function App() {
   return (
-    <TranslationProvider>
-      <AuthProvider>
-        <RootInner />
-      </AuthProvider>
-    </TranslationProvider>
+    <ThemeProvider>
+      <TranslationProvider>
+        <AuthProvider>
+          <RootInner />
+        </AuthProvider>
+      </TranslationProvider>
+    </ThemeProvider>
   );
 }

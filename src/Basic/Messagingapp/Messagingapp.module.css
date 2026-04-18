@@ -2,14 +2,14 @@
   display: flex;
   width: 100%;
   height: 680px;
-  background: #ffffff;
+  background: var(--color-card-bg);
   border-radius: 24px;
   overflow: hidden;
   box-shadow: 0 8px 48px rgba(59, 91, 219, 0.12);
-  border: 1px solid #e8eaf0;
+  border: 1px solid var(--color-border);
   animation: appear 0.4s ease;
   font-family: "Sora", sans-serif;
-  color: #1a1d2e;
+  color: var(--color-text);
 }
 
 @keyframes appear {
@@ -26,11 +26,11 @@
 /* ====== SIDEBAR ====== */
 .sidebar {
   width: 300px;
-  border-right: 1px solid #e8eaf0;
+  border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  background: #ffffff;
+  background: var(--color-card-bg);
 }
 
 .searchWrap {
@@ -41,8 +41,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #f4f6fb;
-  border: 1.5px solid #e8eaf0;
+  background: var(--color-bg-secondary);
+  border: 1.5px solid var(--color-border);
   border-radius: 12px;
   padding: 10px 14px;
   transition: border-color 0.2s;
@@ -58,12 +58,12 @@
   outline: none;
   font-family: "Sora", sans-serif;
   font-size: 13px;
-  color: #1a1d2e;
+  color: var(--color-text);
   width: 100%;
 }
 
 .searchBox input::placeholder {
-  color: #8892a4;
+  color: var(--color-text-muted);
 }
 
 .contacts {
@@ -76,7 +76,7 @@
   width: 4px;
 }
 .contacts::-webkit-scrollbar-thumb {
-  background: #e8eaf0;
+  background: var(--color-border);
   border-radius: 4px;
 }
 
@@ -92,10 +92,10 @@
 }
 
 .contact:hover {
-  background: #f4f6fb;
+  background: var(--color-bg-secondary);
 }
 .contactActive {
-  background: #eef2ff;
+  background: var(--color-primary-light);
 }
 
 .contactAvatar {
@@ -117,7 +117,7 @@
   justify-content: center;
   font-size: 15px;
   font-weight: 700;
-  color: white;
+  color: var(--color-card-bg);
 }
 
 .initialsLg {
@@ -131,7 +131,7 @@
   justify-content: center;
   font-size: 26px;
   font-weight: 700;
-  color: white;
+  color: var(--color-card-bg);
 }
 
 .initialsSm {
@@ -145,7 +145,7 @@
   justify-content: center;
   font-size: 12px;
   font-weight: 700;
-  color: white;
+  color: var(--color-card-bg);
 }
 
 .onlineDot {
@@ -156,7 +156,7 @@
   height: 11px;
   border-radius: 50%;
   background: #20c997;
-  border: 2px solid white;
+  border: 2px solid var(--color-card-bg);
 }
 
 .contactInfo {
@@ -174,16 +174,16 @@
 .contactName {
   font-size: 14px;
   font-weight: 600;
-  color: #1a1d2e;
+  color: var(--color-text);
 }
 .contactTime {
   font-size: 11px;
-  color: #8892a4;
+  color: var(--color-text-muted);
 }
 .contactPreview {
   font-size: 12px;
-  color: #8892a4;
-  white-space: nowrap;
+  color: var(--color-text-muted);
+  var(--color-card-bg)-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -201,8 +201,8 @@
   align-items: center;
   gap: 12px;
   padding: 16px 24px;
-  border-bottom: 1px solid #e8eaf0;
-  background: white;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-card-bg);
 }
 
 .chatHeaderInfo {
@@ -211,11 +211,11 @@
 .chatHeaderName {
   font-size: 15px;
   font-weight: 700;
-  color: #1a1d2e;
+  color: var(--color-text);
 }
 .chatHeaderRole {
   font-size: 12px;
-  color: #8892a4;
+  color: var(--color-text-muted);
 }
 
 .headerActions {
@@ -233,7 +233,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #8892a4;
+  color: var(--color-text-muted);
   font-size: 18px;
   transition:
     background 0.15s,
@@ -241,7 +241,7 @@
 }
 
 .iconBtn:hover {
-  background: #f4f6fb;
+  background: var(--color-bg-secondary);
   color: #3b5bdb;
 }
 .starred {
@@ -256,14 +256,14 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  background: white;
+  background: var(--color-card-bg);
 }
 
 .messagesArea::-webkit-scrollbar {
   width: 4px;
 }
 .messagesArea::-webkit-scrollbar-thumb {
-  background: #e8eaf0;
+  background: var(--color-border);
   border-radius: 4px;
 }
 
@@ -291,7 +291,7 @@
 }
 .introRole {
   font-size: 13px;
-  color: #8892a4;
+  color: var(--color-text-muted);
 }
 .introRole span {
   color: #3b5bdb;
@@ -299,12 +299,12 @@
 }
 .introDesc {
   font-size: 13px;
-  color: #8892a4;
+  color: var(--color-text-muted);
   text-align: center;
   max-width: 320px;
 }
 .introDesc b {
-  color: #1a1d2e;
+  color: var(--color-text);
 }
 
 .dayDivider {
@@ -318,13 +318,13 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: #f4f6fb;
-  border: 1px solid #e8eaf0;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
   border-radius: 20px;
   padding: 5px 14px;
   font-size: 12px;
   font-weight: 500;
-  color: #8892a4;
+  color: var(--color-text-muted);
   cursor: pointer;
 }
 
@@ -373,33 +373,33 @@
 }
 
 .incomingBubble {
-  background: #f4f6fb;
-  color: #1a1d2e;
+  background: var(--color-bg-secondary);
+  color: var(--color-text);
   border-bottom-left-radius: 6px;
-  border: 1px solid #e8eaf0;
+  border: 1px solid var(--color-border);
 }
 
 .outgoingBubble {
   background: #3b5bdb;
-  color: white;
+  color: var(--color-card-bg);
   border-bottom-right-radius: 6px;
 }
 
 .msgMeta {
   font-size: 11px;
-  color: #8892a4;
+  color: var(--color-text-muted);
   margin-top: 4px;
   padding: 0 4px;
 }
 
 /* Input bar */
 .inputBar {
-  border-top: 1px solid #e8eaf0;
+  border-top: 1px solid var(--color-border);
   padding: 14px 20px;
   display: flex;
   align-items: center;
   gap: 10px;
-  background: white;
+  background: var(--color-card-bg);
 }
 
 .attachBtn {
@@ -412,7 +412,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #8892a4;
+  color: var(--color-text-muted);
   font-size: 18px;
   transition:
     background 0.15s,
@@ -421,7 +421,7 @@
 }
 
 .attachBtn:hover {
-  background: #f4f6fb;
+  background: var(--color-bg-secondary);
   color: #3b5bdb;
 }
 
@@ -432,7 +432,7 @@
   background: none;
   font-family: "Sora", sans-serif;
   font-size: 13.5px;
-  color: #1a1d2e;
+  color: var(--color-text);
   resize: none;
   height: 22px;
   line-height: 22px;
@@ -466,7 +466,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--color-card-bg);
   font-size: 17px;
   transition:
     background 0.15s,
@@ -479,7 +479,7 @@
 }
 
 .sendBtn:disabled {
-  background: #e8eaf0;
+  background: var(--color-border);
   cursor: not-allowed;
 }
 
@@ -487,8 +487,8 @@
   position: absolute;
   bottom: 70px;
   right: 60px;
-  background: white;
-  border: 1px solid #e8eaf0;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
@@ -520,7 +520,7 @@
   justify-content: center;
   flex-direction: column;
   gap: 12px;
-  color: #8892a4;
+  color: var(--color-text-muted);
 }
 
 .chatPlaceholder .icon {

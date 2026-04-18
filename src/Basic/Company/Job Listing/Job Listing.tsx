@@ -29,6 +29,28 @@ export default function JobListing() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  const [filterType, setFilterType] = useState({
+    "full-time": false,
+    "part-time": false,
+    freelance: false,
+    internship: false,
+    "one-time": false,
+    remote: false
+  });
+  
+  const [filterStatus, setFilterStatus] = useState({
+    active: false,
+    closed: false
+  });
+
+  const toggleStatusFilter = (key: keyof typeof filterStatus) => {
+    setFilterStatus(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const toggleTypeFilter = (key: keyof typeof filterType) => {
+    setFilterType(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const fetchJobs = useCallback(async () => {
     try {
@@ -162,6 +184,29 @@ export default function JobListing() {
     });
   };
 
+  const filteredJobs = jobs.filter(job => {
+    const sType = job.jobType?.toLowerCase() || "";
+    const isActive = job.isActive;
+
+    const anyStatus = filterStatus.active || filterStatus.closed;
+    const matchStatus = !anyStatus || (
+      (filterStatus.active && isActive) || 
+      (filterStatus.closed && !isActive)
+    );
+
+    const anyType = Object.values(filterType).some(v => v);
+    const matchType = !anyType || (
+      (filterType["full-time"] && (sType === "full-time" || sType === "دوام كامل")) ||
+      (filterType["part-time"] && (sType === "part-time" || sType === "دوام جزئي")) ||
+      (filterType.freelance && (sType === "freelance" || sType.includes("عمل حر") || sType.includes("freelance"))) ||
+      (filterType.internship && (sType === "internship" || sType.includes("تدريب") || sType.includes("internship"))) ||
+      (filterType["one-time"] && (sType === "one-time" || sType.includes("مرة واحدة") || sType.includes("one-time"))) ||
+      (filterType.remote && (sType === "remote" || sType.includes("عن بعد") || sType.includes("remote")))
+    );
+
+    return matchStatus && matchType;
+  });
+
   if (loading) return <div className="jl-loading">{t("جاري التحميل...")}</div>;
   if (error) return <div className="jl-error">{t("خطأ")}: {t(error)}</div>;
 
@@ -175,28 +220,12 @@ export default function JobListing() {
               {t("إدارة الوظائف التي قمت بنشرها ومتابعة المتقدمين.")}
             </p>
           </div>
-        </div>
-
-        <div className="jl-tabs">
-          {["المتقدمون"].map((tab) => (
-            <button
-              key={tab}
-              className={`jl-tab-btn ${activeTab === tab ? "active" : ""}`}
-              onClick={() => setActiveTab(tab)}
-            >
-              {t(tab)}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="jl-main-card">
-        <div className="jl-card-toolbar">
-          <h2 className="jl-card-title">{t("قائمة الوظائف")} ({jobs.length})</h2>
-          <button className="jl-filter-btn">
+          <div className="jl-date-range-picker">
+            <span className="jl-date-text">13 Apr — 19 Apr</span>
             <svg
-              width="18"
-              height="18"
+              className="jl-date-icon"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -204,16 +233,65 @@ export default function JobListing() {
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <line x1="4" y1="6" x2="16" y2="6"></line>
-              <line x1="8" y1="12" x2="20" y2="12"></line>
-              <line x1="4" y1="18" x2="12" y2="18"></line>
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+              <rect x="7" y="14" width="2" height="2"></rect>
+              <rect x="11" y="14" width="2" height="2"></rect>
+              <path d="M15 14h2"></path>
+              <path d="M15 18h2"></path>
+              <rect x="7" y="18" width="2" height="2"></rect>
+              <rect x="11" y="18" width="2" height="2"></rect>
             </svg>
-            {t("تصفية")}
-          </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="jl-main-card">
+        <div className="jl-card-toolbar">
+          <h2 className="jl-card-title">{t("قائمة الوظائف")} ({jobs.length})</h2>
+          <div className="filter-checkboxes" style={{ gap: "10px" }}>
+            <label className={`filter-chip ${filterStatus.active ? "filter-chip-active filter-chip-hired" : ""}`}>
+              <input type="checkbox" checked={filterStatus.active} onChange={() => toggleStatusFilter("active")} />
+              {t("مفتوح")}
+            </label>
+            <label className={`filter-chip ${filterStatus.closed ? "filter-chip-active filter-chip-declined" : ""}`}>
+              <input type="checkbox" checked={filterStatus.closed} onChange={() => toggleStatusFilter("closed")} />
+              {t("مغلق")}
+            </label>
+            
+            <span style={{ width: "1px", height: "30px", background: "var(--color-border)", margin: "0 10px" }}></span>
+
+            <label className={`filter-chip ${filterType["full-time"] ? "filter-chip-active filter-chip-waitlisted" : ""}`}>
+              <input type="checkbox" checked={filterType["full-time"]} onChange={() => toggleTypeFilter("full-time")} />
+              {t("دوام كامل")}
+            </label>
+            <label className={`filter-chip ${filterType["part-time"] ? "filter-chip-active filter-chip-inreview" : ""}`}>
+              <input type="checkbox" checked={filterType["part-time"]} onChange={() => toggleTypeFilter("part-time")} />
+              {t("دوام جزئي")}
+            </label>
+            <label className={`filter-chip ${filterType.freelance ? "filter-chip-active filter-chip-waitlisted" : ""}`}>
+              <input type="checkbox" checked={filterType.freelance} onChange={() => toggleTypeFilter("freelance")} />
+              {t("عمل حر (Freelance)")}
+            </label>
+            <label className={`filter-chip ${filterType.internship ? "filter-chip-active filter-chip-inreview" : ""}`}>
+              <input type="checkbox" checked={filterType.internship} onChange={() => toggleTypeFilter("internship")} />
+              {t("تدريب (Internship)")}
+            </label>
+            <label className={`filter-chip ${filterType["one-time"] ? "filter-chip-active filter-chip-declined" : ""}`}>
+              <input type="checkbox" checked={filterType["one-time"]} onChange={() => toggleTypeFilter("one-time")} />
+              {t("عمل لمرة واحدة")}
+            </label>
+            <label className={`filter-chip ${filterType.remote ? "filter-chip-active filter-chip-hired" : ""}`}>
+              <input type="checkbox" checked={filterType.remote} onChange={() => toggleTypeFilter("remote")} />
+              {t("عن بعد (Remote)")}
+            </label>
+          </div>
         </div>
 
-        {jobs.length === 0 ? (
-          <div className="jl-empty-state">{t("لا توجد وظائف منشورة حالياً.")}</div>
+        {filteredJobs.length === 0 ? (
+          <div className="jl-empty-state">{t("لا توجد وظائف تتطابق مع البحث.")}</div>
         ) : (
           <table className="jl-table">
             <thead>
@@ -228,7 +306,7 @@ export default function JobListing() {
               </tr>
             </thead>
             <tbody>
-              {jobs.map((job) => (
+              {filteredJobs.map((job) => (
                 <tr
                   key={job.jobId || job.job_id}
                   onClick={() =>
@@ -259,7 +337,7 @@ export default function JobListing() {
                       style={{
                         background: "none",
                         border: "none",
-                        color: "#4640DE",
+                        color: "var(--color-primary)",
                         fontWeight: 600,
                         cursor: "pointer",
                         textDecoration: "underline",

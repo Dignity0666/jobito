@@ -1,5 +1,4 @@
 .page {
-  background-color: #fafbfc;
   min-height: 100vh;
   font-family: "Plus Jakarta Sans", sans-serif;
 }
@@ -21,23 +20,23 @@
   font-size: 52px;
   text-align: center;
   font-weight: 800;
-  color: #202430;
+  color: var(--color-text);
   line-height: 1.1;
   margin-bottom: 25px;
 }
 
 .purpleText {
-  color: #4640de;
+  color: var(--color-primary);
 }
 
 .blueText {
-  color: #26a4ff;
+  color: var(--color-accent);
   position: relative;
   display: inline-block;
 }
 
 .description {
-  color: #515b6f;
+  color: var(--color-text-secondary);
   font-size: 18px;
   text-align: center;
   line-height: 1.6;
@@ -48,9 +47,9 @@
   display: flex;
   align-items: center;
   padding: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-md);
   max-width: 850px;
-  border: 1px solid #e9ebf0;
+  border: 1px solid var(--color-border-light);
 }
 
 .inputGroup {
@@ -61,7 +60,7 @@
 }
 
 .icon {
-  color: #202430;
+  color: var(--color-text);
   margin-right: 10px;
 }
 
@@ -71,7 +70,7 @@
   outline: none;
   width: 100%;
   font-size: 16px;
-  color: #515b6f;
+  color: var(--color-text-secondary);
   padding: 10px 0;
 }
 
@@ -82,7 +81,7 @@
 }
 
 .searchBtn {
-  background-color: #4640de;
+  background-color: var(--color-primary);
   color: white;
   border: none;
   padding: 14px 28px;
@@ -93,7 +92,7 @@
 }
 
 .searchBtn:hover {
-  background-color: #3530a3;
+  background-color: var(--color-primary-hover);
 }
 
 .popular {
@@ -103,13 +102,13 @@
 }
 
 .popular strong {
-  color: #202430;
+  color: var(--color-text);
 }
 
 .companiesSection {
   width: 100%;
   padding: 40px 0;
-  background-color: #ffffff;
+  background-color: var(--color-bg);
 }
 
 .container {
@@ -129,7 +128,7 @@
   display: flex;
   width: 100%;
   height: 100px;
-  background-color: #26a4ff;
+  background-color: var(--color-accent);
   justify-content: 间-between;
   align-items: center;
   justify-content: space-between;

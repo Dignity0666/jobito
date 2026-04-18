@@ -1,5 +1,5 @@
 .footer {
-  background-color: #243545; /* Dark bluish slate matching the image */
+  background-color: var(--color-footer-bg);
   color: #ffffff;
   padding: 40px 32px 24px;
   font-family: inherit;
@@ -45,7 +45,7 @@
 
 .footer-description {
   font-size: 15px;
-  color: #c9d1d9;
+  color: var(--color-footer-text);
   line-height: 1.8;
   margin: 0 0 24px 0;
   max-width: 400px;
@@ -73,7 +73,7 @@
 }
 
 .footer-links li {
-  color: #c9d1d9;
+  color: var(--color-footer-text);
   font-size: 15px;
   cursor: pointer;
   transition: color 0.2s ease;
@@ -92,7 +92,7 @@
   width: 36px;
   height: 36px;
   border-radius: 6px;
-  background-color: rgba(255, 255, 255, 0.08); /* slight transp white */
+  background-color: rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -103,7 +103,7 @@
 
 .social-icon:hover {
   transform: translateY(-2px);
-  background-color: #4A90E2; /* Brand blue hover */
+  background-color: var(--color-primary);
 }
 
 .footer-bottom {
@@ -114,7 +114,7 @@
 }
 
 .copyright {
-  color: #c9d1d9;
+  color: var(--color-footer-text);
   font-size: 14px;
   margin: 0;
 }

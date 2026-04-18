@@ -1,5 +1,5 @@
 import { SignUpPage } from "../Customer Account/SignUpPage";
-import { CompanyRegister } from "../CustomerAccount/Customer Account";
+import { CompanyRegister } from "../CustomerAccount/CompanyRegister";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface UIProps {

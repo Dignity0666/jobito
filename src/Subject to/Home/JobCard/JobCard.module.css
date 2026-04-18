@@ -1,5 +1,5 @@
 .dashboard {
-  background-color: #f8faff;
+  background-color: var(--color-bg-secondary, #f8faff);
   min-height: 100vh;
   padding: 64px 16px;
   font-family: "Plus Jakarta Sans", sans-serif;
@@ -25,12 +25,12 @@
 .title {
   font-size: 36px;
   font-weight: 800;
-  color: #05264e;
+  color: var(--color-text);
   margin-bottom: 16px;
 }
 
 .subtitle {
-  color: #6b7280;
+  color: var(--color-text);
   font-size: 18px;
 }
 
@@ -54,7 +54,7 @@
 
 /* Card Component */
 .card {
-  background-color: #ffffff;
+  background-color: var(--color-card-bg, #ffffff);
   padding: 24px;
   border-radius: 16px;
   border: 1px solid #f3f4f6;
@@ -104,17 +104,17 @@
 
 .companyName {
   font-weight: 700;
-  color: #1f2937;
+  color: var(--color-text);
   transition: color 0.2s;
   margin: 0;
 }
 
 .card:hover .companyName {
-  color: #3b82f6;
+  color: var(--color-text);
 }
 
 .location {
-  color: #9ca3af;
+  color: var(--color-text);
   font-size: 12px;
   display: flex;
   align-items: center;
@@ -134,7 +134,7 @@
 .jobTitle {
   font-size: 17px;
   font-weight: 700;
-  color: #05264e;
+  color: var(--color-text);
   margin-bottom: 12px;
   line-height: 1.25;
   height: 48px;
@@ -148,7 +148,7 @@
   display: flex;
   gap: 12px;
   font-size: 11px;
-  color: #9ca3af;
+  color: var(--color-text);
   margin-bottom: 16px;
   font-weight: 500;
 }
@@ -160,7 +160,7 @@
 }
 
 .description {
-  color: #9ca3af;
+  color: var(--color-text);
   font-size: 14px;
   margin-bottom: 20px;
   line-height: 1.625;
@@ -179,7 +179,7 @@
 
 .tag {
   background-color: #f2f6fd;
-  color: #66789c;
+  color: var(--color-text);
   padding: 4px 12px;
   border-radius: 6px;
   font-size: 11px;
@@ -202,21 +202,21 @@
 }
 
 .price {
-  color: #05264e;
+  color: var(--color-text);
   font-weight: 800;
   font-size: 18px;
   margin: 0;
 }
 
 .perHour {
-  color: #9ca3af;
+  color: var(--color-text);
   font-weight: 400;
   font-size: 12px;
 }
 
 .applyBtn {
   background-color: #e0e6f7;
-  color: #3c65f5;
+  color: var(--color-text);
   padding: 8px 16px;
   border-radius: 8px;
   font-size: 12px;
@@ -227,6 +227,6 @@
 }
 
 .applyBtn:hover {
-  background-color: #3c65f5;
-  color: #ffffff;
+  background-color: var(--color-primary);
+  color: var(--color-text);
 }

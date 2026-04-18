@@ -61,6 +61,7 @@ export default function ApplicantDetails() {
         const res = await apiFetch(`${API_BASE_URL}/applications/${id}`);
         if (!res.ok) throw new Error(t("فشل في جلب بيانات المتقدم"));
         const data = await res.json();
+        console.log("🕵️‍♂️ [ApplicantDetails] Data fetched from backend:", data);
         setApp(data);
       } catch (err) {
         setError(err instanceof Error ? t(err.message) : t("خطأ غير متوقع"));
@@ -306,7 +307,7 @@ export default function ApplicantDetails() {
                 </div>
                 <div className="cv-info-row">
                   <div className="cv-details-text">
-                    <span className="cv-filename" style={{ color: "#94a3b8" }}>
+                    <span className="cv-filename" style={{ color: "var(--color-text-muted)" }}>
                       {t("بدون ملف CV")}
                     </span>
                     <span className="cv-filesize">{t("لم يقم المتقدم برفع ملف")}</span>
@@ -692,16 +693,16 @@ export default function ApplicantDetails() {
                     <div
                       style={{
                         padding: "30px",
-                        background: "#f8fafc",
+                        background: "var(--color-bg)",
                         borderRadius: "12px",
                         textAlign: "center",
                         marginTop: "16px",
-                        border: "1px dashed #cbd5e1",
+                        border: "1px dashed var(--color-border)",
                       }}
                     >
                       <p
                         style={{
-                          color: "#475569",
+                          color: "var(--color-text-muted)",
                           marginBottom: "16px",
                           fontSize: "15px",
                         }}

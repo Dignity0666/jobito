@@ -1,10 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap");
 
 .pageContainer {
-  background-color: #ffffff;
+  background-color: var(--color-bg);
   min-height: 100vh;
   font-family: "Plus Jakarta Sans", "Inter", sans-serif;
-  color: #202430;
+  color: var(--color-text);
   padding-bottom: 60px;
 }
 
@@ -12,14 +12,14 @@
   text-align: center;
   padding: 100px;
   font-size: 18px;
-  color: #7c8493;
+  color: var(--color-text-muted);
 }
 
 /* ── Header Section ──────────────────────────── */
 .headerSection {
-  background: #ffffff;
+  background: var(--color-card-bg);
   padding: 48px 0;
-  border-bottom: 1px solid #edeff2;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .headerContent {
@@ -42,8 +42,8 @@
   height: 80px;
   border-radius: 12px;
   overflow: hidden;
-  background: #f8f9fb;
-  border: 1px solid #edeff2;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
 }
 
 .mainLogo img {
@@ -63,7 +63,7 @@
   font-size: 32px;
   font-weight: 700;
   margin: 0;
-  color: #202430;
+  color: var(--color-text);
 }
 
 .websiteLink {
@@ -92,12 +92,12 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--color-card-bg);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #4640de;
-  border: 1px solid #e9ebf0;
+  color: var(--color-primary);
+  border: 1px solid var(--color-border);
 }
 
 .statText {
@@ -107,14 +107,14 @@
 
 .statLabel {
   font-size: 14px;
-  color: #7c8493;
+  color: var(--color-text-muted);
   font-weight: 500;
 }
 
 .statValue {
   font-size: 16px;
   font-weight: 600;
-  color: #202430;
+  color: var(--color-text);
 }
 
 .headerActions {
@@ -134,9 +134,9 @@
 }
 
 .secondaryBtn {
-  background: white;
-  color: #4640de !important;
-  border: 1px solid #e9ebf0;
+  background: var(--color-card-bg);
+  color: var(--color-primary) !important;
+  border: 1px solid var(--color-border);
   padding: 12px 24px;
   border-radius: 0;
   font-weight: 600;
@@ -164,7 +164,7 @@
   font-size: 24px;
   font-weight: 700;
   margin: 0;
-  color: #202430;
+  color: var(--color-text);
 }
 
 .textLink {
@@ -189,7 +189,7 @@
 .descriptionText {
   line-height: 1.7;
   font-size: 16px;
-  color: #515b6fac;
+  color: var(--color-text-secondary);
   max-width: 900px;
 }
 
@@ -205,17 +205,17 @@
   align-items: center;
   gap: 12px;
   padding: 14px 20px;
-  border: 1px solid #e9ebf0;
+  border: 1px solid var(--color-border);
   text-decoration: none;
-  color: #4640de;
+  color: var(--color-primary);
   font-weight: 500;
   font-size: 14px;
   transition: all 0.2s;
 }
 
 .contactChip:hover {
-  border-color: #4640de;
-  background: #f8f8fd;
+  border-color: var(--color-primary);
+  background: var(--color-bg-secondary);
 }
 
 /* ── Benefits ─────────────────────────────────── */
@@ -239,7 +239,7 @@
 
 .benefitInfo p {
   font-size: 14px;
-  color: #515b6f;
+  color: var(--color-text-secondary);
   line-height: 1.6;
   margin: 0;
 }
@@ -248,7 +248,7 @@
 .premiumTitle {
   font-size: 24px;
   font-weight: 700;
-  color: #202430;
+  color: var(--color-text);
   position: relative;
   padding-right: 16px;
 }
@@ -273,8 +273,8 @@
 }
 
 .jobCard {
-  background: #ffffff;
-  border: 1px solid #e9ebf0;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 24px;
   cursor: pointer;
@@ -300,8 +300,8 @@
   width: 56px;
   height: 56px;
   border-radius: 12px;
-  background: #f8f9fb;
-  border: 1px solid #f1f2f4;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-light);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -335,14 +335,14 @@
 .cardTitle {
   font-size: 18px;
   font-weight: 700;
-  color: #202430;
+  color: var(--color-text);
   margin: 0;
   line-height: 1.5;
 }
 
 .cardMeta {
   font-size: 14px;
-  color: #7c8493;
+  color: var(--color-text-muted);
   margin: 0;
 }
 
@@ -360,13 +360,13 @@
 }
 
 .tagOrange {
-  background: #fff8eb;
-  color: #ffb836;
+  background: var(--color-accent-light);
+  color: var(--color-accent);
 }
 
 .tagBlue {
-  background: #ebf0ff;
-  color: #4640de;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
 }
 
 .cardFooter {
@@ -378,14 +378,14 @@
 
 .footerDivider {
   height: 1px;
-  background: #f1f2f4;
+  background: var(--color-border-light);
   width: 100%;
 }
 
 .footerProgress {
   font-size: 14px;
   font-weight: 600;
-  color: #7c8493;
+  color: var(--color-text-muted);
   display: flex;
   gap: 4px;
 }

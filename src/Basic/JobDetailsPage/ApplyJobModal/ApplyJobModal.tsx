@@ -26,45 +26,20 @@ class ErrorBoundary extends Component<
     if (this.state.hasError) {
       return (
         <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            zIndex: 9999,
-          }}
+          className={styles.errorBoundaryOverlay}
         >
           <div
-            style={{
-              background: "#fff",
-              borderRadius: "12px",
-              padding: "32px",
-              maxWidth: "400px",
-              textAlign: "center",
-            }}
+            className={styles.errorBoundaryContent}
           >
-            <h2 style={{ color: "#dc3545", marginBottom: "12px" }}>
+            <h2 className={styles.errorTitle}>
               {this.context && typeof this.context === 'object' && 't' in this.context ? (this.context as any).t("حدث خطأ غير متوقع") : "Unexpected Error"}
             </h2>
-            <p style={{ color: "#666", marginBottom: "20px" }}>
+            <p className={styles.errorDescription}>
               {this.context && typeof this.context === 'object' && 't' in this.context ? (this.context as any).t("عذراً، حدث خطأ أثناء تحميل نموذج التقديم.") : "Sorry, an error occurred while loading the application form."}
             </p>
             <button
               onClick={() => this.props.onClose?.()}
-              style={{
-                padding: "10px 24px",
-                background: "#4640de",
-                color: "#fff",
-                border: "none",
-                borderRadius: "8px",
-                cursor: "pointer",
-                fontSize: "14px",
-              }}
+              className={styles.errorCloseButton}
             >
               {this.context && typeof this.context === 'object' && 't' in this.context ? (this.context as any).t("إغلاق") : "Close"}
             </button>
@@ -313,26 +288,11 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
                 </div>
                 <h2>{t("تم التقديم مسبقاً")}</h2>
                 <p>{t("لقد قمت بالتقديم على هذه الوظيفة بالفعل.")}</p>
-                <div
-                  style={{
-                    background: "#f8f9fa",
-                    padding: "15px",
-                    borderRadius: "12px",
-                    marginBottom: "24px",
-                    border: "1px solid #e9ecef",
-                  }}
-                >
-                  <span style={{ fontSize: "14px", color: "#666" }}>
+                <div className={styles.statusBox}>
+                  <span className={styles.statusLabel}>
                     {t("حالة الطلب الحالية:")}
                   </span>
-                  <div
-                    style={{
-                      fontWeight: 700,
-                      color: "#4640de",
-                      marginTop: "5px",
-                      fontSize: "18px",
-                    }}
-                  >
+                  <div className={styles.statusValue}>
                     {existingApplication.status === "applied" ||
                     existingApplication.status === "reviewing"
                       ? t("تحت المراجعة")
@@ -450,21 +410,7 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
             <hr className={styles.divider} />
 
             {formError && (
-              <div
-                style={{
-                  background: "#fff2f0",
-                  border: "1px solid #ffccc7",
-                  borderRadius: "12px",
-                  padding: "12px 20px",
-                  marginBottom: "24px",
-                  color: "#dc3545",
-                  fontSize: "14px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  boxShadow: "0 2px 8px rgba(220, 53, 69, 0.05)",
-                }}
-              >
+              <div className={styles.formErrorBox}>
                 <i className="fa-solid fa-circle-exclamation"></i>
                 <span>{t(formError)}</span>
               </div>
@@ -530,64 +476,54 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
               </div>
 
               <div className={styles.formGroupResume}>
-                <span className={styles.resumeLabel}>
-                  {t("إرفاق السيرة الذاتية")}{" "}
-                  <span
-                    style={{
-                      fontSize: "13px",
-                      color: "#666",
-                      fontWeight: "normal",
-                    }}
-                  >
-                    ({t("اختياري")})
+                <div className={styles.resumeTop}>
+                  <span className={styles.resumeLabel}>
+                    {t("إرفاق السيرة الذاتية")}{" "}
+                    <span className={styles.optionalText}>
+                      ({t("اختياري")})
+                    </span>
                   </span>
-                </span>
-                <p
-                  style={{
-                    fontSize: "12px",
-                    color: "#888",
-                    margin: "4px 0 8px",
-                    lineHeight: "1.6",
-                  }}
-                >
-                  {t("PDF أو Word — الحد الأقصى")} {MAX_FILE_SIZE_MB} {t("ميجابايت")}. <br />
-                  <span style={{ color: "#4640de" }}>{t("ملاحظة")}:</span> {t("سيتم استخدام سيرتك الذاتية السابقة تلقائياً إذا كانت موجودة ولم تقم بإرفاق ملف جديد.")}
-                </p>
-                <div className={styles.uploadBox}>
-                  <input
-                    type="file"
-                    id="resumeUpload"
-                    accept=".pdf,.doc,.docx"
-                    style={{ display: "none" }}
-                    onChange={handleFileChange}
-                  />
-                  <label htmlFor="resumeUpload" className={styles.uploadButton}>
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      style={{ marginLeft: "8px" }}
-                    >
-                      <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
-                    </svg>
-                    {resumeFile ? resumeFile.name : t("إرفاق السيرة الذاتية")}
-                  </label>
+                  <div className={styles.uploadBox}>
+                    <input
+                      type="file"
+                      id="resumeUpload"
+                      accept=".pdf,.doc,.docx"
+                      style={{ display: "none" }}
+                      onChange={handleFileChange}
+                    />
+                    <label htmlFor="resumeUpload" className={styles.uploadButton}>
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        style={{ marginLeft: "8px" }}
+                      >
+                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                      </svg>
+                      {resumeFile ? resumeFile.name : t("اختيار ملف")}
+                    </label>
+                  </div>
+                </div>
+                <div className={styles.resumeHelpBox}>
+                  <i className="fa-solid fa-circle-info" style={{ color: "var(--color-primary)", fontSize: "14px", flexShrink: 0, marginTop: "2px" }}></i>
+                  <div className={styles.uploadHelpText}>
+                    <p style={{ margin: "0 0 4px 0", color: "var(--color-text)", fontWeight: 600 }}>
+                      {t("PDF أو Word — الحد الأقصى")} {MAX_FILE_SIZE_MB} {t("ميجابايت")}.
+                    </p>
+                    <p style={{ margin: 0, color: "var(--color-text-muted)" }}>
+                      {t("إرفاق سيرتك الذاتية اختياري، لكنه يزيد من فرص قبولك للاستفسار.")}
+                    </p>
+                  </div>
                 </div>
                 {fileError && (
-                  <p
-                    style={{
-                      color: "#dc3545",
-                      fontSize: "13px",
-                      marginTop: "6px",
-                    }}
-                  >
-                    ⚠️ {fileError}
-                  </p>
+                    <p className={styles.fileValidationError}>
+                      ⚠️ {fileError}
+                    </p>
                 )}
               </div>
 

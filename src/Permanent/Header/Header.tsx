@@ -7,36 +7,51 @@ import { HeaderActionscompany } from "../../Subject to/Header/HeaderActionscompa
 import { useJobitoAuth } from "../../context/LinkContxt";
 import { Logocompany } from "../../Subject to/Header/Logocompany/Logocompany";
 import { useTranslation } from "../../context/translation-context";
+import { useTheme } from "../../context/ThemeContext";
+import SidebarMenu from "../../Basic/SidebarMenu/SidebarMenu";
+import {
+  Home,
+  Search,
+  Building2,
+  Info,
+  Mail,
+  LayoutDashboard,
+  UserCircle,
+  FileText,
+  MessageSquare,
+  List,
+  Moon,
+  Sun,
+} from "lucide-react";
 
 export function Header() {
   const { isAuthenticated, user, role } = useJobitoAuth();
   const { language, setLanguage, t } = useTranslation();
+  const { theme, toggleTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const guestNavLinks = useMemo(() => [
-    { label: t("nav.home"), path: "/" },
-    { label: t("nav.find_jobs"), path: "/Find Jobs" },
-    { label: t("nav.companies"), path: "/Browse Companies" },
-    { label: t("nav.about"), path: "/about" },
-    { label: t("nav.contact"), path: "/contact" },
+    { label: t("الرئيسية"), path: "/", icon: <Home size={16} /> },
+    { label: t("بحث عن وظائف"), path: "/Find Jobs", icon: <Search size={16} /> },
+    { label: t("تصفح الشركات"), path: "/Browse Companies", icon: <Building2 size={16} /> },
+    { label: t("عن المنصة"), path: "/about", icon: <Info size={16} /> },
+    { label: t("اتصل بنا"), path: "/contact", icon: <Mail size={16} /> },
   ], [t]);
 
   const authNavLinks = useMemo(() => [
-    { label: t("nav.home"), path: "/" },
-    { label: t("nav.find_jobs"), path: "/Find Jobs" },
-    { label: t("nav.dashboard"), path: "/JobDashboard" },
-    { label: t("nav.companies"), path: "/Browse Companies" },
-    { label: t("nav.profile"), path: "/Profile" },
-    { label: t("dashboard.total_applied"), path: "/MyApplications" },
-    { label: t("nav.messaging"), path: "/Messagingapp" },
-    { label: t("nav.contact"), path: "/contact" },
+    { label: t("الرئيسية"), path: "/", icon: <Home size={16} /> },
+    { label: t("بحث عن وظائف"), path: "/Find Jobs", icon: <Search size={16} /> },
+    { label: t("لوحة التحكم"), path: "/JobDashboard", icon: <LayoutDashboard size={16} /> },
+    { label: t("تصفح الشركات"), path: "/Browse Companies", icon: <Building2 size={16} /> },
+    { label: t("الملف الشخصي"), path: "/Profile", icon: <UserCircle size={16} /> },
+    { label: t("الرسائل"), path: "/Messagingapp", icon: <MessageSquare size={16} /> },
   ], [t]);
 
   const navLinkscompany = useMemo(() => [
-    { label: t("nav.home"), path: "/home" },
-    { label: t("nav.messaging"), path: "/Messagingapp" },
-    { label: t("nav.profile"), path: "/Profile" },
-    { label: t("profile.experience"), path: "/JobListing" },
+    { label: t("الرئيسية"), path: "/home", icon: <Home size={16} /> },
+    { label: t("الرسائل"), path: "/Messagingapp", icon: <MessageSquare size={16} /> },
+    { label: t("الملف الشخصي"), path: "/Profile", icon: <UserCircle size={16} /> },
+    { label: t("قائمة الوظائف"), path: "/JobListing", icon: <List size={16} /> },
   ], [t]);
 
   const navLinksuser = isAuthenticated ? authNavLinks : guestNavLinks;
@@ -57,9 +72,16 @@ export function Header() {
             navLinks={navLinksuser}
           />
           <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-            <button className={styles.langBtn} onClick={toggleLanguage}>
-              <i className="fas fa-globe"></i>
-              <span>{language === "ar" ? "English" : "العربية"}</span>
+            {isAuthenticated && role === "student" && <SidebarMenu />}
+            <button
+              className={styles.themeToggleBtn}
+              onClick={toggleTheme}
+              title={theme === "light" ? "Dark Mode" : "Light Mode"}
+            >
+              {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
+            </button>
+            <button className={styles.langBtn} onClick={toggleLanguage} title={language === "ar" ? "English" : "العربية"}>
+              <span>{language === "ar" ? "EN" : "AR"}</span>
             </button>
             <HeaderActions isAuthenticated={isAuthenticated} user={user} />
           </div>
@@ -73,9 +95,15 @@ export function Header() {
             navLinks={navLinkscompany}
           />
           <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-            <button className={styles.langBtn} onClick={toggleLanguage}>
-              <i className="fas fa-globe"></i>
-              <span>{language === "ar" ? "English" : "العربية"}</span>
+            <button
+              className={styles.themeToggleBtn}
+              onClick={toggleTheme}
+              title={theme === "light" ? "Dark Mode" : "Light Mode"}
+            >
+              {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
+            </button>
+            <button className={styles.langBtn} onClick={toggleLanguage} title={language === "ar" ? "English" : "العربية"}>
+              <span>{language === "ar" ? "EN" : "AR"}</span>
             </button>
             <HeaderActionscompany />
           </div>

@@ -20,8 +20,8 @@
 
 /* MAIN STATISTICS CARD (LEFT) */
 .statisticsCard {
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
     border-radius: 12px;
     padding: 24px;
     display: flex;
@@ -38,23 +38,23 @@
 .title {
     font-size: 20px;
     font-weight: 700;
-    color: #111827;
+    color: var(--color-text);
     margin: 0;
 }
 
 .subtitle {
     font-size: 14px;
-    color: #6B7280;
+    color: var(--color-text-muted);
     margin: 4px 0 0 0;
 }
 
 /* Period Switcher */
 .periodSwitcher {
     display: flex;
-    background: #F3F4F6;
+    background: var(--color-bg);
     border-radius: 6px;
     padding: 4px;
-    border: 1px solid #E5E7EB;
+    border: 1px solid var(--color-border);
 }
 
 .periodBtn {
@@ -79,7 +79,7 @@
 .tabList {
     display: flex;
     gap: 32px;
-    border-bottom: 1px solid #E5E7EB;
+    border-bottom: 1px solid var(--color-border);
     margin-bottom: 30px;
 }
 
@@ -87,7 +87,7 @@
     padding: 0 0 12px 0;
     font-size: 16px;
     font-weight: 600;
-    color: #6B7280;
+    color: var(--color-text-muted);
     background: transparent;
     border: none;
     cursor: pointer;
@@ -96,7 +96,7 @@
 }
 
 .tabItemActive {
-    color: #111827;
+    color: var(--color-text);
 }
 
 .tabItemActive::after {
@@ -155,7 +155,7 @@
 
 .legendLabel {
     font-size: 14px;
-    color: #6B7280;
+    color: var(--color-text-muted);
     font-weight: 500;
 }
 
@@ -169,8 +169,8 @@
 }
 
 .miniStatCard {
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
     border-radius: 12px;
     padding: 16px;
 }
@@ -184,14 +184,14 @@
 .miniStatLabel {
     font-size: 14px;
     font-weight: 600;
-    color: #4B5563;
+    color: var(--color-text-muted);
     margin: 0 0 8px 0;
 }
 
 .miniStatValue {
     font-size: 24px;
     font-weight: 700;
-    color: #111827;
+    color: var(--color-text);
     margin: 0 0 8px 0;
 }
 
@@ -203,7 +203,7 @@
 
 .trendLabel {
     font-size: 12px;
-    color: #6B7280;
+    color: var(--color-text-muted);
 }
 
 .trendUp {
@@ -249,8 +249,8 @@
 }
 
 .sideCard {
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
     border-radius: 12px;
     padding: 24px;
 }
@@ -258,7 +258,7 @@
 .sideCardLabel {
     font-size: 16px;
     font-weight: 700;
-    color: #4B5563;
+    color: var(--color-text-muted);
     margin: 0 0 16px 0;
 }
 
@@ -271,27 +271,27 @@
 .sideCardValue {
     font-size: 56px;
     font-weight: 700;
-    color: #111827;
+    color: var(--color-text);
     line-height: 1;
 }
 
 .sideCardUnit {
     font-size: 18px;
-    color: #6B7280;
+    color: var(--color-text-muted);
 }
 
 /* Applicants Summary Progress Bar */
 .applicantsSummaryCard {
-    background: #FFFFFF;
-    color: #111827;
-    border: 1px solid #E5E7EB;
+    background: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
 }
 
 .sideCardHeaderTitle {
     font-size: 18px;
     font-weight: 700;
     margin: 0 0 16px 0;
-    color: #111827;
+    color: var(--color-text);
 }
 
 .sumValueArea {
@@ -305,12 +305,12 @@
     font-size: 64px;
     font-weight: 700;
     line-height: 1;
-    color: #111827;
+    color: var(--color-text);
 }
 
 .sumLabelText {
     font-size: 20px;
-    color: #6B7280;
+    color: var(--color-text-muted);
 }
 
 .progressBar {
@@ -319,7 +319,7 @@
     border-radius: 4px;
     overflow: hidden;
     margin-bottom: 32px;
-    background-color: #F3F4F6;
+    background-color: var(--color-bg);
 }
 
 .progressSegment {
@@ -347,18 +347,18 @@
 
 .applicantLegendLabel {
     font-size: 15px;
-    color: #4B5563;
+    color: var(--color-text-muted);
 }
 
 .applicantLegendLabel strong {
-    color: #111827;
+    color: var(--color-text);
     margin-left: 4px;
 }
 
 /* Tooltip Styles */
 .tooltip {
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
     border-radius: 6px;
     padding: 12px;
     display: flex;
@@ -377,7 +377,7 @@
     height: 0;
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
-    border-top: 6px solid #FFFFFF;
+    border-top: 6px solid var(--color-surface);
 }
 
 .tooltipRow {
@@ -395,7 +395,7 @@
 .tooltipValue {
     font-size: 14px;
     font-weight: 600;
-    color: #111827;
+    color: var(--color-text);
 }
 
 /* Responsive */

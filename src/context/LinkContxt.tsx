@@ -50,6 +50,7 @@ export type AuthUser = {
   dob?: string;
   gender?: string;
   languages?: string[];
+  banner_url?: string;
 };
 
 export type AuthContextType = {
@@ -192,6 +193,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     languages?: string[];
     dob?: string;
     gender?: string;
+    banner?: string;
   }) => {
     setUser({
       id: decoded.sub,
@@ -215,6 +217,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       languages: decoded.languages,
       dob: decoded.dob,
       gender: decoded.gender,
+      banner_url: decoded.banner,
     });
     setRole(decoded.role || "student");
     setIsAuthenticated(true);

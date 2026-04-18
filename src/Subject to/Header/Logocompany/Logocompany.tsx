@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import styles from "./Logocompany.module.css";
 import { useJobitoAuth } from "../../../context/LinkContxt";
+import { useTranslation } from "../../../context/translation-context";
 
 export const Logocompany = () => {
   const { role, apiFetch } = useJobitoAuth();
+  const { t } = useTranslation();
   const [dbCompany, setDbCompany] = useState<any>(null);
   const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
@@ -39,7 +41,7 @@ export const Logocompany = () => {
   };
 
   const currentLogo = getAvatarUrl(dbCompany?.logo_url || dbCompany?.logoUrl);
-  const companyName = dbCompany?.name || "Company";
+  const companyName = dbCompany?.name || t("Company");
 
   return (
     <div className={styles.Logocompanycompany}>

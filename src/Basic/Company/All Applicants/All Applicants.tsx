@@ -43,11 +43,11 @@ const SortIcon = () => (
 
 const CustomCheckbox = () => <div className="custom-checkbox"></div>;
 
-export default function AllApplicants() {
+export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | number | null }) {
   const { t, language } = useTranslation();
   const { apiFetch } = useJobitoAuth();
   const [searchParams] = useSearchParams();
-  const jobId = searchParams.get("jobId");
+  const jobId = jobIdProp ? String(jobIdProp) : searchParams.get("jobId");
 
   const [applicants, setApplicants] = useState<Applicant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,10 +60,13 @@ export default function AllApplicants() {
     inreview: false,
     waitlisted: false,
   });
+  const [pageSize, setPageSize] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
 
   const toggleFilter = (key: keyof typeof statusFilters) => {
     setStatusFilters((prev) => ({ ...prev, [key]: !prev[key] }));
+    setCurrentPage(1);
   };
 
   useEffect(() => {
@@ -208,11 +211,25 @@ export default function AllApplicants() {
     return matchesSearch && matchesStatus;
   });
 
+  // Calculate pages
+  const totalPages = Math.ceil(filteredApplicants.length / pageSize) || 1;
+  const paginatedApplicants = filteredApplicants.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  // If currentPage is greater than totalPages (e.g. on search or filter change), reset it
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(1);
+    }
+  }, [totalPages, currentPage]);
+
   if (loading) {
     return (
       <div className="applicant-page">
         <div
-          style={{ textAlign: "center", padding: "60px 0", color: "#7C8493" }}
+          style={{ textAlign: "center", padding: "60px 0", color: "var(--color-text-muted)" }}
         >
           {t("جاري تحميل المتقدمين...")}
         </div>
@@ -242,7 +259,10 @@ export default function AllApplicants() {
               type="text"
               placeholder={t("البحث عن متقدم...")}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
             />
           </div>
         </div>
@@ -326,14 +346,14 @@ export default function AllApplicants() {
                   style={{
                     textAlign: "center",
                     padding: "40px",
-                    color: "#7C8493",
+                    color: "var(--color-text-muted)",
                   }}
                 >
                   {t("لا يوجد متقدمون لهذه الوظيفة بعد.")}
                 </td>
               </tr>
             ) : (
-              filteredApplicants.map((app) => (
+              paginatedApplicants.map((app) => (
                 <tr key={app.applicationId}>
                   <td style={{ textAlign: "center" }}>
                     <CustomCheckbox />
@@ -422,58 +442,118 @@ export default function AllApplicants() {
         </table>
       </div>
 
-      <div className="pagination-footer">
-        <div className="page-size-wrap">
-          {t("عرض")}
-          <div className="page-size-box">
-            <span>10</span>
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+      {filteredApplicants.length > 0 && (
+        <div className="pagination-footer">
+          <div 
+            className="page-size-wrap"
+            style={{ 
+              display: "flex", 
+              alignItems: "center", 
+              gap: "10px", 
+              whiteSpace: "nowrap",
+              color: "var(--color-text)",
+              fontWeight: "500"
+            }}
+          >
+            <span>{t("عرض")}</span>
+            <select
+              style={{
+                background: "transparent",
+                border: `1px solid var(--color-border)`,
+                color: "var(--color-text)",
+                padding: "6px 12px",
+                borderRadius: "6px",
+                outline: "none",
+                cursor: "pointer",
+                fontWeight: "600",
+                fontSize: "14px"
+              }}
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setCurrentPage(1);
+              }}
             >
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                <option key={num} value={num}>
+                  {num}
+                </option>
+              ))}
+            </select>
+            <span>{t("لكل صفحة")}</span>
           </div>
-          {t("لكل صفحة")}
+          
+          {totalPages > 1 && (
+            <div className="page-controls" style={{ display: "flex", alignItems: "center", gap: "8px", flexDirection: "row" }}>
+              <button
+                className="page-nav"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                style={{ opacity: currentPage === 1 ? 0.3 : 1, cursor: currentPage === 1 ? "default" : "pointer" }}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+              
+              <div style={{ display: "flex", gap: "6px", flexDirection: "row" }}>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    style={{
+                      cursor: "pointer",
+                      width: "32px",
+                      height: "32px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: "6px",
+                      border: "none",
+                      fontWeight: "600",
+                      fontSize: "14px",
+                      backgroundColor: currentPage === pageNum ? "var(--color-primary)" : "transparent",
+                      color: currentPage === pageNum ? "#fff" : "var(--color-text)",
+                      transition: "0.2s"
+                    }}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
+              </div>
+              
+              <button
+                className="page-nav"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                style={{ opacity: currentPage === totalPages ? 0.3 : 1, cursor: currentPage === totalPages ? "default" : "pointer" }}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
-        <div className="page-controls">
-          <button className="page-nav">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </button>
-          <button className="page-num active">1</button>
-          <button className="page-nav">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -15,18 +15,18 @@
 .title {
   font-size: 52px;
   font-weight: 800;
-  color: #202430;
+  color: var(--color-text);
   text-align: center;
   line-height: 1.1;
   margin-bottom: 25px;
 }
 
 .purpleText {
-  color: #4640de;
+  color: var(--color-primary);
 }
 
 .blueText {
-  color: #26a4ff;
+  color: var(--color-accent);
   position: relative;
   display: inline-block;
 }
@@ -39,7 +39,7 @@
 }
 
 .description {
-  color: #515b6f;
+  color: var(--color-text-secondary);
   font-size: 18px;
   text-align: center;
   line-height: 1.6;
@@ -49,7 +49,7 @@
 .searchBar {
   display: flex;
   align-items: center;
-  background: #ffffff;
+  background: var(--color-card-bg);
   padding: 10px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   max-width: 850px;
@@ -64,7 +64,7 @@
 }
 
 .icon {
-  color: #202430;
+  color: var(--color-text);
   margin-right: 10px;
 }
 
@@ -85,7 +85,7 @@
 }
 
 .searchBtn {
-  background-color: #4640de;
+  background-color: var(--color-primary);
   color: white;
   border: none;
   padding: 14px 28px;
@@ -96,7 +96,7 @@
 }
 
 .searchBtn:hover {
-  background-color: #3530a3;
+  background-color: var(--color-primary-hover);
 }
 
 .popular {
@@ -106,7 +106,7 @@
 }
 
 .popular strong {
-  color: #202430;
+  color: var(--color-text);
 }
 
 .Companiespage {
@@ -128,7 +128,7 @@
 .filterTitle {
   font-size: 16px;
   font-weight: 700;
-  color: #202430;
+  color: var(--color-text);
   margin-bottom: 20px;
   display: block;
 }
@@ -152,7 +152,7 @@
   width: 18px;
   height: 18px;
   cursor: pointer;
-  accent-color: #4640de;
+  accent-color: var(--color-primary);
   border: 1px solid #d6ddeb;
   border-radius: 4px;
 }
@@ -171,7 +171,7 @@
 }
 
 .checkboxLabel:hover .labelSpan {
-  color: #4640de;
+  color: var(--color-primary);
 }
 
 .companies-content {
@@ -210,7 +210,7 @@
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 20px;
-  background: #fff;
+  background: var(--color-card-bg);
 }
 
 .Cardtop {
@@ -306,7 +306,7 @@
 }
 
 .pagination .active {
-  background: #4640de;
+  background: var(--color-primary);
   color: #fff;
 }
 
@@ -324,7 +324,7 @@
   width: 40px;
   height: 40px;
   border: 3px solid #f3f3f3;
-  border-top: 3px solid #4640de;
+  border-top: 3px solid var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 15px;
@@ -368,9 +368,9 @@
 }
 
 .activePage {
-  background-color: #4640de !important;
+  background-color: var(--color-primary) !important;
   color: white !important;
-  border-color: #4640de !important;
+  border-color: var(--color-primary) !important;
 }
 
 .noTag {
@@ -387,7 +387,7 @@
 }
 
 .tagLabel:hover {
-  color: #4640de !important;
+  color: var(--color-primary) !important;
 }
 
 .emptyText {

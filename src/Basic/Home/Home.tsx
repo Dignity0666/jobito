@@ -56,7 +56,7 @@ export const Home = () => {
                     animate={{ pathLength: 1 }}
                     transition={{ duration: 1.5, delay: 1, ease: "easeInOut" }}
                     d="M5 15 Q 40 5, 80 15 T 160 15 T 240 15 T 300 15"
-                    stroke="#26A4FF"
+                    stroke="var(--color-accent, #26A4FF)"
                     fill="transparent"
                     strokeWidth="4"
                   />
@@ -70,7 +70,7 @@ export const Home = () => {
 
             <motion.div
               variants={itemVariants}
-              style={{ marginTop: "20px", marginBottom: "20px" }}
+              style={{ marginTop: "20px", marginBottom: "20px",}}
             >
               <a
                 href="https://play.google.com/store/apps/details?id=com.jobito.app"
@@ -78,10 +78,38 @@ export const Home = () => {
                 rel="noopener noreferrer"
                 className={styles.heroDownloadBtn}
               >
-                <i
-                  className="fab fa-google-play"
-                  style={{ paddingLeft: "8px" }}
-                ></i>
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 28 28"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g clip-path="url(#clip0_1532_46193)">
+                    <path
+                      d="M14.5601 13.4405L1.01508 26.9855C0.367578 26.373 0.0175781 25.533 0.0175781 24.623V3.37797C0.0175781 2.45047 0.385078 1.61047 1.05008 0.980469L14.5601 13.4405Z"
+                      fill="#2196F3"
+                    />
+                    <path
+                      d="M26.2671 14.0003C26.2671 15.2253 25.6021 16.3103 24.4996 16.9228L20.6496 19.0578L15.8721 14.6478L14.5596 13.4403L19.6171 8.38281L24.4996 11.0778C25.6021 11.6903 26.2671 12.7753 26.2671 14.0003Z"
+                      fill="#FFC107"
+                    />
+                    <path
+                      d="M14.5598 13.4408L1.0498 0.980823C1.2248 0.805823 1.4523 0.648323 1.6798 0.508323C2.7823 -0.156677 4.1123 -0.174177 5.2498 0.455823L19.6173 8.38332L14.5598 13.4408Z"
+                      fill="#4CAF50"
+                    />
+                    <path
+                      d="M20.6496 19.057L5.24965 27.5445C4.70715 27.8595 4.09465 27.9995 3.49965 27.9995C2.86965 27.9995 2.23965 27.842 1.67965 27.492C1.43663 27.3528 1.21304 27.1821 1.01465 26.9845L14.5596 13.4395L15.8721 14.647L20.6496 19.057Z"
+                      fill="#F44336"
+                    />
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_1532_46193">
+                      <rect width="28" height="28" fill="white" />
+                    </clipPath>
+                  </defs>
+                </svg>
+
                 {t("احصل عليه من Google Play")}
               </a>
             </motion.div>

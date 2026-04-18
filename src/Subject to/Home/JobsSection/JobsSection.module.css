@@ -15,18 +15,18 @@
 .sectionHeader h2 {
   font-size: 32px;
   font-weight: 800;
-  color: #05264e;
+  color: var(--color-text);
   margin: 0;
 }
 
 .sectionHeader span {
-  color: #3b82f6;
+  color: var(--color-text);
 }
 
 .showAllLink {
   font-size: 14px;
   font-weight: 600;
-  color: #3c65f5;
+  color: var(--color-text);
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -58,8 +58,8 @@
 
 .jobCard {
   padding: 24px;
-  background: #ffffff;
-  border: 1px solid #e0e6f7;
+  background: var(--color-card-bg, #ffffff);
+  border: 1px solid var(--color-border-light, #e0e6f7);
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -68,7 +68,7 @@
 }
 
 .jobCard:hover {
-  border-color: #3c65f5;
+  border-color: var(--color-text);
   box-shadow: 0 10px 30px rgba(60, 101, 245, 0.08);
   transform: translateY(-4px);
 }
@@ -90,7 +90,7 @@
   justify-content: center;
   font-size: 10px;
   font-weight: 700;
-  color: #3c65f5;
+  color: var(--color-text);
   border: 1px solid #eef2ff;
   overflow: hidden;
 }
@@ -107,7 +107,7 @@
   padding: 4px 12px;
   border-radius: 20px;
   background: #eef2ff;
-  color: #3b82f6;
+  color: var(--color-text);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -115,18 +115,18 @@
 .jobCard h3 {
   font-size: 18px;
   font-weight: 700;
-  color: #05264e;
+  color: var(--color-text);
   margin: 0 0 8px 0;
   transition: color 0.2s;
 }
 
 .jobCard:hover h3 {
-  color: #3c65f5;
+  color: var(--color-text);
 }
 
 .jobCard p {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--color-text);
   margin: 0 0 20px 0;
   line-height: 1.5;
 }
@@ -148,27 +148,27 @@
 /* Category Specific Tags */
 .marketing {
   background: #fff7ed;
-  color: #f97316;
+  color: var(--color-text);
 }
 
 .design {
   background: #ecfeff;
-  color: #06b6d4;
+  color: var(--color-text);
 }
 
 .business {
   background: #f0fdf4;
-  color: #22c55e;
+  color: var(--color-text);
 }
 
 .technology {
   background: #fef2f2;
-  color: #ef4444;
+  color: var(--color-text);
 }
 
 /* Latest Section (if needed in main TSX later) */
 .latestSection {
-  background: #f8faff;
+  background: var(--color-bg-secondary, #f8faff);
   padding: 60px 40px;
   border-radius: 24px;
   margin-top: 80px;
@@ -190,7 +190,7 @@
   display: flex;
   align-items: center;
   gap: 20px;
-  background: #ffffff;
+  background: var(--color-card-bg, #ffffff);
   padding: 24px;
   border-radius: 16px;
   border: 1px solid #e5e7eb;
@@ -198,19 +198,19 @@
 }
 
 .latestCard:hover {
-  border-color: #3c65f5;
+  border-color: var(--color-text);
 }
 
 .latestCard h4 {
   font-size: 16px;
   font-weight: 700;
-  color: #05264e;
+  color: var(--color-text);
   margin: 0 0 4px 0;
 }
 
 .latestCard p {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--color-text);
   margin: 0;
 }
 
@@ -218,10 +218,10 @@
   grid-column: 1 / -1;
   text-align: center;
   padding: 40px;
-  color: #6b7280;
+  color: var(--color-text);
   font-size: 14px;
 }
 
 .error {
-  color: #ef4444;
+  color: var(--color-text);
 }

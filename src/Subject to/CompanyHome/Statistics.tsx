@@ -42,65 +42,67 @@ interface PeriodData {
   summary: StatSummary;
 }
 
-const chartOptions: ChartOptions<"bar"> = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      display: false,
-    },
-    tooltip: {
-      backgroundColor: "#FFFFFF",
-      titleColor: "#111827",
-      bodyColor: "#6B7280",
-      padding: 10,
-      cornerRadius: 8,
-      displayColors: true,
-      usePointStyle: true,
-      borderColor: "#E5E7EB",
-      borderWidth: 1,
-    },
-  },
-  animation: {
-    duration: 500,
-  },
-  scales: {
-    x: {
-      stacked: true,
-      grid: {
-        display: false,
-      },
-      ticks: {
-        color: "#6B7280",
-        font: {
-          size: 12,
-          weight: "normal",
-        },
-      },
-    },
-    y: {
-      stacked: true,
-      display: false,
-      grid: {
-        display: false,
-      },
-    },
-  },
-};
-
+// ChartOptions are generated dynamically inside the component
 export default function Statistics({
   companyId,
 }: {
   companyId: number | null;
 }) {
   const { apiFetch } = useJobitoAuth();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [activeTab, setActiveTab] = useState("Overview");
-  const [activePeriod, setActivePeriod] = useState<"Week" | "Month" | "Year">(
-    "Week",
-  );
+  const [activePeriod, setActivePeriod] = useState<"Week" | "Month" | "Year">("Week");
   const [data, setData] = useState<PeriodData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [theme, setTheme] = useState(document.documentElement.getAttribute("data-theme") || "light");
+
+  useEffect(() => {
+    // Observer to seamlessly track root dark mode changes and instantly re-render the chart!
+    const observer = new MutationObserver(() => {
+      setTheme(document.documentElement.getAttribute("data-theme") || "light");
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => observer.disconnect();
+  }, []);
+
+  // Compute precise chart style strings based on the live theme
+  const isDark = theme === "dark";
+  const axisTextColor = isDark ? "#E2E8F0" : "#26292D"; // strict --color-text
+
+  const chartOptions: ChartOptions<"bar"> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: isDark ? "#141B2D" : "#FFFFFF",
+        titleColor: isDark ? "#E2E8F0" : "#111827",
+        bodyColor: isDark ? "#94A3B8" : "#4B5563",
+        padding: 10,
+        cornerRadius: 8,
+        displayColors: true,
+        usePointStyle: true,
+        borderColor: isDark ? "#1E2A45" : "#E5E7EB",
+        borderWidth: 1,
+      },
+    },
+    animation: { duration: 500 },
+    scales: {
+      x: {
+        stacked: true,
+        grid: { display: false },
+        ticks: {
+          color: axisTextColor,
+          font: { size: language === "ar" ? 19 : 14, weight: "bold" },
+        },
+      },
+      y: {
+        stacked: true,
+        display: false,
+        grid: { display: false },
+      },
+    },
+  };
 
   useEffect(() => {
     if (!companyId) {
@@ -298,7 +300,7 @@ export default function Statistics({
                   <Bar
                     data={chartData}
                     options={chartOptions}
-                    key={activePeriod}
+                    key={`${activePeriod}-${theme}`}
                   />
                 </div>
               </div>

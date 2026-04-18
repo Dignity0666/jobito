@@ -61,9 +61,11 @@ export default function EditProfile() {
     socialLinks: {
       instagram: user?.socialLinks?.instagram || "",
       twitter: user?.socialLinks?.twitter || "",
-      website: user?.socialLinks?.website || "",
+      linkedin: user?.socialLinks?.linkedin || "",
+      github: user?.socialLinks?.github || "",
     },
     location: user?.location || "",
+    banner_url: user?.banner_url || "",
   });
 
   const [experience, setExperience] = useState<Experience[]>(
@@ -83,7 +85,10 @@ export default function EditProfile() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+  const [selectedBannerFile, setSelectedBannerFile] = useState<File | null>(null);
 
   // Login Details State
   const [passwords, setPasswords] = useState({
@@ -145,6 +150,16 @@ export default function EditProfile() {
     }
   };
 
+  const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedBannerFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setBannerPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
   const addExperience = () => {
     setExperience([...experience, { role: "", period: "", desc: "" }]);
   };
@@ -166,7 +181,8 @@ export default function EditProfile() {
           socialLinks: {
             instagram: data.socialLinks?.instagram || "",
             twitter: data.socialLinks?.twitter || "",
-            website: data.socialLinks?.website || "",
+            linkedin: data.socialLinks?.linkedin || "",
+            github: data.socialLinks?.github || "",
           },
           location: data.location || "",
         });
@@ -209,6 +225,20 @@ export default function EditProfile() {
         }
       }
 
+      let finalBannerUrl = user?.banner_url || "";
+      if (selectedBannerFile) {
+        const fd = new FormData();
+        fd.append("file", selectedBannerFile);
+        const uploadRes = await apiFetch(`${API_BASE_URL}/images/banner`, {
+          method: "PUT",
+          body: fd,
+        });
+        if (uploadRes.ok) {
+          const imgData = await uploadRes.json();
+          finalBannerUrl = imgData.imageUrl || imgData.image_url;
+        }
+      }
+
       if (activeTab === "login") {
         if (passwords.new) {
           const passRes = await apiFetch(`${API_BASE_URL}/users/me/password`, {
@@ -240,6 +270,7 @@ export default function EditProfile() {
           portfolios: gallery,
           avatarUrl: finalAvatarUrl,
           avatar: finalAvatarUrl,
+          banner_url: finalBannerUrl,
           location: profileData.location,
         };
 
@@ -264,6 +295,8 @@ export default function EditProfile() {
       alert(t("تم حفظ التعديلات بنجاح!"));
       setSelectedFile(null);
       setPhotoPreview(null);
+      setSelectedBannerFile(null);
+      setBannerPreview(null);
       if (activeTab === "login") {
         setPasswords({ current: "", new: "", confirm: "" });
       }
@@ -315,6 +348,46 @@ export default function EditProfile() {
                 <p className={styles.sectionSub}>
                   {t("هذه معلوماتك الشخصية التي يمكنك تحديثها في أي وقت.")}
                 </p>
+
+                <div className={styles.row}>
+                  <div className={styles.labelGroup}>
+                    <p className={styles.label}>{t("صورة الغلاف")}</p>
+                    <p className={styles.sectionSub}>
+                      {t("تُعرض هذه الصورة في خلفية ملفك الشخصي.")}
+                    </p>
+                  </div>
+                  <div className={styles.fieldFull}>
+                    <div
+                      className={styles.bannerPreview}
+                      onClick={() => bannerInputRef.current?.click()}
+                      style={{
+                        backgroundImage: `url(${bannerPreview || getAvatarUrl(user?.banner_url) || ""})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }}
+                    >
+                      {!bannerPreview && !user?.banner_url && (
+                        <div className={styles.bannerPlaceholder}>
+                          <UploadIcon />
+                          <p>{t("انقر لرفع صورة غلاف")}</p>
+                        </div>
+                      )}
+                      {(bannerPreview || user?.banner_url) && (
+                        <div className={styles.bannerOverlay}>
+                          <UploadIcon />
+                          <span>{t("تغيير الصورة")}</span>
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        ref={bannerInputRef}
+                        style={{ display: "none" }}
+                        accept="image/*"
+                        onChange={handleBannerUpload}
+                      />
+                    </div>
+                  </div>
+                </div>
 
                 <div className={styles.row}>
                   <div className={styles.labelGroup}>
@@ -707,7 +780,7 @@ export default function EditProfile() {
                         type="text"
                         name="instagram"
                         className={styles.input}
-                        placeholder={t("غير محدد")}
+                        placeholder="instagram.com/username"
                         value={profileData.socialLinks.instagram}
                         onChange={handleSocialChange}
                       />
@@ -718,19 +791,30 @@ export default function EditProfile() {
                         type="text"
                         name="twitter"
                         className={styles.input}
-                        placeholder={t("غير محدد")}
+                        placeholder="twitter.com/username"
                         value={profileData.socialLinks.twitter}
                         onChange={handleSocialChange}
                       />
                     </div>
-                    <div className={styles.fieldFull}>
-                      <label className={styles.label}>{t("الموقع الإلكتروني")}</label>
+                    <div className={styles.field}>
+                      <label className={styles.label}>{t("لينكد إن")}</label>
                       <input
                         type="text"
-                        name="website"
+                        name="linkedin"
                         className={styles.input}
-                        placeholder="https://example.com"
-                        value={profileData.socialLinks.website}
+                        placeholder="linkedin.com/in/username"
+                        value={profileData.socialLinks.linkedin}
+                        onChange={handleSocialChange}
+                      />
+                    </div>
+                    <div className={styles.field}>
+                      <label className={styles.label}>{t("جيت هب")}</label>
+                      <input
+                        type="text"
+                        name="github"
+                        className={styles.input}
+                        placeholder="github.com/username"
+                        value={profileData.socialLinks.github}
                         onChange={handleSocialChange}
                       />
                     </div>
@@ -738,101 +822,62 @@ export default function EditProfile() {
                 </div>
               </div>
 
-              {/* Gallery */}
+
+              {/* Portfolio / Exhibition */}
               <div className={styles.section}>
                 <div className={styles.row}>
                   <div className={styles.labelGroup}>
                     <p className={styles.label}>{t("المعرض")}</p>
                     <p className={styles.sectionSub}>
-                      {t("أضف صوراً لأعمالك أو إنجازاتك.")}
+                      {t("أضف صور أعمالك ومشاريعك السابقة لعرضها في ملفك الشخصي.")}
                     </p>
                   </div>
                   <div className={styles.fieldFull}>
-                    <div
-                      className={styles.uploadZone}
-                      onClick={() => galleryInputRef.current?.click()}
-                    >
-                      <UploadIcon />
-                      <p className={styles.uploadText}>
-                        {t("انقر لإضافة صور إلى المعرض")}
-                      </p>
-                      <input
-                        type="file"
-                        ref={galleryInputRef}
-                        style={{ display: "none" }}
-                        accept="image/*"
-                        multiple
-                        onChange={handleGalleryUpload}
-                      />
-                    </div>
                     <div className={styles.galleryGrid}>
-                      {gallery.map((img, i) => (
-                        <div key={i} className={styles.galleryItem}>
+                      {gallery.map((img, idx) => (
+                        <div className={styles.galleryItem} key={idx}>
                           <img
-                            src={img}
-                            alt={`Gallery ${i}`}
+                            src={
+                              img.startsWith("data:") || img.startsWith("http")
+                                ? img
+                                : getAvatarUrl(img) || ""
+                            }
+                            alt={`Portfolio ${idx + 1}`}
                             className={styles.galleryImg}
                           />
                           <button
-                            className={styles.galleryRemove}
+                            className={styles.galleryRemoveBtn}
                             onClick={() =>
-                              setGallery(gallery.filter((_, idx) => idx !== i))
+                              setGallery(gallery.filter((_, i) => i !== idx))
                             }
+                            title={t("حذف")}
                           >
                             ×
                           </button>
                         </div>
                       ))}
+                      <div
+                        className={styles.galleryAddBtn}
+                        onClick={() => galleryInputRef.current?.click()}
+                      >
+                        <UploadIcon />
+                        <span>{t("إضافة صورة")}</span>
+                      </div>
                     </div>
+                    <input
+                      type="file"
+                      ref={galleryInputRef}
+                      style={{ display: "none" }}
+                      accept="image/*"
+                      multiple
+                      onChange={handleGalleryUpload}
+                    />
                   </div>
                 </div>
               </div>
 
               {/* Account Type */}
-              <div className={styles.section}>
-                <div className={styles.row}>
-                  <div className={styles.labelGroup}>
-                    <p className={styles.label}>{t("نوع الحساب")}</p>
-                    <p className={styles.sectionSub}>
-                      {t("يمكنك تحديث نوع حسابك للوصول لميزات مختلفة.")}
-                    </p>
-                  </div>
-                  <div className={styles.radioGroup}>
-                    <label className={styles.radioItem}>
-                      <input
-                        type="radio"
-                        name="accountType"
-                        value="job_seeker"
-                        className={styles.radioInput}
-                        checked={profileData.accountType === "job_seeker"}
-                        onChange={handleProfileChange}
-                      />
-                      <div className={styles.radioLabel}>
-                        <span className={styles.radioTitle}>{t("باحث عن عمل")}</span>
-                        <span className={styles.radioDesc}>
-                          {t("ابحث عن وظائف وتقدم لها بسهولة")}
-                        </span>
-                      </div>
-                    </label>
-                    <label className={styles.radioItem}>
-                      <input
-                        type="radio"
-                        name="accountType"
-                        value="employer"
-                        className={styles.radioInput}
-                        checked={profileData.accountType === "employer"}
-                        onChange={handleProfileChange}
-                      />
-                      <div className={styles.radioLabel}>
-                        <span className={styles.radioTitle}>{t("خدمات")}</span>
-                        <span className={styles.radioDesc}>
-                          {t("قدم خدمة")}
-                        </span>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-              </div>
+
             </motion.div>
           )}
 

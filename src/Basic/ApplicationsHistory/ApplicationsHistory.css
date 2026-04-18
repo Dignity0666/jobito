@@ -8,8 +8,8 @@
     Helvetica,
     Arial,
     sans-serif;
-  color: #202430;
-  background-color: #fff;
+  color: var(--color-text);
+  background-color: var(--color-bg);
   min-height: 100vh;
 }
 
@@ -37,7 +37,7 @@ h4 {
 .ah-title {
   font-size: 24px;
   font-weight: 800;
-  color: #202430;
+  color: var(--color-text);
   margin-bottom: 8px;
 }
 
@@ -56,7 +56,7 @@ h4 {
   padding: 10px 16px;
   font-size: 14px;
   font-weight: 500;
-  color: #202430;
+  color: var(--color-text);
   cursor: pointer;
   background-color: transparent;
   border-color: rgba(32, 36, 48, 0.1);
@@ -97,7 +97,7 @@ h4 {
 .ah-banner-title {
   font-size: 16px;
   font-weight: 700;
-  color: #4640de; /* blue */
+  color: var(--color-primary); /* blue */
   margin-bottom: 8px;
   font-family: "Inter", sans-serif;
 }
@@ -136,7 +136,7 @@ h4 {
 }
 
 .ah-tab.active {
-  color: #202430;
+  color: var(--color-text);
 }
 
 .ah-tab.active::after {
@@ -146,7 +146,7 @@ h4 {
   left: 0;
   right: 0;
   height: 3px;
-  background-color: #4640de;
+  background-color: var(--color-primary);
   border-radius: 3px 3px 0 0;
 }
 
@@ -165,7 +165,7 @@ h4 {
 .ah-table-title {
   font-size: 18px;
   font-weight: 800;
-  color: #202430;
+  color: var(--color-text);
   margin: 0;
 }
 
@@ -183,7 +183,7 @@ h4 {
   padding: 10px 16px;
   font-size: 14px;
   font-weight: 600;
-  color: #202430;
+  color: var(--color-text);
   cursor: pointer;
 }
 
@@ -205,7 +205,7 @@ h4 {
   padding: 24px 16px;
   border-bottom: 1px solid #d6ddeb;
   font-size: 15px;
-  color: #202430;
+  color: var(--color-text);
 }
 
 .ah-company-cell {
@@ -259,8 +259,8 @@ h4 {
 }
 
 .status-offered {
-  color: #4640de;
-  border: 1px solid #4640de;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
 }
 
 .status-interviewing {
@@ -305,7 +305,7 @@ h4 {
 }
 
 .ah-page-btn.active {
-  background-color: #4640de;
+  background-color: var(--color-primary);
   color: white;
 }
 
@@ -314,7 +314,7 @@ h4 {
 }
 
 .ah-nav-btn {
-  color: #202430;
+  color: var(--color-text);
 }
 
 .ah-page-dots {

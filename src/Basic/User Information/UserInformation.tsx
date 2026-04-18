@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLocation } from "react-router-dom";
 import BorderAnimatedContainer from "../../Subject to/User Information/BorderAnimatedContainer";
 import styles from "./User_Information.module.css";
 import { useTranslation } from "../../context/translation-context";
@@ -11,6 +12,14 @@ export const UserInformation: React.FC = () => {
   const [showLogin, setShowLogin] = useState(true);
   const [isCustomer, setIsCustomer] = useState(true);
   const { t } = useTranslation();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state) {
+      if (location.state.showLogin !== undefined) setShowLogin(location.state.showLogin);
+      if (location.state.isCustomer !== undefined) setIsCustomer(location.state.isCustomer);
+    }
+  }, [location.state]);
 
   const toggleLogin = () => setShowLogin(!showLogin);
 

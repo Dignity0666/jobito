@@ -1,22 +1,3 @@
-:root {
-  --color-primary: #030412;
-  --color-midnight: #06091f;
-  --color-navy: #161a31;
-  --color-indigo: #1f1e39;
-  --color-storm: #282b4b;
-  --color-aqua: #33c2cc;
-  --color-mint: #57db96;
-  --color-royal: #5c33cc;
-  --color-lavender: #7a57db;
-  --color-fuchsia: #ca2f8c;
-  --color-orange: #cc6033;
-  --color-sand: #d6995c;
-  --color-coral: #ea4884;
-
-  --marquee-duration: 40s;
-  --card-width: 250px;
-}
-
 .testimonial {
   margin-top: 4rem;
   display: flex;
@@ -28,13 +9,12 @@
   font-family: "Inter", system-ui, -apple-system, sans-serif;
   gap: 3rem;
   padding: 4rem 0;
-  background: radial-gradient(circle at top center, rgba(70, 64, 222, 0.05), transparent 70%);
 }
 
 .testimonial h2 {
   font-size: clamp(1.5rem, 5vw, 2.2rem);
   font-weight: 800;
-  color: var(--color-midnight);
+  color: var(--color-text);
   text-align: center;
   letter-spacing: -0.02em;
   margin-bottom: 1rem;
@@ -49,11 +29,12 @@
   transform: translateX(-50%);
   width: 60px;
   height: 4px;
-  background: linear-gradient(90deg, #4640de, #26A4FF);
+  background: var(--gradient-primary, linear-gradient(90deg, #4640de, #26A4FF));
   border-radius: 2px;
 }
 
-.marquee-container {
+/* ── Marquee Container ── */
+.marqueeContainer {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -61,26 +42,55 @@
   position: relative;
 }
 
+/* ── Single marquee row ── */
 .marquee {
-  display: flex;
-  gap: 3rem;
-  width: max-content;
-  animation: marquee var(--marquee-duration) linear infinite;
-  padding: 1rem 0;
+  width: 100%;
+  overflow: hidden;
 }
 
-.marquee:hover {
+.marqueeInner {
+  display: flex;
+  gap: 2rem;
+  width: max-content;
+  animation: scrollLeft 35s linear infinite;
+  padding: 0.75rem 0;
+}
+
+.marqueeInner:hover {
   animation-play-state: paused;
 }
 
-@keyframes marquee {
-  to {
-    transform: translateX(calc(-50% - 1.5rem));
+/* Reverse direction for second row */
+.marqueeInnerReverse {
+  animation: scrollRight 35s linear infinite;
+}
+
+.marqueeInnerReverse:hover {
+  animation-play-state: paused;
+}
+
+/* ── Keyframes ── */
+@keyframes scrollLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
   }
 }
 
+@keyframes scrollRight {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* ── Partner Card ── */
 .reviewCard {
-  width: var(--card-width);
+  min-width: 160px;
   padding: 1.25rem 2rem;
   border-radius: 1rem;
   background: rgba(255, 255, 255, 0.8);
@@ -92,15 +102,17 @@
   transition: all 0.3s ease;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .reviewCard:hover {
   transform: translateY(-5px);
   background: #ffffff;
-  border-color: #4640de;
+  border-color: var(--color-text);
   box-shadow: 0 20px 25px -5px rgba(70, 64, 222, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
+/* ── Partner Logo ── */
 .partnerLogo {
   height: 32px !important;
   width: auto !important;
@@ -114,22 +126,22 @@
   filter: grayscale(0) opacity(1);
 }
 
+/* ── Partner Name (fallback) ── */
 .partnerName {
-  display: none; /* Only show logo for premium partner look, or keep name? User's choice. Letting it be logo only for cleaner look */
+  display: none;
 }
 
-/* For when logo fails and we show name */
 .nameOnly .partnerName {
   display: block;
   font-size: 1.1rem;
   font-weight: 700;
-  color: #1e293b;
-  text-transform: uppercase;
+  color: var(--color-text);
   letter-spacing: 0.5px;
 }
 
+/* ── Loading ── */
 .loading {
-  color: #4640de;
+  color: var(--color-text);
   font-weight: 600;
   padding: 60px;
   display: flex;
@@ -142,7 +154,7 @@
   width: 20px;
   height: 20px;
   border: 3px solid #e2e8f0;
-  border-top-color: #4640de;
+  border-top-color: var(--color-text);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -151,28 +163,24 @@
   to { transform: rotate(360deg); }
 }
 
-.pause {
-  animation-play-state: paused !important;
-}
-
-/* Gradients for seamless edges */
+/* ── Edge fade gradients ── */
 .testimonial::before,
 .testimonial::after {
   content: "";
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 20%;
+  width: 15%;
   z-index: 2;
   pointer-events: none;
 }
 
 .testimonial::before {
   left: 0;
-  background: linear-gradient(to right, #ffffff, transparent);
+  background: linear-gradient(to right, var(--color-bg), transparent);
 }
 
 .testimonial::after {
   right: 0;
-  background: linear-gradient(to left, #ffffff, transparent);
+  background: linear-gradient(to left, var(--color-bg), transparent);
 }

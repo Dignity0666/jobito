@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./Messagingapp.module.css";
 import { useJobitoAuth } from "../../context/LinkContxt";
+import { useTranslation } from "../../context/translation-context";
 
 const EMOJIS = [
   "😊",
@@ -73,61 +74,61 @@ function Avatar({
   );
 }
 
-const initialContacts = [
+const getInitialContacts = (t: any) => [
   {
     id: 1,
-    name: "جان ماير",
-    role: "مسؤول توظيف في نوماد",
+    name: t("Jan Mayer", "جان ماير"),
+    role: t("Recruiter at Nomad", "مسؤول توظيف في نوماد"),
     online: true,
-    time: "منذ 12 دقيقة",
+    time: t("12 mins ago", "منذ 12 دقيقة"),
     messages: [
       {
         id: 1,
         from: "them",
-        text: "مرحباً جيك، أردت التواصل معك لأننا رأينا مساهماتك في العمل وكنا معجبين جداً بما قدمته.",
-        time: "منذ 12 دقيقة",
+        text: t("Hi Jake, I wanted to reach out because we saw your work contributions and were very impressed.", "مرحباً جيك، أردت التواصل معك لأننا رأينا مساهماتك في العمل وكنا معجبين جداً بما قدمته."),
+        time: t("12 mins ago", "منذ 12 دقيقة"),
       },
       {
         id: 2,
         from: "them",
-        text: "نريد دعوتك لإجراء مقابلة سريعة.",
-        time: "منذ 12 دقيقة",
+        text: t("We'd like to invite you for a quick interview.", "نريد دعوتك لإجراء مقابلة سريعة."),
+        time: t("12 mins ago", "منذ 12 دقيقة"),
       },
       {
         id: 3,
         from: "me",
-        text: "أهلاً جان، بالتأكيد يسعدني ذلك. شكراً لك على وقتك لرؤية أعمالي!",
-        time: "منذ 12 دقيقة",
+        text: t("Hi Jan, sure I'd love to. Thank you for taking the time to see my work!", "أهلاً جان، بالتأكيد يسعدني ذلك. شكراً لك على وقتك لرؤية أعمالي!"),
+        time: t("12 mins ago", "منذ 12 دقيقة"),
       },
     ],
   },
   {
     id: 2,
-    name: "جو بارتمان",
-    role: "الموارد البشرية في ديفي",
+    name: t("Joe Bartmann", "جو بارتمان"),
+    role: t("HR at Devi", "الموارد البشرية في ديفي"),
     online: false,
-    time: "3:40 م",
+    time: "3:40 PM",
     messages: [
       {
         id: 1,
         from: "them",
-        text: "مرحباً، شكراً لك على المقابلة...",
-        time: "3:40 م",
+        text: t("Hi, thanks for the interview...", "مرحباً، شكراً لك على المقابلة..."),
+        time: "3:40 PM",
       },
     ],
   },
   {
     id: 3,
-    name: "آلي ويلز",
-    role: "مصممة في فيجما",
+    name: t("Ally Wells", "آلي ويلز"),
+    role: t("Designer at Figma", "مصممة في فيجما"),
     online: false,
-    time: "3:40 م",
+    time: "3:40 PM",
     messages: [
       {
         id: 1,
         from: "them",
-        text: "مرحباً، شكراً لك على المقابلة...",
-        time: "3:40 م",
+        text: t("Hi, thanks for the interview...", "مرحباً، شكراً لك على المقابلة..."),
+        time: "3:40 PM",
       },
     ],
   },
@@ -140,6 +141,7 @@ interface MessagingAppProps {
 export const MessagingApp: React.FC<MessagingAppProps> = ({
   setShowHeader,
 }) => {
+  const { t } = useTranslation();
   const { user } = useJobitoAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -149,7 +151,11 @@ export const MessagingApp: React.FC<MessagingAppProps> = ({
     return () => setShowHeader(true);
   }, [setShowHeader]);
 
-  const [contacts, setContacts] = useState<any[]>(initialContacts);
+  const [contacts, setContacts] = useState<any[]>([]);
+
+  useEffect(() => {
+    setContacts(getInitialContacts(t));
+  }, [t]);
   const [activeId, setActiveId] = useState<number | string>(1);
   const [input, setInput] = useState("");
   const processedRef = useRef(false);
@@ -172,9 +178,9 @@ export const MessagingApp: React.FC<MessagingAppProps> = ({
           const newContact = {
             id: targetId,
             name: pUser.fullName,
-            role: "متقدم لوظيفة",
+            role: t("Job Applicant", "متقدم لوظيفة"),
             online: true,
-            time: "الآن",
+            time: t("Now", "الآن"),
             messages: [],
           };
           newContacts.unshift(newContact);
@@ -284,7 +290,7 @@ export const MessagingApp: React.FC<MessagingAppProps> = ({
               <path d="m21 21-4.35-4.35" />
             </svg>
             <input
-              placeholder="البحث في الرسائل..."
+              placeholder={t("Search in messages...", "البحث في الرسائل...")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -325,7 +331,7 @@ export const MessagingApp: React.FC<MessagingAppProps> = ({
               <div className={styles.chatHeaderRole}>{active.role}</div>
             </div>
             <div className={styles.headerActions}>
-              <button className={styles.iconBtn} title="تثبيت">
+              <button className={styles.iconBtn} title={t("Pin", "تثبيت")}>
                 <svg
                   width="16"
                   height="16"
@@ -342,11 +348,11 @@ export const MessagingApp: React.FC<MessagingAppProps> = ({
                 onClick={() =>
                   setStarred((s) => ({ ...s, [active.id]: !s[active.id] }))
                 }
-                title="تميز"
+                title={t("Star", "تميز")}
               >
                 ★
               </button>
-              <button className={styles.iconBtn} title="المزيد">
+              <button className={styles.iconBtn} title={t("More", "المزيد")}>
                 ⋯
               </button>
             </div>
@@ -361,7 +367,7 @@ export const MessagingApp: React.FC<MessagingAppProps> = ({
               <div className={styles.introName}>{active.name}</div>
               <div className={styles.introRole}>{active.role}</div>
               <div className={styles.introDesc}>
-                هذه بداية محادثتك مع <b>{active.name}</b>
+                {t("This is the beginning of your conversation with", "هذه بداية محادثتك مع")} <b>{active.name}</b>
               </div>
             </div>
 
@@ -377,7 +383,7 @@ export const MessagingApp: React.FC<MessagingAppProps> = ({
                 >
                   <path d="m6 9 6 6 6-6" />
                 </svg>
-                اليوم
+                {t("Today", "اليوم")}
               </div>
             </div>
 
@@ -409,7 +415,7 @@ export const MessagingApp: React.FC<MessagingAppProps> = ({
                     (isLast ? (
                       <div className={styles.msgAvatar}>
                         <Avatar
-                          name={user?.name || "أنت"}
+                          name={user?.name || t("You", "أنت")}
                           size="sm"
                           color="#495057"
                         />
@@ -431,7 +437,7 @@ export const MessagingApp: React.FC<MessagingAppProps> = ({
                       }}
                     >
                     {isOut
-                      ? `أنت · ${msg.time}`
+                      ? `${t("You", "أنت")} · ${msg.time}`
                       : `${active.name.split(" ")[0]} · ${msg.time}`}
                   </div>,
                 );
@@ -444,13 +450,13 @@ export const MessagingApp: React.FC<MessagingAppProps> = ({
 
           {/* Input */}
           <div className={styles.inputBar} style={{ position: "relative" }}>
-            <button className={styles.attachBtn} title="إرفاق ملف">
+            <button className={styles.attachBtn} title={t("Attach File", "إرفاق ملف")}>
               📎
             </button>
             <input
               ref={inputRef}
               className={styles.msgInput}
-              placeholder="اكتب رداً..."
+              placeholder={t("Write a reply...", "اكتب رداً...")}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKey}
@@ -461,7 +467,7 @@ export const MessagingApp: React.FC<MessagingAppProps> = ({
                 e.stopPropagation();
                 setShowEmoji((s) => !s);
               }}
-              title="إيموجي"
+              title={t("Emoji", "إيموجي")}
             >
               😊
             </button>
@@ -469,7 +475,7 @@ export const MessagingApp: React.FC<MessagingAppProps> = ({
               className={styles.sendBtn}
               onClick={sendMessage}
               disabled={!input.trim()}
-              title="إرسال"
+              title={t("Send", "إرسال")}
             >
               <svg
                 width="16"
@@ -501,7 +507,7 @@ export const MessagingApp: React.FC<MessagingAppProps> = ({
         <div className={styles.chat}>
           <div className={styles.chatPlaceholder}>
             <div className={styles.icon}>💬</div>
-            <p>اختر محادثة للبدء</p>
+            <p>{t("Choose a conversation to start", "اختر محادثة للبدء")}</p>
           </div>
         </div>
       )}

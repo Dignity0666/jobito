@@ -13,7 +13,7 @@
 .title {
   font-size: 72px;
   font-weight: 800;
-  color: #202430;
+  color: var(--color-text);
   line-height: 1.1;
   margin-bottom: 25px;
 }
@@ -30,11 +30,11 @@
 }
 
 .purpleText {
-  color: #4640de;
+  color: var(--color-primary);
 }
 
 .blueText {
-  color: #26a4ff;
+  color: var(--color-accent);
   position: relative;
   display: inline-block;
 }
@@ -47,7 +47,7 @@
 }
 
 .description {
-  color: #556493;
+  color: var(--color-text-secondary);
   font-size: 18px;
   line-height: 1.6;
   width: 500px;
@@ -57,11 +57,11 @@
 .searchBar {
   display: flex;
   align-items: center;
-  background: #ffffff;
+  background: var(--color-card-bg);
   padding: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-md);
   max-width: 500px;
-  border: 1px solid #e9ebf0;
+  border: 1px solid var(--color-border-light);
 }
 
 .inputGroup {
@@ -73,7 +73,7 @@
 }
 
 .icon {
-  color: #202430;
+  color: var(--color-text);
   margin-right: 10px;
 }
 
@@ -83,7 +83,7 @@
   outline: none;
   width: 100%;
   font-size: 16px;
-  color: #515b6f;
+  color: var(--color-text-secondary);
   padding: 10px 0;
 }
 
@@ -94,7 +94,7 @@
 }
 
 .searchBtn {
-  background-color: #4640de;
+  background-color: var(--color-primary);
   color: white;
   border: none;
   padding: 14px 28px;
@@ -105,43 +105,44 @@
 }
 
 .searchBtn:hover {
-  background-color: #3530a3;
+  background-color: var(--color-primary-hover);
 }
 
 .heroDownloadBtn {
   display: inline-flex;
   align-items: center;
-  background-color: #101828;
+  background-color: var(--color-text);
   color: #ffffff;
   padding: 14px 28px;
   border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
   text-decoration: none;
+  gap: 10px;
   box-shadow: 0 4px 12px rgba(16, 24, 40, 0.1);
   transition: all 0.2s ease;
 }
 
 .heroDownloadBtn:hover {
-  background-color: #1d2939;
+  opacity: 0.9;
   transform: translateY(-2px);
   color: #ffffff;
 }
 
 .popular {
   margin-top: 20px;
-  color: #7c8493;
+  color: var(--color-text-muted);
   font-size: 14px;
 }
 
 .popular strong {
-  color: #202430;
+  color: var(--color-text);
 }
 
 .companiesSection {
   width: 100%;
   padding: 40px 0;
-  background-color: #fff;
+  background-color: var(--color-bg);
 }
 
 .container {
@@ -150,7 +151,7 @@
 }
 
 .leadText {
-  color: #7c8493;
+  color: var(--color-text-muted);
   font-size: 16px;
   margin-bottom: 30px;
   font-family: "Inter", sans-serif;
@@ -160,7 +161,7 @@
   display: flex;
   width: 100%;
   height: 100px;
-  background-color: #26a4ff;
+  background-color: var(--color-accent);
   justify-content: 间-between;
   align-items: center;
   justify-content: space-between;

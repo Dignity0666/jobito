@@ -42,6 +42,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { io, Socket } from "socket.io-client";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useJobitoAuth } from "../../context/LinkContxt";
+import { useTranslation } from "../../context/translation-context";
 // import EmojiPicker from "emoji-picker-react"; // TEMPORARILY DISABLED
 
 const s = styles as Record<string, string>;
@@ -283,6 +284,7 @@ interface ChatAppProps {
 }
 
 const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
+  const { t } = useTranslation();
   const { user, apiFetch } = useJobitoAuth();
   const myUserId = user?.id || "";
   const location = useLocation();
@@ -974,8 +976,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
             fontSize: "18px",
           }}
         >
-          <MessageCircle size={24} style={{ marginRight: 10 }} /> Please login
-          to use the chat
+          <MessageCircle size={24} style={{ marginRight: 10 }} /> {t("Please login to use the chat", "يرجى تسجيل الدخول لاستخدام الدردشة")}
         </div>
       </div>
     );
@@ -1004,7 +1005,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
             }}
           >
             <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>
-              Messages
+              {t("Messages", "الرسائل")}
             </h2>
             <Plus
               size={20}
@@ -1018,7 +1019,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
               <Search size={18} className={s.searchIcon} />
               <input
                 type="text"
-                placeholder="Search messages"
+                placeholder={t("Search messages", "البحث في الرسائل")}
                 value={sidebarSearchQuery}
                 onChange={(e) => setSidebarSearchQuery(e.target.value)}
               />
@@ -1034,12 +1035,12 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
             ) : filteredChats.length === 0 ? (
               <div className={s.emptyChats}>
                 <MessageCircle size={48} color="#d1d7db" />
-                <p>No conversations yet</p>
+                <p>{t("No conversations yet", "لا توجد محادثات بعد")}</p>
                 <button
                   className={s.newChatBtn}
                   onClick={() => setShowNewChatModal(true)}
                 >
-                  <Plus size={16} /> Start a new chat
+                  <Plus size={16} /> {t("Start a new chat", "ابدأ دردشة جديدة")}
                 </button>
               </div>
             ) : (
@@ -1074,7 +1075,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                     </div>
                     <div className={s.chatBottom}>
                       <span className={s.lastMessage}>
-                        {chat.lastMessage || "Start a conversation"}
+                        {chat.lastMessage || t("Start a conversation", "ابدأ محادثة")}
                       </span>
                     </div>
                   </div>
@@ -1120,7 +1121,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                     >
                       {activeChat?.name}
                     </h3>
-                    <p>{activeChat?.email || "Online"}</p>
+                    <p>{activeChat?.email || t("Online", "متصل")}</p>
                   </div>
                 </div>
                 <div className={s.headerActions}>
@@ -1148,55 +1149,55 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                         <div className={s.menuIcon}>
                           <UserPlus size={18} />
                         </div>
-                        Add member
+                        {t("Add member", "إضافة عضو")}
                       </div>
                       <div className={s.menuItem}>
                         <div className={s.menuIcon}>
                           <Info size={18} />
                         </div>
-                        Contact info
+                        {t("Contact info", "معلومات الاتصال")}
                       </div>
                       <div className={s.menuItem}>
                         <div className={s.menuIcon}>
                           <CheckSquare size={18} />
                         </div>
-                        Select messages
+                        {t("Select messages", "تحديد الرسائل")}
                       </div>
                       <div className={s.menuItem}>
                         <div className={s.menuIcon}>
                           <BellOff size={18} />
                         </div>
-                        Mute notifications
+                        {t("Mute notifications", "كتم التنبيهات")}
                       </div>
                       <div className={s.menuItem}>
                         <div className={s.menuIcon}>
                           <History size={18} />
                         </div>
-                        Disappearing messages
+                        {t("Disappearing messages", "رسائل تختفي")}
                       </div>
                       <div className={s.menuItem}>
                         <div className={s.menuIcon}>
                           <Heart size={18} />
                         </div>
-                        Add to favourites
+                        {t("Add to favourites", "إضافة للمفضلة")}
                       </div>
                       <div className={s.menuItem}>
                         <div className={s.menuIcon}>
                           <List size={18} />
                         </div>
-                        Add to list
+                        {t("Add to list", "إضافة للقائمة")}
                       </div>
                       <div className={s.menuItem}>
                         <div className={s.menuIcon}>
                           <LogOut size={18} />
                         </div>
-                        Close chat
+                        {t("Close chat", "إغلاق الدردشة")}
                       </div>
                       <div className={s.menuItem}>
                         <div className={s.menuIcon}>
                           <Trash2 size={18} />
                         </div>
-                        Clear chat
+                        {t("Clear chat", "مسح الدردشة")}
                       </div>
                     </motion.div>
                   )}
@@ -1207,13 +1208,13 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                 {messagesLoading ? (
                   <div className={s.messagesLoadingState}>
                     <div className={s.spinner} />
-                    <span>Loading messages...</span>
+                    <span>{t("Loading messages...", "جاري تحميل الرسائل...")}</span>
                   </div>
                 ) : messages.length === 0 ? (
                   <div className={s.emptyMessages}>
                     <div className={s.emptyMessagesIcon}>🔐</div>
-                    <h4>End-to-end encrypted</h4>
-                    <p>Messages are secured. Start by saying hello!</p>
+                    <h4>{t("End-to-end encrypted", "مشفر من الطرفين")}</h4>
+                    <p>{t("Messages are secured. Start by saying hello!", "الرسائل مؤمنة. ابدأ بالتحية!")}</p>
                   </div>
                 ) : (
                   <>
@@ -1235,12 +1236,12 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                       <h2>{activeChat?.name}</h2>
                       <p className={s.subtitle}>{activeChat?.email}</p>
                       <p className={s.notice}>
-                        This is the very beginning of your direct message with{" "}
+                        {t("This is the very beginning of your direct message with", "هذه هي بداية رسائلك المباشرة مع")}{" "}
                         <strong>{activeChat?.name}</strong>
                       </p>
                     </div>
                     <div className={s.dateSeparator}>
-                      <span className={s.dateTag}>Today</span>
+                      <span className={s.dateTag}>{t("Today", "اليوم")}</span>
                     </div>
 
                     <div className={s.messagesListAnchor}>
@@ -1300,8 +1301,8 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                                     audioUrl={msg.audioUrl}
                                     senderName={
                                       isMe
-                                        ? "You"
-                                        : activeChat?.name || "Contact"
+                                        ? t("You", "أنت")
+                                        : activeChat?.name || t("Contact", "جهة اتصال")
                                     }
                                     timestamp={formatMessageTime(msg.createdAt)}
                                     isOutgoing={isMe}
@@ -1364,7 +1365,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                                           wordBreak: "break-all",
                                         }}
                                       >
-                                        View Document
+                                        {t("View Document", "عرض المستند")}
                                       </a>
                                       <span
                                         style={{ fontSize: 11, opacity: 0.7 }}
@@ -1381,7 +1382,6 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                                     {msg.message}
                                   </div>
                                 )}
-
                                 {msg.type !== "voice" && (
                                   <div
                                     style={{
@@ -1481,42 +1481,42 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                           onClick={closeContextMenu}
                         >
                           <Info size={18} />
-                          <span>Message info</span>
+                          <span>{t("Message info", "معلومات الرسالة")}</span>
                         </div>
                         <div
                           className={s.contextMenuItem}
                           onClick={closeContextMenu}
                         >
                           <Reply size={18} />
-                          <span>Reply</span>
+                          <span>{t("Reply", "رد")}</span>
                         </div>
                         <div
                           className={s.contextMenuItem}
                           onClick={handleCopyMessage}
                         >
                           <Copy size={18} />
-                          <span>Copy</span>
+                          <span>{t("Copy", "نسخ")}</span>
                         </div>
                         <div
                           className={s.contextMenuItem}
                           onClick={closeContextMenu}
                         >
                           <Forward size={18} />
-                          <span>Forward</span>
+                          <span>{t("Forward", "إعادة توجيه")}</span>
                         </div>
                         <div
                           className={s.contextMenuItem}
                           onClick={closeContextMenu}
                         >
                           <Pin size={18} />
-                          <span>Pin</span>
+                          <span>{t("Pin", "تثبيت")}</span>
                         </div>
                         <div
                           className={s.contextMenuItem}
                           onClick={closeContextMenu}
                         >
                           <Star size={18} />
-                          <span>Star</span>
+                          <span>{t("Star", "تميز")}</span>
                         </div>
                         {contextMenu.isMe && (
                           <div
@@ -1524,7 +1524,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                             onClick={closeContextMenu}
                           >
                             <Pencil size={18} />
-                            <span>Edit</span>
+                            <span>{t("Edit", "تعديل")}</span>
                           </div>
                         )}
                         <div
@@ -1532,14 +1532,14 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                           onClick={closeContextMenu}
                         >
                           <CheckSquare size={18} />
-                          <span>Select</span>
+                          <span>{t("Select", "تحديد")}</span>
                         </div>
                         <div
                           className={`${s.contextMenuItem} ${s.contextMenuDanger}`}
                           onClick={handleDeleteMessage}
                         >
                           <Trash2 size={18} />
-                          <span>Delete</span>
+                          <span>{t("Delete", "حذف")}</span>
                         </div>
                       </div>
                     </motion.div>
@@ -1605,29 +1605,28 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                               className={s.menuItem}
                               onClick={() => fileInputRef.current?.click()}
                             >
-                              <FileText color="#7f66ff" size={18} /> Document
+                              <FileText color="#7f66ff" size={18} /> {t("Document", "مستند")}
                             </div>
                             <div
                               className={s.menuItem}
                               onClick={() => fileInputRef.current?.click()}
                             >
-                              <ImageIcon color="#007bfc" size={18} /> Photos &
-                              videos
+                              <ImageIcon color="#007bfc" size={18} /> {t("Photos & videos", "صور وفيديوهات")}
                             </div>
                             <div className={s.menuItem}>
-                              <ImageIcon color="#ff2e74" size={18} /> Camera
+                              <ImageIcon color="#ff2e74" size={18} /> {t("Camera", "كاميرا")}
                             </div>
                             <div className={s.menuItem}>
-                              <Headphones color="#ff7f35" size={18} /> Audio
+                              <Headphones color="#ff7f35" size={18} /> {t("Audio", "صوت")}
                             </div>
                             <div className={s.menuItem}>
-                              <UserIcon color="#009de2" size={18} /> Contact
+                              <UserIcon color="#009de2" size={18} /> {t("Contact", "جهة اتصال")}
                             </div>
                             <div className={s.menuItem}>
-                              <BarChart2 color="#ffbc38" size={18} /> Poll
+                              <BarChart2 color="#ffbc38" size={18} /> {t("Poll", "استطلاع")}
                             </div>
                             <div className={s.menuItem}>
-                              <Sticker color="#00c0cb" size={18} /> New sticker
+                              <Sticker color="#00c0cb" size={18} /> {t("New sticker", "ملصق جديد")}
                             </div>
                             <input
                               type="file"
@@ -1641,7 +1640,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                       <input
                         type="text"
                         placeholder={
-                          uploadingFile ? "Uploading..." : "Reply message"
+                          uploadingFile ? t("Uploading...", "جاري الرفع...") : t("Reply message", "اكتب رداً...")
                         }
                         value={inputText}
                         onChange={(e) => setInputText(e.target.value)}
@@ -1687,16 +1686,15 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
               <div className={s.noChatIcon}>
                 <MessageCircle size={80} strokeWidth={1} color="#d1d7db" />
               </div>
-              <h2>Jobito Chat</h2>
+              <h2>{t("Jobito Chat", "دردشة جوبيتو")}</h2>
               <p>
-                Send and receive messages with other users. <br /> Select a
-                conversation or start a new one.
+                {t("Send and receive messages with other users.", "أرسل واستقبل الرسائل مع المستخدمين الآخرين.")} <br /> {t("Select a conversation or start a new one.", "اختر محادثة أو ابدأ واحدة جديدة.")}
               </p>
               <button
                 className={s.newChatBtn}
                 onClick={() => setShowNewChatModal(true)}
               >
-                <Plus size={18} /> New Chat
+                <Plus size={18} /> {t("New Chat", "دردشة جديدة")}
               </button>
             </div>
           )}
@@ -1729,7 +1727,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                   ) : (
                     <div className={s.previewNoImage}>
                       <FileText size={80} color="#8696a0" />
-                      <p>No preview available</p>
+                      <p>{t("No preview available", "لا يوجد معاينة متاحة")}</p>
                       <span>
                         {(selectedFile.size / 1024).toFixed(2)} KB -{" "}
                         {selectedFile.type || "Document"}
@@ -1742,7 +1740,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                   <div className={s.previewInputWrapper}>
                     <input
                       type="text"
-                      placeholder="Type a message"
+                      placeholder={t("Type a message", "اكتب رسالة...")}
                       value={fileCaption}
                       onChange={(e) => setFileCaption(e.target.value)}
                       onKeyDown={(e) =>
@@ -1794,18 +1792,18 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                   onClick={() => setShowSearchSidebar(false)}
                   style={{ cursor: "pointer" }}
                 />
-                <h3>Search messages</h3>
+                <h3>{t("Search messages", "البحث في الرسائل")}</h3>
               </header>
               <div className={s.searchSidebarContent}>
                 <div className={s.searchSidebarInputArea}>
                   <Calendar size={20} className={s.footerIcon} />
                   <div className={s.sidebarSearchInputBox}>
                     <Search size={16} className={s.searchIcon} />
-                    <input type="text" placeholder="Search" />
+                    <input type="text" placeholder={t("Search", "بحث")} />
                   </div>
                 </div>
                 <div className={s.searchEmptyState}>
-                  Search for messages within {activeChat?.name || "this chat"}.
+                  {t("Search for messages within", "البحث عن رسائل داخل")} {activeChat?.name || t("this chat", "هذه المحادثة")}.
                 </div>
               </div>
             </motion.div>
@@ -1837,14 +1835,14 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                 >
                   <ArrowLeft size={20} />
                 </div>
-                <h3>New Chat</h3>
+                <h3>{t("New Chat", "دردشة جديدة")}</h3>
               </header>
               <div className={s.modalSearch}>
                 <div className={s.modalSearchBox}>
                   <Search size={18} />
                   <input
                     type="text"
-                    placeholder="Search users by name or email..."
+                    placeholder={t("Search users by name or email...", "البحث عن مستخدمين بالاسم أو البريد...")}
                     value={newChatQuery}
                     onChange={(e) => setNewChatQuery(e.target.value)}
                     autoFocus
@@ -1881,10 +1879,10 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                     </div>
                   ))
                 ) : newChatQuery.length >= 2 ? (
-                  <div className={s.modalEmpty}>No users found</div>
+                  <div className={s.modalEmpty}>{t("No users found", "لم يتم العثور على مستخدمين")}</div>
                 ) : (
                   <div className={s.modalEmpty}>
-                    Type at least 2 characters to search
+                    {t("Type at least 2 characters to search", "اكتب حرفين على الأقل للبحث")}
                   </div>
                 )}
               </div>

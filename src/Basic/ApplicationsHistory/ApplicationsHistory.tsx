@@ -225,7 +225,7 @@ export const ApplicationsHistory = () => {
               ) : (
                 <button
                   className="ah-action-btn"
-                  style={{ backgroundColor: "#E2EFFC", color: "#4640DE" }}
+                  style={{ backgroundColor: "var(--color-primary-light)", color: "var(--color-primary)" }}
                   onClick={() => setShowSearch(true)}
                 >
                   <svg

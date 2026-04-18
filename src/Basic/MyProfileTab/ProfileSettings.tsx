@@ -51,7 +51,7 @@ const getFullImageUrl = (url?: string) => {
   return `${API_BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`;
 };
 
-type ProfileSubTab = "overview" | "social" | "security" | "benefits";
+type ProfileSubTab = "overview" | "social" | "security";
 
 export default function ProfileSettings() {
   const { t } = useTranslation();
@@ -312,10 +312,7 @@ export default function ProfileSettings() {
   const subTabs = [
     { id: "overview" as ProfileSubTab, label: t("نظرة عامة") },
     ...(role === "company"
-      ? [
-          { id: "social" as ProfileSubTab, label: t("روابط التواصل") },
-          { id: "benefits" as ProfileSubTab, label: t("المزايا") },
-        ]
+      ? [{ id: "social" as ProfileSubTab, label: t("روابط التواصل") }]
       : []),
     { id: "security" as ProfileSubTab, label: t("أمان الحساب") },
   ];
@@ -515,6 +512,107 @@ export default function ProfileSettings() {
                   )}
                 </div>
               </div>
+
+              {role === "company" && (
+                <div className={styles.row}>
+                  <div className={styles.rowLabel}>
+                    <strong>{t("المزايا والفوائد")}</strong>
+                    <span>{t("أضف المزايا التي توفرها شركتك للموظفين.")}</span>
+                  </div>
+                  <div className={styles.rowContent}>
+                    <div className={styles.benefitsGrid}>
+                      {formData.benefits?.map((benefit: any, index: number) => (
+                        <div key={index} className={styles.benefitCard}>
+                          <button
+                            className={styles.removeBenefitBtn}
+                            onClick={() => {
+                              const updated = formData.benefits.filter(
+                                (_: any, i: number) => i !== index,
+                              );
+                              setFormData({ ...formData, benefits: updated });
+                            }}
+                          >
+                            ✕
+                          </button>
+                          <h3>{benefit.title}</h3>
+                          <p>{benefit.description}</p>
+                        </div>
+                      ))}
+
+                      {showAddBenefit ? (
+                        <div className={styles.addBenefitCard}>
+                          <input
+                            type="text"
+                            placeholder={t("عنوان الميزة (مثال: تأمين صحي)")}
+                            value={newBenefit.title}
+                            onChange={(e) =>
+                              setNewBenefit({
+                                ...newBenefit,
+                                title: e.target.value,
+                              })
+                            }
+                          />
+                          <textarea
+                            placeholder={t("وصف الميزة...")}
+                            value={newBenefit.description}
+                            onChange={(e) =>
+                              setNewBenefit({
+                                ...newBenefit,
+                                description: e.target.value,
+                              })
+                            }
+                            rows={3}
+                          />
+                          <div className={styles.benefitAddActions}>
+                            <button
+                              className={styles.addBtnSmall}
+                              onClick={() => {
+                                if (!newBenefit.title)
+                                  return alert(t("يرجى إدخال عنوان الميزة"));
+                                setFormData({
+                                  ...formData,
+                                  benefits: [
+                                    ...(formData.benefits || []),
+                                    newBenefit,
+                                  ],
+                                });
+                                setNewBenefit({ title: "", description: "" });
+                                setShowAddBenefit(false);
+                              }}
+                            >
+                              {t("إضافة")}
+                            </button>
+                            <button
+                              className={styles.cancelBtnSmall}
+                              onClick={() => setShowAddBenefit(false)}
+                            >
+                              {t("إلغاء")}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          className={styles.addBenefitTrigger}
+                          onClick={() => setShowAddBenefit(true)}
+                        >
+                          <svg
+                            width="32"
+                            height="32"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                          </svg>
+                          <span>{t("إضافة ميزة جديدة")}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </>
           )}
           {activeSubTab === "social" && (
@@ -577,106 +675,7 @@ export default function ProfileSettings() {
               </div>
             </div>
           )}
-          {activeSubTab === "benefits" && (
-            <div className={styles.row}>
-              <div className={styles.rowLabel}>
-                <strong>{t("المزايا والفوائد")}</strong>
-                <span>{t("أضف المزايا التي توفرها شركتك للموظفين.")}</span>
-              </div>
-              <div className={styles.rowContent}>
-                <div className={styles.benefitsGrid}>
-                  {formData.benefits?.map((benefit: any, index: number) => (
-                    <div key={index} className={styles.benefitCard}>
-                      <button
-                        className={styles.removeBenefitBtn}
-                        onClick={() => {
-                          const updated = formData.benefits.filter(
-                            (_: any, i: number) => i !== index,
-                          );
-                          setFormData({ ...formData, benefits: updated });
-                        }}
-                      >
-                        ✕
-                      </button>
-                      <h3>{benefit.title}</h3>
-                      <p>{benefit.description}</p>
-                    </div>
-                  ))}
 
-                  {showAddBenefit ? (
-                    <div className={styles.addBenefitCard}>
-                      <input
-                        type="text"
-                        placeholder={t("عنوان الميزة (مثال: تأمين صحي)")}
-                        value={newBenefit.title}
-                        onChange={(e) =>
-                          setNewBenefit({
-                            ...newBenefit,
-                            title: e.target.value,
-                          })
-                        }
-                      />
-                      <textarea
-                        placeholder={t("وصف الميزة...")}
-                        value={newBenefit.description}
-                        onChange={(e) =>
-                          setNewBenefit({
-                            ...newBenefit,
-                            description: e.target.value,
-                          })
-                        }
-                        rows={3}
-                      />
-                      <div className={styles.benefitAddActions}>
-                        <button
-                          className={styles.addBtnSmall}
-                          onClick={() => {
-                            if (!newBenefit.title)
-                              return alert(t("يرجى إدخال عنوان الميزة"));
-                            setFormData({
-                              ...formData,
-                              benefits: [
-                                ...(formData.benefits || []),
-                                newBenefit,
-                              ],
-                            });
-                            setNewBenefit({ title: "", description: "" });
-                            setShowAddBenefit(false);
-                          }}
-                        >
-                          {t("إضافة")}
-                        </button>
-                        <button
-                          className={styles.cancelBtnSmall}
-                          onClick={() => setShowAddBenefit(false)}
-                        >
-                          {t("إلغاء")}
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div
-                      className={styles.addBenefitTrigger}
-                      onClick={() => setShowAddBenefit(true)}
-                    >
-                      <svg
-                        width="32"
-                        height="32"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <line x1="12" y1="5" x2="12" y2="19" />
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                      </svg>
-                      <span>{t("إضافة ميزة جديدة")}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
 
           {activeSubTab === "security" && (
             <>

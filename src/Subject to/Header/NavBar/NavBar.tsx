@@ -5,6 +5,7 @@ import styles from "./NavBar.module.css";
 export type NavLinkType = {
   label: string;
   path: string;
+  icon?: React.ReactNode;
 };
 
 type NavBarProps = {
@@ -37,6 +38,7 @@ export function NavBar({ mobileOpen, setMobileOpen, navLinks }: NavBarProps) {
                 to={link.path}
                 className={`${styles.link} ${active ? styles.linkActive : ""}`}
               >
+                {link.icon && <span className={styles.navIcon}>{link.icon}</span>}
                 <span className={styles.navLabel}>{link.label}</span>
               </Link>
             </div>
@@ -53,6 +55,7 @@ export function NavBar({ mobileOpen, setMobileOpen, navLinks }: NavBarProps) {
               className={`${styles.mobileLink} ${location.pathname === link.path ? styles.mobileLinkActive : ""}`}
               onClick={() => setMobileOpen(false)}
             >
+              {link.icon && <span className={styles.navIcon}>{link.icon}</span>}
               {link.label}
             </Link>
           ))}

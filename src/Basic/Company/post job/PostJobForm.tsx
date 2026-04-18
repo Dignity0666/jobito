@@ -193,13 +193,7 @@ function Step1({
   const [skillInput, setSkillInput] = useState("");
   const [showSkillInput, setShowSkillInput] = useState(false);
 
-  const toggleEmp = (t: string) => {
-    if (data.jobTypes.includes(t)) {
-      updateData({ jobTypes: data.jobTypes.filter((x) => x !== t) });
-    } else {
-      updateData({ jobTypes: [...data.jobTypes, t] });
-    }
-  };
+
 
   const addSkill = () => {
     if (skillInput.trim() && !data.skills.includes(skillInput.trim())) {
@@ -238,21 +232,21 @@ function Step1({
       <div className={styles.fieldRow}>
         <div className={styles.rowLabel}>
           <strong>{t("نوع التوظيف")}</strong>
-          <span>{t("يمكنك اختيار أكثر من نوع")}</span>
+          <span>{t("اختر نوع توظيف واحد فقط")}</span>
         </div>
         <div className={styles.rowContent}>
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-          >
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "16px" }}>
             {EMPLOYMENT_TYPES.map((type) => (
-              <label key={type} className={styles.checkRow}>
-                <input
-                  type="checkbox"
-                  checked={data.jobTypes.includes(type)}
-                  onChange={() => toggleEmp(type)}
-                />
-                {t(type)}
-              </label>
+              <label key={type} className={styles.checkRow} style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+                  <input
+                    type="radio"
+                    name="jobType"
+                    value={type}
+                  checked={data.jobTypes[0] === type}
+                    onChange={(e) => updateData({ jobTypes: [e.target.value] })}
+                  />
+                  {t(type)}
+                </label>
             ))}
           </div>
         </div>
@@ -266,8 +260,8 @@ function Step1({
         </div>
         <div className={styles.rowContent}>
           <div className={styles.salaryRow}>
-            <div className={styles.salaryBox} style={{ width: "200px" }}>
-              <span>£</span>
+            <div className={styles.salaryBox} style={{ width: "200px", direction: "ltr" }}>
+              <span>EGP</span>
               <input
                 type="number"
                 value={data.salary}
@@ -326,13 +320,13 @@ function Step1({
 
       <div className={styles.fieldRow}>
         <div className={styles.rowLabel}>
-          <strong>{t("البحث في الأقسام")}</strong>
-          <span>{t("يمكنك اختيار فئة الوظيفة المناسبة")}</span>
+          <strong>{t("القسم الوظيفي")}</strong>
+          <span>{t("اكتب فئة الوظيفة المناسبة")}</span>
         </div>
         <div className={styles.rowContent}>
           <div className={styles.categorySelectionBox}>
             <label className={styles.categorySelectionLabel}>
-              {t("اختر فئة الوظيفة")}
+              {t("اكتب فئة الوظيفة")}
             </label>
             <input
               type="text"

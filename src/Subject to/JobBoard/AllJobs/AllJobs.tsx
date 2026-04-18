@@ -311,25 +311,25 @@ const AllJobs: React.FC<AllJobsProps> = ({
     const text = (job.title + " " + (job.description || "")).toLowerCase();
 
     // 2. Fallback: Check for explicit Classification tags in text
-    if (text.includes("التصنيف: تقني") || text.includes("تقني")) return t("تقني");
+    if (text.includes("التصنيف: تقني") || text.includes("تقني")) return "تقني";
     if (text.includes("التصنيف: غير تقني") || text.includes("غير تقني"))
-      return t("غير تقني");
+      return "غير تقني";
     if (text.includes("التصنيف: خدمات") || text.includes("خدمات"))
-      return t("خدمات");
+      return "خدمات";
 
-    if (text.includes("director") || text.includes("مدير")) return t("مدير");
-    if (text.includes("senior") || text.includes("خبير")) return t("خبير");
-    if (text.includes("mid") || text.includes("متوسط")) return t("متوسط الخبرة");
-    if (text.includes("vp") || text.includes("نائب")) return t("نائب رئيس وأعلى");
-    return t("مبتدئ");
+    if (text.includes("director") || text.includes("مدير")) return "مدير";
+    if (text.includes("senior") || text.includes("خبير")) return "خبير";
+    if (text.includes("mid") || text.includes("متوسط")) return "متوسط الخبرة";
+    if (text.includes("vp") || text.includes("نائب")) return "نائب رئيس وأعلى";
+    return "مبتدئ";
   };
 
   const getSalaryRange = (job: Job) => {
     const s = job.salary || job.salaryMin || 0;
-    if (s >= 3000) return t("٣٠٠٠$ أو أكثر");
-    if (s >= 1500) return t("١٥٠٠$ - ٢٠٠٠$");
-    if (s >= 1000) return t("١٠٠٠$ - ١٥٠٠$");
-    if (s >= 700) return t("٧٠٠$ - ١٠٠٠$");
+    if (s >= 3000) return "٣٠٠٠$ أو أكثر";
+    if (s >= 1500) return "١٥٠٠$ - ٢٠٠٠$";
+    if (s >= 1000) return "١٠٠٠$ - ١٥٠٠$";
+    if (s >= 700) return "٧٠٠$ - ١٠٠٠$";
     return null;
   };
 
@@ -475,18 +475,18 @@ const AllJobs: React.FC<AllJobsProps> = ({
         />
 
         <Filter
-          title={t("صنيفات")}
+          title={t("تصنيفات")}
           items={[
             {
-              name: t("تقني"),
+              name: "تقني",
               count: jobs.filter((j) => getJobLevel(j) === "تقني").length,
             },
             {
-              name: t("غير تقني"),
+              name: "غير تقني",
               count: jobs.filter((j) => getJobLevel(j) === "غير تقني").length,
             },
             {
-              name: t("خدمات"),
+              name: "خدمات",
               count: jobs.filter((j) => getJobLevel(j) === "خدمات").length,
             },
           ]}
@@ -498,22 +498,22 @@ const AllJobs: React.FC<AllJobsProps> = ({
           title={t("نطاق الراتب")}
           items={[
             {
-              name: t("٧٠٠$ - ١٠٠٠$"),
+              name: "٧٠٠$ - ١٠٠٠$",
               count: jobs.filter((j) => getSalaryRange(j) === "٧٠٠$ - ١٠٠٠$")
                 .length,
             },
             {
-              name: t("١٠٠٠$ - ١٥٠٠$"),
+              name: "١٠٠٠$ - ١٥٠٠$",
               count: jobs.filter((j) => getSalaryRange(j) === "١٠٠٠$ - ١٥٠٠$")
                 .length,
             },
             {
-              name: t("١٥٠٠$ - ٢٠٠٠$"),
+              name: "١٥٠٠$ - ٢٠٠٠$",
               count: jobs.filter((j) => getSalaryRange(j) === "١٥٠٠$ - ٢٠٠٠$")
                 .length,
             },
             {
-              name: t("٣٠٠٠$ أو أكثر"),
+              name: "٣٠٠٠$ أو أكثر",
               count: jobs.filter((j) => getSalaryRange(j) === "٣٠٠٠$ أو أكثر")
                 .length,
             },
@@ -854,6 +854,7 @@ const Filter: React.FC<FilterProps> = ({
   setSelected,
 }) => {
   const [isOpen, setIsOpen] = useState(true);
+  const { t } = useTranslation();
   const toggleItem = (name: string) =>
     selected.includes(name)
       ? setSelected(selected.filter((i) => i !== name))
@@ -876,7 +877,7 @@ const Filter: React.FC<FilterProps> = ({
                 checked={selected.includes(item.name)}
                 onChange={() => toggleItem(item.name)}
               />
-              {item.name}
+              {t(item.name)}
               <span className={styles.itemCount}>({item.count})</span>
             </label>
           ))}

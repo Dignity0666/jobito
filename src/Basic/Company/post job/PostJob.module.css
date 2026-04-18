@@ -3,7 +3,7 @@
   margin: 0 auto;
   padding: 28px 24px 80px;
   font-family: "Epilogue", "Segoe UI", sans-serif;
-  color: #202430;
+  color: var(--color-text);
 }
 
 .pageHeader {
@@ -15,7 +15,7 @@
   font-size: 32px;
   font-weight: 800;
   margin-bottom: 8px;
-  color: #202430;
+  color: var(--color-text);
 }
 
 .pageHeader p {
@@ -32,14 +32,14 @@
   border: none;
   font-size: 18px;
   font-weight: 700;
-  color: #202430;
+  color: var(--color-text);
   cursor: pointer;
   padding: 0;
   margin-bottom: 28px;
   font-family: inherit;
 }
 .backBtn:hover {
-  color: #4640de;
+  color: var(--color-primary);
 }
 
 /* ── Step bar ────────────────────────────────── */
@@ -78,13 +78,13 @@
   transition: all 0.3s ease;
 }
 .stepActive {
-  border-color: #4640de;
-  background: #4640de;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
   color: #fff;
 }
 .stepDone {
-  border-color: #4640de;
-  background: #4640de;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
   color: #fff;
 }
 
@@ -101,7 +101,7 @@
 .stepLabel {
   font-size: 13px;
   font-weight: 600;
-  color: #202430;
+  color: var(--color-text);
 }
 
 .stepLine {
@@ -113,7 +113,7 @@
   transition: background 0.3s ease;
 }
 .stepLineDone {
-  background: #4640de;
+  background: var(--color-primary);
 }
 
 /* ── Section header ──────────────────────────── */
@@ -124,7 +124,7 @@
   font-size: 18px;
   font-weight: 700;
   margin: 0 0 4px;
-  color: #202430;
+  color: var(--color-text);
 }
 .sectionHeader p {
   font-size: 14px;
@@ -148,7 +148,7 @@
 .rowLabel strong {
   font-size: 14px;
   font-weight: 600;
-  color: #202430;
+  color: var(--color-text);
 }
 .rowLabel span {
   font-size: 13px;
@@ -174,7 +174,7 @@
   border-radius: 8px;
   padding: 10px 14px;
   font-size: 14px;
-  color: #202430;
+  color: var(--color-text);
   outline: none;
   font-family: inherit;
   transition:
@@ -183,7 +183,7 @@
   box-sizing: border-box;
 }
 .textInput:focus {
-  border-color: #4640de;
+  border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(70, 64, 222, 0.1);
 }
 
@@ -193,7 +193,7 @@
   border-radius: 8px;
   padding: 12px 14px;
   font-size: 14px;
-  color: #202430;
+  color: var(--color-text);
   outline: none;
   font-family: inherit;
   transition: all 0.2s ease;
@@ -202,7 +202,7 @@
 }
 
 .textArea:focus {
-  border-color: #4640de;
+  border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(70, 64, 222, 0.1);
 }
 
@@ -212,7 +212,7 @@
   border-radius: 8px;
   padding: 12px 14px;
   font-size: 14px;
-  color: #202430;
+  color: var(--color-text);
   outline: none;
   font-family: inherit;
   background: #fff;
@@ -245,7 +245,7 @@
   display: block;
   font-size: 15px;
   font-weight: 700;
-  color: #202430;
+  color: var(--color-text);
   margin-bottom: 2px;
 }
 
@@ -266,7 +266,7 @@
 .checkRow input[type="checkbox"] {
   width: 16px;
   height: 16px;
-  accent-color: #4640de;
+  accent-color: var(--color-primary);
   cursor: pointer;
 }
 
@@ -285,7 +285,7 @@
   padding: 8px 14px;
   font-size: 14px;
   font-weight: 500;
-  color: #202430;
+  color: var(--color-text);
   background-color: #f9fafb;
 }
 
@@ -296,7 +296,7 @@
   outline: none;
   font-size: 14px;
   font-weight: 700;
-  color: #202430;
+  color: var(--color-text);
   padding: 0;
 }
 
@@ -308,7 +308,7 @@
 
 .rangeSlider {
   width: 100%;
-  accent-color: #4640de;
+  accent-color: var(--color-primary);
   height: 4px;
   cursor: pointer;
 }
@@ -324,7 +324,7 @@
   padding: 8px 16px;
   font-size: 14px;
   font-weight: 500;
-  color: #4640de;
+  color: var(--color-primary);
   cursor: pointer;
   font-family: inherit;
   transition:
@@ -333,7 +333,7 @@
   align-self: flex-start;
 }
 .addSkillBtn:hover {
-  border-color: #4640de;
+  border-color: var(--color-primary);
   background: #f5f4ff;
 }
 
@@ -347,7 +347,7 @@
   align-items: center;
   gap: 6px;
   background: #f0efff;
-  color: #4640de;
+  color: var(--color-primary);
   border-radius: 20px;
   padding: 5px 12px;
   font-size: 13px;
@@ -357,7 +357,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #4640de;
+  color: var(--color-primary);
   display: flex;
   align-items: center;
   padding: 0;
@@ -388,7 +388,7 @@
   transition: border-color 0.2s ease;
 }
 .richBox:focus-within {
-  border-color: #4640de;
+  border-color: var(--color-primary);
 }
 
 .richBox textarea {
@@ -397,7 +397,7 @@
   outline: none;
   padding: 12px 14px;
   font-size: 14px;
-  color: #202430;
+  color: var(--color-text);
   font-family: inherit;
   resize: none;
   box-sizing: border-box;
@@ -434,7 +434,7 @@
 }
 .toolbarBtn:hover {
   background: #f0efff;
-  color: #4640de;
+  color: var(--color-primary);
 }
 
 .charCount {
@@ -458,14 +458,14 @@
   justify-content: center;
   gap: 10px;
   background: #fcfcfd;
-  color: #4640de;
+  color: var(--color-primary);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .addBenefitCard:hover {
-  border-color: #4640de;
+  border-color: var(--color-primary);
   background: #f5f4ff;
 }
 
@@ -506,7 +506,7 @@
 .benefitCard strong {
   font-size: 15px;
   font-weight: 700;
-  color: #202430;
+  color: var(--color-text);
 }
 .benefitCard p {
   font-size: 13px;
@@ -516,7 +516,7 @@
 }
 
 .nextBtn {
-  background: #4640de;
+  background: var(--color-primary);
   color: #fff;
   border: none;
   padding: 14px 40px 14px 40px;
@@ -529,7 +529,7 @@
 }
 
 .primaryBtn {
-  background: #4640de;
+  background: var(--color-primary);
   color: #fff;
   border: none;
   padding: 10px 20px;
@@ -641,7 +641,7 @@
   background: transparent;
   padding: 8px 0;
   font-size: 15px;
-  color: #202430;
+  color: var(--color-text);
   font-weight: 500;
   font-family: inherit;
   outline: none;
@@ -671,7 +671,7 @@
   gap: 8px;
   background: none;
   border: none;
-  color: #4640de;
+  color: var(--color-primary);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
