@@ -36,14 +36,11 @@
 }
 
 .sidebar-card {
-  background: var(--color-sidebar-bg, #0b1a2d); /* Keeps the dark blue if no variable, otherwise falls back smoothly */
+  background: var(--color-bg-secondary);
   border-radius: 12px;
   padding: 24px;
-  color: #fff;
+  color: var(--color-text);
   margin-bottom: 24px;
-}
-[data-theme="dark"] .sidebar-card {
-  background: var(--color-card-bg);
   border: 1px solid var(--color-border);
 }
 
@@ -72,7 +69,7 @@
 
 .profile-role {
   font-size: 15px;
-  color: #94a3b8;
+  color: var(--color-text-secondary);
   margin-bottom: 12px;
 }
 
@@ -102,7 +99,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 13px;
-  color: #94a3b8;
+  color: var(--color-text-muted);
   margin-bottom: 12px;
 }
 
@@ -114,15 +111,15 @@
 
 .applied-job-meta {
   font-size: 14px;
-  color: #94a3b8;
+  color: var(--color-text-muted);
 }
 
 .cv-file-box {
   display: flex;
   align-items: center;
   gap: 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 16px;
   cursor: pointer;
@@ -143,10 +140,10 @@
 }
 
 .cv-file-box.clickable:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(59, 130, 246, 0.4);
+  background: var(--color-card-bg);
+  border-color: var(--color-primary);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(59, 130, 246, 0.1) inset;
+  box-shadow: var(--shadow-md);
 }
 
 .cv-file-box.clickable:hover::after {
@@ -186,7 +183,7 @@
   position: absolute;
   top: -6px;
   right: -6px;
-  background: #0b1a2d;
+  background: var(--color-card-bg);
   color: #10b981;
   width: 20px;
   height: 20px;
@@ -198,9 +195,6 @@
   justify-content: center;
   border: 2px solid #10b981;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-[data-theme="dark"] .download-badge {
-  background: var(--color-card-bg);
 }
 
 .cv-info-row {
@@ -221,13 +215,13 @@
 .cv-filename {
   font-size: 15px;
   font-weight: 800;
-  color: #f8fafc;
+  color: var(--color-text);
   letter-spacing: -0.01em;
 }
 
 .cv-filesize {
   font-size: 13px;
-  color: #94a3b8;
+  color: var(--color-text-muted);
   font-weight: 500;
 }
 
@@ -355,7 +349,7 @@
 .item-label {
   display: block;
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--color-text-muted);
   margin-bottom: 2px;
 }
 

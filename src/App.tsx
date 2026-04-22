@@ -17,14 +17,12 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import { About } from "./Basic/About/About";
 import CompaniesJobs from "./Basic/CompaniesJobs/CompaniesJobs";
 import { Header } from "./Permanent/Header/Header";
+import ModeSwitcherBar from "./Permanent/ModeSwitcherBar/ModeSwitcherBar";
 import Footer from "./Permanent/Footer/Footer";
 import { JobDetailsPage } from "./Basic/JobDetailsPage/JobDetailsPage";
-import { ObitoSidebar } from "./Basic/ObitoSidebar/ObitoSidebar";
 import ApplicationsHistory from "./Basic/ApplicationsHistory/ApplicationsHistory";
 import JobDashboard from "./Basic/DoughnutChart/DoughnutChart";
 import ProfilePage from "./Basic/Profilepage/Profilepage";
-// import { MessagingApp } from "./Basic/Messagingapp/Messagingapp";
-// import HelpCenter from "./Basic/Help/Help";
 import Applicants from "./Basic/Social Media Assistant applicant/Social Media As";
 import AllApplicants from "./Basic/Company/All Applicants/All Applicants";
 import PostJobStep3 from "./Basic/Company/Perks & Benefits/Perks&Benefits";
@@ -41,6 +39,15 @@ import ProfileSettings from "./Basic/MyProfileTab/ProfileSettings";
 import ChatApp from "./Basic/ChatApp/ChatApp";
 import NotFound from "./Shared/NotFound/NotFound";
 import ApplicantDetails from "./Basic/Company/ApplicantDetails/ApplicantDetails";
+import JobAnalytics from "./Basic/Company/JobAnalytics/JobAnalytics";
+import CompleteProfile from "./Basic/CompleteProfile/CompleteProfile";
+import PostWork from "./Basic/Tradesman/PostWork/PostWork";
+import WorkListing from "./Basic/Tradesman/WorkListing/WorkListing";
+import WorkApplicants from "./Basic/Tradesman/WorkApplicants/WorkApplicants";
+import WorkApplicantDetails from "./Basic/Tradesman/WorkApplicants/Details/WorkApplicantDetails";
+
+import WorkDetails from "./Basic/Tradesman/WorkListing/Details/WorkDetails";
+import { ToastProvider } from "./context/ToastContext";
 
 const pageVariants = {
   initial: {
@@ -135,13 +142,13 @@ const SplashScreen = () => (
 );
 
 function AppContent() {
-  const { role, isAuthenticated, isBackendOffline, isInitialLoading } =
+  const { role, user, isAuthenticated, isBackendOffline, isInitialLoading } =
     useJobitoAuth();
+  const classification = user?.classification;
   const location = useLocation();
   const [showHeader, setShowHeader] = useState(true);
 
-  const [showObitoSidebar, setshowObitoSidebar] = useState(false);
-  const hideLayoutPaths = ["/user-information"];
+  const hideLayoutPaths = ["/user-information", "/complete-profile"];
   const currentPath = location.pathname.toLowerCase();
   const shouldHide = hideLayoutPaths.includes(currentPath);
 
@@ -184,31 +191,29 @@ function AppContent() {
 
   return (
     <div className="App">
-      <div className="">
-        <AnimatePresence>
-          {showObitoSidebar && isAuthenticated && (
-            <ObitoSidebar setshowObitoSidebar={setshowObitoSidebar} />
-          )}
-        </AnimatePresence>
-      </div>
 
       <div className="main-layout" ref={mainLayoutRef}>
         {showHeader && <Header />}
+        {showHeader && role === "user" && <ModeSwitcherBar />}
         <div className="page-content">
           <AnimatePresence mode="wait" initial={false}>
             <Routes location={location} key={location.pathname}>
-              {/* ─── Company Routes ────────────────────────────────────────── */}
-              {role === "company" && (
+              {/* ─── Company & Tradesman Management Routes ────────────────────────── */}
+              {(role === "company" || classification === "tradesman") && (
                 <>
-                  <Route path="/" element={<Navigate to="/home" replace />} />
-                  <Route
-                    path="/home"
-                    element={
-                      <PageWrapper>
-                        <CompanyHome />
-                      </PageWrapper>
-                    }
-                  />
+                  {role === "company" && (
+                    <>
+                      <Route path="/" element={<Navigate to="/home" replace />} />
+                      <Route
+                        path="/home"
+                        element={
+                          <PageWrapper>
+                            <CompanyHome />
+                          </PageWrapper>
+                        }
+                      />
+                    </>
+                  )}
                   <Route
                     path="/PostJob"
                     element={
@@ -226,7 +231,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/Messagingapp"
+                    path="/chat"
                     element={
                       <PageWrapper>
                         <ChatApp setShowHeader={setShowHeader} />
@@ -245,7 +250,39 @@ function AppContent() {
                     path="/JobListing"
                     element={
                       <PageWrapper>
-                        <JobListing />
+                        {classification === "tradesman" ? <WorkListing /> : <JobListing />}
+                      </PageWrapper>
+                    }
+                  />
+                  <Route
+                    path="/PostWork"
+                    element={
+                      <PageWrapper>
+                        <PostWork />
+                      </PageWrapper>
+                    }
+                  />
+                   <Route
+                    path="/WorkApplicants"
+                    element={
+                      <PageWrapper>
+                        <WorkApplicants />
+                      </PageWrapper>
+                    }
+                  />
+                  <Route
+                    path="/WorkApplicantDetails/:id"
+                    element={
+                      <PageWrapper>
+                        <WorkApplicantDetails />
+                      </PageWrapper>
+                    }
+                  />
+                  <Route
+                    path="/WorkManagement/:id"
+                    element={
+                      <PageWrapper>
+                        <WorkDetails />
                       </PageWrapper>
                     }
                   />
@@ -254,6 +291,14 @@ function AppContent() {
                     element={
                       <PageWrapper>
                         <ApplicantDetails />
+                      </PageWrapper>
+                    }
+                  />
+                  <Route
+                    path="/JobAnalytics/:jobId"
+                    element={
+                      <PageWrapper>
+                        <JobAnalytics />
                       </PageWrapper>
                     }
                   />
@@ -270,7 +315,7 @@ function AppContent() {
                     path="/Profile"
                     element={
                       <PageWrapper>
-                        <ProfilepageCompany />
+                        {classification === "tradesman" ? <ProfilePage /> : <ProfilepageCompany />}
                       </PageWrapper>
                     }
                   />
@@ -378,6 +423,14 @@ function AppContent() {
                     }
                   />
                   <Route
+                    path="/complete-profile"
+                    element={
+                      <PageWrapper>
+                        <CompleteProfile />
+                      </PageWrapper>
+                    }
+                  />
+                  <Route
                     path="/settings/security"
                     element={
                       <PageWrapper>
@@ -394,7 +447,7 @@ function AppContent() {
                     }
                   />
                   <Route
-                    path="/Messagingapp"
+                    path="/chat"
                     element={
                       <PageWrapper>
                         <ChatApp setShowHeader={setShowHeader} />
@@ -454,7 +507,9 @@ export default function App() {
     <ThemeProvider>
       <TranslationProvider>
         <AuthProvider>
-          <RootInner />
+          <ToastProvider>
+            <RootInner />
+          </ToastProvider>
         </AuthProvider>
       </TranslationProvider>
     </ThemeProvider>

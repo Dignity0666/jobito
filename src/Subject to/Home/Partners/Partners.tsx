@@ -1,10 +1,7 @@
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import styles from "./Partners.module.css";
+import { useState } from "react";
+import Marquee from "react-fast-marquee";
 import { useTranslation } from "../../../context/translation-context";
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+import styles from "./Partners.module.css";
 
 type Partner = {
   id: number;
@@ -12,14 +9,6 @@ type Partner = {
   logo?: string;
 };
 
-interface BackendCompany {
-  companyId: number;
-  name: string;
-  description?: string;
-  logoUrl?: string;
-}
-
-// Egyptian companies as featured partners
 const EGYPTIAN_PARTNERS: Partner[] = [
   { id: -1, name: "فودافون مصر", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Vodafone_icon.svg/239px-Vodafone_icon.svg.png" },
   { id: -2, name: "اتصالات مصر", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Etisalat_logo.svg/2560px-Etisalat_logo.svg.png" },
@@ -33,113 +22,63 @@ const EGYPTIAN_PARTNERS: Partner[] = [
 
 export default function Partners() {
   const { t } = useTranslation();
-  const [partners, setPartners] = useState<Partner[]>(EGYPTIAN_PARTNERS);
-  const [isLoading, setIsLoading] = useState(true);
+  const [partners] = useState<Partner[]>(EGYPTIAN_PARTNERS);
 
-  useEffect(() => {
-    const fetchPartners = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch(`${API_BASE_URL}/companies?limit=20`);
-        if (!response.ok) throw new Error("Failed to fetch partners");
-        const result = await response.json();
-        
-        const data: BackendCompany[] = Array.isArray(result) ? result : (result.data || []);
-
-        const mappedPartners = data.map((c) => ({
-          id: Number(c.companyId),
-          name: c.name,
-          logo: c.logoUrl 
-            ? (c.logoUrl.startsWith("http") ? c.logoUrl : `${API_BASE_URL}${c.logoUrl}`)
-            : undefined,
-        }));
-
-        // Combine DB results with Egyptian partners
-        const combined = [...mappedPartners, ...EGYPTIAN_PARTNERS.slice(0, Math.max(0, 10 - mappedPartners.length))];
-        setPartners(combined);
-
-      } catch (err) {
-        console.error("Error loading partners:", err);
-        setPartners(EGYPTIAN_PARTNERS);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPartners();
-  }, []);
-
+  // Company names are proper nouns — do NOT translate them
+  // This prevents animation clash when the translation service updates
   const ReviewCard = ({ logo, name }: { logo?: string; name: string }) => (
-    <figure className={`${styles.reviewCard} ${!logo ? styles.nameOnly : ""}`} title={t(name)}>
+    <figure className={`${styles.reviewCard} ${!logo ? styles.nameOnly : ""}`} title={name}>
       {logo ? (
-        <img src={logo} alt={t(name)} className={styles.partnerLogo} />
+        <img src={logo} alt={name} className={styles.partnerLogo} />
       ) : (
-        <span className={styles.partnerName}>{t(name)}</span>
+        <span className={styles.partnerName}>{name}</span>
       )}
     </figure>
   );
 
-  // We always duplicate for seamless infinite scroll
-  const row = [...partners, ...partners];
-
-  if (isLoading && partners.length === 0) {
-    return (
-      <div className={styles.testimonial}>
-        <div className={styles.loading}>{t("جاري تحميل الشركاء...")}</div>
-      </div>
-    );
-  }
-
   return (
-    <motion.div 
-      className={styles.testimonial}
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8 }}
-    >
-      <motion.h2
-        initial={{ opacity: 0, scale: 0.9 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
+    <div className={styles.testimonial}>
+      <h2>
         {t("نثق بهم ويثقون بنا")}
-      </motion.h2>
+      </h2>
 
-      <motion.div 
-        className={styles.marqueeContainer}
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-      >
+      <div className={styles.marqueeContainer}>
         {/* Row 1: scrolls left */}
-        <div className={styles.marquee}>
-          <div className={styles.marqueeInner}>
-            {row.map((partner, idx) => (
-              <ReviewCard
-                key={`row1-${partner.id}-${idx}`}
-                logo={partner.logo}
-                name={partner.name}
-              />
-            ))}
-          </div>
-        </div>
+        <Marquee
+          pauseOnHover={true}
+          speed={40}
+          gradient={false}
+          direction="left"
+          className={styles.marqueeBand}
+        >
+          {partners.map((partner, idx) => (
+            <ReviewCard
+              key={`row1-${partner.id}-${idx}`}
+              logo={partner.logo}
+              name={partner.name}
+            />
+          ))}
+        </Marquee>
 
         {/* Row 2: scrolls right (reverse) */}
-        <div className={`${styles.marquee} ${styles.marqueeReverse}`}>
-          <div className={`${styles.marqueeInner} ${styles.marqueeInnerReverse}`}>
-            {row.map((partner, idx) => (
-              <ReviewCard
-                key={`row2-${partner.id}-${idx}`}
-                logo={partner.logo}
-                name={partner.name}
-              />
-            ))}
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
+        <Marquee
+          pauseOnHover={true}
+          speed={40}
+          gradient={false}
+          direction="right"
+          className={styles.marqueeBand}
+        >
+          {/* Reversing the array slightly varies the second row if preferred, 
+              but using the same mapping is absolutely fine. */}
+          {partners.map((partner, idx) => (
+            <ReviewCard
+              key={`row2-${partner.id}-${idx}`}
+              logo={partner.logo}
+              name={partner.name}
+            />
+          ))}
+        </Marquee>
+      </div>
+    </div>
   );
 }

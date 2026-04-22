@@ -20,7 +20,7 @@
 .filter {
   margin-bottom: 24px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .filterHeader {
@@ -34,12 +34,12 @@
 .filterHeader h4 {
   font-size: 16px;
   font-weight: 700;
-  color: #05264e;
+  color: var(--color-text);
   margin: 0;
 }
 
 .chevron {
-  color: #05264e;
+  color: var(--color-text);
   font-size: 14px;
 }
 
@@ -47,7 +47,7 @@
   font-size: 16px;
   font-weight: 800;
   margin-bottom: 16px;
-  color: #05264e;
+  color: var(--color-text);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -63,13 +63,13 @@
   align-items: center;
   gap: 12px;
   font-size: 14px;
-  color: #515b6f;
+  color: var(--color-text-secondary);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .filter label:hover {
-  color: #3c65f5;
+  color: var(--color-primary);
 }
 
 .filter input[type="checkbox"] {
@@ -77,16 +77,16 @@
   width: 20px;
   height: 20px;
   border-radius: 4px;
-  border: 2px solid #d6ddeb;
-  background-color: #fff;
+  border: 2px solid var(--color-border);
+  background-color: var(--color-input-bg);
   cursor: pointer;
   position: relative;
   transition: all 0.2s;
 }
 
 .filter input[type="checkbox"]:checked {
-  background-color: #3c65f5;
-  border-color: #3c65f5;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .filter input[type="checkbox"]:checked::after {
@@ -100,7 +100,7 @@
 }
 
 .itemCount {
-  color: #a0abb8;
+  color: var(--color-text-muted);
   margin-left: 2px;
 }
 
@@ -131,13 +131,13 @@
 .jobsHeader h2 {
   font-size: 32px;
   font-weight: 800;
-  color: #05264e;
+  color: var(--color-text);
   margin: 0 0 8px 0;
 }
 
 .jobsHeader p {
   font-size: 14px;
-  color: #515b6f;
+  color: var(--color-text-secondary);
   margin: 0;
 }
 
@@ -152,16 +152,16 @@
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  color: #515b6f;
+  color: var(--color-text-secondary);
 }
 
 .sort select {
   padding: 10px 16px;
   border-radius: 10px;
-  border: 1px solid #e8eaf0;
-  background-color: transparent;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-input-bg);
   font-weight: 600;
-  color: #05264e;
+  color: var(--color-text);
   cursor: pointer;
   outline: none;
 }
@@ -178,29 +178,29 @@
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  border: 1px solid #e8eaf0;
-  background: white;
-  color: #a0abb8;
+  border: 1px solid var(--color-border);
+  background: var(--color-card-bg);
+  color: var(--color-text-muted);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .toggleBtn.active {
-  background: #3c65f5;
+  background: var(--color-primary);
   color: white;
-  border-color: #3c65f5;
+  border-color: var(--color-primary);
 }
 
 /* Job Row Card */
 .jobRow {
   display: flex;
   padding: 32px;
-  border: 1px solid #eef2ff;
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   margin-bottom: 24px;
   justify-content: space-between;
 
-  background: #ffffff;
+  background: var(--color-card-bg);
   transition: all 0.3s ease;
   cursor: pointer;
   align-items: center;
@@ -208,7 +208,7 @@
 
 .jobRow:hover {
   transform: translateY(-2px);
-  border-color: #3c65f5;
+  border-color: var(--color-primary);
   box-shadow: 0 10px 30px rgba(60, 101, 245, 0.08);
 }
 
@@ -221,7 +221,7 @@
 .logoPlaceholder {
   width: 60px;
   height: 60px;
-  background: #f8faff;
+  background: var(--color-bg-secondary);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -241,17 +241,208 @@
   flex: 1;
 }
 
-.jobInfo h3 {
-  font-size: 20px;
-  font-weight: 700;
-  color: #05264e;
-  margin: 0 0 8px 0;
-}
-
 .jobInfo p {
   font-size: 14px;
-  color: #515b6f;
+  color: var(--color-text-secondary);
   margin: 0 0 16px 0;
+}
+
+/* Premium Job Row Redesign - Match Reference Image */
+.jobRowContent {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.jobRowLeft {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.jobLogoContainer {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+}
+
+.jobLogoContainer img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.jobInfoColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.jobRowMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+}
+
+.companyNameText {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.metaCircle {
+  color: #94a3b8;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.locationNameText {
+  color: #94a3b8;
+}
+
+.jobRowTags {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.typePill {
+  background: rgba(86, 205, 173, 0.1);
+  color: #56cdad;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.verticalDivider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 0 4px;
+}
+
+.catPillPrimary {
+  border: 1.5px solid #ffb836;
+  color: #ffb836;
+  padding: 5px 14px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.catPillSecondary {
+  border: 1.5px solid #4640de;
+  color: #4640de;
+  padding: 5px 14px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.jobRowRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  min-width: 180px;
+}
+
+.premiumApplyBtn {
+  width: 100%;
+  background: linear-gradient(90deg, #4640de 0%, #6366f1 100%);
+  color: #ffffff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 100px;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(70, 64, 222, 0.3);
+}
+
+.premiumApplyBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(70, 64, 222, 0.4);
+  filter: brightness(1.1);
+}
+
+.capacityWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.capacityBar {
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.capacityFill {
+  height: 100%;
+  background: #56cdad;
+  border-radius: 100px;
+  transition: width 0.5s ease;
+}
+
+.capacityLabel {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* Tradesman Specific Styles */
+.tradesmanAvatarCircle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tradesmanAvatarCircle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tradesmanJobTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffb836; /* Orange color from reference */
+  margin: 0 0 4px 0;
+}
+
+.jobRatingMiddle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.starIconSmall {
+  color: #ffb836;
+  font-size: 20px;
+}
+
+.ratingValueText {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 16px;
 }
 
 /* Tags */
@@ -313,7 +504,7 @@
 }
 
 .applyBtn {
-  background-color: #3c65f5;
+  background-color: var(--color-primary);
   color: #ffffff;
   border: none;
   padding: 12px 0;
@@ -326,7 +517,7 @@
 }
 
 .applyBtn:hover {
-  background-color: #3359d9;
+  background-color: var(--color-primary-hover);
 }
 
 .statusContainer {
@@ -339,15 +530,15 @@
 
 .appliedBadge {
   font-size: 14px;
-  color: #515b6f;
-  background-color: #f8faff;
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-secondary);
   padding: 6px 12px;
   border-radius: 6px;
   display: inline-block;
 }
 
 .appliedBadge strong {
-  color: #05264e;
+  color: var(--color-text);
   font-weight: 700;
   margin-right: 4px;
 }
@@ -385,7 +576,7 @@
 .loading {
   text-align: center;
   padding: 40px;
-  color: #515b6f;
+  color: var(--color-text-secondary);
   font-size: 16px;
   font-weight: 500;
 }
@@ -405,7 +596,7 @@
   border-radius: 8px;
   border: 1px solid transparent;
   background: transparent;
-  color: #515b6f;
+  color: var(--color-text-secondary);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -415,17 +606,17 @@
 }
 
 .pageBtn:hover:not(:disabled) {
-  background: #f8faff;
-  color: #3c65f5;
+  background: var(--color-bg-secondary);
+  color: var(--color-primary);
 }
 
 .pageBtn.active {
-  background-color: #3c65f5;
+  background-color: var(--color-primary);
   color: #ffffff;
 }
 
 .navBtn {
-  color: #515b6f;
+  color: var(--color-text-secondary);
   background: transparent;
   border: none;
   cursor: pointer;
@@ -437,14 +628,14 @@
 }
 
 .navBtn:disabled {
-  color: #d6ddeb;
+  color: var(--color-border);
   cursor: not-allowed;
 }
 
 /* Job Card Grid View */
 .jobCard {
-  background: #ffffff;
-  border: 1px solid #eef2ff;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 24px;
   display: flex;
@@ -456,7 +647,7 @@
 
 .jobCard:hover {
   transform: translateY(-5px);
-  border-color: #3c65f5;
+  border-color: var(--color-primary);
   box-shadow: 0 15px 35px rgba(60, 101, 245, 0.1);
 }
 
@@ -470,7 +661,7 @@
 .cardLogo {
   width: 56px;
   height: 56px;
-  background: #f8faff;
+  background: var(--color-bg-secondary);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -486,8 +677,8 @@
 }
 
 .jobBadge {
-  background: #f4f7ff;
-  color: #3c65f5;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
   padding: 6px 14px;
   border-radius: 6px;
   font-size: 13px;
@@ -503,14 +694,14 @@
 .cardBody h3 {
   font-size: 18px;
   font-weight: 800;
-  color: #05264e;
+  color: var(--color-text);
   margin: 0 0 12px 0;
   line-height: 1.4;
 }
 
 .cardBody p {
   font-size: 14px;
-  color: #515b6f;
+  color: var(--color-text-secondary);
   line-height: 1.6;
   margin: 0 0 20px 0;
   display: -webkit-box;
@@ -544,7 +735,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px dashed #eef2ff;
+  border-top: 1px dashed var(--color-border);
   padding-top: 16px;
 }
 
@@ -553,7 +744,7 @@
 }
 
 .applyBtnGrid {
-  background-color: #3c65f5;
+  background-color: var(--color-primary);
   color: #ffffff;
   border: none;
   padding: 10px 24px;
@@ -565,7 +756,7 @@
 }
 
 .applyBtnGrid:hover {
-  background-color: #3359d9;
+  background-color: var(--color-primary-hover);
 }
 
 /* Responsive */

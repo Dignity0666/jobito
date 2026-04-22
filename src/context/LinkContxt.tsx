@@ -30,7 +30,7 @@ export type AuthUser = {
   avatar?: string;
   avatarUrl?: string;
   phone?: string;
-  role?: "student" | "company";
+  role?: "user" | "company";
   companyId?: string | number;
   companyName?: string;
   location?: string;
@@ -50,17 +50,20 @@ export type AuthUser = {
   dob?: string;
   gender?: string;
   languages?: string[];
+  classification?: string;
   banner_url?: string;
+  deletionRequestedAt?: string;
 };
 
 export type AuthContextType = {
   user: AuthUser | null;
-  role: "student" | "company" | null;
+  role: "user" | "company" | null;
   isAuthenticated: boolean;
   login: (token: string) => void;
   logout: () => void;
   googleClientId: string;
   apiFetch: (url: string, options?: RequestInit) => Promise<Response>;
+  updateUser: (newData: Partial<AuthUser>) => void;
   isBackendOffline: boolean;
   isInitialLoading: boolean;
 };
@@ -74,7 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [role, setRole] = useState<"student" | "company" | null>(null);
+  const [role, setRole] = useState<"user" | "company" | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [googleClientId, setGoogleClientId] = useState<string>("");
   const [isBackendOffline, setIsBackendOffline] = useState(false);
@@ -126,7 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     checkHealth(); // Immediate check
-    const interval = setInterval(checkHealth, 5000);
+    const interval = setInterval(checkHealth, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -170,7 +173,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     email: string;
     avatar: string;
     phone: string;
-    role?: "student" | "company";
+    role?: "user" | "company";
     companyId?: string | number;
     company_id?: string | number;
     companyName?: string;
@@ -193,7 +196,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     languages?: string[];
     dob?: string;
     gender?: string;
+    classification?: string;
     banner?: string;
+    deletionRequestedAt?: string;
   }) => {
     setUser({
       id: decoded.sub,
@@ -217,10 +222,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       languages: decoded.languages,
       dob: decoded.dob,
       gender: decoded.gender,
+      classification: decoded.classification,
       banner_url: decoded.banner,
+      deletionRequestedAt: decoded.deletionRequestedAt,
     });
-    setRole(decoded.role || "student");
+    const finalRole = decoded.role === "student" ? "user" : (decoded.role || "user");
+    setRole(finalRole as "user" | "company");
     setIsAuthenticated(true);
+  }, []);
+
+  const updateUser = useCallback((newData: Partial<AuthUser>) => {
+    setUser((prev) => (prev ? { ...prev, ...newData } : null));
   }, []);
 
   const logout = useCallback(() => {
@@ -272,7 +284,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           email: string;
           avatar: string;
           phone: string;
-          role?: "student" | "company";
+          role?: "user" | "company";
         };
 
         // Check if token is expired
@@ -311,10 +323,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [logout, applyToken, refreshToken]);
 
-  useEffect(() => {
-    checkAuth();
+  // Keep a ref to checkAuth so the event listener effect doesn't re-run
+  const checkAuthRef = useRef(checkAuth);
+  checkAuthRef.current = checkAuth;
 
-    const handleAuthChange = () => checkAuth();
+  useEffect(() => {
+    checkAuthRef.current();
+
+    const handleAuthChange = () => checkAuthRef.current();
     window.addEventListener("auth-changed", handleAuthChange);
     window.addEventListener("storage", handleAuthChange);
 
@@ -322,7 +338,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       window.removeEventListener("auth-changed", handleAuthChange);
       window.removeEventListener("storage", handleAuthChange);
     };
-  }, [checkAuth]);
+  }, []); // Empty deps — runs once, uses ref for latest checkAuth
 
   const login = useCallback((token: string) => {
     localStorage.setItem("token", token);
@@ -366,8 +382,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           }
         }
 
-        if (response.status === 401 || response.status === 403) {
-          console.warn("🔐 Auth failed (401/403). Logging out...");
+        if (response.status === 401) {
+          console.warn("🔐 Auth failed (401). Logging out...");
           logout();
         }
 
@@ -390,6 +406,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         logout,
         googleClientId,
         apiFetch,
+        updateUser,
         isBackendOffline,
         isInitialLoading,
       }}

@@ -18,8 +18,10 @@
 .nav {
   display: flex;
   align-items: stretch;
+  justify-content: flex-end; /* Push items left in RTL / right in LTR */
   flex: 1;
-  margin-left: 8px;
+  gap: 15px;
+  margin: 0 20px;
 }
 
 @media (max-width: 768px) {

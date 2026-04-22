@@ -25,6 +25,7 @@
   --color-input-bg: #ffffff;
   --color-input-focus-shadow: rgba(74, 110, 209, 0.15);
   --gradient-primary: linear-gradient(135deg, #4A6ED1, #FF7A2A);
+  --navy: #0B1020;
   --shadow-sm: 0 1px 12px rgba(0, 0, 0, 0.06);
   --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.05);
   --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
@@ -53,9 +54,10 @@
   --color-border-light: #1a2338;
   --color-card-bg: #141B2D;
   --color-card-hover: #1a2540;
-  --color-input-bg: #141B2D;
+  --color-input-bg: #090e1a; /* Darker input background */
   --color-input-focus-shadow: rgba(107, 140, 224, 0.2);
   --gradient-primary: linear-gradient(135deg, #6B8CE0, #FF9A55);
+  --navy: #8AA3E8;
   --shadow-sm: 0 1px 12px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.25);
   --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
@@ -124,6 +126,52 @@ input {
   outline: none;
   border: none;
   font-family: inherit;
+}
+
+input,
+select,
+textarea {
+  background-color: var(--color-input-bg);
+  color: var(--color-text);
+  font-family: inherit;
+  border: 1px solid var(--color-border);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="url"],
+input[type="number"] {
+  background-color: var(--color-input-bg);
+  color: var(--color-text);
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background-color: var(--color-input-bg) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Autofill fixes for Dark Mode */
+[data-theme="dark"] input:-webkit-autofill,
+[data-theme="dark"] input:-webkit-autofill:hover, 
+[data-theme="dark"] input:-webkit-autofill:focus, 
+[data-theme="dark"] input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--color-input-bg) inset !important;
+  -webkit-text-fill-color: var(--color-text) !important;
+}
+
+/* For inputs that should be transparent (like search bars) */
+input.transparent,
+.transparent input,
+.transparent select {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  background-image: none !important;
 }
 
 input:focus,

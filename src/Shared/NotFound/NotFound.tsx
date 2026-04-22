@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import illustration from "../../assets/404_illustration_premium_1775420271131.png";
+import "./NotFound.css";
 import { useTranslation } from "../../context/translation-context";
 
 const NotFound: React.FC = () => {
@@ -15,20 +15,21 @@ const NotFound: React.FC = () => {
         alignItems: "center",
         justifyContent: "center",
         minHeight: "100vh",
-        backgroundColor: "#ffffff",
+        backgroundColor: "var(--color-bg)",
         padding: "20px",
         fontFamily: '"Inter", "Roboto", -apple-system, sans-serif',
         textAlign: "center",
       }}
     >
-      {/* 404 Illustration */}
-        <div style={{ maxWidth: '400px', marginBottom: '40px' }}>
-                 <img 
-                    src={illustration} 
-                    alt="404 Error" 
-                    style={{ width: '100%', height: 'auto' }} 
-                />
-            </div>
+      {/* 404 Visual CSS */}
+      <div className="notfound-visual-container" style={{ marginBottom: '40px' }}>
+        <div className="notfound-visual">
+          <span className="notfound-digit digit-1">4</span>
+          <span className="notfound-digit digit-2">0</span>
+          <span className="notfound-digit digit-3">4</span>
+        </div>
+        <div className="notfound-glitch-line"></div>
+      </div>
 
       {/* Main Header */}
       <h1
@@ -36,7 +37,7 @@ const NotFound: React.FC = () => {
           fontSize: "4.5rem",
           fontWeight: "800",
           margin: "0 0 10px 0",
-          color: "#1a1a1a",
+          color: "var(--color-text)",
           letterSpacing: "-1px",
         }}
       >
@@ -49,7 +50,7 @@ const NotFound: React.FC = () => {
           fontSize: "1.8rem",
           fontWeight: "700",
           margin: "0 0 15px 0",
-          color: "#2d2d2d",
+          color: "var(--color-text-secondary)",
         }}
       >
         {t("Looks like you're in the wrong place.")}
@@ -59,7 +60,7 @@ const NotFound: React.FC = () => {
       <p
         style={{
           fontSize: "1rem",
-          color: "#888888",
+          color: "var(--color-text-muted)",
           marginBottom: "40px",
           fontWeight: "500",
         }}
@@ -67,28 +68,38 @@ const NotFound: React.FC = () => {
         {t("We can't find the page you're looking for...")}
       </p>
 
-      {/* Action Link */}
-      <div
+      {/* Action Button */}
+      <button
         onClick={() => navigate("/")}
         style={{
           cursor: "pointer",
-          display: "flex",
+          display: "inline-flex",
           alignItems: "center",
+          justifyContent: "center",
           gap: "10px",
-          fontSize: "1.1rem",
+          fontSize: "1rem",
           fontWeight: "700",
-          color: "#000000",
-          textDecoration: "none",
-          paddingBottom: "8px",
-          borderBottom: "2px solid #000000",
-          transition: "opacity 0.2s ease",
+          color: "#fff",
+          backgroundColor: "var(--color-primary)",
+          border: "none",
+          padding: "14px 32px",
+          borderRadius: "50px",
+          transition: "all 0.3s ease",
+          boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
         }}
-        onMouseOver={(e) => (e.currentTarget.style.opacity = "0.7")}
-        onMouseOut={(e) => (e.currentTarget.style.opacity = "1")}
+        onMouseOver={(e) => {
+          e.currentTarget.style.transform = "translateY(-3px)";
+          e.currentTarget.style.boxShadow = "0 8px 25px rgba(0, 0, 0, 0.15)";
+          e.currentTarget.style.backgroundColor = "var(--color-primary-hover)";
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow = "0 4px 15px rgba(0, 0, 0, 0.1)";
+          e.currentTarget.style.backgroundColor = "var(--color-primary)";
+        }}
       >
-        <span style={{ fontSize: "1.4rem" }}>&rarr;</span>
         <span>{t("Take me home")}</span>
-      </div>
+      </button>
     </div>
   );
 };

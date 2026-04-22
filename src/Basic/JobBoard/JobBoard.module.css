@@ -50,6 +50,8 @@
   box-shadow: var(--shadow-md);
   max-width: 850px;
   border: 1px solid var(--color-border-light);
+  background-color: var(--color-input-bg);
+  border-radius: 12px;
 }
 
 .inputGroup {
@@ -64,20 +66,42 @@
   margin-right: 10px;
 }
 
-.inputGroup input,
-.inputGroup select {
-  border: none;
-  outline: none;
+.inputGroup input {
+  border: none !important;
+  outline: none !important;
   width: 100%;
   font-size: 16px;
-  color: var(--color-text-secondary);
+  color: var(--color-text) !important;
+  background-color: var(--color-input-bg) !important;
   padding: 10px 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.inputGroup select {
+  border: none !important;
+  outline: none !important;
+  width: 100%;
+  font-size: 16px;
+  color: var(--color-text) !important;
+  background-color: var(--color-input-bg) !important;
+  padding: 10px 0;
+  appearance: none;
+}
+
+.inputGroup input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.inputGroup select option {
+  background-color: var(--color-card-bg);
+  color: var(--color-text);
 }
 
 .divider {
   width: 1px;
   height: 40px;
-  background-color: #e9ebf0;
+  background-color: var(--color-border);
 }
 
 .searchBtn {
@@ -97,7 +121,7 @@
 
 .popular {
   margin-top: 20px;
-  color: #7c8493;
+  color: var(--color-text-muted);
   font-size: 14px;
 }
 
@@ -118,7 +142,7 @@
 }
 
 .leadText {
-  color: #7c8493;
+  color: var(--color-text-muted);
   font-size: 16px;
   margin-bottom: 30px;
   font-family: "Inter", sans-serif;

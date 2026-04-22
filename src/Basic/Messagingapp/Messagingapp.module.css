@@ -5,7 +5,7 @@
   background: var(--color-card-bg);
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 8px 48px rgba(59, 91, 219, 0.12);
+  box-shadow: var(--shadow-lg);
   border: 1px solid var(--color-border);
   animation: appear 0.4s ease;
   font-family: "Sora", sans-serif;
@@ -49,7 +49,7 @@
 }
 
 .searchBox:focus-within {
-  border-color: #3b5bdb;
+  border-color: var(--color-primary);
 }
 
 .searchBox input {
@@ -242,7 +242,7 @@
 
 .iconBtn:hover {
   background: var(--color-bg-secondary);
-  color: #3b5bdb;
+  color: var(--color-primary);
 }
 .starred {
   color: #fab005;
@@ -294,7 +294,7 @@
   color: var(--color-text-muted);
 }
 .introRole span {
-  color: #3b5bdb;
+  color: var(--color-primary);
   font-weight: 600;
 }
 .introDesc {
@@ -380,8 +380,8 @@
 }
 
 .outgoingBubble {
-  background: #3b5bdb;
-  color: var(--color-card-bg);
+  background: var(--color-primary);
+  color: white;
   border-bottom-right-radius: 6px;
 }
 
@@ -422,7 +422,7 @@
 
 .attachBtn:hover {
   background: var(--color-bg-secondary);
-  color: #3b5bdb;
+  color: var(--color-primary);
 }
 
 .msgInput {
@@ -456,26 +456,26 @@
   transform: scale(1.2);
 }
 
+.sendBtn:hover {
+  background: var(--color-primary-hover);
+}
+
 .sendBtn {
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: #3b5bdb;
+  background: var(--color-primary);
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-card-bg);
+  color: white;
   font-size: 17px;
   transition:
     background 0.15s,
     transform 0.1s;
   flex-shrink: 0;
-}
-
-.sendBtn:hover {
-  background: #2f4ac7;
 }
 
 .sendBtn:disabled {

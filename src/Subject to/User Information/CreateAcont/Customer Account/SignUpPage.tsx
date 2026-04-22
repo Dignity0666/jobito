@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
 import signupImage from "../../../../assets/signup.png";
 import { useTranslation } from "../../../../context/translation-context";
+import { useToast } from "../../../../context/ToastContext";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
@@ -22,6 +23,7 @@ const API_BASE_URL =
 export const SignUpPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [isSigningUp, setIsSigningUp] = useState(false);
   const [success, setSuccess] = useState(false);
   const [formError, setFormError] = useState("");
@@ -66,10 +68,10 @@ export const SignUpPage: React.FC = () => {
         window.dispatchEvent(new Event("auth-changed"));
         navigate("/");
       } catch (err: unknown) {
-        alert(err instanceof Error ? t(err.message) : t("Something went wrong"));
+        showToast(err instanceof Error ? t(err.message) : t("Something went wrong"), "error");
       }
     },
-    onError: () => alert(t("Google login failed")),
+    onError: () => showToast(t("Google login failed"), "error"),
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -116,6 +118,7 @@ export const SignUpPage: React.FC = () => {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Verification failed");
+      localStorage.setItem("isNewUser", "true");
       setVerifiedStatus("success");
       setSuccess(false);
     } catch (err: any) {
@@ -151,7 +154,7 @@ export const SignUpPage: React.FC = () => {
               </p>
               <button
                 className={Style.authbtn}
-                onClick={() => navigate("/user-information")}
+                onClick={() => navigate("/user-information", { state: { showLogin: true } })}
               >
                 {t("الذهاب لتسجيل الدخول")}
               </button>

@@ -6,6 +6,7 @@ import React, {
 } from "react";
 import { useTranslation } from "../../../context/translation-context";
 import { useJobitoAuth } from "../../../context/LinkContxt";
+import { useToast } from "../../../context/ToastContext";
 import styles from "./ApplyJobModal.module.css";
 
 class ErrorBoundary extends Component<
@@ -73,6 +74,7 @@ interface ApplyJobModalProps {
   jobType?: string;
   isActive?: boolean;
   logoUrl?: string;
+  isTradesman?: boolean;
 }
 
 interface ApplicationStatus {
@@ -91,16 +93,20 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
   jobType,
   isActive = true,
   logoUrl,
+  isTradesman = false,
 }) => {
   const { t } = useTranslation();
   const { apiFetch, user } = useJobitoAuth();
+  const { showToast } = useToast();
 
   const displayJobTitle = jobTitle || t("وظيفة");
   const displayCompanyName = companyName || t("شركة");
-  const displayLocation = location || t("عن بعد");
+  const displayLocation = location || t("الموقع");
   const displayJobType = jobType || t("دوام كامل");
+  
   const [portfolioUrl, setPortfolioUrl] = useState("");
   const [additionalInfo, setAdditionalInfo] = useState("");
+  const [address, setAddress] = useState("");
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fileError, setFileError] = useState<string | null>(null);
@@ -168,7 +174,12 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
   const handleSubmit = async () => {
     if (!jobId) return;
 
-    // Validation
+    // Validation for Tradesman
+    if (isTradesman && !address.trim()) {
+      setFormError(t("يرجى إدخال العنوان"));
+      return;
+    }
+
     setFormError(null);
 
     try {
@@ -205,15 +216,17 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
           job_id: typeof jobId === "string" ? parseInt(jobId) : jobId,
           portfolioUrl: portfolioUrl.trim(),
           coverLetter: additionalInfo.trim(),
+          address: isTradesman ? address.trim() : "",
           resumeUrl: finalResumeUrl,
         }),
       });
 
       if (res.ok) {
-        alert(t("تم تقديم طلبك بنجاح! 🎉"));
+        showToast(t("تم تقديم طلبك بنجاح! 🎉"), "success");
         // Reset form
         setPortfolioUrl("");
         setAdditionalInfo("");
+        setAddress("");
         setResumeFile(null);
         setFormError(null);
         onClose();
@@ -228,7 +241,7 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
     } catch (error: any) {
       console.error("Error submitting application:", error);
       setFormError(
-        error?.message || "حدث خطأ في الاتصال بالخادم. يرجى المحاولة لاحقاً.",
+        error?.message || t("حدث خطأ في الاتصال بالخادم. يرجى المحاولة لاحقاً."),
       );
     } finally {
       setIsSubmitting(false);
@@ -417,126 +430,158 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
             )}
 
             <form className={styles.applyForm}>
-              <div className={styles.formGroup}>
-                <label>{t("رابط الملف الشخصي (Portfolio)")}</label>
-                <input
-                  type="text"
-                  placeholder={t("أدخل رابط ملفك الشخصي...")}
-                  value={portfolioUrl}
-                  onChange={(e) => setPortfolioUrl(e.target.value)}
-                />
-              </div>
+              {isTradesman ? (
+                /* --- TRADESMAN SPECIAL FORM --- */
+                <>
+                  <div className={styles.formGroup}>
+                    <label>{t("العنوان")}</label>
+                    <input
+                      type="text"
+                      placeholder={t("أدخل عنوانك...")}
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label>{t("وصف المشكلة")}</label>
+                    <textarea
+                      className={styles.roundedTextarea}
+                      placeholder={t("صف المشكلة التي تواجهها باختصار...")}
+                      value={additionalInfo}
+                      onChange={(e) => setAdditionalInfo(e.target.value)}
+                    />
+                  </div>
+                </>
+              ) : (
+                /* --- CORPORATE FORM --- */
+                <>
+                  <div className={styles.formGroup}>
+                    <label>{t("رابط الملف الشخصي (Portfolio)")}</label>
+                    <input
+                      type="text"
+                      placeholder={t("أدخل رابط ملفك الشخصي...")}
+                      value={portfolioUrl}
+                      onChange={(e) => setPortfolioUrl(e.target.value)}
+                    />
+                  </div>
 
-              <hr className={styles.divider} />
+                  <hr className={styles.divider} />
 
-              <div className={styles.formGroup}>
-                <label>{t("معلومات إضافية")}</label>
-                <div className={styles.textareaWrapper}>
-                  <textarea
-                    placeholder={t("أضف خطاب تقديم أو أي معلومات إضافية تريد مشاركتها...")}
-                    value={additionalInfo}
-                    onChange={(e) => setAdditionalInfo(e.target.value)}
-                    maxLength={500}
-                  />
-                  <div className={styles.formattingToolbar}>
-                    <div className={styles.toolbarIcons}>
-                      <button type="button" className={styles.iconBtn}>
-                        <i className="fa-regular fa-face-smile"></i>
-                      </button>
-                      <button type="button" className={styles.iconBtn}>
-                        <span style={{ fontWeight: 800 }}>B</span>
-                      </button>
-                      <button type="button" className={styles.iconBtn}>
-                        <span
-                          style={{
-                            fontStyle: "italic",
-                            fontFamily: "serif",
-                            fontWeight: 600,
-                          }}
-                        >
-                          I
-                        </span>
-                      </button>
-                      <button type="button" className={styles.iconBtn}>
-                        <i className="fa-solid fa-list-ol"></i>
-                      </button>
-                      <button type="button" className={styles.iconBtn}>
-                        <i className="fa-solid fa-list-ul"></i>
-                      </button>
-                      <button type="button" className={styles.iconBtn}>
-                        <i className="fa-solid fa-link"></i>
-                      </button>
+                  <div className={styles.formGroup}>
+                    <label>{t("معلومات إضافية")}</label>
+                    <div className={styles.textareaWrapper}>
+                      <textarea
+                        placeholder={t("أضف خطاب تقديم أو أي معلومات إضافية تريد مشاركتها...")}
+                        value={additionalInfo}
+                        onChange={(e) => setAdditionalInfo(e.target.value)}
+                        maxLength={500}
+                      />
+                      <div className={styles.formattingToolbar}>
+                        <div className={styles.toolbarIcons}>
+                          <button type="button" className={styles.iconBtn}>
+                            <i className="fa-regular fa-face-smile"></i>
+                          </button>
+                          <button type="button" className={styles.iconBtn}>
+                            <span style={{ fontWeight: 800 }}>B</span>
+                          </button>
+                          <button type="button" className={styles.iconBtn}>
+                            <span
+                              style={{
+                                fontStyle: "italic",
+                                fontFamily: "serif",
+                                fontWeight: 600,
+                              }}
+                            >
+                              I
+                            </span>
+                          </button>
+                          <button type="button" className={styles.iconBtn}>
+                            <i className="fa-solid fa-list-ol"></i>
+                          </button>
+                          <button type="button" className={styles.iconBtn}>
+                            <i className="fa-solid fa-list-ul"></i>
+                          </button>
+                          <button type="button" className={styles.iconBtn}>
+                            <i className="fa-solid fa-link"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className={styles.textareaFooter}>
+                      <span>{t("الحد الأقصى 500 حرف")}</span>
+                      <span>{additionalInfo.length} / 500</span>
                     </div>
                   </div>
-                </div>
-                <div className={styles.textareaFooter}>
-                  <span>{t("الحد الأقصى 500 حرف")}</span>
-                  <span>{additionalInfo.length} / 500</span>
-                </div>
-              </div>
 
-              <div className={styles.formGroupResume}>
-                <div className={styles.resumeTop}>
-                  <span className={styles.resumeLabel}>
-                    {t("إرفاق السيرة الذاتية")}{" "}
-                    <span className={styles.optionalText}>
-                      ({t("اختياري")})
-                    </span>
-                  </span>
-                  <div className={styles.uploadBox}>
-                    <input
-                      type="file"
-                      id="resumeUpload"
-                      accept=".pdf,.doc,.docx"
-                      style={{ display: "none" }}
-                      onChange={handleFileChange}
-                    />
-                    <label htmlFor="resumeUpload" className={styles.uploadButton}>
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        style={{ marginLeft: "8px" }}
-                      >
-                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
-                      </svg>
-                      {resumeFile ? resumeFile.name : t("اختيار ملف")}
-                    </label>
+                  <div className={styles.formGroupResume}>
+                    <div className={styles.resumeTop}>
+                      <span className={styles.resumeLabel}>
+                        {t("إرفاق السيرة الذاتية")}{" "}
+                        <span className={styles.optionalText}>
+                          ({t("اختياري")})
+                        </span>
+                      </span>
+                      <div className={styles.uploadBox}>
+                        <input
+                          type="file"
+                          id="resumeUpload"
+                          accept=".pdf,.doc,.docx"
+                          style={{ display: "none" }}
+                          onChange={handleFileChange}
+                        />
+                        <label htmlFor="resumeUpload" className={styles.uploadButton}>
+                          <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{ marginLeft: "8px" }}
+                          >
+                            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                          </svg>
+                          {resumeFile ? resumeFile.name : t("اختيار ملف")}
+                        </label>
+                      </div>
+                    </div>
+                    <div className={styles.resumeHelpBox}>
+                      <i className="fa-solid fa-circle-info" style={{ color: "var(--color-primary)", fontSize: "14px", flexShrink: 0, marginTop: "2px" }}></i>
+                      <div className={styles.uploadHelpText}>
+                        <p style={{ margin: "0 0 4px 0", color: "var(--color-text)", fontWeight: 600 }}>
+                          {t("PDF أو Word — الحد الأقصى")} {MAX_FILE_SIZE_MB} {t("ميجابايت")}.
+                        </p>
+                        <p style={{ margin: 0, color: "var(--color-text-muted)" }}>
+                          {t("إرفاق سيرتك الذاتية اختياري، لكنه يزيد من فرص قبولك للاستفسار.")}
+                        </p>
+                      </div>
+                    </div>
+                    {fileError && (
+                        <p className={styles.fileValidationError}>
+                          ⚠️ {fileError}
+                        </p>
+                    )}
                   </div>
-                </div>
-                <div className={styles.resumeHelpBox}>
-                  <i className="fa-solid fa-circle-info" style={{ color: "var(--color-primary)", fontSize: "14px", flexShrink: 0, marginTop: "2px" }}></i>
-                  <div className={styles.uploadHelpText}>
-                    <p style={{ margin: "0 0 4px 0", color: "var(--color-text)", fontWeight: 600 }}>
-                      {t("PDF أو Word — الحد الأقصى")} {MAX_FILE_SIZE_MB} {t("ميجابايت")}.
-                    </p>
-                    <p style={{ margin: 0, color: "var(--color-text-muted)" }}>
-                      {t("إرفاق سيرتك الذاتية اختياري، لكنه يزيد من فرص قبولك للاستفسار.")}
-                    </p>
-                  </div>
-                </div>
-                {fileError && (
-                    <p className={styles.fileValidationError}>
-                      ⚠️ {fileError}
-                    </p>
-                )}
-              </div>
+                </>
+              )}
 
               <hr className={styles.divider} />
 
               <div className={styles.submitSection}>
+                {user?.deletionRequestedAt && (
+                   <p style={{ color: "#ff4d4f", fontSize: "14px", marginTop: "8px", textAlign: "center", fontWeight: 600 }}>
+                     {t("لا يمكنك التقديم على وظائف لأن حسابك مجدول للحذف.")}
+                   </p>
+                )}
                 <button
                   type="button"
-                  className={(styles as any).submitButton}
+                  className={isTradesman ? styles.pillSubmitButton : (styles as any).submitButton}
                   onClick={handleSubmit}
-                   disabled={isSubmitting}
+                  disabled={isSubmitting || !!user?.deletionRequestedAt}
                 >
-                  {isSubmitting ? t("جاري التقديم...") : t("إرسال الطلب")}
+                  {isSubmitting ? t("جاري التقديم...") : (isTradesman ? t("تقديم الطلب") : t("إرسال الطلب"))}
                 </button>
                 <p className={styles.termsText}>
                   {t("بإرسال الطلب فإنك توافق على")} <a href="#">{t("شروط الخدمة")}</a> {t("و")}{" "}

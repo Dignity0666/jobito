@@ -180,29 +180,21 @@ export default function ProfilePage() {
     fetchProfile();
   }, [apiFetch]);
 
-  const handleAccountTypeChange = async (newType: string) => {
-    try {
-      const role = newType === "employer" ? "company" : "user";
-      const response = await apiFetch(`${API_BASE_URL}/users/me`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role }),
-      });
-      if (response.ok) {
-        const updatedUser = await response.json();
-        setProfile(updatedUser);
-      }
-    } catch (error) {
-      console.error("Failed to update account type", error);
-    }
-  };
 
   const profileUser = profile || user;
+  
+  // Sync classification from context to profile state if context user changes
+  useEffect(() => {
+    if (user?.classification && profile && profile.classification !== user.classification) {
+      setProfile(prev => prev ? { ...prev, classification: user.classification } : null);
+    }
+  }, [user?.classification, profile]);
 
   const experiences = (profileUser?.experiences || []) as Experience[];
   const educations = (profileUser?.educations || []) as Education[];
   const skills = profileUser?.skills || [];
   const portfolios = (profileUser?.portfolios || []) as string[];
+  const services = profileUser?.services || [];
   const socialLinks = profileUser?.socialLinks || {
     instagram: "",
     twitter: "",
@@ -243,7 +235,11 @@ export default function ProfilePage() {
             <div className={styles.heroInfo}>
               <div className={styles.heroName}>{displayName}</div>
               <div className={styles.heroRole}>
-                {profileUser?.role === "company" ? t("حساب شركة") : t("باحث عن عمل")}
+                {profileUser?.role === "company"
+                  ? t("حساب شركة")
+                  : profileUser?.classification === "tradesman"
+                  ? t("صنايعي")
+                  : t("باحث عن عمل")}
               </div>
               <div className={styles.heroLoc}>
                 <svg
@@ -323,26 +319,26 @@ export default function ProfilePage() {
               ))}
           </div>
         </div>
-
         {/* Education */}
         <div className={styles.card}>
           <div className={styles.cardBody}>
             <div className={styles.cardHeader}>
               <span className={styles.cardTitle}>{t("التعليم")}</span>
             </div>
-             {educations
+            {educations
               .slice(0, showMoreEdu ? undefined : 4)
               .map((edu, idx) => (
-                <div className={styles.eduItem} key={idx}>
-                  <div className={styles.eduLogo}>
+                <div className={styles.expItem} key={idx}>
+                  <div className={styles.expLogo}>
                     <GraduationIcon />
                   </div>
-                  <div style={{ flex: 1 }}>
+                  <div className={styles.expContent}>
                     <div className={styles.expTop}>
                       <div>
                         <div className={styles.eduSchool}>{t(edu.school || "")}</div>
                         <div className={styles.eduDegree}>{t(edu.degree || "")}</div>
                         <div className={styles.eduPeriod}>{t(edu.period || "")}</div>
+                        <div className={styles.expLoc}>{t(edu.location || "")}</div>
                       </div>
                     </div>
                     {edu.desc && (
@@ -351,8 +347,21 @@ export default function ProfilePage() {
                   </div>
                 </div>
               ))}
+            {educations.length === 0 && (
+              <div className={styles.detailVal}>{t("غير محدد")}</div>
+            )}
+            {educations.length > 4 && (
+              <button
+                className={styles.showMore}
+                onClick={() => setShowMoreEdu((e) => !e)}
+              >
+                {showMoreEdu ? t("عرض أقل ↑") : t("عرض المزيد ↓")}
+              </button>
+            )}
           </div>
         </div>
+
+
         {/* Skills */}
         <div className={styles.card}>
           <div className={styles.cardBody}>
@@ -369,24 +378,23 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Languages (Moved here below Skills) */}
-        <div className={styles.card}>
-          <div className={styles.cardBody}>
-            <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>{t("اللغات")}</span>
-            </div>
-            <div className={styles.skillsWrap}>
-              {profileUser?.languages?.map((l: string) => (
-                <div className={styles.skillTag} key={l}>
-                  {t(l || "")}
-                </div>
-              ))}
-              {(!profileUser?.languages || profileUser.languages.length === 0) && (
-                <div className={styles.detailVal}>{t("غير محدد")}</div>
-              )}
+        {/* Serves Section - Only for Tradesmen */}
+        {profileUser?.classification === "tradesman" && services.length > 0 && (
+          <div className={styles.card}>
+            <div className={styles.cardBody}>
+              <div className={styles.cardHeader}>
+                <span className={styles.cardTitle}>{t("Serves")}</span>
+              </div>
+              <div className={styles.servesList}>
+                {services.map((srv: string, idx: number) => (
+                  <div key={idx} className={styles.servesItem}>
+                    {t(srv)}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Portfolio */}
         <div className={styles.card}>
@@ -456,28 +464,6 @@ export default function ProfilePage() {
               link: socialLinks.twitter,
               color: "#1DA1F2",
             },
-            {
-              icon: (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-                  <rect x="2" y="9" width="4" height="12" />
-                  <circle cx="4" cy="4" r="2" />
-                </svg>
-              ),
-              label: t("لينكد إن"),
-              link: socialLinks.linkedin,
-              color: "#0A66C2",
-            },
-            {
-              icon: (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
-                </svg>
-              ),
-              label: t("جيت هب"),
-              link: socialLinks.github,
-              color: "#333",
-            },
           ];
           const activeLinks = allLinks.filter((s) => s.link && s.link.trim() !== "");
           if (activeLinks.length === 0) return null;
@@ -509,46 +495,6 @@ export default function ProfilePage() {
           );
         })()}
 
-        {/* Account Type Selector */}
-        <div className={styles.card}>
-          <div className={styles.cardBody}>
-            <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>{t("نوع الحساب")}</span>
-            </div>
-            <div className={styles.radioGroup}>
-              <label className={styles.radioItem}>
-                <input
-                  type="radio"
-                  name="accountType"
-                  value="job_seeker"
-                  className={styles.radioInput}
-                  checked={profileUser?.role !== "company"}
-                  onChange={() => handleAccountTypeChange("job_seeker")}
-                />
-                <div className={styles.radioLabel}>
-                  <span className={styles.radioTitle}>{t("باحث عن عمل")}</span>
-                  <span className={styles.radioDesc}>
-                    {t("ابحث عن وظائف وتقدم لها بسهولة")}
-                  </span>
-                </div>
-              </label>
-              <label className={styles.radioItem}>
-                <input
-                  type="radio"
-                  name="accountType"
-                  value="employer"
-                  className={styles.radioInput}
-                  checked={profileUser?.role === "company"}
-                  onChange={() => handleAccountTypeChange("employer")}
-                />
-                <div className={styles.radioLabel}>
-                  <span className={styles.radioTitle}>{t("خدمات")}</span>
-                  <span className={styles.radioDesc}>{t("قدم خدمة")}</span>
-                </div>
-              </label>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

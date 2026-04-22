@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Style from "./CompanyHome.module.css";
 import Statistics from "../../../Subject to/CompanyHome/Statistics";
 import { useJobitoAuth } from "../../../context/LinkContxt";
@@ -9,6 +10,7 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 interface JobCardProps {
+  jobId: number;
   title: string;
   company: string;
   location: string;
@@ -27,6 +29,7 @@ const getLogoUrl = (logoPath: string | undefined) => {
 };
 
 const JobCard: React.FC<JobCardProps> = ({
+  jobId,
   title,
   company,
   location,
@@ -37,9 +40,10 @@ const JobCard: React.FC<JobCardProps> = ({
   tags = [],
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const displayType = type || t("دوام كامل");
   return (
-    <div className={Style.jobCard}>
+    <div className={Style.jobCard} onClick={() => navigate(`/JobAnalytics/${jobId}`)}>
       <div className={Style.cardTop}>
         <div className={Style.logoBox}>
           {logo ? (
@@ -330,6 +334,7 @@ const CompanyHome = () => {
                 latestJobs.map((job) => (
                   <JobCard
                     key={job.jobId}
+                    jobId={job.jobId}
                     title={job.title}
                     company={user?.name || t("الشركة")}
                     location={job.address || t("عن بُعد")}

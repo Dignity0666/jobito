@@ -10,7 +10,11 @@ import { API_BASE_URL, getCommonHeaders } from '../services/api';
 
 // --- TYPES & INTERFACES ---
 export interface TranslationContextType {
-  t: (key: string, options?: Record<string, string | number>) => string;
+  t: (
+    key: string,
+    fallbackOrOptions?: string | Record<string, string | number>,
+    options?: Record<string, string | number>
+  ) => string;
   language: 'ar' | 'en';
   setLanguage: (lang: 'ar' | 'en') => void;
   isLoading: boolean;
@@ -162,18 +166,44 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   // 5. Main 't' function
   const t = useCallback(
-    (key: string, options?: Record<string, string | number>): string => {
+    (
+      key: string,
+      fallbackOrOptions?: string | Record<string, string | number>,
+      options?: Record<string, string | number>
+    ): string => {
       if (!key) return '';
 
+      // Determine fallback and options
+      let fallbackText: string | undefined;
+      let actualOptions: Record<string, string | number> | undefined;
+
+      if (typeof fallbackOrOptions === 'string') {
+        fallbackText = fallbackOrOptions;
+        actualOptions = options;
+      } else if (typeof fallbackOrOptions === 'object') {
+        actualOptions = fallbackOrOptions;
+      }
+
       // Priority 1: Static API translations (Postgres)
-      let text = staticTranslations[key] || key;
+      let text = staticTranslations[key];
 
       // Priority 2: Dynamic translations cache (Redis/Python results)
-      if (dynamicTranslations[`${language}:${key}`]) {
+      if (!text && dynamicTranslations[`${language}:${key}`]) {
         text = dynamicTranslations[`${language}:${key}`];
       }
-      // Priority 3: Dynamic on-demand translation logic
-      else if (!staticTranslations[key]) {
+
+      // Priority 3: Explicit Fallback (if provided and translation is missing)
+      if (!text && fallbackText) {
+        text = fallbackText;
+      }
+
+      // If still no translation, use key itself
+      if (!text) {
+        text = key;
+      }
+
+      // Priority 4: Dynamic on-demand translation logic (only if not found in static/cache)
+      if (!staticTranslations[key] && !dynamicTranslations[`${language}:${key}`]) {
         const isTranslationKey = /^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)+$/.test(key);
         if (!isTranslationKey) {
           const isArabicText = /[\u0600-\u06FF]/.test(key);
@@ -185,9 +215,10 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
         }
       }
 
-      if (options && typeof text === 'string') {
-        Object.entries(options).forEach(([k, v]) => {
-          text = text.replace(new RegExp(`{{${k}}}`, 'g'), String(v));
+      // Variable Replacement
+      if (actualOptions && typeof text === 'string') {
+        Object.entries(actualOptions).forEach(([k, v]) => {
+          text = text?.replace(new RegExp(`{{${k}}}`, 'g'), String(v));
         });
       }
       return text;

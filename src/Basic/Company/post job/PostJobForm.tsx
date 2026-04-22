@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./PostJob.module.css";
 import { useJobitoAuth } from "../../../context/LinkContxt";
 import { useTranslation } from "../../../context/translation-context";
+import { useToast } from "../../../context/ToastContext";
 
 type Step = 1 | 2 | 3;
 
@@ -96,12 +97,12 @@ function StepBar({
           >
             {current > s.n ? (
               <svg
-                width="18"
-                height="18"
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="3"
+                strokeWidth="3.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
@@ -109,12 +110,12 @@ function StepBar({
               </svg>
             ) : s.n === 1 ? (
               <svg
-                width="18"
-                height="18"
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
@@ -123,12 +124,12 @@ function StepBar({
               </svg>
             ) : s.n === 2 ? (
               <svg
-                width="18"
-                height="18"
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
@@ -139,12 +140,12 @@ function StepBar({
               </svg>
             ) : (
               <svg
-                width="18"
-                height="18"
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
@@ -167,15 +168,19 @@ function StepBar({
   );
 }
 
-// No static fallback - categories must come from the API to ensure correct IDs
-
 const JOB_TYPE_MAP: Record<string, string> = {
   "دوام كامل": "full-time",
+  "Full Time": "full-time",
   "دوام جزئي": "part-time",
+  "Part Time": "part-time",
   "عمل حر (Freelance)": "freelance",
+  "Freelance": "freelance",
   "تدريب (Internship)": "internship",
+  "Internship": "internship",
   "عمل لمرة واحدة": "one-time",
+  "One Time": "one-time",
   "عن بعد (Remote)": "remote",
+  "Remote": "remote",
 };
 
 const EMPLOYMENT_TYPES = Object.keys(JOB_TYPE_MAP);
@@ -193,21 +198,19 @@ function Step1({
   const [skillInput, setSkillInput] = useState("");
   const [showSkillInput, setShowSkillInput] = useState(false);
 
-
-
   const addSkill = () => {
     if (skillInput.trim() && !data.skills.includes(skillInput.trim())) {
       updateData({ skills: [...data.skills, skillInput.trim()] });
       setSkillInput("");
-      setShowSkillInput(false); // Hide input after adding
+      setShowSkillInput(false);
     }
   };
 
   return (
     <div className={styles.stepContent}>
       <div className={styles.sectionHeader}>
-        <h2>{t("المعلومات الأساسية")}</h2>
-        <p>{t("هذه المعلومات ستظهر للعامة")}</p>
+        <h2 className={styles.sectionTitle}>{t("المعلومات الأساسية")}</h2>
+        <p className={styles.sectionSubtitle}>{t("هذه المعلومات ستظهر للعامة")}</p>
       </div>
       <div className={styles.divider} />
 
@@ -235,17 +238,17 @@ function Step1({
           <span>{t("اختر نوع توظيف واحد فقط")}</span>
         </div>
         <div className={styles.rowContent}>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "16px" }}>
+          <div className={styles.radioGrid}>
             {EMPLOYMENT_TYPES.map((type) => (
-              <label key={type} className={styles.checkRow} style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+              <label key={type} className={styles.checkRow}>
                   <input
                     type="radio"
                     name="jobType"
                     value={type}
-                  checked={data.jobTypes[0] === type}
+                    checked={data.jobTypes[0] === type}
                     onChange={(e) => updateData({ jobTypes: [e.target.value] })}
                   />
-                  {t(type)}
+                  <span>{t(type)}</span>
                 </label>
             ))}
           </div>
@@ -259,20 +262,18 @@ function Step1({
           <span>{t("يرجى تحديد الراتب المتوقع.")}</span>
         </div>
         <div className={styles.rowContent}>
-          <div className={styles.salaryRow}>
-            <div className={styles.salaryBox} style={{ width: "200px", direction: "ltr" }}>
-              <span>EGP</span>
-              <input
-                type="number"
-                value={data.salary}
-                onChange={(e) => {
-                  const val = parseInt(e.target.value) || 0;
-                  updateData({ salary: val });
-                }}
-                className={styles.salaryInputInner}
-                placeholder={t("مثال: 10000")}
-              />
-            </div>
+          <div className={styles.salaryBox}>
+            <span className={styles.currencyLabel}>EGP</span>
+            <input
+              type="number"
+              value={data.salary}
+              onChange={(e) => {
+                const val = parseInt(e.target.value) || 0;
+                updateData({ salary: val });
+              }}
+              className={styles.salaryInputInner}
+              placeholder={t("مثال: 10000")}
+            />
           </div>
         </div>
       </div>
@@ -357,7 +358,7 @@ function Step1({
                 <PlusIcon /> {t("أضف مهارات")}
               </button>
             ) : (
-              <div style={{ display: "flex", gap: "8px", width: "100%" }}>
+              <div className={styles.skillInputFlex}>
                 <input
                   type="text"
                   placeholder={t("اكتب المهارة واضغط Enter")}
@@ -372,21 +373,22 @@ function Step1({
                   className={styles.textInput}
                   autoFocus
                 />
-                <button
-                  type="button"
-                  className={styles.primaryBtn}
-                  onClick={addSkill}
-                >
-                  {t("إضافة")}
-                </button>
-                <button
-                  type="button"
-                  className={styles.primaryBtn}
-                  style={{ backgroundColor: "#e5e7eb", color: "#333" }}
-                  onClick={() => setShowSkillInput(false)}
-                >
-                  {t("إلغاء")}
-                </button>
+                <div className={styles.skillActionBtns}>
+                  <button
+                    type="button"
+                    className={styles.primaryBtnSmall}
+                    onClick={addSkill}
+                  >
+                    {t("إضافة")}
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.cancelBtnSmall}
+                    onClick={() => setShowSkillInput(false)}
+                  >
+                    {t("إلغاء")}
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -466,11 +468,11 @@ function CheckmarkList({
         <div key={index} className={styles.respItemWrap}>
           <div className={styles.respCheck}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="#56CDAD" strokeWidth="2" />
+              <circle cx="12" cy="12" r="10" stroke="var(--color-primary)" strokeWidth="2" />
               <path
                 d="M8 12L11 15L16 9"
-                stroke="#56CDAD"
-                strokeWidth="2"
+                stroke="var(--color-primary)"
+                strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
@@ -529,9 +531,9 @@ function Step2({
     <div className={styles.stepContent}>
       <div className={styles.sectionHeader}>
         <div className={styles.headerWithBack}>
-          <h2>{t("التفاصيل")}</h2>
+          <h2 className={styles.sectionTitle}>{t("التفاصيل")}</h2>
         </div>
-        <p>
+        <p className={styles.sectionSubtitle}>
           {t("أضف وصف الوظيفة، المسؤوليات، المؤهلات المطلوبة، والمميزات الإضافية.")}
         </p>
       </div>
@@ -601,8 +603,6 @@ function Step2({
           />
         </div>
       </div>
-
-
 
       <div className={styles.footerNav}>
         <button className={styles.backBtnInline} onClick={onPrev}>
@@ -686,8 +686,8 @@ function Step3({
   return (
     <div className={styles.stepContent}>
       <div className={styles.sectionHeader}>
-        <h2>{t("المزايا والفوائد")}</h2>
-        <p>{t("هذه الوظيفة تأتي مع العديد من المزايا والفوائد")}</p>
+        <h2 className={styles.sectionTitle}>{t("المزايا والفوائد")}</h2>
+        <p className={styles.sectionSubtitle}>{t("هذه الوظيفة تأتي مع العديد من المزايا والفوائد")}</p>
       </div>
       <div className={styles.divider} style={{ marginBottom: "24px" }} />
 
@@ -731,15 +731,9 @@ function Step3({
             </button>
           ) : (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className={styles.benefitCard}
-              style={{
-                border: "2px dashed #4640de",
-                display: "flex",
-                flexDirection: "column",
-                gap: "8px",
-              }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={styles.benefitAddForm}
             >
               <input
                 type="text"
@@ -747,33 +741,24 @@ function Step3({
                 value={newBTitle}
                 onChange={(e) => setNewBTitle(e.target.value)}
                 className={styles.textInput}
-                style={{ padding: "6px" }}
               />
               <textarea
                 placeholder={t("وصف الميزة")}
                 value={newBDesc}
                 onChange={(e) => setNewBDesc(e.target.value)}
                 className={styles.textArea}
-                style={{ padding: "6px", fontSize: "13px" }}
                 rows={3}
               />
-              <div style={{ display: "flex", gap: "8px" }}>
+              <div className={styles.benefitAddBtns}>
                 <button
                   onClick={confirmAddBenefit}
-                  className={styles.primaryBtn}
-                  style={{ flex: 1, padding: "6px" }}
+                  className={styles.primaryBtnSmall}
                 >
                   {t("إضافة")}
                 </button>
                 <button
                   onClick={() => setShowAddForm(false)}
-                  className={styles.primaryBtn}
-                  style={{
-                    flex: 1,
-                    padding: "6px",
-                    backgroundColor: "#e5e7eb",
-                    color: "#333",
-                  }}
+                  className={styles.cancelBtnSmall}
                 >
                   {t("إلغاء")}
                 </button>
@@ -806,9 +791,16 @@ export default function PostJob() {
   const location = useLocation() as { state: { editJob?: any } | null };
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const [step, setStep] = useState<Step>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { role, isAuthenticated, apiFetch } = useJobitoAuth();
+  const { role, isAuthenticated, apiFetch, user } = useJobitoAuth();
+
+  useEffect(() => {
+    if (isAuthenticated && user?.classification === "tradesman") {
+      navigate("/PostWork", { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
   const [formData, setFormData] = useState<JobFormData>({
     title: "",
     jobTypes: [],
@@ -828,13 +820,11 @@ export default function PostJob() {
     classification: "",
   });
 
-  // Categories are now handled via text input and backend resolution
   useEffect(() => {
     if (location.state?.editJob) {
       try {
         const job = location.state.editJob;
 
-        // Parsing logic for combined description
         const sections: Record<string, string[]> = {
           "وصف الوظيفة": [],
           "Job Description": [],
@@ -886,7 +876,7 @@ export default function PostJob() {
         };
 
         setFormData({
-          title: t(job.title || ""),
+          title: job.title || "",
           jobTypes: job.jobType
             ? [
                 Object.keys(JOB_TYPE_MAP).find(
@@ -895,46 +885,46 @@ export default function PostJob() {
               ]
             : [],
           salary: job.salaryMin || job.salary || 0,
-          address: t(job.address || "") || t("Remote"),
+          address: job.address || "Remote",
           description: (sections["وصف الوظيفة"].length
             ? sections["وصف الوظيفة"]
             : sections["Job Description"]
           ).length
             ? sections["وصف الوظيفة"].length
-              ? sections["وصف الوظيفة"].map((s) => t(s))
-              : sections["Job Description"].map((s) => t(s))
+              ? sections["وصف الوظيفة"]
+              : sections["Job Description"]
             : [""],
           responsibilities: (sections["المسؤوليات"].length
             ? sections["المسؤوليات"]
             : sections["Responsibilities"]
           ).length
             ? sections["المسؤوليات"].length
-              ? sections["المسؤوليات"].map((s) => t(s))
-              : sections["Responsibilities"].map((s) => t(s))
+              ? sections["المسؤوليات"]
+              : sections["Responsibilities"]
             : [""],
           whoYouAre: (sections["المؤهلات المطلوبة"].length
             ? sections["المؤهلات المطلوبة"]
             : sections["Required"]
           ).length
             ? sections["المؤهلات المطلوبة"].length
-              ? sections["المؤهلات المطلوبة"].map((s) => t(s))
-              : sections["Required"].map((s) => t(s))
+              ? sections["المؤهلات المطلوبة"]
+              : sections["Required"]
             : [""],
           niceToHaves: (sections["مزايا إضافية"].length
             ? sections["مزايا إضافية"]
             : sections["Nice-To-Haves"]
           ).length
             ? sections["مزايا إضافية"].length
-              ? sections["مزايا إضافية"].map((s) => t(s))
-              : sections["Nice-To-Haves"].map((s) => t(s))
+              ? sections["مزايا إضافية"]
+              : sections["Nice-To-Haves"]
             : [""],
-          skills: sections["Skills"]?.length ? sections["Skills"].map((s) => t(s)) : [],
+          skills: sections["Skills"]?.length ? sections["Skills"] : [],
           benefits: job.benefits || job.company?.benefits || getDefaultBenefits(t),
           slotsAvailable: job.slotsAvailable || 1,
           categoryId: job.categoryId,
-          categoryName: t(job.category?.name || ""),
+          categoryName: job.category?.name || "",
           expiresAt: safeDate(job.expiresAt),
-          classification: t((sections["التصنيف"]?.[0] || "")) as any,
+          classification: (sections["التصنيف"]?.[0] || "") as any,
         });
       } catch (err) {
         console.error("Error hydrating form for edit mode:", err);
@@ -946,13 +936,11 @@ export default function PostJob() {
     setFormData((prev) => ({ ...prev, ...newData }));
   };
 
-  /** Get a valid auth token or throw a descriptive error */
   const getAuthToken = useCallback((): string => {
     const token = localStorage.getItem("token");
     if (!token) {
       throw new Error(t("أنت غير مسجل دخول. يرجى تسجيل الدخول أولاً لنشر وظيفة."));
     }
-    // Role check — ensure user is a company
     try {
       const payload = JSON.parse(atob(token.split(".")[1]));
       if (payload.role !== "company") {
@@ -1010,28 +998,31 @@ ${formData.skills.join(", ")}
 **التصنيف:**
 ${formData.classification}`;
 
-      // Map frontend types to backend enums
       const frontendType = formData.jobTypes[0] || "دوام جزئي";
       const backendJobType = JOB_TYPE_MAP[frontendType] || "part-time";
 
       const payload = {
         title: formData.title,
         description: combinedDescription,
-        salaryMin: formData.salary,
-        salaryMax: formData.salary,
-        salary: formData.salary, // fallback for legacy
+        salaryMin: formData.salary ? Number(formData.salary) : undefined,
+        salaryMax: formData.salary ? Number(formData.salary) : undefined,
+        salary: formData.salary ? Number(formData.salary) : undefined,
         address: formData.address,
         jobType: backendJobType,
         classification: formData.classification,
-        slotsAvailable: formData.slotsAvailable,
-        categoryId: formData.categoryId,
+        slotsAvailable: Number(formData.slotsAvailable) || 1,
+        categoryId: formData.categoryId ? Number(formData.categoryId) : undefined,
         categoryName: formData.categoryName,
         expiresAt: formData.expiresAt || undefined,
         benefits: formData.benefits,
       };
 
       const isEdit = !!location.state?.editJob;
-      const jobId = location.state?.editJob?.jobId;
+      const jobFromState = location.state?.editJob;
+      const jobId = jobFromState?.jobId || jobFromState?.job_id;
+
+      console.log("🚀 [PostJobForm] Sending payload to:", `${API_BASE_URL}/jobs${isEdit ? `/${jobId}` : ""}`);
+      console.log("📦 [PostJobForm] Payload content:", payload);
 
       const response = await apiFetch(
         `${API_BASE_URL}/jobs${isEdit ? `/${jobId}` : ""}`,
@@ -1045,10 +1036,13 @@ ${formData.classification}`;
       );
 
       if (response.ok) {
-        alert(isEdit ? t("تم تحديث الوظيفة بنجاح!") : t("تم نشر الوظيفة بنجاح!"));
+        const responseData = await response.clone().json();
+        console.log("✅ [PostJobForm] Update success! Server returned:", responseData);
+        showToast(isEdit ? t("تم تحديث الوظيفة بنجاح!") : t("تم نشر الوظيفة بنجاح!"), "success");
         navigate("/JobListing");
       } else {
         const err = await response.json();
+        console.error("❌ [PostJobForm] Update failed! Server response:", err);
         if (response.status === 401) {
           throw new Error(t("انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى."));
         } else if (response.status === 403) {
@@ -1060,14 +1054,13 @@ ${formData.classification}`;
       }
     } catch (err: unknown) {
       const errorMessage =
-        err instanceof Error ? err.message : "An unknown error occurred";
-      alert("Error: " + errorMessage);
+        err instanceof Error ? t(err.message) : String(err);
+      showToast(`${t("Error:")} ${errorMessage}`, "error");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Guard: Show message if not authenticated or not a company
   if (!isAuthenticated) {
     return (
       <div className={styles.page}>

@@ -6,6 +6,7 @@ import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useJobitoAuth } from "../../../context/LinkContxt.js";
 import { useRef } from "react";
 import { useTranslation } from "../../../context/translation-context";
+import { useToast } from "../../../context/ToastContext";
 import {
   FiGrid,
   FiList,
@@ -17,11 +18,30 @@ import {
 
 import { API_BASE_URL } from "../../../services/api.js";
 
-const getFullImageUrl = (url?: string, seed?: string) => {
-  if (!url)
-    return `https://api.dicebear.com/7.x/identicon/svg?seed=${seed || "company"}`;
-  if (url.startsWith("http")) return url;
-  return `${API_BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`;
+const getFullImageUrl = (url?: string, seed?: string, job?: Job) => {
+  // Priority 1: Use the Tradesman's personal avatar if available
+  if (job?.user?.avatarUrl) {
+    const avatar = job.user.avatarUrl;
+    if (avatar.startsWith("http")) return avatar;
+    return `${API_BASE_URL}${avatar.startsWith("/") ? "" : "/"}${avatar}`;
+  }
+
+  // Priority 2: Use the logoUrl (Company Logo)
+  if (url) {
+    if (url.startsWith("http")) return url;
+    return `${API_BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`;
+  }
+
+  // Priority 3: Fallback to the first image from the job's own images array
+  if (job?.images && job.images.length > 0) {
+    const firstImg = job.images[0];
+    if (firstImg.startsWith("http")) return firstImg;
+    return `${API_BASE_URL}${firstImg.startsWith("/") ? "" : "/"}${firstImg}`;
+  }
+
+  // Priority 4: Fallback based on classification or default
+  const categorySeed = seed || "company";
+  return `https://api.dicebear.com/7.x/identicon/svg?seed=${categorySeed}`;
 };
 
 interface Job {
@@ -42,11 +62,14 @@ interface Job {
   expiresAt?: string;
   createdAt?: string;
   appliedCount?: number;
-  companyId?: number | string;
-  categoryId?: number;
   category?: { name: string };
+  user?: {
+    avatarUrl?: string;
+    fullName?: string;
+  };
   applications?: any[];
   classification?: string;
+  images?: string[];
 }
 
 const sidebarVariant: Variants = {
@@ -67,9 +90,14 @@ const AllJobs: React.FC<AllJobsProps> = ({
   searchKeyword = "",
   location = "",
 }) => {
-  const { apiFetch, isAuthenticated, role } = useJobitoAuth();
+  const { apiFetch, isAuthenticated, role, user } = useJobitoAuth();
+  const classification = user?.classification;
   const [jobs, setJobs] = useState<Job[]>([]);
   const { t } = useTranslation();
+  
+  // Mock Maintenance Orders removed - linking to backend real data
+
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<"grid" | "list">(() => {
@@ -96,7 +124,9 @@ const AllJobs: React.FC<AllJobsProps> = ({
 
   // Filter states
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
-  const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
+  const [selectedLevels, setSelectedLevels] = useState<string[]>(
+    classification === "tradesman" ? ["tradesman"] : []
+  );
   const [selectedSalaries, setSelectedSalaries] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
@@ -149,6 +179,11 @@ const AllJobs: React.FC<AllJobsProps> = ({
         if (searchKeyword && searchKeyword.trim() !== "") {
           // 🧠 AI Smart Search - uses role tagging, query expansion, and scoring
           const smartParams = new URLSearchParams({ q: searchKeyword });
+          if (classification === "tradesman") {
+            smartParams.append("classification", "خدمات");
+          } else {
+            smartParams.append("excludeClassification", "خدمات");
+          }
           if (safeLocation) smartParams.append("location", safeLocation);
 
           const smartRes = await fetch(
@@ -181,6 +216,9 @@ const AllJobs: React.FC<AllJobsProps> = ({
           const queryParams = new URLSearchParams({
             limit: "100",
             ...(location && { location: location }),
+            ...(classification === "tradesman" 
+              ? { classification: "خدمات" } 
+              : { excludeClassification: "خدمات" }),
           });
 
           const jobsRes = await fetch(
@@ -280,7 +318,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
     const token =
       localStorage.getItem("access_token") || localStorage.getItem("token");
     if (!token) {
-      alert(t("يرجى تسجيل الدخول لحفظ الوظائف المفضلة."));
+      showToast(t("يرجى تسجيل الدخول لحفظ الوظائف المفضلة."), "error");
       return;
     }
 
@@ -305,17 +343,20 @@ const AllJobs: React.FC<AllJobsProps> = ({
   };
 
   const getJobLevel = (job: Job) => {
-    // 1. Use explicit classification field if available
-    if (job.classification) return job.classification;
+    // 1. Differentiate between Company Services and Individual Tradesmen
+    if (!!job.user) return "tradesman"; 
+    
+    if (job.classification === "خدمات" || job.classification === "services" || job.classification === "Services") return "services";
+
+    // 2. Explicit classification field fallbacks
+    if (job.classification === "tradesman" || job.classification === "tradesman_work") return "tradesman";
 
     const text = (job.title + " " + (job.description || "")).toLowerCase();
 
-    // 2. Fallback: Check for explicit Classification tags in text
-    if (text.includes("التصنيف: تقني") || text.includes("تقني")) return "تقني";
-    if (text.includes("التصنيف: غير تقني") || text.includes("غير تقني"))
+    // 3. Fallback: Check for explicit Classification tags in text
+    if (text.includes("التصنيف: تقني") || text.includes("تقني") || job.classification === "تقني") return "تقني";
+    if (text.includes("التصنيف: غير تقني") || text.includes("غير تقني") || job.classification === "غير تقني")
       return "غير تقني";
-    if (text.includes("التصنيف: خدمات") || text.includes("خدمات"))
-      return "خدمات";
 
     if (text.includes("director") || text.includes("مدير")) return "مدير";
     if (text.includes("senior") || text.includes("خبير")) return "خبير";
@@ -350,7 +391,9 @@ const AllJobs: React.FC<AllJobsProps> = ({
         if (t === "دوام كامل") return jt === "full-time";
         if (t === "دوام جزئي") return jt === "part-time";
         if (t === "عن بعد") return jt === "remote";
-        if (t === "تدريب") return jt === "internship";
+        if (t === "تدريب") return jt === "internship" || jt === "intern";
+        if (t === "عقد") return jt === "contract";
+        if (t === "عمل حر") return jt === "freelance";
         if (t === "عمل لمرة واحدة") return jt === "one-time";
         return jt.includes(t.toLowerCase());
       });
@@ -407,11 +450,12 @@ const AllJobs: React.FC<AllJobsProps> = ({
     `📊 [AllJobs] Displaying ${filteredJobs.length} jobs out of ${jobs.length} total.`,
   );
 
-  const totalItems = filteredJobs.length;
+  const displayJobs = filteredJobs;
+  const totalItems = displayJobs.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / jobsPerPage));
   const adjustedPage = Math.min(currentPage, totalPages);
 
-  const currentJobs = filteredJobs.slice(
+  const currentJobs = displayJobs.slice(
     (adjustedPage - 1) * jobsPerPage,
     adjustedPage * jobsPerPage,
   );
@@ -429,99 +473,69 @@ const AllJobs: React.FC<AllJobsProps> = ({
 
   return (
     <div className={styles.jobsPage}>
-      <motion.aside
-        className={styles.sidebar}
-        variants={sidebarVariant}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-      >
-        <Filter
-          title={t("نوع التوظيف")}
-          items={[
-            {
-              name: t("دوام كامل"),
-              count: jobs.filter(
-                (j) => (j.jobType || "").toLowerCase() === "full-time",
-              ).length,
-            },
-            {
-              name: t("دوام جزئي"),
-              count: jobs.filter(
-                (j) => (j.jobType || "").toLowerCase() === "part-time",
-              ).length,
-            },
-            {
-              name: t("عن بعد"),
-              count: jobs.filter(
-                (j) => (j.jobType || "").toLowerCase() === "remote",
-              ).length,
-            },
-            {
-              name: t("تدريب"),
-              count: jobs.filter(
-                (j) => (j.jobType || "").toLowerCase() === "internship",
-              ).length,
-            },
-            {
-              name: t("عمل لمرة واحدة"),
-              count: jobs.filter(
-                (j) => (j.jobType || "").toLowerCase() === "one-time",
-              ).length,
-            },
-          ]}
-          selected={selectedTypes}
-          setSelected={setSelectedTypes}
-        />
+      {classification !== "tradesman" && (
+        <motion.aside
+          className={styles.sidebar}
+          variants={sidebarVariant}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          {/* Category Filter including Tradesman items */}
+          <Filter
+            title={t("نوع التوظيف")}
+            items={[
+              { name: t("دوام كامل"), count: jobs.filter((j) => (j.jobType || "").toLowerCase() === "full-time").length, value: "دوام كامل" },
+              { name: t("دوام جزئي"), count: jobs.filter((j) => (j.jobType || "").toLowerCase() === "part-time").length, value: "دوام جزئي" },
+              { name: t("عن بعد"), count: jobs.filter((j) => (j.jobType || "").toLowerCase() === "remote").length, value: "عن بعد" },
+              { name: t("تدريب"), count: jobs.filter((j) => (j.jobType || "").toLowerCase() === "internship").length, value: "تدريب" },
+              { name: t("عقد"), count: jobs.filter((j) => (j.jobType || "").toLowerCase() === "contract").length, value: "عقد" },
+            ]}
+            selected={selectedTypes}
+            setSelected={setSelectedTypes}
+          />
 
-        <Filter
-          title={t("تصنيفات")}
-          items={[
-            {
-              name: "تقني",
-              count: jobs.filter((j) => getJobLevel(j) === "تقني").length,
-            },
-            {
-              name: "غير تقني",
-              count: jobs.filter((j) => getJobLevel(j) === "غير تقني").length,
-            },
-            {
-              name: "خدمات",
-              count: jobs.filter((j) => getJobLevel(j) === "خدمات").length,
-            },
-          ]}
-          selected={selectedLevels}
-          setSelected={setSelectedLevels}
-        />
+          <Filter
+            title={t("التصنيفات")}
+            items={[
+              { name: t("تقني"), count: jobs.filter((j) => getJobLevel(j) === "تقني").length, value: "تقني" },
+              { name: t("غير تقني"), count: jobs.filter((j) => getJobLevel(j) === "غير تقني").length, value: "غير تقني" },
+              { name: "Services", count: jobs.filter((j) => getJobLevel(j) === "services").length, value: "services" },
+              { name: "tradesman", count: jobs.filter((j) => getJobLevel(j) === "tradesman").length, value: "tradesman" },
+            ]}
+            selected={selectedLevels}
+            setSelected={setSelectedLevels}
+          />
 
-        <Filter
-          title={t("نطاق الراتب")}
-          items={[
-            {
-              name: "٧٠٠$ - ١٠٠٠$",
-              count: jobs.filter((j) => getSalaryRange(j) === "٧٠٠$ - ١٠٠٠$")
-                .length,
-            },
-            {
-              name: "١٠٠٠$ - ١٥٠٠$",
-              count: jobs.filter((j) => getSalaryRange(j) === "١٠٠٠$ - ١٥٠٠$")
-                .length,
-            },
-            {
-              name: "١٥٠٠$ - ٢٠٠٠$",
-              count: jobs.filter((j) => getSalaryRange(j) === "١٥٠٠$ - ٢٠٠٠$")
-                .length,
-            },
-            {
-              name: "٣٠٠٠$ أو أكثر",
-              count: jobs.filter((j) => getSalaryRange(j) === "٣٠٠٠$ أو أكثر")
-                .length,
-            },
-          ]}
-          selected={selectedSalaries}
-          setSelected={setSelectedSalaries}
-        />
-      </motion.aside>
+          <Filter
+            title={t("نطاق الراتب")}
+            items={[
+              {
+                name: "٧٠٠$ - ١٠٠٠$",
+                count: jobs.filter((j) => getSalaryRange(j) === "٧٠٠$ - ١٠٠٠$")
+                  .length,
+              },
+              {
+                name: "١٠٠٠$ - ١٥٠٠$",
+                count: jobs.filter((j) => getSalaryRange(j) === "١٠٠٠$ - ١٥٠٠$")
+                  .length,
+              },
+              {
+                name: "١٥٠٠$ - ٢٠٠٠$",
+                count: jobs.filter((j) => getSalaryRange(j) === "١٥٠٠$ - ٢٠٠٠$")
+                  .length,
+              },
+              {
+                name: "٣٠٠٠$ أو أكثر",
+                count: jobs.filter((j) => getSalaryRange(j) === "٣٠٠٠$ أو أكثر")
+                  .length,
+              },
+            ]}
+            selected={selectedSalaries}
+            setSelected={setSelectedSalaries}
+          />
+        </motion.aside>
+      )}
 
       <main className={styles.jobsContent}>
         {error && <div className={styles.apiStatus}>⚠️ {error}</div>}
@@ -598,86 +612,124 @@ const AllJobs: React.FC<AllJobsProps> = ({
                     navigate("/Job details", { state: { jobId: job.jobId } })
                   }
                 >
-                  {view === "list" ? (
-                    <>
-                      <div className={styles.jobLeft}>
-                        <div className={styles.logoPlaceholder}>
-                          <img
-                            src={getFullImageUrl(
-                              job.company?.logoUrl,
-                              job.company?.name || job.jobId?.toString(),
-                            )}
-                            alt={t("Logo")}
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.src = `https://api.dicebear.com/7.x/identicon/svg?seed=${job.company?.name || job.jobId}`;
-                            }}
-                          />
-                        </div>
-                        <div className={styles.jobInfo}>
-                          <h3>{t(job.title || "وظيفة بدون عنوان")}</h3>
-                          <p>
-                            {t(job.company?.name || "جوبيتو المحدودة")} •{" "}
-                            {t(job.address || "الموقع")}
-                          </p>
-                          <div className={styles.tags}>
-                            <span
-                              className={`${styles.tag} ${styles.fulltime}`}
-                            >
-                              {job.jobType === "full-time"
-                                ? t("دوام كامل")
-                                : job.jobType === "part-time"
-                                  ? t("دوام جزئي")
-                                  : job.jobType === "remote"
-                                    ? t("عن بعد")
-                                    : job.jobType === "internship"
-                                      ? t("تدريب")
-                                      : job.jobType === "one-time"
-                                        ? t("عمل لمرة واحدة")
-                                        : job.jobType}
-                            </span>
+                   {view === "list" ? (
+                    <div className={styles.jobRowContent}>
+                      {/* Determine if it's a Tradesman/Service job */}
+                      {!!job.user ? (
+                        /* --- TRADESMAN LIST VIEW (As per image) --- */
+                        <>
+                          <div className={styles.jobRowLeft}>
+                            <div className={styles.tradesmanAvatarCircle}>
+                              <img
+                                src={getFullImageUrl(
+                                  job.user?.avatarUrl,
+                                  job.user?.fullName || job.jobId?.toString(),
+                                  job
+                                )}
+                                alt={t("Avatar")}
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${job.jobId}`;
+                                }}
+                              />
+                            </div>
+                            <div className={styles.jobInfoColumn}>
+                              <h3 className={styles.tradesmanJobTitle}>{t(job.title)}</h3>
+                              <div className={styles.jobRowMeta}>
+                                <span className={styles.locationNameText}>
+                                  {t(job.company?.name || job.user?.fullName || "Provider")} • {t(job.address || "Paris, France")}
+                                </span>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
 
-                      <div className={styles.jobRight}>
-                        <div
-                          className={`${styles.like} ${job.jobId && likedJobs[job.jobId.toString()] ? styles.liked : ""}`}
-                          onClick={(e) => toggleLike(e, job.jobId)}
-                        >
-                          {job.jobId && likedJobs[job.jobId.toString()] ? (
-                            <FaHeart size={22} />
-                          ) : (
-                            <FaRegHeart size={22} />
-                          )}
-                        </div>
-                        <button
-                          className={styles.applyBtn}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (!isAuthenticated) {
-                              navigate("/user-information");
-                            } else {
-                              navigate("/Job details", {
-                                state: { jobId: job.jobId },
-                              });
-                            }
-                          }}
-                        >
-                          {t("تقدم الآن")}
-                        </button>
-                        <div className={styles.statusContainer}>
-                          <span className={styles.appliedBadge}>
-                            <strong>
-                              {job.applications?.length ||
-                                job.appliedCount ||
-                                0}
-                            </strong>{" "}
-                            {t("المتقدمين")}
-                          </span>
-                        </div>
-                      </div>
-                    </>
+                          <div className={styles.jobRatingMiddle}>
+                             <span className={styles.starIconSmall}>★</span>
+                             <span className={styles.ratingValueText}>
+                               {(3.5 + ((typeof job.jobId === 'number' ? job.jobId : 0) % 15) * 0.1).toFixed(2)}
+                             </span>
+                          </div>
+
+                          <div className={styles.jobRowRight}>
+                            <button
+                              className={styles.premiumApplyBtn}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate("/Job details", {
+                                  state: { jobId: job.jobId },
+                                });
+                              }}
+                            >
+                              {t("Apply")}
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        /* --- COMPANY LIST VIEW (As previously designed) --- */
+                        <>
+                          <div className={styles.jobRowLeft}>
+                            <div className={styles.jobLogoContainer}>
+                              <img
+                                src={getFullImageUrl(
+                                  job.company?.logoUrl,
+                                  job.company?.name || job.jobId?.toString(),
+                                  job
+                                )}
+                                alt={t("Logo")}
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.src = `https://api.dicebear.com/7.x/identicon/svg?seed=${job.company?.name || job.jobId}`;
+                                }}
+                              />
+                            </div>
+                            <div className={styles.jobInfoColumn}>
+                              <div className={styles.jobRowMeta}>
+                                <span className={styles.companyNameText}>{t(job.company?.name || "Nomad")}</span>
+                                <span className={styles.metaCircle}>•</span>
+                                <span className={styles.locationNameText}>{t(job.address || "Paris, France")}</span>
+                              </div>
+                              <div className={styles.jobRowTags}>
+                                <span className={styles.typePill}>
+                                  {job.jobType === "full-time" ? t("Full-Time") : t(job.jobType)}
+                                </span>
+                                <div className={styles.verticalDivider}></div>
+                                <span className={styles.catPillPrimary}>
+                                  {t(job.category?.name || "Marketing")}
+                                </span>
+                                <span className={styles.catPillSecondary}>
+                                  {t("Design")}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className={styles.jobRowRight}>
+                            <button
+                              className={styles.premiumApplyBtn}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate("/Job details", {
+                                  state: { jobId: job.jobId },
+                                });
+                              }}
+                            >
+                              {t("Apply")}
+                            </button>
+                            <div className={styles.capacityWrapper}>
+                               <div className={styles.capacityBar}>
+                                  <div 
+                                    className={styles.capacityFill} 
+                                    style={{ width: `${Math.min(((job.appliedCount || job.applications?.length || 0) / (job.slotsAvailable || 10)) * 100, 100)}%` }}
+                                  ></div>
+                               </div>
+                               <span className={styles.capacityLabel}>
+                                 {job.appliedCount || job.applications?.length || 0} of {job.slotsAvailable || 10} capacity
+                               </span>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
                   ) : (
                     <>
                       {/* --- GRID VIEW --- */}
@@ -687,6 +739,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
                             src={getFullImageUrl(
                               job.company?.logoUrl,
                               job.company?.name || job.jobId?.toString(),
+                              job
                             )}
                             alt={t("Logo")}
                             onError={(e) => {
@@ -839,6 +892,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
 interface FilterItem {
   name: string;
   count: number;
+  value?: string;
 }
 interface FilterProps {
   title: string;
@@ -870,17 +924,20 @@ const Filter: React.FC<FilterProps> = ({
       </div>
       {isOpen && (
         <div className={styles.filterList}>
-          {items.map((item) => (
-            <label key={item.name}>
-              <input
-                type="checkbox"
-                checked={selected.includes(item.name)}
-                onChange={() => toggleItem(item.name)}
-              />
+          {items.map((item) => {
+            const itemValue = item.value || item.name;
+            return (
+              <label key={item.name}>
+                <input
+                  type="checkbox"
+                  checked={selected.includes(itemValue)}
+                  onChange={() => toggleItem(itemValue)}
+                />
               {t(item.name)}
               <span className={styles.itemCount}>({item.count})</span>
-            </label>
-          ))}
+              </label>
+            );
+          })}
         </div>
       )}
     </div>

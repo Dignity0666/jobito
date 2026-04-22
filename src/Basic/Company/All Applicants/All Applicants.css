@@ -45,7 +45,7 @@
 .search-box svg {
   position: absolute;
   left: 14px;
-  color: #9ca3af;
+  color: var(--color-text-muted);
 }
 
 .search-box input {
@@ -61,7 +61,7 @@
 }
 
 .search-box input::placeholder {
-  color: #9ca3af;
+  color: var(--color-text-muted);
   font-weight: 400;
 }
 
@@ -102,8 +102,8 @@
 }
 
 .view-btn.active {
-  background: #eef2ff;
-  color: #556bba;
+  background: var(--color-bg-secondary);
+  color: var(--color-primary);
 }
 
 .table-container {
@@ -185,14 +185,14 @@
 
 .badge-inreview {
   color: #3b82f6;
-  border-color: #93c5fd;
-  background: #eff6ff;
+  border-color: rgba(59, 130, 246, 0.3);
+  background: rgba(59, 130, 246, 0.1);
 }
 
 .badge-waitlisted {
   color: #d97706;
-  border-color: #fcd34d;
-  background: #fffbeb;
+  border-color: rgba(217, 119, 6, 0.3);
+  background: rgba(217, 119, 6, 0.1);
 }
 
 .badge-declined {
@@ -237,7 +237,8 @@
 }
 
 .see-app-btn:hover {
-  background: #e0e7ff;
+  background: var(--color-primary-light);
+  color: var(--color-primary-hover);
 }
 
 .delete-app-btn {
@@ -256,7 +257,8 @@
 
 .delete-app-btn:hover {
   opacity: 1;
-  background: #fef2f2;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
 }
 
 .pagination-footer {
@@ -344,8 +346,8 @@
 }
 
 .filter-chip:hover {
-  border-color: #d1d5db;
-  background: #f9fafb;
+  border-color: var(--color-primary);
+  background: var(--color-bg-secondary);
 }
 
 .filter-chip input[type="checkbox"] {
@@ -357,25 +359,25 @@
 }
 
 .filter-chip-active.filter-chip-hired {
-  border-color: #6ee7b7;
-  background: #ecfdf5;
-  color: #059669;
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
 }
 
 .filter-chip-active.filter-chip-declined {
-  border-color: #fca5a5;
-  background: #fef2f2;
-  color: #dc2626;
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
 }
 
 .filter-chip-active.filter-chip-waitlisted {
-  border-color: #fcd34d;
-  background: #fffbeb;
+  border-color: #d97706;
+  background: rgba(217, 119, 6, 0.1);
   color: #d97706;
 }
 
 .filter-chip-active.filter-chip-inreview {
-  border-color: #93c5fd;
-  background: #eff6ff;
-  color: #2563eb;
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
 }

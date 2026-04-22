@@ -106,7 +106,7 @@ body {
   font-family: "Playfair Display", serif;
   font-weight: 700;
   font-size: 20px;
-  color: var(--navy);
+  color: var(--color-text);
 }
 .nbLogo {
   width: 36px;
@@ -141,12 +141,12 @@ body {
   color: var(--color-primary);
 }
 .nbLink.act {
-  color: var(--navy);
+  color: var(--color-primary);
   border-color: var(--color-accent);
 }
 .nbCta {
   padding: 10px 22px;
-  background: var(--navy);
+  background: var(--color-primary);
   border: none;
   border-radius: 10px;
   color: #fff;
@@ -200,12 +200,12 @@ body {
 .eyebrow.co {
   background: var(--color-primary-light);
   color: var(--color-primary);
-  border: 1px solid #c5d5f6;
+  border: 1px solid var(--color-border);
 }
 .eyebrow.or {
   background: var(--color-accent-light);
   color: var(--color-accent);
-  border: 1px solid #ffcfab;
+  border: 1px solid var(--color-border);
 }
 .pdot {
   width: 7px;
@@ -229,7 +229,7 @@ body {
   font-size: clamp(34px, 4.8vw, 58px);
   font-weight: 900;
   line-height: 1.1;
-  color: var(--navy);
+  color: var(--color-text);
   margin-bottom: 20px;
   letter-spacing: -0.5px;
 }
@@ -257,7 +257,8 @@ body {
   left: 0;
   right: 0;
   z-index: 200;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--color-header-bg);
+  opacity: 0.98;
   backdrop-filter: blur(18px);
   border-bottom: 1px solid var(--color-border);
   display: flex;
@@ -265,7 +266,7 @@ body {
   justify-content: space-between;
   padding: 0 40px;
   height: 68px;
-  box-shadow: 0 1px 20px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-sm);
 }
 .nb-brand {
   display: flex;
@@ -274,7 +275,7 @@ body {
   font-family: "Playfair Display", serif;
   font-weight: 700;
   font-size: 20px;
-  color: var(--navy);
+  color: var(--color-text);
 }
 .nb-logo {
   width: 36px;
@@ -309,12 +310,12 @@ body {
   color: var(--color-primary);
 }
 .nb-link.act {
-  color: var(--navy);
+  color: var(--color-primary);
   border-color: var(--color-accent);
 }
 .nb-cta {
   padding: 10px 22px;
-  background: var(--navy);
+  background: var(--color-primary);
   border: none;
   border-radius: 10px;
   color: #fff;
@@ -334,7 +335,7 @@ body {
   padding: 110px 0 80px;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(165deg, #fefefe 0%, var(--color-bg) 50%, #f0f4ff 100%);
+  background: var(--color-bg);
   display: flex;
   align-items: center;
 }
@@ -403,7 +404,7 @@ body {
   align-items: center;
   gap: 8px;
   background: var(--color-accent-light);
-  border: 1px solid #ffcfab;
+  border: 1px solid var(--color-border);
   border-radius: 99px;
   padding: 8px 18px;
   font-size: 12px;
@@ -418,7 +419,7 @@ body {
   font-size: clamp(46px, 6vw, 76px);
   font-weight: 900;
   line-height: 1;
-  color: var(--navy);
+  color: var(--color-text);
   margin-bottom: 24px;
   letter-spacing: -1.5px;
 }
@@ -498,9 +499,9 @@ body {
   gap: 10px;
   padding: 16px 32px;
   background: transparent;
-  border: 2px solid var(--navy);
+  border: 2px solid var(--color-primary);
   border-radius: 12px;
-  color: var(--navy);
+  color: var(--color-primary);
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
@@ -510,7 +511,7 @@ body {
     color 0.2s ease;
 }
 .btn-sec:hover {
-  background: var(--navy);
+  background: var(--color-primary);
   color: #fff;
 }
 
@@ -528,7 +529,7 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 2px solid #fff;
+  border: 2px solid var(--color-card-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -546,7 +547,7 @@ body {
   color: var(--color-text-muted);
 }
 .tr-txt strong {
-  color: var(--navy);
+  color: var(--color-text);
 }
 
 /* Hero visual card */
@@ -606,7 +607,7 @@ body {
   font-family: "Playfair Display", serif;
   font-size: 38px;
   font-weight: 900;
-  color: var(--navy);
+  color: var(--color-text);
   margin-bottom: 4px;
 }
 .hv-lbl {
@@ -641,7 +642,7 @@ body {
   font-family: "Playfair Display", serif;
   font-weight: 900;
   font-size: 18px;
-  color: var(--navy);
+  color: var(--color-text);
 }
 .hv-mini-l {
   font-size: 10px;
@@ -685,7 +686,7 @@ body {
   font-family: "Playfair Display", serif;
   font-size: 15px;
   font-weight: 700;
-  color: var(--navy);
+  color: var(--color-text);
 }
 .fl-sub {
   font-size: 10px;
@@ -695,7 +696,7 @@ body {
 /* ── Ticker ── */
 .ticker {
   padding: 16px 0;
-  background: var(--navy);
+  background: var(--color-primary-dark);
   overflow: hidden;
   white-space: nowrap;
 }
@@ -776,7 +777,7 @@ body {
   font-family: "Playfair Display", serif;
   font-size: 15px;
   font-weight: 700;
-  color: var(--navy);
+  color: var(--color-text);
   margin-bottom: 10px;
   line-height: 1.3;
 }
@@ -818,7 +819,7 @@ body {
   inset: 0;
   background-image: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.035) 1px,
+    rgba(255, 255, 255, 0.05) 1px,
     transparent 1px
   );
   background-size: 28px 28px;
@@ -854,14 +855,14 @@ body {
   align-items: center;
   gap: 8px;
   padding: 6px 16px;
-  background: rgba(255, 122, 42, 0.15);
-  border: 1px solid rgba(255, 122, 42, 0.3);
+  background: rgba(255, 122, 42, 0.2);
+  border: 1px solid var(--color-accent);
   border-radius: 99px;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: var(--color-accent);
+  color: #fff;
   margin-bottom: 22px;
 }
 .ban-h2 {
@@ -902,11 +903,11 @@ body {
 }
 .ban-avrole {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.7);
 }
 .ban-vis-card {
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 24px;
   padding: 34px;
   backdrop-filter: blur(10px);
@@ -955,15 +956,27 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  width: 100%;
+  max-width: 480px;
 }
 
 .ban-img {
   width: 100%;
-  max-width: 480px;
-  height: auto;
-  border-radius: 28px;
-  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  height: 100%;
+  aspect-ratio: 1/1; /* Keep it squareish for the blob */
+  object-fit: cover;
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  animation: morph-alt 12s ease-in-out infinite alternate;
+  will-change: border-radius;
+}
+
+@keyframes morph-alt {
+  0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+  50% { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; }
+  100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
 }
 
 /* ── Why Us ── */
@@ -1001,8 +1014,9 @@ body {
   border-color: #c5d5f6;
 }
 .feat-card.hl {
-  background: linear-gradient(160deg, var(--color-accent-light), var(--color-card-bg));
-  border-color: #ffcfab;
+  background: linear-gradient(160deg, var(--color-accent-light), var(--color-bg));
+  border-color: var(--color-accent);
+  opacity: 0.9;
 }
 .feat-card.hl:hover {
   box-shadow: 0 10px 36px rgba(255, 122, 42, 0.14);
@@ -1027,7 +1041,7 @@ body {
 }
 .feat-dsc {
   font-size: 14px;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   line-height: 1.82;
 }
 
@@ -1204,41 +1218,92 @@ body {
 }
 .hv-blob-wrap {
   position: relative;
-  animation: float 5s ease-in-out infinite;
-}
-.hv-blob {
   width: 320px;
   height: 340px;
-  border-radius: 62% 38% 50% 50%/50% 60% 40% 50%;
-  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-accent-light) 100%);
-  border: 2px solid var(--color-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 90px;
+  z-index: 1;
+}
+
+.hv-ripple {
+  position: absolute;
+  inset: -20px;
+  border-radius: 62% 38% 50% 50%/50% 60% 40% 50%;
+  border: 1.5px solid var(--color-accent);
+  opacity: 0.2;
+  animation: morph 8s ease-in-out infinite alternate, pulse-ripple 4s ease-in-out infinite;
+  z-index: -1;
+  pointer-events: none;
+}
+
+@keyframes pulse-ripple {
+  0%, 100% { transform: scale(1); opacity: 0.2; }
+  50% { transform: scale(1.05); opacity: 0.4; }
+}
+
+.hv-ripple-2 {
+  inset: -40px;
+  opacity: 0.1;
+  animation: morph 12s ease-in-out infinite alternate-reverse, pulse-ripple 6s ease-in-out infinite 1s;
+  border-style: solid;
+  border-width: 1px;
+}
+
+.hv-blob {
+  width: 100%;
+  height: 100%;
+  border-radius: 62% 38% 50% 50%/50% 60% 40% 50%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: morph 10s ease-in-out infinite alternate;
+  will-change: border-radius;
 }
+
+@keyframes morph {
+  0% {
+    border-radius: 62% 38% 50% 50%/50% 60% 40% 50%;
+  }
+  33% {
+    border-radius: 40% 60% 55% 45%/55% 45% 55% 45%;
+  }
+  66% {
+    border-radius: 55% 45% 40% 60%/45% 55% 45% 55%;
+  }
+  100% {
+    border-radius: 62% 38% 50% 50%/50% 60% 40% 50%;
+  }
+}
+
 .hv-blob::before {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(
     135deg,
-    rgba(74, 110, 209, 0.06),
-    rgba(255, 122, 42, 0.06)
+    rgba(74, 110, 209, 0.1),
+    rgba(255, 122, 42, 0.1)
   );
+  mix-blend-mode: overlay;
 }
 
 .hv-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: brightness(1.05);
 }
 
 .hv-img:hover {
-  transform: scale(1.05);
+  transform: scale(1.1) rotate(2deg);
 }
 .hv-exp {
   position: absolute;
@@ -1344,7 +1409,7 @@ body {
 }
 .fcta-sub {
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.7);
   margin-bottom: 44px;
 }
 .fcta-btns {
@@ -1376,9 +1441,9 @@ body {
 .btn-gh {
   padding: 16px 38px;
   background: transparent;
-  border: 2px solid rgba(255, 255, 255, 0.28);
+  border: 2px solid rgba(255, 255, 255, 0.4);
   border-radius: 12px;
-  color: rgba(255, 255, 255, 0.8);
+  color: #fff;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;

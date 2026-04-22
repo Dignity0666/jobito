@@ -3,6 +3,7 @@ import "./Job Listing.css";
 import { useNavigate } from "react-router-dom";
 import { useJobitoAuth } from "../../../context/LinkContxt";
 import { useTranslation } from "../../../context/translation-context";
+import { useToast } from "../../../context/ToastContext";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
@@ -23,6 +24,7 @@ interface Job {
 export default function JobListing() {
   const { user, apiFetch } = useJobitoAuth();
   const { t, language } = useTranslation();
+  const { showToast } = useToast();
   console.log("Logged in as:", user?.name);
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("المتقدمون");
@@ -57,7 +59,7 @@ export default function JobListing() {
       let companyId;
       try {
         const profileRes = await apiFetch(
-          `${API_BASE_URL}/companies/my/profile`,
+          `${API_BASE_URL}/companies/my/profile?_t=${Date.now()}`,
         );
         if (profileRes.ok) {
           const profileData = await profileRes.json();
@@ -70,8 +72,8 @@ export default function JobListing() {
       }
 
       const url = companyId
-        ? `${API_BASE_URL}/jobs?companyId=${companyId}`
-        : `${API_BASE_URL}/jobs`;
+        ? `${API_BASE_URL}/jobs?companyId=${companyId}&_t=${Date.now()}`
+        : `${API_BASE_URL}/jobs?_t=${Date.now()}`;
 
       const jobsRes = await apiFetch(url);
 
@@ -82,7 +84,9 @@ export default function JobListing() {
         );
       }
       const jobsData = await jobsRes.json();
-      setJobs(jobsData.data || []);
+      const freshJobs = jobsData.data || [];
+      console.log("🔥 [JobListing] Fresh Data from Server:", freshJobs);
+      setJobs(freshJobs);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Unknown error occurred");
     } finally {
@@ -108,10 +112,10 @@ export default function JobListing() {
         setJobs(jobs.filter((j) => (j.jobId || j.job_id) !== id));
       } else {
         const data = await res.json();
-        alert(t(data.message) || t("فشل حذف الوظيفة"));
+        showToast(t(data.message) || t("فشل حذف الوظيفة"), "error");
       }
     } catch {
-      alert(t("خطأ أثناء حذف الوظيفة"));
+      showToast(t("خطأ أثناء حذف الوظيفة"), "error");
     }
   };
 
@@ -147,16 +151,31 @@ export default function JobListing() {
         );
       } else {
         const data = await res.json();
-        alert(t(data.message) || t("فشل تحديث الحالة"));
+        showToast(t(data.message) || t("فشل تحديث الحالة"), "error");
       }
     } catch {
-      alert(t("خطأ أثناء تحديث الحالة"));
+      showToast(t("خطأ أثناء تحديث الحالة"), "error");
     }
   };
 
-  const handleEdit = (e: React.MouseEvent, job: Job) => {
+  const handleEdit = async (e: React.MouseEvent, job: Job) => {
     e.stopPropagation();
-    navigate("/PostJob", { state: { editJob: job } });
+    const id = job.jobId || job.job_id;
+    if (!id) return;
+    
+    try {
+      // Fetch full job details to ensure we have description, benefits, etc.
+      const res = await apiFetch(`${API_BASE_URL}/jobs/${id}?_t=${Date.now()}`);
+      if (res.ok) {
+        const fullJob = await res.json();
+        navigate("/PostJob", { state: { editJob: fullJob } });
+      } else {
+        showToast(t("فشل في جلب بيانات الوظيفة"), "error");
+      }
+    } catch (err) {
+      console.error("Error fetching job for edit:", err);
+      showToast(t("حدث خطأ أثناء جلب البيانات"), "error");
+    }
   };
 
   const getStatusClass = (isActive: boolean) => {
@@ -315,7 +334,7 @@ export default function JobListing() {
                     })
                   }
                 >
-                  <td className="jl-col-role">{t(job.title)}</td>
+                  <td className="jl-col-role">{job.title}</td>
                   <td>
                     <span
                       className={`jl-status-badge ${getStatusClass(job.isActive)}`}

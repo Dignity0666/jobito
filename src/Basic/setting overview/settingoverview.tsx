@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useJobitoAuth } from "../../context/LinkContxt";
+import { useToast } from "../../context/ToastContext";
 import "./settingoverview.css";
 
 const API_BASE_URL =
@@ -166,6 +167,7 @@ const EMP_RANGES = [
 
 export default function CompanySettings() {
   const { user, apiFetch } = useJobitoAuth();
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState("Overview");
   const [hasChanges, setHasChanges] = useState(true);
   const [saved, setSaved] = useState(false);
@@ -301,9 +303,9 @@ export default function CompanySettings() {
         } else {
           console.error("Failed to fetch companies list.");
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Failed to fetch company", err);
-        alert(`Error loading your company settings: ${err.message}`);
+        showToast(`Error loading your company settings: ${err instanceof Error ? err.message : "Known error"}`, "error");
       } finally {
         setLoading(false);
       }
@@ -371,17 +373,18 @@ export default function CompanySettings() {
         } catch (e) {
           /* ignore parse error on PUT */
         }
-        alert("Changes saved successfully!");
+        showToast("Changes saved successfully!", "success");
       } else {
         const errText = await res.text();
         console.error("Failed to save company:", res.status, errText);
-        alert(
+        showToast(
           `Failed to save! Server responded with ${res.status}: ${errText}`,
+          "error"
         );
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error(e);
-      alert(`An error occurred while saving: ${e.message}`);
+      showToast(`An error occurred while saving: ${e instanceof Error ? e.message : "Error"}`, "error");
     }
   };
 

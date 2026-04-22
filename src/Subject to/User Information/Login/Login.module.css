@@ -2,7 +2,7 @@
   width: 100%;
   min-height: 100%;
   display: flex;
-  background-color: #f8fafc;
+  background-color: var(--color-bg);
   overflow: hidden;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   box-sizing: border-box;
@@ -16,7 +16,7 @@
   justify-content: center;
   align-items: center;
   z-index: 2;
-  background: #ffffff;
+  background: var(--color-card-bg);
   overflow-y: auto;
 }
 
@@ -37,7 +37,7 @@
   left: -10%;
   width: 300px;
   height: 300px;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(79, 70, 229, 0.15); /* Keep a subtle primary tint */
   filter: blur(80px);
   border-radius: 50%;
 }
@@ -59,6 +59,10 @@
   filter: drop-shadow(0 40px 80px rgba(0,0,0,0.2));
   z-index: 1;
   animation: float 6s ease-in-out infinite;
+}
+
+:global([data-theme="dark"]) .loginRight img {
+  filter: drop-shadow(0 40px 80px rgba(0,0,0,0.4)) brightness(0.85);
 }
 
 @keyframes float {
@@ -94,14 +98,14 @@
 .title {
   font-size: 32px;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--color-text);
   margin-bottom: 8px;
   letter-spacing: -0.02em;
 }
 
 .subtitle {
   font-size: 16px;
-  color: #64748b;
+  color: var(--color-text-secondary);
   line-height: 1.6;
 }
 
@@ -122,7 +126,7 @@
 .inputGroup label {
   font-size: 14px;
   font-weight: 600;
-  color: #334155;
+  color: var(--color-text-secondary);
   transition: color 0.2s;
 }
 
@@ -138,10 +142,10 @@
   padding: 14px;
   padding-left: 44px;
   border-radius: 12px;
-  border: 1.5px solid #e2e8f0;
+  border: 1.5px solid var(--color-border);
   font-size: 15px;
-  color: #0f172a;
-  background-color: #f8fafc;
+  color: var(--color-text);
+  background-color: var(--color-input-bg);
   transition: all 0.2s ease;
   box-sizing: border-box;
 }
@@ -156,14 +160,14 @@
 }
 
 .relativeInput input:focus {
-  border-color: #4f46e5;
-  background-color: #ffffff;
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1), 0 0 0 4px rgba(79, 70, 229, 0.1);
+  border-color: var(--color-primary);
+  background-color: var(--color-card-bg);
+  box-shadow: 0 4px 12px var(--color-input-focus-shadow), 0 0 0 4px var(--color-input-focus-shadow);
   outline: none;
 }
 
 .relativeInput input::placeholder {
-  color: #94a3b8;
+  color: var(--color-text-muted);
 }
 
 .authbtn {
@@ -273,14 +277,14 @@
 }
 
 .googleBtn {
-  background: #ffffff;
-  border: 1.5px solid #e2e8f0;
-  color: #334155;
+  background: var(--color-card-bg);
+  border: 1.5px solid var(--color-border);
+  color: var(--color-text);
 }
 
 .googleBtn:hover {
-  border-color: #cbd5e1;
-  background: #f8fafc;
+  border-color: var(--color-primary);
+  background: var(--color-bg);
   transform: translateY(-2px);
 }
 
@@ -300,7 +304,7 @@
 .backBtn {
   background: none;
   border: none;
-  color: #64748b;
+  color: var(--color-text-secondary);
   font-weight: 500;
   font-size: 14px;
   cursor: pointer;
@@ -324,22 +328,22 @@
   width: 100%;
   padding: 16px;
   border-radius: 12px;
-  border: 1.5px solid #e2e8f0;
+  border: 1.5px solid var(--color-border);
   font-size: 24px;
   text-align: center;
   letter-spacing: 12px;
   font-weight: 700;
   outline: none;
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: var(--color-input-bg);
+  color: var(--color-text);
   transition: all 0.2s;
   box-sizing: border-box;
 }
 
 .otpInput:focus {
-  border-color: #4f46e5;
-  background-color: #ffffff;
-  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+  border-color: var(--color-primary);
+  background-color: var(--color-card-bg);
+  box-shadow: 0 0 0 4px var(--color-input-focus-shadow);
 }
 
 @media (max-width: 992px) {

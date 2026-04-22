@@ -42,88 +42,41 @@
   position: relative;
 }
 
-/* ── Single marquee row ── */
-.marquee {
-  width: 100%;
-  overflow: hidden;
-}
-
-.marqueeInner {
+.marqueeBand {
   display: flex;
-  gap: 2rem;
-  width: max-content;
-  animation: scrollLeft 35s linear infinite;
-  padding: 0.75rem 0;
+  align-items: center;
 }
 
-.marqueeInner:hover {
-  animation-play-state: paused;
-}
-
-/* Reverse direction for second row */
-.marqueeInnerReverse {
-  animation: scrollRight 35s linear infinite;
-}
-
-.marqueeInnerReverse:hover {
-  animation-play-state: paused;
-}
-
-/* ── Keyframes ── */
-@keyframes scrollLeft {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-@keyframes scrollRight {
-  0% {
-    transform: translateX(-50%);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
-
-/* ── Partner Card ── */
+/* ── Partner Card (No background or border) ── */
 .reviewCard {
-  min-width: 160px;
-  padding: 1.25rem 2rem;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  padding: 0.5rem 1rem;
+  margin: 0 2rem; /* Gap between logos */
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   cursor: pointer;
   flex-shrink: 0;
 }
 
 .reviewCard:hover {
-  transform: translateY(-5px);
-  background: #ffffff;
-  border-color: var(--color-text);
-  box-shadow: 0 20px 25px -5px rgba(70, 64, 222, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transform: translateY(-3px) scale(1.05);
 }
 
 /* ── Partner Logo ── */
 .partnerLogo {
-  height: 32px !important;
+  height: 48px !important;
   width: auto !important;
-  max-width: 150px;
+  max-width: 180px;
   object-fit: contain;
-  filter: grayscale(1) opacity(0.7);
+  opacity: 0.65;
   transition: all 0.3s ease;
+  filter: grayscale(100%);
 }
 
 .reviewCard:hover .partnerLogo {
-  filter: grayscale(0) opacity(1);
+  opacity: 1;
+  filter: grayscale(0%);
 }
 
 /* ── Partner Name (fallback) ── */
@@ -139,31 +92,7 @@
   letter-spacing: 0.5px;
 }
 
-/* ── Loading ── */
-.loading {
-  color: var(--color-text);
-  font-weight: 600;
-  padding: 60px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.loading::after {
-  content: "";
-  width: 20px;
-  height: 20px;
-  border: 3px solid #e2e8f0;
-  border-top-color: var(--color-text);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* ── Edge fade gradients ── */
+/* ── Edge fade gradients (supports dark/light modes) ── */
 .testimonial::before,
 .testimonial::after {
   content: "";

@@ -5,7 +5,7 @@ import { useJobitoAuth } from "../../context/LinkContxt.js";
 import { useEffect, useState, useMemo } from "react";
 import AllApplicants from "../Company/All Applicants/All Applicants";
 import { useTranslation } from "../../context/translation-context";
-
+import { useToast } from "../../context/ToastContext";
 
 const CheckIcon = () => (
   <svg
@@ -64,6 +64,11 @@ interface Job {
     logoUrl?: string;
   };
   applications?: Application[];
+  images?: string[];
+  user?: {
+    avatarUrl?: string;
+    fullName?: string;
+  };
 }
 
 export const JobDetailsPage = () => {
@@ -71,6 +76,7 @@ export const JobDetailsPage = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const { apiFetch, isAuthenticated, role } = useJobitoAuth();
+  const { showToast } = useToast();
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"details" | "applicants">(
     "details",
@@ -89,14 +95,15 @@ export const JobDetailsPage = () => {
     const fetchJobData = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_BASE_URL}/jobs/${jobId}`, {
+        const res = await fetch(`${API_BASE_URL}/jobs/${jobId}?_t=${Date.now()}`, {
           headers: getCommonHeaders(),
         });
         if (!res.ok) throw new Error("Failed to fetch");
         const data = await res.json();
+        console.log("🔥 [JobDetailsPage] Fresh Job Data:", data);
         setJob(data);
 
-        const simRes = await fetch(`${API_BASE_URL}/jobs/similar/${jobId}`, {
+        const simRes = await fetch(`${API_BASE_URL}/jobs/similar/${jobId}?_t=${Date.now()}`, {
           headers: {
             "ngrok-skip-browser-warning": "69420",
           },
@@ -160,15 +167,14 @@ export const JobDetailsPage = () => {
         method: "DELETE",
       });
       if (res.ok) {
-        alert(t("تم حذف الوظيفة بنجاح."));
+        showToast(t("تم حذف الوظيفة بنجاح."), "success");
         navigate("/JobListing");
       } else {
         throw new Error("Failed to delete job");
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error deleting job:", error);
-      alert(t("خطأ أثناء حذف الوظيفة."));
+      showToast(t("خطأ أثناء حذف الوظيفة."), "error");
     }
   };
 
@@ -186,15 +192,18 @@ export const JobDetailsPage = () => {
         setJob((prev) =>
           prev ? { ...prev, isActive: updatedJob.isActive } : null,
         );
-        alert(
-          updatedJob.isActive ? t("تم إعادة فتح الوظيفة") : t("تم إغلاق الوظيفة"),
+        showToast(
+          updatedJob.isActive
+            ? t("تم إعادة فتح الوظيفة")
+            : t("تم إغلاق الوظيفة"),
+          "success"
         );
       } else {
         throw new Error("Failed to update status");
       }
     } catch (error) {
       console.error("Error toggling job status:", error);
-      alert(t("خطأ أثناء تحديث حالة الوظيفة."));
+      showToast(t("خطأ أثناء تحديث حالة الوظيفة."), "error");
     }
   };
 
@@ -230,6 +239,28 @@ export const JobDetailsPage = () => {
         {t("الوظيفة غير موجودة.")}
       </div>
     );
+  }
+
+  const descriptionToUse =
+    lang === "en" && job.descriptionEn ? job.descriptionEn : job.description;
+  const parsedSections: Record<string, string> = {};
+
+  if (descriptionToUse) {
+    let currentTitle = t("الوصف");
+    let currentLines: string[] = [];
+
+    const lines = descriptionToUse.split("\n");
+    lines.forEach((line: string) => {
+      const headerMatch = line.match(/^\*\*(.*):\*\*$/);
+      if (headerMatch) {
+        parsedSections[currentTitle] = currentLines.join("\n").trim();
+        currentTitle = headerMatch[1];
+        currentLines = [];
+      } else {
+        currentLines.push(line);
+      }
+    });
+    parsedSections[currentTitle] = currentLines.join("\n").trim();
   }
 
   return (
@@ -278,26 +309,47 @@ export const JobDetailsPage = () => {
           <div className={styles.headerCard}>
             <div className={styles.headerLeft}>
               <div className={styles.companyLogo}>
-                {job.company?.logoUrl ? (
+                {job.user?.avatarUrl ? (
+                  <img
+                    src={
+                      job.user.avatarUrl.startsWith("http")
+                        ? job.user.avatarUrl
+                        : `${API_BASE_URL}${job.user.avatarUrl.startsWith("/") ? "" : "/"}${job.user.avatarUrl}`
+                    }
+                    alt={job.user.fullName || job.title}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                ) : job.company?.logoUrl ? (
                   <img
                     src={
                       job.company.logoUrl.startsWith("http")
                         ? job.company.logoUrl
-                        : `${API_BASE_URL}${job.company.logoUrl}`
+                        : `${API_BASE_URL}${job.company.logoUrl.startsWith("/") ? "" : "/"}${job.company.logoUrl}`
                     }
                     alt={job.company.name}
-                    style={{ width: "100%", objectFit: "cover" }}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                ) : job.images && job.images.length > 0 ? (
+                  <img
+                    src={
+                      job.images[0].startsWith("http")
+                        ? job.images[0]
+                        : `${API_BASE_URL}${job.images[0].startsWith("/") ? "" : "/"}${job.images[0]}`
+                    }
+                    alt={job.title}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
                   />
                 ) : (
-                  <span>{job.company?.name?.[0]?.toUpperCase() || "C"}</span>
+                  <span>{job.company?.name?.[0]?.toUpperCase() || job.user?.fullName?.[0]?.toUpperCase() || "C"}</span>
                 )}
               </div>
               <div className={styles.headerTitles}>
                 <h1>
-                  {lang === "en" && job.titleEn ? job.titleEn : t(job.title)}
+                  {lang === "en" && job.titleEn ? job.titleEn : job.title}
                 </h1>
                 <p>
-                  {t(job.company?.name || "شركة")} • {t(job.address || "الموقع")} •{" "}
+                  {job.company?.name || t("شركة")} •{" "}
+                  {job.address || t("الموقع")} •{" "}
                   {job.jobType === "full-time"
                     ? t("دوام كامل")
                     : job.jobType === "part-time"
@@ -435,7 +487,9 @@ export const JobDetailsPage = () => {
                   </div>
                 ) : (
                   <button
-                    className={job.isActive ? styles.applyBtn : styles.closedBtn}
+                    className={
+                      job.isActive ? styles.applyBtn : styles.closedBtn
+                    }
                     onClick={handleApplyClick}
                     disabled={!job.isActive}
                   >
@@ -453,62 +507,38 @@ export const JobDetailsPage = () => {
             <div className={styles.mainLayout}>
               {/* Left Column */}
               <div className={styles.leftCol}>
-                {(() => {
-                  const descriptionToUse =
-                    lang === "en" && job.descriptionEn
-                      ? job.descriptionEn
-                      : job.description;
-                  if (!descriptionToUse) return null;
+                {Object.entries(parsedSections).map(([title, content]) => {
+                  if (!content || title === "المهارات" || title === "Skills")
+                    return null;
 
-                  const sections: Record<string, string> = {};
-                  let currentTitle = "الوصف";
-                  let currentLines: string[] = [];
+                  const isList =
+                    content.includes("•") || content.includes("- ");
+                  const listItems = content
+                    .split("\n")
+                    .map((li) => li.replace(/^[•\-\s*]+/, "").trim())
+                    .filter((li) => li.length > 0);
 
-                  const lines = descriptionToUse.split("\n");
-                  lines.forEach((line: string) => {
-                    const headerMatch = line.match(/^\*\*(.*):\*\*$/);
-                    if (headerMatch) {
-                      sections[currentTitle] = currentLines.join("\n").trim();
-                      currentTitle = headerMatch[1];
-                      currentLines = [];
-                    } else {
-                      currentLines.push(line);
-                    }
-                  });
-                  sections[currentTitle] = currentLines.join("\n").trim();
-
-                  return Object.entries(sections).map(([title, content]) => {
-                    if (!content) return null;
-
-                    const isList =
-                      content.includes("•") || content.includes("- ");
-                    const listItems = content
-                      .split("\n")
-                      .map((li) => li.replace(/^[•\-\s*]+/, "").trim())
-                      .filter((li) => li.length > 0);
-
-                    return (
-                      <section key={title} className={styles.section}>
-                        <h2>{t(title)}</h2>
-                        {isList ? (
-                          <ul className={styles.list}>
-                            {listItems.map((item, i) => (
-                              <li key={i}>
-                                <CheckIcon />
-                                {t(item)}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <div
-                            dangerouslySetInnerHTML={{ __html: t(content) }}
-                            className={styles.descriptionText}
-                          />
-                        )}
-                      </section>
-                    );
-                  });
-                })()}
+                  return (
+                    <section key={title} className={styles.section}>
+                      <h2>{t(title)}</h2>
+                      {isList ? (
+                        <ul className={styles.list}>
+                          {listItems.map((item, i) => (
+                            <li key={i}>
+                              <CheckIcon />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <div
+                          dangerouslySetInnerHTML={{ __html: content }}
+                          className={styles.descriptionText}
+                        />
+                      )}
+                    </section>
+                  );
+                })}
               </div>
 
               {/* Right Column */}
@@ -542,18 +572,21 @@ export const JobDetailsPage = () => {
                       <span className={styles.roleLabel}>{t("نشر في")}</span>
                       <span className={styles.roleValue}>
                         {job.createdAt
-                          ? t(new Date(job.createdAt).toLocaleDateString())
+                          ? new Date(job.createdAt).toLocaleDateString(
+                              t("ar-EG") === "ar-EG" ? "ar-EG" : "en-US",
+                            )
                           : t("غير متاح")}
                       </span>
                     </div>
                     {job.expiresAt && (
                       <div className={styles.roleRow}>
-                        <span className={styles.roleLabel}>{t("تقدم قبل")}</span>
-                        <span
-                          className={styles.roleValue}
-                          className={styles.expiresAtValue}
-                        >
-                          {t(new Date(job.expiresAt).toLocaleDateString())}
+                        <span className={styles.roleLabel}>
+                          {t("تقدم قبل")}
+                        </span>
+                        <span className={styles.roleValue}>
+                          {new Date(job.expiresAt).toLocaleDateString(
+                            t("ar-EG") === "ar-EG" ? "ar-EG" : "en-US",
+                          )}
                         </span>
                       </div>
                     )}
@@ -575,7 +608,11 @@ export const JobDetailsPage = () => {
                     </div>
                     <div className={styles.roleRow}>
                       <span className={styles.roleLabel}>{t("الراتب")}</span>
-                      <span className={styles.roleValue} dir="ltr" style={{ display: "inline-block", textAlign: "right" }}>
+                      <span
+                        className={styles.roleValue}
+                        dir="ltr"
+                        style={{ display: "inline-block", textAlign: "right" }}
+                      >
                         {job.salaryMin === job.salaryMax || !job.salaryMax
                           ? `${job.salaryMin || 0} EGP`
                           : `${job.salaryMin || 0} - ${job.salaryMax} EGP`}
@@ -586,21 +623,44 @@ export const JobDetailsPage = () => {
 
                 <div className={styles.separator}></div>
 
+                {(parsedSections["المهارات"] || parsedSections["Skills"]) && (
+                  <>
+                    <div className={styles.widget}>
+                      <h2>{t("المهارات")}</h2>
+                      <p
+                        style={{
+                          fontSize: "15px",
+                          color: "var(--color-text-secondary)",
+                          lineHeight: "1.6",
+                          margin: 0,
+                          fontWeight: 500,
+                        }}
+                      >
+                        {t(
+                          parsedSections["المهارات"] ||
+                            parsedSections["Skills"],
+                        )}
+                      </p>
+                    </div>
+                    <div className={styles.separator}></div>
+                  </>
+                )}
+
                 {(job.category || (job as any).categoryName) && (
                   <>
                     <div className={styles.widget}>
                       <h2>{t("الأقسام")}</h2>
                       <div className={styles.tagsContainer}>
                         <span className={styles.tagYellow}>
-                          {job.category ? t(job.category.name) : t((job as any).categoryName)}
+                          {job.category
+                            ? t(job.category.name)
+                            : t((job as any).categoryName)}
                         </span>
                       </div>
                     </div>
                     <div className={styles.separator}></div>
                   </>
                 )}
-
-
               </div>
             </div>
 
@@ -680,15 +740,17 @@ export const JobDetailsPage = () => {
                       >
                         <img
                           src={
-                            simJob.company?.logoUrl
-                              ? simJob.company.logoUrl.startsWith("http")
-                                ? simJob.company.logoUrl
-                                : `${API_BASE_URL}${simJob.company.logoUrl}`
-                              : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
-                                  simJob.company?.name || "Company",
-                                )}`
+                            simJob.user?.avatarUrl
+                              ? (simJob.user.avatarUrl.startsWith("http")
+                                  ? simJob.user.avatarUrl
+                                  : `${API_BASE_URL}${simJob.user.avatarUrl.startsWith("/") ? "" : "/"}${simJob.user.avatarUrl}`)
+                              : simJob.company?.logoUrl
+                                ? (simJob.company.logoUrl.startsWith("http")
+                                  ? simJob.company.logoUrl
+                                  : `${API_BASE_URL}${simJob.company.logoUrl.startsWith("/") ? "" : "/"}${simJob.company.logoUrl}`)
+                                : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(simJob.company?.name || simJob.user?.fullName || "Company")}`
                           }
-                          alt={simJob.company?.name}
+                          alt={simJob.company?.name || simJob.user?.fullName}
                           style={{
                             width: "100%",
                             height: "100%",
@@ -699,10 +761,10 @@ export const JobDetailsPage = () => {
                       </div>
                       <div className={styles.simDetails}>
                         <div className={styles.simTitleGroup}>
-                          <h3>{t(simJob.title)}</h3>
+                          <h3>{simJob.title}</h3>
                           <p>
-                            {t(simJob.company?.name || "") || "Jobito"} •{" "}
-                            {t(simJob.address || "") || t("عالمي")}
+                            {simJob.company?.name || "Jobito"} •{" "}
+                            {simJob.address || t("عالمي")}
                           </p>
                         </div>
                         <div className={styles.simTags}>
@@ -737,9 +799,10 @@ export const JobDetailsPage = () => {
         isOpen={isApplyModalOpen}
         onClose={() => setIsApplyModalOpen(false)}
         jobId={jobId}
+        isTradesman={!!job?.user || job?.classification === "خدمات" || job?.classification === "services" || job?.classification === "Services"}
         jobTitle={t(job?.title || "")}
         companyName={t(job?.company?.name || "شركة")}
-        location={t(job?.address || "عن بعد")}
+        location={t(job?.address || "الموقع")}
         jobType={job?.jobType === "full-time" ? t("دوام كامل") : t("دوام جزئي")}
         isActive={job?.isActive}
         logoUrl={

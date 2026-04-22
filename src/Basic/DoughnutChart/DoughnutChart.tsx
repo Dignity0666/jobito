@@ -23,9 +23,13 @@ interface Application {
   job: {
     title: string;
     jobType?: string;
-    company: {
+    company?: {
       name: string;
       logoUrl?: string;
+    };
+    user?: {
+      fullName: string;
+      avatarUrl?: string;
     };
   };
 }
@@ -106,6 +110,12 @@ export default function JobDashboard() {
 
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const getFullImageUrl = (url?: string) => {
+    if (!url) return null;
+    if (url.startsWith("http")) return url;
+    return `${API_BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`;
+  };
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -321,12 +331,6 @@ export default function JobDashboard() {
                     </div>
                   )}
                 </div>
-                <button
-                  className={styles.viewLink}
-                  onClick={() => navigate("/MyApplications")}
-                >
-                  {t("عرض الكل")} ←
-                </button>
               </div>
             </div>
 
@@ -340,82 +344,78 @@ export default function JobDashboard() {
                   {t("لم تقم بالتقديم على أي وظائف بعد.")}
                 </div>
               ) : (
-                recentApps.map((app, index) => (
-                  <div
-                    className={styles.appItem}
-                    key={app.applicationId}
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
+                recentApps.map((app, index) => {
+                  const isTradesman = !!app.job.user;
+                  const displayLogo = isTradesman ? app.job.user?.avatarUrl : app.job.company?.logoUrl;
+                  const displayName = isTradesman ? app.job.user?.fullName : app.job.company?.name;
+
+                  return (
                     <div
-                      className={styles.appLogo}
-                      style={{
-                        background: "#f1f5f9",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        overflow: "hidden",
-                      }}
+                      className={styles.appItem}
+                      key={app.applicationId}
+                      style={{ animationDelay: `${index * 0.1}s` }}
                     >
-                      {app.job?.company?.logoUrl ? (
-                        <img
-                          src={
-                            app.job.company.logoUrl.startsWith("http")
-                              ? app.job.company.logoUrl
-                              : `${API_BASE_URL}${app.job.company.logoUrl.startsWith("/") ? "" : "/"}${app.job.company.logoUrl}`
-                          }
-                          alt="logo"
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
-                      ) : (
-                        "🏢"
-                      )}
-                    </div>
-                    <div className={styles.appInfo}>
-                      <div className={styles.appTitle}>
-                        {t(app.job?.title || "") || t("الوظيفة")}
-                      </div>
-                      <div className={styles.appMeta}>
-                        {t(app.job?.company?.name || "") || t("الشركة")} ·{" "}
-                        {t(app.job?.jobType || "") || t("دوام كامل")}
-                      </div>
-                    </div>
-                    <div className={styles.appDateCol}>
-                      <div className={styles.appDateLabel}>
-                        {t("تاريخ التقديم")}
-                      </div>
-                      <div className={styles.appDateVal}>
-                        {new Date(app.appliedAt).toLocaleDateString(
-                          language === "ar" ? "ar-EG" : "en-US",
+                      <div
+                        className={styles.appLogo}
+                        style={{
+                          background: "#f1f5f9",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          overflow: "hidden",
+                          borderRadius: isTradesman ? "50%" : "8px",
+                        }}
+                      >
+                        {displayLogo ? (
+                          <img
+                            src={getFullImageUrl(displayLogo) || ""}
+                            alt="logo"
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
+                          />
+                        ) : (
+                          isTradesman ? "👤" : "🏢"
                         )}
                       </div>
+                      <div className={styles.appInfo}>
+                        <div className={styles.appTitle}>
+                          {t(app.job?.title || "") || t("الوظيفة")}
+                        </div>
+                        <div className={styles.appMeta}>
+                          {t(displayName || "") || t("الجهة المعلنة")} ·{" "}
+                          {t(app.job?.jobType || "") || t("دوام كامل")}
+                        </div>
+                      </div>
+                      <div className={styles.appDateCol}>
+                        <div className={styles.appDateLabel}>
+                          {t("تاريخ التقديم")}
+                        </div>
+                        <div className={styles.appDateVal}>
+                          {new Date(app.appliedAt).toLocaleDateString(
+                            language === "ar" ? "ar-EG" : "en-US",
+                          )}
+                        </div>
+                      </div>
+                      <span
+                        className={`${styles.badge} ${getStatusBadgeClass(app.status)}`}
+                      >
+                        {getStatusLabel(app.status)}
+                      </span>
+                      <button
+                        className={styles.moreBtn}
+                        onClick={() => navigate("/MyApplications")}
+                      >
+                        ⋯
+                      </button>
                     </div>
-                    <span
-                      className={`${styles.badge} ${getStatusBadgeClass(app.status)}`}
-                    >
-                      {getStatusLabel(app.status)}
-                    </span>
-                    <button
-                      className={styles.moreBtn}
-                      onClick={() => navigate("/MyApplications")}
-                    >
-                      ⋯
-                    </button>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
-            <div className={styles.bottomLink}>
-              <button
-                className={styles.viewLink}
-                onClick={() => navigate("/MyApplications")}
-              >
-                {t("عرض كل السجل")} ←
-              </button>
-            </div>
+
           </>
         )}
       </div>

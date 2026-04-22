@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Building2 } from "lucide-react";
+import { Search, Building2, MapPin } from "lucide-react";
 import { motion, type Variants } from "framer-motion";
 import styles from "./CompaniesJobs.module.css";
 import { useTranslation } from "../../context/translation-context";
@@ -59,6 +59,7 @@ const CompaniesJobs = () => {
   const { t, language } = useTranslation();
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [location, setLocation] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
@@ -249,13 +250,30 @@ const CompaniesJobs = () => {
                 <Search className={styles.icon} size={20} />
                 <input
                   type="text"
-                  placeholder={t("ابحث عن شركة...")}
+                  placeholder={t("اسم الشركة أو المجال...")}
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
                     setCurrentPage(1);
                   }}
                 />
+              </div>
+
+              <div className={styles.divider}></div>
+
+              <div className={styles.inputGroup}>
+                <MapPin className={styles.icon} size={20} />
+                <select
+                  value={location}
+                  onChange={(e) => {
+                    setLocation(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                >
+                  <option value="">{t("أي مكان")}</option>
+                  <option value="Cairo">{t("القاهرة، مصر")}</option>
+                  <option value="Alexandria">{t("الإسكندرية، مصر")}</option>
+                </select>
               </div>
 
               <button 
@@ -292,6 +310,7 @@ const CompaniesJobs = () => {
               )}
             </div>
           </div>
+
         </aside>
 
         <main className={styles.Companiespagemu}>
@@ -367,8 +386,7 @@ const CompaniesJobs = () => {
                         company.tags.map((tag) => (
                           <span
                             key={tag}
-                            className={styles.tag}
-                            style={{ background: "#eef2ff", color: "#4640de" }}
+                            className={`${styles.tag} ${styles.paymentgateway}`}
                           >
                             {t(tag)}
                           </span>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import styles from "./JobCard.module.css";
 import { useTranslation } from "../../../context/translation-context";
+import { useJobitoAuth } from "../../../context/LinkContxt";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
@@ -22,102 +23,115 @@ interface Job {
   createdAt: string;
   category?: { name: string };
   description?: string;
+  rating?: number;
+  user?: {
+    avatarUrl?: string;
+    name?: string;
+  };
+  images?: string[];
 }
 
-const getFullImageUrl = (url?: string, seed?: string) => {
-  if (!url) return `https://api.dicebear.com/7.x/identicon/svg?seed=${seed || 'company'}`;
-  if (url.startsWith("http")) return url;
-  return `${API_BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`;
+const getFullImageUrl = (url?: string, seed?: string, job?: Job) => {
+  // Priority 1: Use the Tradesman's personal avatar if available
+  if (job?.user?.avatarUrl) {
+    const avatar = job.user.avatarUrl;
+    if (avatar.startsWith("http")) return avatar;
+    return `${API_BASE_URL}${avatar.startsWith("/") ? "" : "/"}${avatar}`;
+  }
+
+  // Priority 2: Use the logoUrl (Company Logo)
+  if (url) {
+    if (url.startsWith("http")) return url;
+    return `${API_BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`;
+  }
+
+  // Priority 3: Fallback to the first image from the job's own images array
+  if (job?.images && job.images.length > 0) {
+    const firstImg = job.images[0];
+    if (firstImg.startsWith("http")) return firstImg;
+    return `${API_BASE_URL}${firstImg.startsWith("/") ? "" : "/"}${firstImg}`;
+  }
+
+  // Priority 4: Fallback based on default identicon
+  return `https://api.dicebear.com/7.x/identicon/svg?seed=${seed || "company"}`;
 };
 
-const stripMarkdown = (text: string) => {
-  if (!text) return "";
-  // Remove markdown symbols like **, *, #, -, >, _
-  return text.replace(/[*#_~`>]/g, "").replace(/\s+/g, " ").trim();
-};
-
-const useTimeAgo = () => {
+/* ═══════════════════════════════════════
+   COMPANY CARD — Horizontal row
+   ═══════════════════════════════════════ */
+const CompanyJobCard: React.FC<{ job: Job; variants: Variants }> = ({
+  job,
+  variants,
+}) => {
   const { t } = useTranslation();
-  return (date: string) => {
-    const now = new Date();
-    const past = new Date(date);
-    const diffMs = now.getTime() - past.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    const diffMonths = Math.floor(diffDays / 30);
-
-    if (diffMonths > 0) return `${t("منذ")} ${diffMonths} ${t("أشهر")}`;
-    if (diffDays > 0) return `${t("منذ")} ${diffDays} ${t("أيام")}`;
-    return t("اليوم");
-  };
-};
-
-const JobCard: React.FC<{ job: Job; variants: Variants }> = ({ job, variants }) => {
-  const { t } = useTranslation();
-  const timeAgo = useTimeAgo();
-  const cleanDescription = stripMarkdown(job.description || t("نحن نبحث عن شخص موهوب للانضمام إلى فريقنا. هذه فرصة رائعة لتطوير مسيرتك المهنية."));
+  const navigate = useNavigate();
   
+  // Determine if it's a service (tradesman) job based on classification or provider type
+  const isServiceJob = (job as any).classification === "خدمات" || !!job.user;
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    navigate("/Job details", { state: { jobId: job.jobId } });
+    window.scrollTo(0, 0);
+  };
+
   return (
-    <motion.div 
-      className={styles.card}
+    <motion.div
       variants={variants}
-      whileHover={{ y: -8, transition: { duration: 0.2 } }}
+      whileHover={{ y: -5, transition: { duration: 0.3 } }}
     >
-      <div className={styles.cardTop}>
-        <div className={styles.companyInfo}>
-          <div className={styles.logoBox}>
-            <img 
-              src={getFullImageUrl(job.company?.logoUrl || job.company?.logo, job.company?.name || job.jobId?.toString())} 
-              alt={job.company?.name} 
-              className={styles.logo} 
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = `https://api.dicebear.com/7.x/identicon/svg?seed=${job.company?.name || job.jobId}`;
-              }}
+      <div onClick={handleCardClick} className={styles.todayCard} style={{ cursor: 'pointer' }}>
+
+        <div className={styles.cardHeader}>
+          <div className={styles.mainLogo}>
+             <img
+              src={getFullImageUrl(
+                job.company?.logoUrl || job.company?.logo,
+                job.company?.name || job.jobId?.toString(),
+                job
+              )}
+              alt={job.company?.name || "Company"}
             />
           </div>
-          <div>
-            <h3 className={styles.companyName}>{job.company?.name || t("Jobito Ltd")}</h3>
-            <p className={styles.location}>
-              <span className={styles.locIcon}>📍</span> {job.address}
+          <div className={styles.topInfo}>
+            <p className={styles.topMeta}>
+              {t(job.company?.name || "Jobito")} <span className={styles.dot}>•</span>
             </p>
+            <h3 className={styles.mainTitle}>{t(job.title)}</h3>
           </div>
         </div>
-        <span className={styles.flash}>⚡</span>
-      </div>
- 
-      <h2 className={styles.jobTitle}>{t(job.title)}</h2>
- 
-      <div className={styles.meta}>
-        <span className={styles.metaItem}>💼 {job.jobType}</span>
-        <span className={styles.metaItem}>🕒 {timeAgo(job.createdAt)}</span>
-      </div>
- 
-      <p className={styles.description}>
-        {cleanDescription.length > 100 ? t(cleanDescription.substring(0, 100)) + "..." : t(cleanDescription)}
-      </p>
- 
-      <div className={styles.tags}>
-        {job.category?.name && (
-          <span className={styles.tag}>
-            {t(job.category.name)}
-          </span>
-        )}
-      </div>
- 
-      <div className={styles.footer}>
-        <p className={styles.price}>
-          ${job.salary || t("قابل للتفاوض")}
-          {job.salary && <span className={styles.perHour}>/ {t("ساعة")}</span>}
-        </p>
-        <Link to="/Job details" state={{ jobId: job.jobId }} className={styles.applyBtn}>
-          {t("قدم الآن")}
-        </Link>
+
+        <div className={styles.cardBody}>
+          {job.description && (
+            <p className={styles.jobDesc}>
+              {t(job.description)}
+            </p>
+          )}
+        </div>
+
+        <div className={styles.cardFooter}>
+           {!isServiceJob && (
+             <span className={styles.salaryText}>
+               {job.salary ? `${t(job.salary.toString())}/Hour` : "$1.00/Hour"}
+             </span>
+           )}
+           <span className={styles.applyBtn}>
+             {t("Apply")}
+           </span>
+        </div>
       </div>
     </motion.div>
   );
 };
 
+/* ═══════════════════════════════════════
+   MAIN DASHBOARD
+   ═══════════════════════════════════════ */
 export default function JobsDashboard() {
   const { t } = useTranslation();
+  const { user } = useJobitoAuth();
+  const classification = user?.classification;
+  const isTradesman = classification === "tradesman";
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -126,20 +140,24 @@ export default function JobsDashboard() {
     const fetchJobs = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_BASE_URL}/jobs`);
+        const query = isTradesman
+          ? "classification=خدمات" 
+          : "excludeClassification=خدمات";
+        const response = await fetch(`${API_BASE_URL}/jobs?${query}`);
         if (!response.ok) throw new Error("Failed to fetch jobs");
         const result = await response.json();
         const jobsData = result.data || (Array.isArray(result) ? result : []);
-        
-        // Filter jobs to only show jobs posted today (local time)
-        const todayStr = new Date().toLocaleDateString("en-CA"); // Gets YYYY-MM-DD format purely by date
-        const todaysJobs = jobsData.filter((j: Job) => {
-           if (!j.createdAt) return false;
-           const jobDate = new Date(j.createdAt).toLocaleDateString("en-CA");
-           return jobDate === todayStr;
+
+        // Sort jobs to show newest first
+        const sortedJobs = jobsData.sort((a: Job, b: Job) => {
+          if (!a.createdAt || !b.createdAt) return 0;
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
         });
 
-        setJobs(todaysJobs.slice(0, 8)); // Show 8 jobs for the dashboard
+        // Show latest 8 jobs for the dashboard
+        setJobs(sortedJobs.slice(0, 8));
         setError(null);
       } catch (err) {
         console.error("Error fetching jobs:", err);
@@ -149,30 +167,29 @@ export default function JobsDashboard() {
       }
     };
     fetchJobs();
-  }, []);
+  }, [isTradesman]);
 
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.12,
+        staggerChildren: 0.1,
       },
     },
   };
 
   const cardVariants: Variants = {
-    hidden: { y: 50, x: 50, opacity: 0 },
+    hidden: { y: 20, opacity: 0 },
     visible: {
       y: 0,
-      x: 0,
       opacity: 1,
-      transition: { duration: 0.5, ease: "easeOut" },
+      transition: { duration: 0.4, ease: "easeOut" },
     },
   };
 
   return (
-    <motion.div 
+    <motion.div
       className={styles.dashboard}
       initial="hidden"
       whileInView="visible"
@@ -182,23 +199,29 @@ export default function JobsDashboard() {
       <div className={styles.container}>
         {/* Header */}
         <motion.div className={styles.header} variants={cardVariants}>
-          <h1 className={styles.title}>{t("وظائف اليوم")}</h1>
-          <p className={styles.subtitle}>{t("تصفح أحدث الفرص المتاحة التي تم نشرها اليوم.")}</p>
+          <div className={styles.headerContent}>
+            <h1 className={styles.todayTitle}>
+              Today <span className={styles.jobOpenText}>job open</span>
+            </h1>
+          </div>
+          <Link to="/Find Jobs" className={styles.showAllLink}>
+            {t("Show all jobs")} →
+          </Link>
         </motion.div>
 
-        {/* Jobs Grid */}
+        {/* Jobs List */}
         {loading ? (
           <div className={styles.loading}>{t("جاري التحميل...")}</div>
         ) : error ? (
           <div className={styles.error}>{t(error)}</div>
         ) : jobs.length === 0 ? (
-          <div className={styles.emptyState} style={{textAlign: "center", color: "#6b7280", padding: "40px"}}>
-             {t("لا توجد وظائف جديدة تم نشرها في هذا اليوم بعد.")}
+          <div className={styles.emptyState}>
+            {t("لا توجد وظائف جديدة تم نشرها في هذا اليوم بعد.")}
           </div>
         ) : (
-          <motion.div className={styles.grid} variants={containerVariants}>
+          <motion.div className={styles.todayGrid} variants={containerVariants}>
             {jobs.map((job) => (
-              <JobCard key={job.jobId} job={job} variants={cardVariants} />
+               <CompanyJobCard key={job.jobId} job={job} variants={cardVariants} />
             ))}
           </motion.div>
         )}
@@ -206,4 +229,3 @@ export default function JobsDashboard() {
     </motion.div>
   );
 }
-

@@ -6,18 +6,18 @@
 }
 
 :root {
-  --bg: var(--color-bg-secondary, #f4f6fb);
-  --card: var(--color-card-bg, #ffffff);
-  --primary: var(--color-primary, #3b5bdb);
-  --primary-light: var(--color-primary-light, #eef2ff);
-  --text: var(--color-text, #1a1d2e);
-  --muted: var(--color-text-muted, #8892a4);
-  --border: var(--color-border, #e8eaf0);
-  --active-bg: var(--color-primary-light, #eef2ff);
-  --bubble-in: var(--color-card-bg, #ffffff);
-  --bubble-out: var(--color-primary, #db4b3b);
+  --bg: var(--color-bg-secondary);
+  --card: var(--color-card-bg);
+  --primary: var(--color-primary);
+  --primary-light: var(--color-primary-light);
+  --text: var(--color-text);
+  --muted: var(--color-text-muted);
+  --border: var(--color-border);
+  --active-bg: var(--color-bg-secondary);
+  --bubble-in: var(--color-bg-secondary);
+  --bubble-out: var(--color-primary);
   --radius: 16px;
-  --shadow: var(--shadow-sm, 0 2px 16px rgba(59, 91, 219, 0.06));
+  --shadow: var(--shadow-sm);
 }
 
 .app {
@@ -27,7 +27,7 @@
   background: var(--card);
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 8px 48px rgba(59, 91, 219, 0.12);
+  box-shadow: var(--shadow-lg);
   border: 1px solid var(--border);
   animation: appear 0.4s ease;
 }
@@ -138,6 +138,7 @@
   font-size: 15px;
   font-weight: 700;
   color: white;
+  background: var(--primary);
 }
 
 .online-dot {
@@ -148,7 +149,7 @@
   height: 11px;
   border-radius: 50%;
   background: #20c997;
-  border: 2px solid white;
+  border: 2px solid var(--card);
 }
 
 .contact-info {
@@ -513,7 +514,7 @@
 }
 
 .send-btn:hover {
-  background: #2f4ac7;
+  background: var(--color-primary-hover);
 }
 .send-btn:active {
   transform: scale(0.93);

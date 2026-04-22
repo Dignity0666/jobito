@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useJobitoAuth } from "../../../context/LinkContxt";
 import { useTranslation } from "../../../context/translation-context";
+import { useToast } from "../../../context/ToastContext";
 import "./ApplicantDetails.css";
 
 const API_BASE_URL =
@@ -49,6 +50,7 @@ export default function ApplicantDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { apiFetch } = useJobitoAuth();
+  const { showToast } = useToast();
   const [app, setApp] = useState<Applicant | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -80,7 +82,7 @@ export default function ApplicantDetails() {
           const res = await apiFetch(
             `${API_BASE_URL}/applications/${id}/status`,
             {
-              method: "POST",
+              method: "PATCH",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ status: "reviewing" }),
             },
@@ -101,7 +103,7 @@ export default function ApplicantDetails() {
   const handleStatusUpdate = async (newStatus: string) => {
     try {
       const res = await apiFetch(`${API_BASE_URL}/applications/${id}/status`, {
-        method: "POST",
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
@@ -115,9 +117,9 @@ export default function ApplicantDetails() {
           : newStatus === "declined"
             ? t("مرفوض")
             : t("في الانتظار");
-      alert(`${t("تم تحديث الحالة إلى:")} ${statusText}`);
+      showToast(`${t("تم تحديث الحالة إلى:")} ${statusText}`, "success");
     } catch (err) {
-      alert(err instanceof Error ? t(err.message) : t("خطأ"));
+      showToast(err instanceof Error ? t(err.message) : t("خطأ"), "error");
     }
   };
 
@@ -153,7 +155,7 @@ export default function ApplicantDetails() {
 
   const handleGoToChat = () => {
     if (!u) return;
-    navigate("/Messagingapp", {
+    navigate('/chat', {
       state: {
         preselectedUser: {
           userId: u.userId,

@@ -451,3 +451,44 @@
   gap: 10px;
   box-shadow: 0 2px 8px rgba(220, 53, 69, 0.05);
 }
+
+/* Tradesman Special UI */
+.roundedTextarea {
+  width: 100%;
+  height: 160px;
+  padding: 24px 30px;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 60px; /* High radius as per image */
+  color: var(--color-text);
+  font-size: 15px;
+  outline: none;
+  resize: none;
+  box-sizing: border-box;
+  font-family: inherit;
+  margin-top: 8px;
+}
+
+.pillSubmitButton {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(90deg, #5b8def 0%, #4a7acc 100%);
+  color: #1a2a47; /* Dark text on button as per image */
+  border: none;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: opacity 0.2s;
+  box-shadow: 0 4px 15px rgba(91, 141, 139, 0.2);
+}
+
+.pillSubmitButton:hover {
+  opacity: 0.9;
+}
+
+.pillSubmitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

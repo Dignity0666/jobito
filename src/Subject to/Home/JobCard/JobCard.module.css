@@ -1,232 +1,176 @@
 .dashboard {
-  background-color: var(--color-bg-secondary, #f8faff);
-  min-height: 100vh;
-  padding: 64px 16px;
-  font-family: "Plus Jakarta Sans", sans-serif;
-}
-
-@media (min-width: 768px) {
-  .dashboard {
-    padding-left: 40px;
-    padding-right: 40px;
-  }
+  background: transparent;
+  padding: 40px 24px;
 }
 
 .container {
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
 .header {
-  text-align: center;
-  margin-bottom: 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
 }
 
-.title {
-  font-size: 36px;
-  font-weight: 800;
-  color: var(--color-text);
-  margin-bottom: 16px;
+.todayTitle {
+  font-size: 40px;
+  font-weight: 700;
+  color: #25324b;
+  margin: 0;
 }
 
-.subtitle {
-  color: var(--color-text);
-  font-size: 18px;
+.jobOpenText {
+  color: #4640de;
+  font-weight: 500;
 }
 
-.grid {
+.showAllLink {
+  color: #4640de;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.todayGrid {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
   gap: 24px;
 }
 
 @media (min-width: 640px) {
-  .grid {
+  .todayGrid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (min-width: 1024px) {
-  .grid {
+  .todayGrid {
     grid-template-columns: repeat(4, 1fr);
   }
 }
 
-/* Card Component */
-.card {
-  background-color: var(--color-card-bg, #ffffff);
+/* ════════════════════════════════════════════════
+   TODAY CARD (Match Image Square Shape)
+   ════════════════════════════════════════════════ */
+.todayCard {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
   padding: 24px;
-  border-radius: 16px;
-  border: 1px solid #f3f4f6;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  transition: all 0.3s;
+  text-decoration: none;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  transition: all 0.3s ease;
 }
 
-.card:hover {
-  box-shadow:
-    0 10px 25px -5px rgba(0, 0, 0, 0.1),
-    0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
+.todayCard:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
 }
 
-.cardTop {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  margin-bottom: 16px;
-}
-
-.companyInfo {
+.cardHeader {
   display: flex;
   gap: 16px;
-}
-
-.logoBox {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background-color: #f9fafb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border: 1px solid #f3f4f6;
-  flex-shrink: 0;
-}
-
-.logo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.companyName {
-  font-weight: 700;
-  color: var(--color-text);
-  transition: color 0.2s;
-  margin: 0;
-}
-
-.card:hover .companyName {
-  color: var(--color-text);
-}
-
-.location {
-  color: var(--color-text);
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin: 2px 0 0 0;
-}
-
-.locIcon {
-  opacity: 0.7;
-}
-
-.flash {
-  color: #22c55e;
-  font-size: 14px;
-}
-
-.jobTitle {
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--color-text);
-  margin-bottom: 12px;
-  line-height: 1.25;
-  height: 48px;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-.meta {
-  display: flex;
-  gap: 12px;
-  font-size: 11px;
-  color: var(--color-text);
-  margin-bottom: 16px;
-  font-weight: 500;
-}
-
-.metaItem {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.description {
-  color: var(--color-text);
-  font-size: 14px;
-  margin-bottom: 20px;
-  line-height: 1.625;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  align-items: flex-start;
   margin-bottom: 24px;
 }
 
-.tag {
-  background-color: #f2f6fd;
-  color: var(--color-text);
-  padding: 4px 12px;
-  border-radius: 6px;
-  font-size: 11px;
+.mainLogo {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mainLogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.topInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.topMeta {
+  font-size: 14px;
   font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  color: #515b6f;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.tag:hover {
-  background-color: #dbeafe;
+.mainTitle {
+  font-size: 20px;
+  font-weight: 800;
+  color: #25324b;
+  margin: 0;
+  line-height: 1.3;
 }
 
-.footer {
+.cardBody {
+  margin-bottom: 32px;
+  flex-grow: 1;
+}
+
+.jobDesc {
+  font-size: 14px;
+  color: #515b6f;
+  line-height: 1.6;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  opacity: 0.8;
+}
+
+.cardFooter {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 16px;
-  border-top: 1px solid #f9fafb;
   margin-top: auto;
 }
 
-.price {
-  color: var(--color-text);
-  font-weight: 800;
+.salaryText {
   font-size: 18px;
-  margin: 0;
-}
-
-.perHour {
-  color: var(--color-text);
-  font-weight: 400;
-  font-size: 12px;
+  font-weight: 800;
+  color: #000;
 }
 
 .applyBtn {
-  background-color: #e0e6f7;
-  color: var(--color-text);
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 12px;
+  background: #e8ebfd;
+  color: #4640de;
+  padding: 10px 24px;
+  border-radius: 4px;
+  font-size: 14px;
   font-weight: 700;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
 }
 
 .applyBtn:hover {
-  background-color: var(--color-primary);
-  color: var(--color-text);
+  background: #4640de;
+  color: #ffffff;
 }
+
+.loading, .error, .emptyState {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+}
+
+@media (max-width: 640px) {
+  .horizontalCard {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+

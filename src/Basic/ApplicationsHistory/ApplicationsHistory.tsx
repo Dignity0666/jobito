@@ -13,10 +13,14 @@ interface Application {
   job: {
     title: string;
     titleEn?: string;
-    company: {
+    company?: {
       name: string;
       nameEn?: string;
       logoUrl?: string;
+    };
+    user?: {
+      fullName: string;
+      avatarUrl?: string;
     };
   };
 }
@@ -53,12 +57,11 @@ export const ApplicationsHistory = () => {
         if (!response.ok) throw new Error("Failed to fetch applications");
 
         const data = await response.json();
-        // Defensively ensure data is an array before setting
         const applicationsList = Array.isArray(data) ? data : data.data || [];
         setApplications(applicationsList);
       } catch (err) {
         console.error("Error fetching applications:", err);
-        setApplications([]); // Set to empty array on error
+        setApplications([]);
       } finally {
         setLoading(false);
       }
@@ -82,6 +85,9 @@ export const ApplicationsHistory = () => {
         searchQuery.toLowerCase(),
       ) ||
       (app.job?.company?.name?.toLowerCase() || "").includes(
+        searchQuery.toLowerCase(),
+      ) ||
+      (app.job?.user?.fullName?.toLowerCase() || "").includes(
         searchQuery.toLowerCase(),
       );
     return tabMatch && searchMatch;
@@ -252,7 +258,7 @@ export const ApplicationsHistory = () => {
             <thead>
               <tr>
                 <th style={{ width: "5%" }}>#</th>
-                <th style={{ width: "25%" }}>{t("اسم الشركة")}</th>
+                <th style={{ width: "25%" }}>{t("مقدم الخدمة / الشركة")}</th>
                 <th style={{ width: "25%" }}>{t("المسمى الوظيفي")}</th>
                 <th style={{ width: "20%" }}>{t("تاريخ التقديم")}</th>
                 <th style={{ width: "15%" }}>{t("الحالة")}</th>
@@ -279,86 +285,95 @@ export const ApplicationsHistory = () => {
                   </td>
                 </tr>
               ) : (
-                filteredApplications.map((app, index) => (
-                  <tr key={app.applicationId}>
-                    <td>{index + 1}</td>
-                    <td>
-                      <div className="ah-company">
-                        <img
-                          src={getFullImageUrl(app.job?.company?.logoUrl)}
-                          alt={app.job?.company?.name || "Company Logo"}
-                          className="ah-company-logo"
-                        />
-                        <span>
-                          {app.job?.company?.name || "Unknown Company"}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="ah-role">
-                      {app.job?.title || "Unknown Role"}
-                    </td>
-                    <td>
-                      {new Date(app.appliedAt).toLocaleDateString()}
-                    </td>
-                    <td>
-                      <span
-                        className={`ah-status-badge ${app.status.toLowerCase()}`}
-                      >
-                        {getStatusLabel(app.status)}
-                      </span>
-                    </td>
-                    <td style={{ textAlign: "left" }}>
-                      <button className="ah-more-btn">
-                        <svg
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
+                filteredApplications.map((app, index) => {
+                  const isTradesman = !!app.job.user;
+                  const displayName = isTradesman ? app.job.user?.fullName : app.job.company?.name;
+                  const displayLogo = isTradesman ? app.job.user?.avatarUrl : app.job.company?.logoUrl;
+                  
+                  return (
+                    <tr key={app.applicationId}>
+                      <td>{index + 1}</td>
+                      <td>
+                        <div className="ah-company-cell">
+                          <img
+                            src={getFullImageUrl(displayLogo)}
+                            alt={displayName || t("Logo")}
+                            className="ah-company-logo"
+                            style={{ borderRadius: isTradesman ? "50%" : "4px" }}
+                          />
+                          <span className="ah-company-name">
+                            {displayName || t("غير معروف")}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="ah-role">
+                        {app.job?.title || t("عنوان غير معروف")}
+                      </td>
+                      <td>
+                        {new Date(app.appliedAt).toLocaleDateString()}
+                      </td>
+                      <td>
+                        <span
+                          className={`ah-status-badge ${app.status.toLowerCase()}`}
                         >
-                          <circle cx="12" cy="7" r="1.5" />
-                          <circle cx="12" cy="12" r="1.5" />
-                          <circle cx="12" cy="17" r="1.5" />
-                        </svg>
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                          {getStatusLabel(app.status)}
+                        </span>
+                      </td>
+                      <td style={{ textAlign: "left" }}>
+                        <button className="ah-more-btn">
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                          >
+                            <circle cx="12" cy="7" r="1.5" />
+                            <circle cx="12" cy="12" r="1.5" />
+                            <circle cx="12" cy="17" r="1.5" />
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
 
           {/* Pagination */}
-          <div className="ah-pagination">
-            <button className="ah-page-btn ah-nav-btn" disabled>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="9 18 15 12 9 6"></polyline>
-              </svg>
-            </button>
-            <button className="ah-page-btn active">1</button>
-            <button className="ah-page-btn ah-nav-btn" disabled>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="15 18 9 12 15 6"></polyline>
-              </svg>
-            </button>
-          </div>
+          {filteredApplications.length > 10 && (
+            <div className="ah-pagination">
+              <button className="ah-page-btn ah-nav-btn" disabled>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+              <button className="ah-page-btn active">1</button>
+              <button className="ah-page-btn ah-nav-btn" disabled>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

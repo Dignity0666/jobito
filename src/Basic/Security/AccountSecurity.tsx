@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import styles from "./AccountSecurity.module.css";
 import { useJobitoAuth } from "../../context/LinkContxt";
+import { useToast } from "../../context/ToastContext";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 export default function AccountSecurity() {
-  const { user, apiFetch } = useJobitoAuth();
+  const { user, apiFetch, logout } = useJobitoAuth();
+  const { showToast } = useToast();
   const [email, setEmail] = useState(user?.email || "");
   const [passwords, setPasswords] = useState({
     current: "",
@@ -17,21 +19,42 @@ export default function AccountSecurity() {
   const [isSavingEmail, setIsSavingEmail] = useState(false);
   const [isSavingPass, setIsSavingPass] = useState(false);
 
+  // Deletion state
+  const [deletionStatus, setDeletionStatus] = useState<{
+    scheduled: boolean;
+    daysLeft?: number;
+    permanentDeleteAt?: string;
+  }>({ scheduled: false });
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  useEffect(() => {
+    const fetchDeletionStatus = async () => {
+      try {
+        const res = await apiFetch(`${API_BASE_URL}/users/me/deletion-status`);
+        if (res.ok) {
+          const data = await res.json();
+          setDeletionStatus(data);
+        }
+      } catch { /* ignore */ }
+    };
+    fetchDeletionStatus();
+  }, [apiFetch]);
+
   const handleUpdateEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setIsSavingEmail(true);
       const res = await apiFetch(`${API_BASE_URL}/users/me`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
       if (!res.ok) throw new Error("فشل في تحديث البريد الإلكتروني.");
-      alert("تم تحديث البريد الإلكتروني بنجاح!");
-    } catch (err: any) {
-      alert(err.message);
+      showToast("تم تحديث البريد الإلكتروني بنجاح!", "success");
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : "Error", "error");
     } finally {
       setIsSavingEmail(false);
     }
@@ -40,31 +63,61 @@ export default function AccountSecurity() {
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (passwords.new !== passwords.confirm) {
-      alert("Passwords do not match!");
+      showToast("Passwords do not match!", "error");
       return;
     }
     try {
       setIsSavingPass(true);
       const res = await apiFetch(`${API_BASE_URL}/users/me/password`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           oldPassword: passwords.current,
           newPassword: passwords.new,
         }),
       });
       if (!res.ok)
-        throw new Error(
-          "فشل في تحديث كلمة المرور. تأكد من كلمة المرور الحالية.",
-        );
-      alert("تم تحديث كلمة المرور بنجاح!");
+        throw new Error("فشل في تحديث كلمة المرور. تأكد من كلمة المرور الحالية.");
+      showToast("تم تحديث كلمة المرور بنجاح!", "success");
       setPasswords({ current: "", new: "", confirm: "" });
-    } catch (err: any) {
-      alert(err.message);
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : "Error", "error");
     } finally {
       setIsSavingPass(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      const res = await apiFetch(`${API_BASE_URL}/users/me`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("فشل في طلب حذف الحساب");
+      const data = await res.json();
+      showToast(data.message || "تم جدولة حذف الحساب خلال 7 أيام", "success");
+      setDeletionStatus({ scheduled: true, daysLeft: 7 });
+      setShowDeleteConfirm(false);
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : "Error", "error");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleCancelDeletion = async () => {
+    setIsCancelling(true);
+    try {
+      const res = await apiFetch(`${API_BASE_URL}/users/me/cancel-deletion`, {
+        method: "PATCH",
+      });
+      if (!res.ok) throw new Error("فشل في إلغاء طلب الحذف");
+      showToast("تم إلغاء طلب حذف الحساب بنجاح!", "success");
+      setDeletionStatus({ scheduled: false });
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : "Error", "error");
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -169,6 +222,76 @@ export default function AccountSecurity() {
               </motion.button>
             </div>
           </form>
+        </section>
+
+        <div className={styles.divider} />
+
+        {/* ─── Danger Zone: Delete Account ─── */}
+        <section className={styles.section}>
+          <div className={styles.sectionInfo}>
+            <h2 className={styles.dangerTitle}>Delete Account</h2>
+            <p>
+              {deletionStatus.scheduled
+                ? `Your account is scheduled for permanent deletion in ${deletionStatus.daysLeft ?? "?"} days. You can cancel this anytime before then.`
+                : "Once you request deletion, your account will be permanently deleted after 7 days. This action can be cancelled within that period."}
+            </p>
+          </div>
+          <div className={styles.form}>
+            {deletionStatus.scheduled ? (
+              <div className={styles.deletionWarningBox}>
+                <div className={styles.warningIcon}>⚠️</div>
+                <p className={styles.warningText}>
+                  Account deletion in progress — <strong>{deletionStatus.daysLeft} days remaining</strong>
+                </p>
+                <motion.button
+                  className={styles.cancelDeleteBtn}
+                  onClick={handleCancelDeletion}
+                  disabled={isCancelling}
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {isCancelling ? "Cancelling..." : "Cancel Deletion"}
+                </motion.button>
+              </div>
+            ) : !showDeleteConfirm ? (
+              <div className={styles.formFooter}>
+                <motion.button
+                  type="button"
+                  className={styles.deleteBtn}
+                  onClick={() => setShowDeleteConfirm(true)}
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Delete My Account
+                </motion.button>
+              </div>
+            ) : (
+              <div className={styles.confirmDeleteBox}>
+                <p className={styles.confirmText}>
+                  Are you sure? Your account will be permanently deleted after 7 days.
+                </p>
+                <div className={styles.confirmActions}>
+                  <motion.button
+                    className={styles.confirmDeleteBtn}
+                    onClick={handleDeleteAccount}
+                    disabled={isDeleting}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {isDeleting ? "Processing..." : "Yes, Delete Account"}
+                  </motion.button>
+                  <motion.button
+                    className={styles.cancelBtn}
+                    onClick={() => setShowDeleteConfirm(false)}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Cancel
+                  </motion.button>
+                </div>
+              </div>
+            )}
+          </div>
         </section>
       </div>
     </div>

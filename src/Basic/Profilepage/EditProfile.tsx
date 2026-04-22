@@ -3,10 +3,26 @@ import styles from "./EditProfile.module.css";
 import { useJobitoAuth } from "../../context/LinkContxt";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "../../context/translation-context";
+import { useToast } from "../../context/ToastContext";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
+const GOVERNORATES = [
+  "القاهرة", "الجيزة", "الإسكندرية", "الدقهلية", "البحر الأحمر", "البحيرة", "الفيوم", "الغربية", "الإسماعيلية", "المنوفية", "المنيا", "القليوبية", "الوادي الجديد", "الشرقية", "السويس", "أسوان", "أسيوط", "بني سويف", "بورسعيد", "دمياط", "جنوب سيناء", "كفر الشيخ", "مطروح", "قنا", "شمال سيناء", "سوهاج", "الأقصر"
+];
+
+const PREDEFINED_SERVICES = [
+  "كهربائى",
+  "فني سباكه",
+  "نجار",
+  "منظف بيوت",
+  "نقاش",
+  "ميكانيكي",
+  "حداد",
+
+];
 const UploadIcon = () => (
   <svg
     className={styles.uploadIcon}
@@ -26,6 +42,7 @@ const UploadIcon = () => (
 interface Experience {
   role: string;
   period: string;
+  location: string;
   desc: string;
 }
 
@@ -33,6 +50,7 @@ interface Education {
   school: string;
   degree: string;
   period: string;
+  desc: string;
 }
 
 type Tab = "profile" | "login" | "notifications";
@@ -47,7 +65,12 @@ const getAvatarUrl = (path: string | undefined | null) => {
 export default function EditProfile() {
   const { t } = useTranslation();
   const { user, apiFetch } = useJobitoAuth();
+  const { showToast } = useToast();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>("profile");
+  const [services, setServices] = useState<string[]>([]);
+  const [isAddingService, setIsAddingService] = useState(false);
+  const [newServiceInput, setNewServiceInput] = useState("");
 
   // Advanced Profile State
   const [profileData, setProfileData] = useState({
@@ -61,11 +84,11 @@ export default function EditProfile() {
     socialLinks: {
       instagram: user?.socialLinks?.instagram || "",
       twitter: user?.socialLinks?.twitter || "",
-      linkedin: user?.socialLinks?.linkedin || "",
-      github: user?.socialLinks?.github || "",
     },
     location: user?.location || "",
     banner_url: user?.banner_url || "",
+    role: user?.role || "user",
+    classification: user?.classification || "job_seeker",
   });
 
   const [experience, setExperience] = useState<Experience[]>(
@@ -75,11 +98,9 @@ export default function EditProfile() {
     user?.educations || [],
   );
   const [skills, setSkills] = useState<string[]>(user?.skills || []);
-  const [languages, setLanguages] = useState<string[]>(user?.languages || []);
   const [gallery, setGallery] = useState<string[]>(user?.portfolios || []);
 
   const [skillInput, setSkillInput] = useState("");
-  const [langInput, setLangInput] = useState("");
 
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -161,7 +182,11 @@ export default function EditProfile() {
   };
 
   const addExperience = () => {
-    setExperience([...experience, { role: "", period: "", desc: "" }]);
+    setExperience([...experience, { role: "", period: "", location: "", desc: "" }]);
+  };
+
+  const addEducation = () => {
+    setEducation([...education, { school: "", degree: "", period: "", desc: "" }]);
   };
 
   useEffect(() => {
@@ -177,20 +202,19 @@ export default function EditProfile() {
           dob: data.dob ? new Date(data.dob).toISOString().split("T")[0] : "",
           gender: data.gender || "",
           bio: data.bio || "",
-          accountType: data.role === "company" ? "employer" : "job_seeker",
+          role: data.role || "user",
+          classification: data.classification || "job_seeker",
           socialLinks: {
             instagram: data.socialLinks?.instagram || "",
             twitter: data.socialLinks?.twitter || "",
-            linkedin: data.socialLinks?.linkedin || "",
-            github: data.socialLinks?.github || "",
           },
           location: data.location || "",
         });
         setExperience(data.experiences || []);
         setEducation(data.educations || []);
         setSkills(data.skills || []);
-        setLanguages(data.languages || []);
         setGallery(data.portfolios || []);
+        setServices(data.services || []);
       } catch (error) {
         console.error("Failed to fetch profile", error);
       }
@@ -198,13 +222,11 @@ export default function EditProfile() {
     fetchProfile();
   }, [apiFetch]);
 
-  const addEducation = () => {
-    setEducation([...education, { school: "", degree: "", period: "" }]);
-  };
+
 
   const handleSave = async () => {
     if (activeTab === "login" && passwords.new !== passwords.confirm) {
-      alert(t("كلمات المرور الجديدة غير متطابقة!"));
+      showToast(t("كلمات المرور الجديدة غير متطابقة!"), "error");
       return;
     }
 
@@ -266,12 +288,12 @@ export default function EditProfile() {
           experiences: experience,
           educations: education,
           skills: skills,
-          languages: languages,
           portfolios: gallery,
           avatarUrl: finalAvatarUrl,
           avatar: finalAvatarUrl,
           banner_url: finalBannerUrl,
           location: profileData.location,
+          services: services,
         };
 
         const res = await apiFetch(`${API_BASE_URL}/users/me`, {
@@ -292,7 +314,8 @@ export default function EditProfile() {
         }
       }
 
-      alert(t("تم حفظ التعديلات بنجاح!"));
+      showToast(t("تم حفظ التعديلات بنجاح!"), "success");
+      navigate("/Profile");
       setSelectedFile(null);
       setPhotoPreview(null);
       setSelectedBannerFile(null);
@@ -301,7 +324,7 @@ export default function EditProfile() {
         setPasswords({ current: "", new: "", confirm: "" });
       }
     } catch (error: any) {
-      alert(`${t("فشل الحفظ:")} ${error.message}`);
+      showToast(`${t("فشل الحفظ:")} ${error.message}`, "error");
     } finally {
       setIsSaving(false);
     }
@@ -310,7 +333,14 @@ export default function EditProfile() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1 className={styles.title}>{t("تعديل الملف الشخصي")}</h1>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+          <h1 className={styles.title}>{t("تعديل الملف الشخصي")}</h1>
+          {user?.deletionRequestedAt && (
+            <div className={styles.deletionNotice}>
+              ⚠️ {t("حسابك مجدول للحذف. تم إيقاف التعديلات.")}
+            </div>
+          )}
+        </div>
         <div className={styles.tabs}>
           <button
             className={`${styles.tabBtn} ${activeTab === "profile" ? styles.activeTab : ""}`}
@@ -503,15 +533,20 @@ export default function EditProfile() {
                       </select>
                     </div>
                     <div className={styles.fieldFull}>
-                      <label className={styles.label}>{t("الموقع / السكن")}</label>
-                      <input
-                        type="text"
+                      <label className={styles.label}>{t("المحافظة")}</label>
+                      <select
                         name="location"
-                        className={styles.input}
-                        placeholder={t("مثل: القاهرة، مصر")}
+                        className={styles.select}
                         value={profileData.location}
                         onChange={handleProfileChange}
-                      />
+                      >
+                        <option value="">{t("اختر المحافظة...")}</option>
+                        {GOVERNORATES.map((gov) => (
+                          <option key={gov} value={gov}>
+                            {gov}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -540,71 +575,107 @@ export default function EditProfile() {
 
               {/* Experience */}
               <div className={styles.section}>
-                <div className={styles.row}>
-                  <div className={styles.labelGroup}>
-                    <p className={styles.label}>{t("الخبرات")}</p>
-                    <p className={styles.sectionSub}>
-                      {t("أضف خبراتك العملية السابقة.")}
-                    </p>
+                  <div className={styles.row}>
+                    <div className={styles.labelGroup}>
+                      <p className={styles.label}>{t("الخبرات")}</p>
+                      <p className={styles.sectionSub}>
+                        {t("أضف خبراتك العملية السابقة.")}
+                      </p>
+                    </div>
+                    <div className={styles.listContainer}>
+                      {experience.map((exp, index) => (
+                        <div key={index} className={styles.listItem}>
+                          <div className={styles.listHeader}>
+                            <p className={styles.label}>{t("خبرة")} {index + 1}</p>
+                            <button
+                              className={styles.removeBtn}
+                              onClick={() =>
+                                setExperience(
+                                  experience.filter((_, i) => i !== index),
+                                )
+                              }
+                            >
+                              {t("حذف")}
+                            </button>
+                          </div>
+                          <div className={styles.fieldFull}>
+                            <label className={styles.label}>{t("المسمى الوظيفي")}</label>
+                            <input
+                              type="text"
+                              className={styles.input}
+                              value={exp.role}
+                              onChange={(e) => {
+                                setExperience(
+                                  experience.map((item, i) =>
+                                    i === index
+                                      ? { ...item, role: e.target.value }
+                                      : item,
+                                  ),
+                                );
+                              }}
+                            />
+                          </div>
+                          <div className={styles.formGrid}>
+                            <div className={styles.field}>
+                              <label className={styles.label}>{t("المدة")}</label>
+                              <input
+                                type="text"
+                                className={styles.input}
+                                placeholder={t("مثل: يناير 2020 - مارس 2023")}
+                                value={exp.period}
+                                onChange={(e) => {
+                                  setExperience(
+                                    experience.map((item, i) =>
+                                      i === index
+                                        ? { ...item, period: e.target.value }
+                                        : item,
+                                    ),
+                                  );
+                                }}
+                              />
+                            </div>
+                            <div className={styles.field}>
+                              <label className={styles.label}>{t("الموقع")}</label>
+                              <input
+                                type="text"
+                                className={styles.input}
+                                value={exp.location}
+                                onChange={(e) => {
+                                  setExperience(
+                                    experience.map((item, i) =>
+                                      i === index
+                                        ? { ...item, location: e.target.value }
+                                        : item,
+                                    ),
+                                  );
+                                }}
+                              />
+                            </div>
+                          </div>
+                          <div className={styles.fieldFull}>
+                            <label className={styles.label}>{t("الوصف")}</label>
+                            <textarea
+                              className={styles.textarea}
+                              style={{ minHeight: "80px" }}
+                              value={exp.desc}
+                              onChange={(e) => {
+                                setExperience(
+                                  experience.map((item, i) =>
+                                    i === index
+                                      ? { ...item, desc: e.target.value }
+                                      : item,
+                                  ),
+                                );
+                              }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                      <button className={styles.addBtn} onClick={addExperience}>
+                        + {t("إضافة خبرة جديدة")}
+                      </button>
+                    </div>
                   </div>
-                  <div className={styles.listContainer}>
-                    {experience.map((exp, index) => (
-                      <div key={index} className={styles.listItem}>
-                        <div className={styles.listHeader}>
-                          <p className={styles.label}>{t("خبرة")} {index + 1}</p>
-                          <button
-                            className={styles.removeBtn}
-                            onClick={() =>
-                              setExperience(
-                                experience.filter((_, i) => i !== index),
-                              )
-                            }
-                          >
-                            {t("حذف")}
-                          </button>
-                        </div>
-                        <div className={styles.fieldFull}>
-                          <label className={styles.label}>{t("المسمى الوظيفي")}</label>
-                          <input
-                            type="text"
-                            className={styles.input}
-                            value={exp.role}
-                            onChange={(e) => {
-                              setExperience(
-                                experience.map((item, i) =>
-                                  i === index
-                                    ? { ...item, role: e.target.value }
-                                    : item,
-                                ),
-                              );
-                            }}
-                          />
-                        </div>
-                        <div className={styles.fieldFull}>
-                          <label className={styles.label}>{t("المدة")}</label>
-                          <input
-                            type="text"
-                            className={styles.input}
-                            placeholder={t("مثل: يناير 2020 - مارس 2023")}
-                            value={exp.period}
-                            onChange={(e) => {
-                              setExperience(
-                                experience.map((item, i) =>
-                                  i === index
-                                    ? { ...item, period: e.target.value }
-                                    : item,
-                                ),
-                              );
-                            }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                    <button className={styles.addBtn} onClick={addExperience}>
-                      + {t("إضافة خبرة جديدة")}
-                    </button>
-                  </div>
-                </div>
               </div>
 
               {/* Education */}
@@ -612,78 +683,98 @@ export default function EditProfile() {
                 <div className={styles.row}>
                   <div className={styles.labelGroup}>
                     <p className={styles.label}>{t("التعليم")}</p>
-                    <p className={styles.sectionSub}>{t("أضف مؤهلاتك العلمية.")}</p>
+                    <p className={styles.sectionSub}>
+                      {t("أضف المؤسسات التعليمية التي درست بها والدرجات العلمية التي حصلت عليها.")}
+                    </p>
                   </div>
-                  <div className={styles.listContainer}>
-                    {education.map((edu, index) => (
-                      <div key={index} className={styles.listItem}>
-                        <div className={styles.listHeader}>
-                          <p className={styles.label}>{t("تعليم")} {index + 1}</p>
-                          <button
-                            className={styles.removeBtn}
-                            onClick={() =>
-                              setEducation(
-                                education.filter((_, i) => i !== index),
-                              )
-                            }
-                          >
-                            {t("حذف")}
-                          </button>
+                  <div className={styles.formGrid}>
+                    <div className={styles.fieldFull}>
+                      {education.map((edu, index) => (
+                        <div key={index} className={styles.experienceBlock}>
+                          <div className={styles.listHeader}>
+                            <p className={styles.label}>{t("تعليم")} {index + 1}</p>
+                            <button
+                              className={styles.removeBtn}
+                              onClick={() =>
+                                setEducation(education.filter((_, i) => i !== index))
+                              }
+                            >
+                              {t("حذف")}
+                            </button>
+                          </div>
+                          <div className={styles.formGrid}>
+                            <div className={styles.field}>
+                              <label className={styles.label}>{t("المدرسة / الجامعة")}</label>
+                              <input
+                                type="text"
+                                className={styles.input}
+                                value={edu.school}
+                                onChange={(e) => {
+                                  const newEdu = [...education];
+                                  newEdu[index].school = e.target.value;
+                                  setEducation(newEdu);
+                                }}
+                              />
+                            </div>
+                            <div className={styles.field}>
+                              <label className={styles.label}>{t("الدرجة العلمية")}</label>
+                              <input
+                                type="text"
+                                className={styles.input}
+                                value={edu.degree}
+                                onChange={(e) => {
+                                  const newEdu = [...education];
+                                  newEdu[index].degree = e.target.value;
+                                  setEducation(newEdu);
+                                }}
+                              />
+                            </div>
+                            <div className={styles.field}>
+                              <label className={styles.label}>{t("الفترة")}</label>
+                              <input
+                                type="text"
+                                className={styles.input}
+                                placeholder="2018 - 2022"
+                                value={edu.period}
+                                onChange={(e) => {
+                                  const newEdu = [...education];
+                                  newEdu[index].period = e.target.value;
+                                  setEducation(newEdu);
+                                }}
+                              />
+                            </div>
+                            <div className={styles.field}>
+                              <label className={styles.label}>{t("الموقع")}</label>
+                              <input
+                                type="text"
+                                className={styles.input}
+                                value={edu.location}
+                                onChange={(e) => {
+                                  const newEdu = [...education];
+                                  newEdu[index].location = e.target.value;
+                                  setEducation(newEdu);
+                                }}
+                              />
+                            </div>
+                            <div className={styles.fieldFull}>
+                              <label className={styles.label}>{t("الوصف")}</label>
+                              <textarea
+                                className={styles.textarea}
+                                value={edu.desc}
+                                onChange={(e) => {
+                                  const newEdu = [...education];
+                                  newEdu[index].desc = e.target.value;
+                                  setEducation(newEdu);
+                                }}
+                              />
+                            </div>
+                          </div>
                         </div>
-                        <div className={styles.formGrid}>
-                          <div className={styles.field}>
-                            <label className={styles.label}>
-                              {t("المؤسسة التعليمية")}
-                            </label>
-                            <input
-                              type="text"
-                              className={styles.input}
-                              value={edu.school}
-                              onChange={(e) => {
-                                setEducation(
-                                  education.map((item, i) =>
-                                    i === index
-                                      ? { ...item, school: e.target.value }
-                                      : item,
-                                  ),
-                                );
-                              }}
-                            />
-                          </div>
-                          <div className={styles.field}>
-                            <label className={styles.label}>
-                              {t("الدرجة العلمية")}
-                            </label>
-                            <input
-                              type="text"
-                              className={styles.input}
-                              value={edu.degree}
-                              onChange={(e) => {
-                                const newEdu = [...education];
-                                newEdu[index].degree = e.target.value;
-                                setEducation(newEdu);
-                              }}
-                            />
-                          </div>
-                          <div className={styles.field}>
-                            <label className={styles.label}>{t("المدة")}</label>
-                            <input
-                              type="text"
-                              className={styles.input}
-                              value={edu.period}
-                              onChange={(e) => {
-                                const newEdu = [...education];
-                                newEdu[index].period = e.target.value;
-                                setEducation(newEdu);
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                    <button className={styles.addBtn} onClick={addEducation}>
-                      + {t("إضافة تعليم جديد")}
-                    </button>
+                      ))}
+                      <button className={styles.addBtn} onClick={addEducation}>
+                        + {t("إضافة تعليم جديد")}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -695,7 +786,8 @@ export default function EditProfile() {
                     <p className={styles.label}>{t("المهارات واللغات")}</p>
                   </div>
                   <div className={styles.formGrid}>
-                    <div className={styles.field}>
+                    {/* Specialized Service Selection and Skills for Tradesmen */}
+                    <div className={styles.fieldFull}>
                       <label className={styles.label}>{t("المهارات")}</label>
                       <div className={styles.tagInputWrapper}>
                         <input
@@ -728,41 +820,8 @@ export default function EditProfile() {
                         ))}
                       </div>
                     </div>
-                    <div className={styles.field}>
-                      <label className={styles.label}>{t("اللغات")}</label>
-                      <div className={styles.tagInputWrapper}>
-                        <input
-                          type="text"
-                          className={styles.input}
-                          placeholder={t("أضف لغة واضغط Enter")}
-                          value={langInput}
-                          onChange={(e) => setLangInput(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" && langInput.trim()) {
-                              setLanguages([...languages, langInput.trim()]);
-                              setLangInput("");
-                            }
-                          }}
-                        />
-                      </div>
-                      <div className={styles.tagContainer}>
-                        {languages.map((lang, i) => (
-                          <span key={i} className={styles.tag}>
-                            {lang}
-                            <span
-                              className={styles.tagRemove}
-                              onClick={() =>
-                                setLanguages(
-                                  languages.filter((_, idx) => idx !== i),
-                                )
-                              }
-                            >
-                              ×
-                            </span>
-                          </span>
-                        ))}
-                      </div>
-                    </div>
+
+
                   </div>
                 </div>
               </div>
@@ -796,31 +855,103 @@ export default function EditProfile() {
                         onChange={handleSocialChange}
                       />
                     </div>
-                    <div className={styles.field}>
-                      <label className={styles.label}>{t("لينكد إن")}</label>
-                      <input
-                        type="text"
-                        name="linkedin"
-                        className={styles.input}
-                        placeholder="linkedin.com/in/username"
-                        value={profileData.socialLinks.linkedin}
-                        onChange={handleSocialChange}
-                      />
+                  </div>
+                </div>
+              </div>
+
+
+              {/* Services Section - Only for Tradesmen */}
+              {(user?.classification === "tradesman" || profileData.classification === "tradesman") && (
+              <div className={styles.section}>
+                <div className={styles.row}>
+                  <div className={styles.labelGroup}>
+                    <p className={styles.label}>{t("الخدمات")}</p>
+                    <p className={styles.sectionSub}>
+                      {t("اختر الخدمات التي تقدمها للعملاء.")}
+                    </p>
+                  </div>
+                  <div className={styles.fieldFull}>
+                    <div className={styles.servicesRow}>
+                      {PREDEFINED_SERVICES.map((srv, idx) => (
+                        <button
+                          key={idx}
+                          className={`${styles.serviceSlot} ${services.includes(srv) ? styles.serviceSlotActive : ""}`}
+                          onClick={() => {
+                            if (services.includes(srv)) {
+                              setServices(services.filter((s) => s !== srv));
+                            } else {
+                              setServices([...services, srv]);
+                            }
+                          }}
+                        >
+                          {t(srv)}
+                        </button>
+                      ))}
                     </div>
-                    <div className={styles.field}>
-                      <label className={styles.label}>{t("جيت هب")}</label>
-                      <input
-                        type="text"
-                        name="github"
-                        className={styles.input}
-                        placeholder="github.com/username"
-                        value={profileData.socialLinks.github}
-                        onChange={handleSocialChange}
-                      />
+
+                    <div className={styles.customServiceArea}>
+                      {isAddingService ? (
+                        <div className={styles.serviceInputGroup}>
+                          <input
+                            type="text"
+                            className={styles.input}
+                            placeholder={t("اسم الخدمة...")}
+                            value={newServiceInput}
+                            autoFocus
+                            onChange={(e) => setNewServiceInput(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" && newServiceInput.trim()) {
+                                e.preventDefault();
+                                if (!services.includes(newServiceInput.trim())) {
+                                  setServices([...services, newServiceInput.trim()]);
+                                }
+                                setNewServiceInput("");
+                                setIsAddingService(false);
+                              } else if (e.key === "Escape") {
+                                setIsAddingService(false);
+                              }
+                            }}
+                          />
+                          <button 
+                            className={styles.addBtnSmall}
+                            onClick={() => {
+                              if (newServiceInput.trim() && !services.includes(newServiceInput.trim())) {
+                                setServices([...services, newServiceInput.trim()]);
+                              }
+                              setNewServiceInput("");
+                              setIsAddingService(false);
+                            }}
+                          >
+                            {t("إضافة")}
+                          </button>
+                        </div>
+                      ) : (
+                        <button 
+                          className={styles.dashedAddBtn}
+                          onClick={() => setIsAddingService(true)}
+                        >
+                          {t("Add new Serves")}
+                        </button>
+                      )}
+                    </div>
+
+                    <div className={styles.tagContainer}>
+                      {services.filter(s => !PREDEFINED_SERVICES.includes(s)).map((srv, i) => (
+                        <span key={i} className={styles.tag}>
+                          {srv}
+                          <span
+                            className={styles.tagRemove}
+                            onClick={() => setServices(services.filter((sItem) => sItem !== srv))}
+                          >
+                            ×
+                          </span>
+                        </span>
+                      ))}
                     </div>
                   </div>
                 </div>
               </div>
+              )}
 
 
               {/* Portfolio / Exhibition */}
@@ -875,8 +1006,6 @@ export default function EditProfile() {
                   </div>
                 </div>
               </div>
-
-              {/* Account Type */}
 
             </motion.div>
           )}
@@ -1024,7 +1153,7 @@ export default function EditProfile() {
         <button
           className={styles.saveBtn}
           onClick={handleSave}
-          disabled={isSaving}
+          disabled={isSaving || !!user?.deletionRequestedAt}
         >
           {isSaving ? t("جاري الحفظ...") : t("حفظ الملف الشخصي")}
         </button>

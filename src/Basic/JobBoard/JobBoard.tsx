@@ -4,6 +4,7 @@ import AllJobs from "../../Subject to/JobBoard/AllJobs/AllJobs";
 import { motion, type Variants } from "framer-motion";
 import { useState } from "react";
 import { useTranslation } from "../../context/translation-context";
+import { useJobitoAuth } from "../../context/LinkContxt";
 
 const heroContainer = {
   hidden: {},
@@ -44,6 +45,8 @@ const sectionVariant: Variants = {
 };
 
 export default function JobBoard() {
+  const { apiFetch, isAuthenticated, role, user } = useJobitoAuth();
+  const classification = user?.classification;
   const [search, setSearch] = useState("");
   const [location, setLocation] = useState("");
   const { t } = useTranslation();
@@ -70,14 +73,16 @@ export default function JobBoard() {
           >
             {/* Title */}
             <motion.h1 className={Styles.title} variants={fadeUp}>
-              {t("ابحث عن")}{" "}
+              {classification === "tradesman" ? t("ابحث عن") : t("ابحث عن")}{" "}
               <span className={Styles.purpleText}>
-                {t("وظيفة أحلامك")}{" "}
+                {classification === "tradesman" ? t("طلبات صيانة") : t("وظيفة أحلامك")}{" "}
               </span>
             </motion.h1>
 
             <motion.p className={Styles.description} variants={fadeUp}>
-              {t("الآلاف من فرص العمل في انتظارك. ابدأ مسيرتك المهنية اليوم.")}
+              {classification === "tradesman" 
+                ? t("الآلاف من طلبات العمل المنزلي في انتظارك. ابدأ العمل الآن.")
+                : t("الآلاف من فرص العمل في انتظارك. ابدأ مسيرتك المهنية اليوم.")}
             </motion.p>
 
             {/* Search Bar */}
@@ -89,7 +94,9 @@ export default function JobBoard() {
                 <Search className={Styles.icon} size={20} />
                 <input
                   type="text"
-                  placeholder={t("مسمى الوظيفة أو الكلمة الرئيسية...")}
+                  placeholder={classification === "tradesman" 
+                    ? t("ما هي الخدمة التي تستطيع تقديمها؟ (سباكة، نجارة...)") 
+                    : t("مسمى الوظيفة أو الكلمة الرئيسية...")}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSearch()}

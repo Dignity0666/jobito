@@ -15,6 +15,7 @@ import MyLoginPage from "../MyLoginPage/MyLoginPage";
 import { useJobitoAuth } from "../../../context/LinkContxt.js";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "../../../context/translation-context";
+import { useToast } from "../../../context/ToastContext";
 
 import { API_BASE_URL } from "../../../services/api.js";
 
@@ -26,6 +27,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { googleClientId } = useJobitoAuth();
+  const { showToast } = useToast();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -70,9 +72,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
       localStorage.setItem("token", data.access_token);
       window.dispatchEvent(new Event("auth-changed"));
       setShowLogin(false);
-      navigate("/");
+      const isNewUser = localStorage.getItem("isNewUser");
+      if (isNewUser) {
+        localStorage.removeItem("isNewUser");
+        navigate("/complete-profile");
+      } else {
+        navigate("/");
+      }
     } catch (err: unknown) {
-      alert(err instanceof Error ? t(err.message) : t("حدث خطأ ما"));
+      showToast(err instanceof Error ? t(err.message) : t("حدث خطأ ما"), "error");
     }
   };
 
@@ -91,10 +99,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || t("فشل إرسال الرمز"));
-      alert(t("تم إرسال رمز التحقق إلى بريدك الإلكتروني!"));
+      showToast(t("تم إرسال رمز التحقق إلى بريدك الإلكتروني!"), "success");
       setResetStep(2); // Step 2 for email is code entry + new password
     } catch (err: unknown) {
-      alert(err instanceof Error ? t(err.message) : t("حدث خطأ ما"));
+      showToast(err instanceof Error ? t(err.message) : t("حدث خطأ ما"), "error");
     } finally {
       setIsSendingCode(false);
     }
@@ -103,7 +111,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
-      alert(t("كلمات المرور غير متطابقة!"));
+      showToast(t("كلمات المرور غير متطابقة!"), "error");
       return;
     }
 
@@ -137,7 +145,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Reset failed");
 
-      alert(t("Password reset success! Please login with your new password."));
+      showToast(t("Password reset success! Please login with your new password."), "success");
       setIsResetMode(false);
       setResetStep(1);
       setResetMethod(null);
@@ -146,7 +154,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
       setNewPassword("");
       setConfirmPassword("");
     } catch (err: unknown) {
-      alert(err instanceof Error ? t(err.message) : t("فشل إعادة تعيين كلمة المرور"));
+      showToast(err instanceof Error ? t(err.message) : t("فشل إعادة تعيين كلمة المرور"), "error");
     } finally {
       setIsResetting(false);
     }
@@ -175,11 +183,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
       localStorage.setItem("token", data.access_token);
       window.dispatchEvent(new Event("auth-changed"));
       setShowLogin(false);
-      navigate("/");
+      const isNewUser = localStorage.getItem("isNewUser");
+      if (isNewUser) {
+        localStorage.removeItem("isNewUser");
+        navigate("/complete-profile");
+      } else {
+        navigate("/");
+      }
     } catch (err: unknown) {
       const message =
         err instanceof Error ? t(err.message) : t("حدث خطأ ما");
-      alert(message);
+      showToast(message, "error");
     } finally {
       setIsLoggingIn(false);
     }

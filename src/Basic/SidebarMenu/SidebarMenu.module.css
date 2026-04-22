@@ -22,7 +22,7 @@
 
 .line {
   fill: none;
-  stroke: var(--color-text, #ffffff);
+  stroke: var(--color-text);
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 3;
@@ -48,8 +48,9 @@
   display: flex;
   flex-direction: column;
   width: 200px;
-  background-color: #0d1117;
+  background-color: var(--color-card-bg);
   justify-content: center;
+  border: 1px solid var(--color-border);
   border-radius: 10px;
   transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 10px;
@@ -60,7 +61,7 @@
   opacity: 0;
   transform: translateX(-20px);
   pointer-events: none;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  box-shadow: var(--shadow-lg);
 }
 
 .inputOpen {
@@ -74,7 +75,7 @@
   background-color: transparent;
   border: none;
   padding: 10px;
-  color: white;
+  color: var(--color-text);
   display: flex;
   position: relative;
   gap: 15px;
@@ -90,13 +91,13 @@
 
 .value:not(:active):hover,
 .value:focus {
-  background-color: #1a1f24;
-  color: #637185;
+  background-color: var(--color-bg-secondary);
+  color: var(--color-primary);
 }
 
 .value:focus,
 .value:active {
-  background-color: #1a1f24;
+  background-color: var(--color-bg-secondary);
   outline: none;
   padding-left: 20px;
 }
@@ -108,7 +109,7 @@
   left: 2px;
   width: 4px;
   height: 80%;
-  background-color: #2f81f7;
+  background-color: var(--color-primary);
   border-radius: 5px;
   opacity: 0;
   transition: 0.3s;

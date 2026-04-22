@@ -11,8 +11,11 @@ import { useJobitoAuth } from "../../context/LinkContxt";
 import { useTranslation } from "../../context/translation-context";
 
 export const Home = () => {
-  const { isAuthenticated } = useJobitoAuth();
-  const { t } = useTranslation();
+  const { user, isAuthenticated } = useJobitoAuth();
+  const { t, language } = useTranslation();
+  const isRTL = language === "ar";
+  const isTradesman = user?.classification === "tradesman";
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -46,10 +49,10 @@ export const Home = () => {
         <div className={styles.container}>
           <motion.div className={styles.content} variants={containerVariants}>
             <motion.h1 className={styles.title} variants={itemVariants}>
-              {t("جد وظيفة")} <br />
-              <span className={styles.purpleText}>{t("أحلامك")}</span> <br />
+              {isTradesman ? (language === "ar" ? "اعرض خدماتك" : "Offer your services") : t("جد وظيفة")} <br />
+              <span className={styles.purpleText}>{isTradesman ? (language === "ar" ? "لعملائك" : "For your customers") : t("أحلامك")}</span> <br />
               <span className={styles.blueText}>
-                {t("اليوم")}
+                {isTradesman ? (language === "ar" ? "بسهولة" : "easily") : t("اليوم")}
                 <svg className={styles.underline} viewBox="0 0 300 20">
                   <motion.path
                     initial={{ pathLength: 0 }}
@@ -65,7 +68,10 @@ export const Home = () => {
             </motion.h1>
 
             <motion.p className={styles.description} variants={itemVariants}>
-              {t("نربط المحترفين الموهوبين بأفضل الفرص في الشرق الأوسط.")}
+              {isTradesman 
+                ? t("سوق لمهاراتك وتواصل مع العملاء الذين يبحثون عن خبراتك.")
+                : t("نربط المحترفين الموهوبين بأفضل الفرص في الشرق الأوسط.")
+              }
             </motion.p>
 
             <motion.div
@@ -121,7 +127,7 @@ export const Home = () => {
           src={heroSectionImage}
           alt="Hero Section"
           className={styles.heroImage}
-          initial={{ opacity: 0, x: 50 }}
+          initial={{ opacity: 0, x: isRTL ? -50 : 50 }}
           whileInView={{ opacity: 1, x: 0 }}
           animate={{ y: [0, -15, 0] }}
           transition={{

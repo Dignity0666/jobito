@@ -239,11 +239,11 @@
   gap: 8px;
   padding: 8px 18px;
   border-radius: 24px;
-  background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.2);
+  background: rgba(86, 205, 173, 0.1);
+  border: 1px solid rgba(86, 205, 173, 0.2);
   font-size: 12px;
   font-weight: 700;
-  color: #4ade80;
+  color: #56cdad;
   cursor: default;
 }
 
@@ -251,8 +251,8 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #22c55e;
-  box-shadow: 0 0 8px #22c55e;
+  background: #56cdad;
+  box-shadow: 0 0 8px #56cdad;
   animation: pulse 2s infinite;
 }
 
@@ -693,3 +693,36 @@
   color: var(--color-text-muted);
   line-height: 1.4;
 }
+
+/* ===== SERVES SECTION ===== */
+.servesList {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: 12px;
+  padding: 12px 0 12px 0;
+}
+
+.servesItem {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: all 0.2s;
+  cursor: default;
+}
+
+.servesItem:hover {
+  background: rgba(60, 101, 245, 0.1);
+  color: #3c65f5;
+  border-color: #3c65f5;
+  transform: translateY(-2px);
+}
+
+[dir="rtl"] .servesItem:hover {
+  transform: translateY(-2px);
+}
+

@@ -43,6 +43,7 @@ import { io, Socket } from "socket.io-client";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useJobitoAuth } from "../../context/LinkContxt";
 import { useTranslation } from "../../context/translation-context";
+import { useToast } from "../../context/ToastContext";
 // import EmojiPicker from "emoji-picker-react"; // TEMPORARILY DISABLED
 
 const s = styles as Record<string, string>;
@@ -115,7 +116,7 @@ const VoiceMessage: React.FC<VoiceMessageProps> = ({
   return (
     <div className={s.voiceMessageWhatsApp}>
       {!isOutgoing && (
-        <span className={s.voiceSenderName}>{senderName || "Contact"}</span>
+        <span className={s.voiceSenderName}>{senderName || t("Contact", "جهة اتصال")}</span>
       )}
 
       <div className={s.voiceMainContent}>
@@ -221,14 +222,14 @@ function formatTimeRelative(date: string | Date | undefined) {
   const oneHour = 60 * oneMin;
   const oneDay = 24 * oneHour;
 
-  if (diff < oneMin) return "just now";
-  if (diff < oneHour) return `${Math.floor(diff / oneMin)} mins ago`;
+  if (diff < oneMin) return t("just now", "الآن");
+  if (diff < oneHour) return t("{{mins}} mins ago", "منذ {{mins}} دقيقة", { mins: Math.floor(diff / oneMin) });
   if (diff < oneDay) {
     const hours = Math.floor(diff / oneHour);
-    if (hours === 1) return "1 hour ago";
-    return `${hours} hours ago`;
+    if (hours === 1) return t("1 hour ago", "منذ ساعة");
+    return t("{{hours}} hours ago", "منذ {{hours}} ساعة", { hours });
   }
-  if (diff < 2 * oneDay) return "Yesterday";
+  if (diff < 2 * oneDay) return t("Yesterday", "أمس");
   return d.toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
@@ -238,7 +239,8 @@ function getAvatarUrl(path: string | undefined | null) {
   return `${API}${path.startsWith("/") ? "" : "/"}${path}`;
 }
 
-function getInitials(name: string) {
+function getInitials(name: string, t?: any) {
+  if (!name || name === "Me") return t ? t("Me", "أنا")[0] : "A";
   return name
     .split(" ")
     .map((w) => w[0])
@@ -269,6 +271,9 @@ interface MessageItem {
   isRead: boolean;
   clientId?: string;
   createdAt: string;
+  replyToId?: string;
+  replyToMessage?: string;
+  replyToSenderName?: string;
 }
 
 interface UserSearchResult {
@@ -286,6 +291,7 @@ interface ChatAppProps {
 const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
   const { t } = useTranslation();
   const { user, apiFetch } = useJobitoAuth();
+  const { showToast } = useToast();
   const myUserId = user?.id || "";
   const location = useLocation();
   const navigate = useNavigate();
@@ -308,6 +314,9 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
   const [searchResults, setSearchResults] = useState<UserSearchResult[]>([]);
   const [searchingUsers, setSearchingUsers] = useState(false);
   const [mobileChatOpen, setMobileChatOpen] = useState(false);
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<MessageItem | null>(null);
 
   // Recording state
   const [isRecording, setIsRecording] = useState(false);
@@ -531,6 +540,29 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
 
     const clientId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
+    if (isEditing && editingMessageId) {
+      // Handle Edit
+      const originalId = editingMessageId;
+      cancelEdit(); // Reset UI immediately
+
+      // Optimistic Update
+      setMessages((prev) =>
+        prev.map((m) => (m._id === originalId ? { ...m, message: content } : m)),
+      );
+
+      try {
+        await apiFetch(`${API}/chat/p2p/${originalId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content }),
+        });
+        loadChats();
+      } catch (err) {
+        console.error("Failed to update message:", err);
+      }
+      return;
+    }
+
     // Optimistic update
     const tempMsg: MessageItem = {
       _id: clientId, // Use clientId as temp _id
@@ -541,8 +573,27 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
       type: "text",
       isRead: false,
       createdAt: new Date().toISOString(),
+      replyToId: replyingTo?._id,
+      replyToMessage: replyingTo?.message,
+      replyToSenderName:
+        replyingTo?.senderId === myUserId
+          ? t("You", "أنت")
+          : activeChat.name,
     };
     setMessages((prev) => [...prev, tempMsg]);
+
+    const replyData = replyingTo
+      ? {
+          replyToId: replyingTo._id,
+          replyToMessage: replyingTo.message,
+          replyToSenderName:
+            replyingTo.senderId === myUserId
+              ? t("You", "أنت")
+              : activeChat.name,
+        }
+      : {};
+
+    cancelReply();
 
     try {
       const res = await apiFetch(`${API}/chat/p2p`, {
@@ -554,6 +605,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
           content,
           type: "text",
           clientId: clientId,
+          ...replyData,
         }),
       });
       if (res.ok) {
@@ -594,11 +646,8 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
     formData.append("file", selectedFile);
 
     try {
-      const response = await fetch(`${API}/chat/upload`, {
+      const response = await apiFetch(`${API}/chat/upload`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
         body: formData,
       });
       const { url } = await response.json();
@@ -782,7 +831,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
       }, 1000);
     } catch (err) {
       console.error("Microphone access denied:", err);
-      alert("Please allow microphone access to record.");
+      showToast(t("Please allow microphone access to record."), "error");
     }
   };
 
@@ -898,9 +947,15 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
   ) => {
     e.preventDefault();
     e.stopPropagation();
-    const x = e.clientX;
-    const y = e.clientY;
-    setContextMenu({ x, y, msgId: msg._id, isMe, msgText: msg.message || "" });
+    
+    // We use fixed positioning, so we just pass standard viewport coordinates
+    setContextMenu({ 
+      x: e.clientX, 
+      y: e.clientY, 
+      msgId: msg._id, 
+      isMe, 
+      msgText: msg.message || "" 
+    });
   };
 
   const handleMessageTouchStart = (msg: MessageItem, isMe: boolean) => {
@@ -920,7 +975,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
     if (longPressTimer.current) clearTimeout(longPressTimer.current);
   };
 
-  const closeContextMenu = () => setContextMenu(null);
+  const closeContextMenu = useCallback(() => setContextMenu(null), []);
 
   const handleCopyMessage = () => {
     if (contextMenu?.msgText) {
@@ -950,6 +1005,35 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
     console.log("React with", emoji, "to", contextMenu?.msgId);
     closeContextMenu();
   };
+
+  const handleEditMessage = () => {
+    if (!contextMenu) return;
+    const msg = messages.find((m) => m._id === contextMenu.msgId);
+    if (msg && msg.type === "text") {
+      setInputText(msg.message || "");
+      setEditingMessageId(msg._id);
+      setIsEditing(true);
+    }
+    closeContextMenu();
+  };
+
+  const cancelEdit = () => {
+    setEditingMessageId(null);
+    setIsEditing(false);
+    setInputText("");
+  };
+
+  const handleReplyMessage = () => {
+    if (!contextMenu) return;
+    const msg = messages.find((m) => m._id === contextMenu.msgId);
+    if (msg) {
+      setReplyingTo(msg);
+      // Focus input
+    }
+    closeContextMenu();
+  };
+
+  const cancelReply = () => setReplyingTo(null);
 
   // ─── Filter chats by sidebar search ───────────────────────────────────
   const filteredChats = chats.filter(
@@ -996,20 +1080,10 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
         <aside
           className={`${s.sidebar} ${mobileChatOpen ? s.sidebarHiddenMobile : ""}`}
         >
-          <header
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              padding: "20px 16px 0",
-              alignItems: "center",
-            }}
-          >
-            <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>
-              {t("Messages", "الرسائل")}
-            </h2>
+          <header className={s.sidebarHeader}>
+            <h2>{t("Messages", "الرسائل")}</h2>
             <Plus
-              size={20}
-              style={{ cursor: "pointer", color: "#6b7280" }}
+              className={s.addIcon}
               onClick={() => setShowNewChatModal(true)}
             />
           </header>
@@ -1204,7 +1278,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                 </AnimatePresence>
               </header>
 
-              <div className={s.messagesArea} ref={areaRef}>
+              <div className={s.messagesArea} ref={areaRef} onScroll={closeContextMenu}>
                 {messagesLoading ? (
                   <div className={s.messagesLoadingState}>
                     <div className={s.spinner} />
@@ -1277,6 +1351,32 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                                 onTouchEnd={handleMessageTouchEnd}
                                 onTouchMove={handleMessageTouchEnd}
                               >
+                                <div
+                                  className={s.bubbleAction}
+                                  onClick={(e) =>
+                                    handleMessageContextMenu(e, msg, isMe)
+                                  }
+                                >
+                                  <Search
+                                    size={14}
+                                    style={{
+                                      transform: "rotate(90deg)",
+                                      opacity: 0.7,
+                                    }}
+                                  />
+                                </div>
+
+                                {msg.replyToId && (
+                                  <div className={s.quotedMessage}>
+                                    <span className={s.quotedUser}>
+                                      {msg.replyToSenderName || t("User", "مستخدم")}
+                                    </span>
+                                    <span className={s.quotedText}>
+                                      {msg.replyToMessage}
+                                    </span>
+                                  </div>
+                                )}
+
                                 {!isMe && msg.type !== "voice" && (
                                   <span
                                     className={s.voiceSenderName}
@@ -1435,119 +1535,41 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                     </div>
                   </>
                 )}
+
+                {/* Context Menu Removed From Here (Moved to Root) */}
               </div>
 
-              {/* ─── Message Context Menu ───────────────────────────────── */}
-              <AnimatePresence>
-                {contextMenu && (
-                  <motion.div
-                    className={s.contextMenuOverlay}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    onClick={closeContextMenu}
-                  >
-                    <motion.div
-                      className={s.contextMenuContainer}
-                      style={{ top: contextMenu.y, left: contextMenu.x }}
-                      initial={{ opacity: 0, scale: 0.85, y: -8 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.85, y: -8 }}
-                      transition={{ duration: 0.15 }}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {/* Emoji reactions bar */}
-                      <div className={s.contextReactions}>
-                        {["👍", "❤️", "😂", "😮", "😢", "🙏"].map((emoji) => (
-                          <button
-                            key={emoji}
-                            className={s.reactionBtn}
-                            onClick={() => handleReactToMessage(emoji)}
-                          >
-                            {emoji}
-                          </button>
-                        ))}
-                        <button
-                          className={s.reactionBtnPlus}
-                          onClick={() => handleReactToMessage("+")}
-                        >
-                          <Plus size={18} />
-                        </button>
-                      </div>
-                      {/* Menu items */}
-                      <div className={s.contextMenuItems}>
-                        <div
-                          className={s.contextMenuItem}
-                          onClick={closeContextMenu}
-                        >
-                          <Info size={18} />
-                          <span>{t("Message info", "معلومات الرسالة")}</span>
-                        </div>
-                        <div
-                          className={s.contextMenuItem}
-                          onClick={closeContextMenu}
-                        >
-                          <Reply size={18} />
-                          <span>{t("Reply", "رد")}</span>
-                        </div>
-                        <div
-                          className={s.contextMenuItem}
-                          onClick={handleCopyMessage}
-                        >
-                          <Copy size={18} />
-                          <span>{t("Copy", "نسخ")}</span>
-                        </div>
-                        <div
-                          className={s.contextMenuItem}
-                          onClick={closeContextMenu}
-                        >
-                          <Forward size={18} />
-                          <span>{t("Forward", "إعادة توجيه")}</span>
-                        </div>
-                        <div
-                          className={s.contextMenuItem}
-                          onClick={closeContextMenu}
-                        >
-                          <Pin size={18} />
-                          <span>{t("Pin", "تثبيت")}</span>
-                        </div>
-                        <div
-                          className={s.contextMenuItem}
-                          onClick={closeContextMenu}
-                        >
-                          <Star size={18} />
-                          <span>{t("Star", "تميز")}</span>
-                        </div>
-                        {contextMenu.isMe && (
-                          <div
-                            className={s.contextMenuItem}
-                            onClick={closeContextMenu}
-                          >
-                            <Pencil size={18} />
-                            <span>{t("Edit", "تعديل")}</span>
-                          </div>
-                        )}
-                        <div
-                          className={s.contextMenuItem}
-                          onClick={closeContextMenu}
-                        >
-                          <CheckSquare size={18} />
-                          <span>{t("Select", "تحديد")}</span>
-                        </div>
-                        <div
-                          className={`${s.contextMenuItem} ${s.contextMenuDanger}`}
-                          onClick={handleDeleteMessage}
-                        >
-                          <Trash2 size={18} />
-                          <span>{t("Delete", "حذف")}</span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
               <footer className={s.footer} style={{ position: "relative" }}>
+                {isEditing && (
+                  <div className={s.editingStatus}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <Pencil size={14} />
+                      {t("Editing message", "تعديل الرسالة...")}
+                    </div>
+                    <X
+                      size={16}
+                      className={s.cancelEditBtn}
+                      onClick={cancelEdit}
+                    />
+                  </div>
+                )}
+                {replyingTo && (
+                  <div className={s.replyStatus}>
+                    <div className={s.replyPreviewContent}>
+                      <span className={s.replyUser}>
+                        {replyingTo.senderId === myUserId
+                          ? t("You", "أنت")
+                          : activeChat?.name}
+                      </span>
+                      <span className={s.replyText}>{replyingTo.message}</span>
+                    </div>
+                    <X
+                      size={16}
+                      className={s.cancelEditBtn}
+                      onClick={cancelReply}
+                    />
+                  </div>
+                )}
                 {isRecording ? (
                   <div
                     className={s.inputBar}
@@ -1605,28 +1627,49 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                               className={s.menuItem}
                               onClick={() => fileInputRef.current?.click()}
                             >
-                              <FileText color="#7f66ff" size={18} /> {t("Document", "مستند")}
+                              <div className={s.menuIcon}>
+                                <FileText color="#7f66ff" size={18} />
+                              </div>
+                              {t("Document", "مستند")}
                             </div>
                             <div
                               className={s.menuItem}
                               onClick={() => fileInputRef.current?.click()}
                             >
-                              <ImageIcon color="#007bfc" size={18} /> {t("Photos & videos", "صور وفيديوهات")}
+                              <div className={s.menuIcon}>
+                                <ImageIcon color="#007bfc" size={18} />
+                              </div>
+                              {t("Photos & videos", "صور وفيديوهات")}
                             </div>
                             <div className={s.menuItem}>
-                              <ImageIcon color="#ff2e74" size={18} /> {t("Camera", "كاميرا")}
+                              <div className={s.menuIcon}>
+                                <ImageIcon color="#ff2e74" size={18} />
+                              </div>
+                              {t("Camera", "كاميرا")}
                             </div>
                             <div className={s.menuItem}>
-                              <Headphones color="#ff7f35" size={18} /> {t("Audio", "صوت")}
+                              <div className={s.menuIcon}>
+                                <Headphones color="#ff7f35" size={18} />
+                              </div>
+                              {t("Audio", "صوت")}
                             </div>
                             <div className={s.menuItem}>
-                              <UserIcon color="#009de2" size={18} /> {t("Contact", "جهة اتصال")}
+                              <div className={s.menuIcon}>
+                                <UserIcon color="#009de2" size={18} />
+                              </div>
+                              {t("Contact", "جهة اتصال")}
                             </div>
                             <div className={s.menuItem}>
-                              <BarChart2 color="#ffbc38" size={18} /> {t("Poll", "استطلاع")}
+                              <div className={s.menuIcon}>
+                                <BarChart2 color="#ffbc38" size={18} />
+                              </div>
+                              {t("Poll", "استطلاع")}
                             </div>
                             <div className={s.menuItem}>
-                              <Sticker color="#00c0cb" size={18} /> {t("New sticker", "ملصق جديد")}
+                              <div className={s.menuIcon}>
+                                <Sticker color="#00c0cb" size={18} />
+                              </div>
+                              {t("New sticker", "ملصق جديد")}
                             </div>
                             <input
                               type="file"
@@ -1890,6 +1933,79 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ─── Message Context Menu (Root Level for Fixed Positioning) ─── */}
+      <AnimatePresence>
+        {contextMenu && (
+        <React.Fragment key="context-menu-wrapper">
+          <motion.div
+            key="overlay"
+            className={s.contextMenuOverlay}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeContextMenu}
+          />
+          <motion.div
+            key="menu"
+            className={s.contextMenuContainer}
+            style={{ 
+              top: contextMenu.y > 250 
+                ? contextMenu.y - 12 - (contextMenu.isMe ? 230 : 190) 
+                : contextMenu.y + 12, 
+              left: Math.min(contextMenu.x, window.innerWidth - 240)
+            }}
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.85 }}
+            transition={{ duration: 0.12 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Menu items */}
+            <div className={s.contextMenuItems}>
+              <div
+                className={s.contextMenuItem}
+                onClick={handleReplyMessage}
+              >
+                <Reply size={18} />
+                <span>{t("Reply", "رد")}</span>
+              </div>
+              <div
+                className={s.contextMenuItem}
+                onClick={handleCopyMessage}
+              >
+                <Copy size={18} />
+                <span>{t("Copy", "نسخ")}</span>
+              </div>
+              <div
+                className={s.contextMenuItem}
+                onClick={closeContextMenu}
+              >
+                <Pin size={18} />
+                <span>{t("Pin", "تثبيت")}</span>
+              </div>
+              {contextMenu.isMe && (
+                <div
+                  className={s.contextMenuItem}
+                  onClick={handleEditMessage}
+                >
+                  <Pencil size={18} />
+                  <span>{t("Edit", "تعديل")}</span>
+                </div>
+              )}
+              <div
+                className={`${s.contextMenuItem} ${s.contextMenuDanger}`}
+                onClick={handleDeleteMessage}
+              >
+                <Trash2 size={18} />
+                <span>{t("Delete", "حذف")}</span>
+              </div>
+            </div>
+          </motion.div>
+        </React.Fragment>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 };

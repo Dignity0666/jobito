@@ -43,15 +43,15 @@ h4 {
 
 .ah-subtitle {
   font-size: 15px;
-  color: #515b6f;
+  color: var(--color-text-secondary);
   margin: 0;
 }
 
 .ah-date-btn {
   display: flex;
   align-items: center;
-  background: white;
-  border: 1px solid #d6ddeb;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
   border-radius: 4px;
   padding: 10px 16px;
   font-size: 14px;
@@ -79,7 +79,7 @@ h4 {
   justify-content: space-between;
   align-items: flex-start;
   padding: 24px;
-  border: 1px solid #d6ddeb;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   margin-bottom: 32px;
 }
@@ -105,7 +105,7 @@ h4 {
 .ah-banner-desc {
   font-size: 14px;
   line-height: 1.6;
-  color: #515b6f;
+  color: var(--color-text-secondary);
   margin: 0;
 }
 
@@ -120,7 +120,7 @@ h4 {
 .ah-tabs {
   display: flex;
   gap: 32px;
-  border-bottom: 1px solid #d6ddeb;
+  border-bottom: 1px solid var(--color-border);
   margin-bottom: 32px;
 }
 
@@ -130,7 +130,7 @@ h4 {
   padding: 0 0 16px 0;
   font-size: 15px;
   font-weight: 600;
-  color: #7c8493;
+  color: var(--color-text-muted);
   cursor: pointer;
   position: relative;
 }
@@ -177,8 +177,8 @@ h4 {
 .ah-action-btn {
   display: flex;
   align-items: center;
-  background: #e2effc;
-  border: none;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
   border-radius: 4px;
   padding: 10px 16px;
   font-size: 14px;
@@ -197,13 +197,13 @@ h4 {
   padding: 16px;
   font-size: 14px;
   font-weight: 500;
-  color: #7c8493;
-  border-bottom: 1px solid #d6ddeb;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .ah-table td {
   padding: 24px 16px;
-  border-bottom: 1px solid #d6ddeb;
+  border-bottom: 1px solid var(--color-border);
   font-size: 15px;
   color: var(--color-text);
 }
@@ -215,16 +215,14 @@ h4 {
 }
 
 .ah-company-logo {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-weight: 800;
-  font-size: 16px;
-  font-family: "Syne", sans-serif;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 
 .ah-company-name {
@@ -232,11 +230,11 @@ h4 {
 }
 
 .ah-role {
-  color: #515b6f;
+  color: var(--color-text-secondary);
 }
 
 .ah-date {
-  color: #515b6f;
+  color: var(--color-text-secondary);
 }
 
 .ah-status-badge {
@@ -297,7 +295,7 @@ h4 {
   background: none;
   font-size: 14px;
   font-weight: 500;
-  color: #515b6f;
+  color: var(--color-text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -310,7 +308,7 @@ h4 {
 }
 
 .ah-page-btn:hover:not(.active) {
-  background-color: #f8f8fd;
+  background-color: var(--color-bg-secondary);
 }
 
 .ah-nav-btn {
@@ -318,5 +316,5 @@ h4 {
 }
 
 .ah-page-dots {
-  color: #515b6f;
+  color: var(--color-text-muted);
 }

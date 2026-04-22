@@ -4,7 +4,7 @@ import styles from "./HeaderActionscompany.module.css";
 import { useTranslation } from "../../../context/translation-context";
 
 export const HeaderActionscompany = () => {
-  const { logout } = useJobitoAuth();
+  const { logout, user } = useJobitoAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -14,13 +14,17 @@ export const HeaderActionscompany = () => {
   };
 
   const handlePostJob = () => {
-    navigate("/PostJob");
+    if (user?.classification === "tradesman") {
+      navigate("/PostWork");
+    } else {
+      navigate("/PostJob");
+    }
   };
 
   return (
     <section className={styles.section}>
       <button className={styles.primaryBtn} onClick={handlePostJob}>
-        {t("نشر وظيفة")}
+        {user?.classification === "tradesman" ? t("إضافة خدمة") : t("نشر وظيفة")}
         <svg
           width="24"
           height="24"

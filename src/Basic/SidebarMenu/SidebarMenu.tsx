@@ -1,13 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../../context/translation-context";
-import { Mail, FileText, Info } from "lucide-react";
+import { useJobitoAuth } from "../../context/LinkContxt";
+import { Mail, FileText, Info, MessageSquare } from "lucide-react";
 import styles from "./SidebarMenu.module.css";
 
 const SidebarMenu: React.FC = () => {
+  const { user } = useJobitoAuth();
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  const isTradesman = user?.classification === "tradesman";
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -45,6 +49,13 @@ const SidebarMenu: React.FC = () => {
         >
           <FileText size={20} color="#7D8590" />
           {t("طلباتي")}
+        </button>
+        <button
+          className={styles.value}
+          onClick={() => handleNavigate("/chat")}
+        >
+          <MessageSquare size={20} color="#7D8590" />
+          {t("الرسائل")}
         </button>
         <button
           className={styles.value}

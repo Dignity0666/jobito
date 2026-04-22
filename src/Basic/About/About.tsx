@@ -2,9 +2,9 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./About.module.css";
 import { useTranslation } from "../../context/translation-context";
-import careerImg from "../../assets/career_growth.png";
+import careerImg from "../../assets/Img/Gemini_Generated_Image_lk4biqlk4biqlk4b.png";
 import projectLogo from "../../assets/412ec68f361b4f49b52fb8d584c317ccf197a403.png";
-import advisorImg from "../../assets/advisor.png";
+import advisorImg from "../../assets/Img/Gemini_Generated_Image_vzjw8dvzjw8dvzjw.png";
 
 const Icon = ({ d, children, size = 24, className = "", stroke = "currentColor", fill = "none" }) => (
   <svg
@@ -398,7 +398,9 @@ export function About() {
                 </div>
               </div>
               <div ref={r("ban-v")} className={rv(vis, "ban-v", "rr")}>
-                <div className={styles["ban-img-wrap"]} style={{ animation: "float 6s ease-in-out infinite" }}>
+                <div className={styles["ban-img-wrap"]}>
+                  <div className={styles["hv-ripple"]} style={{ inset: "-15px" }} />
+                  <div className={styles["hv-ripple-2"]} style={{ inset: "-30px" }} />
                   <img 
                     src={careerImg} 
                     alt={t("Career Growth")} 
@@ -523,8 +525,10 @@ export function About() {
               <div ref={r("help-v")} className={rv(vis, "help-v", "rr")}>
                 <div className={styles["help-vis"]}>
                   <div className={styles["hv-blob-wrap"]}>
+                    <div className={styles["hv-ripple"]} />
+                    <div className={styles["hv-ripple-2"]} />
                     <div className={styles["hv-blob"]}>
-                      <img src={advisorImg} alt="Advisor" className={styles["hv-img"]} />
+                      <img src={advisorImg} alt={t("دعم مهني")} className={styles["hv-img"]} />
                     </div>
                     <div className={styles["hv-exp"]}>
                       <span className={styles["hv-exp-n"]}>10+</span>

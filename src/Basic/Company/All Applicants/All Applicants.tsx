@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import "./All Applicants.css";
 import { useJobitoAuth } from "../../../context/LinkContxt";
 import { useTranslation } from "../../../context/translation-context";
+import { useToast } from "../../../context/ToastContext";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
@@ -46,6 +47,7 @@ const CustomCheckbox = () => <div className="custom-checkbox"></div>;
 export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | number | null }) {
   const { t, language } = useTranslation();
   const { apiFetch } = useJobitoAuth();
+  const { showToast } = useToast();
   const [searchParams] = useSearchParams();
   const jobId = jobIdProp ? String(jobIdProp) : searchParams.get("jobId");
 
@@ -107,13 +109,17 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
           method: "DELETE",
         },
       );
-      if (!res.ok) throw new Error("فشل في حذف المتقدم");
-      setApplicants((prev) =>
-        prev.filter((app) => app.applicationId !== applicationId),
-      );
+      if (res.ok) {
+        setApplicants((prev) =>
+          prev.filter((app) => app.applicationId !== applicationId),
+        );
+        showToast(t("تم الحذف بنجاح"), "success");
+      } else {
+        showToast(t("حدث خطأ أثناء محاولة الحذف"), "error");
+      }
     } catch (err) {
       console.error(err);
-      alert("حدث خطأ أثناء محاولة الحذف");
+      showToast(t("حدث خطأ أثناء محاولة الحذف"), "error");
     }
   };
 

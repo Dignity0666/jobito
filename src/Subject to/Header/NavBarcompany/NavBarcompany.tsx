@@ -4,7 +4,7 @@ import styles from "./NavBarcompany.module.css";
 
 const navLinkscompany = [
   { label: "Home", path: "/home" },
-  { label: "Messages", path: "/Messagingapp" },
+  { label: "Messages", path: "/chat" },
   { label: "Profile", path: "/Browse Companies" },
   { label: "Job Listings", path: "/JobListing" },
   { label: "Help Center", path: "/Help" },
