@@ -45,9 +45,14 @@ import PostWork from "./Basic/Tradesman/PostWork/PostWork";
 import WorkListing from "./Basic/Tradesman/WorkListing/WorkListing";
 import WorkApplicants from "./Basic/Tradesman/WorkApplicants/WorkApplicants";
 import WorkApplicantDetails from "./Basic/Tradesman/WorkApplicants/Details/WorkApplicantDetails";
+import ChatBotWidget from "./Shared/ChatBotWidget/ChatBotWidget";
+import AIChatBot from "./Basic/AIChatBot/AIChatBot";
+import Admin from "./Basic/Admin/Admin";
 
 import WorkDetails from "./Basic/Tradesman/WorkListing/Details/WorkDetails";
 import { ToastProvider } from "./context/ToastContext";
+import CompanyRatings from "./Basic/Company/CompanyRatings/CompanyRatings";
+
 
 const pageVariants = {
   initial: {
@@ -148,7 +153,7 @@ function AppContent() {
   const location = useLocation();
   const [showHeader, setShowHeader] = useState(true);
 
-  const hideLayoutPaths = ["/user-information", "/complete-profile"];
+  const hideLayoutPaths = ["/user-information", "/complete-profile", "/admin"];
   const currentPath = location.pathname.toLowerCase();
   const shouldHide = hideLayoutPaths.includes(currentPath);
 
@@ -243,6 +248,14 @@ function AppContent() {
                     element={
                       <PageWrapper>
                         <AllApplicants />
+                      </PageWrapper>
+                    }
+                  />
+                  <Route
+                    path="/CompanyRatings"
+                    element={
+                      <PageWrapper>
+                        <CompanyRatings />
                       </PageWrapper>
                     }
                   />
@@ -470,8 +483,34 @@ function AppContent() {
                       </PageWrapper>
                     }
                   />
+                  <Route
+                    path="/Profile/:id"
+                    element={
+                      <PageWrapper>
+                        <ProfilePage />
+                      </PageWrapper>
+                    }
+                  />
                 </>
               )}
+
+              {/* ─── AI ChatBot (available for all roles) ─── */}
+              <Route
+                path="/admin"
+                element={
+                  <PageWrapper>
+                    <Admin />
+                  </PageWrapper>
+                }
+              />
+              <Route
+                path="/ai-chat"
+                element={
+                  <PageWrapper>
+                    <AIChatBot />
+                  </PageWrapper>
+                }
+              />
 
               <Route
                 path="*"
@@ -483,9 +522,11 @@ function AppContent() {
               />
             </Routes>
           </AnimatePresence>
-          {showHeader && currentPath !== "/messagingapp" && <Footer />}
+          {showHeader && currentPath !== "/messagingapp" && currentPath !== "/ai-chat" && currentPath !== "/chat" && <Footer />}
         </div>
       </div>
+      {/* ─── Global Floating Chat Button ─── */}
+      {showHeader && <ChatBotWidget />}
     </div>
   );
 }

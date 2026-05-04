@@ -1,15 +1,12 @@
 import React from "react";
 import styles from "./HiringBanner.module.css";
-import img1 from "../../../assets/WhatsApp Image 2026-02-20 at 12.19.07 AM.jpeg";
-import img2 from "../../../assets/WhatsApp Image 2026-02-20 at 12.19.09 AM.jpeg";
-import img3 from "../../../assets/WhatsApp Image 2026-02-20 at 12.16.48 AM (1).jpeg";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../../../context/translation-context";
 
 const HiringBanner: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const containerVariants: Variants = {
     hidden: { opacity: 0, scale: 0.95 },
     visible: {
@@ -23,7 +20,7 @@ const HiringBanner: React.FC = () => {
   };
 
   const itemVariants: Variants = {
-    hidden: { opacity: 0, x: 40, y: 30 },
+    hidden: { opacity: 0, x: 0, y: 10 },
     visible: {
       opacity: 1,
       x: 0,
@@ -53,17 +50,14 @@ const HiringBanner: React.FC = () => {
       <div className={styles.bannerContainer}>
         {/* Left Side: Illustration & Text */}
         <div className={styles.leftContent}>
-          <motion.div className={styles.illustration} variants={imageVariants}>
-            <img src={img1} alt={t("Hiring")} />
-          </motion.div>
-
-          <motion.span className={styles.weAreLabel} variants={itemVariants}>{t("نحن")}</motion.span>
-          <motion.h2 className={styles.hiringTitle} variants={itemVariants}>{t("نوظف!")}</motion.h2>
-          <motion.p className={styles.description} variants={itemVariants}>
-            {t("دعنا نعمل معا")}
-            <br />&{" "}
-            <span className={styles.mutedText}>{t("واستكشف الفرص")}</span>
-          </motion.p>
+          <div className={styles.textStack}>
+            <motion.h2 className={styles.hiringTitle} variants={itemVariants}>{t("We are hiring!")}</motion.h2>
+            <motion.p className={styles.description} variants={itemVariants}>
+              {t("All companies")}
+              <br />&{" "}
+              <span className={styles.mutedText}>{t("And explore opportunities")}</span>
+            </motion.p>
+          </div>
         </div>
 
         {/* Right Side: Button & Team Illustration */}
@@ -92,15 +86,6 @@ const HiringBanner: React.FC = () => {
             </svg>
             {t("قدم الآن")}
           </motion.button>
-
-          <div className={styles.teamIllustrations}>
-            <motion.div className={styles.teamImgSmall} variants={imageVariants}>
-              <img src={img2} alt={t("team")} />
-            </motion.div>
-            <motion.div className={styles.teamImgTall} variants={imageVariants}>
-              <img src={img3} alt={t("team")} />
-            </motion.div>
-          </div>
         </div>
 
         {/* Decorative Background Elements */}

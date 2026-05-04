@@ -41,9 +41,10 @@ const JobCard: React.FC<JobCardProps> = ({
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const displayType = type || t("دوام كامل");
+  const rawType = Array.isArray(type) ? type.join(" / ") : type;
+  const displayType = String(rawType || t("دوام كامل"));
   return (
-    <div className={Style.jobCard} onClick={() => navigate(`/JobAnalytics/${jobId}`)}>
+    <div className={Style.jobCard}>
       <div className={Style.cardTop}>
         <div className={Style.logoBox}>
           {logo ? (
@@ -133,15 +134,20 @@ const CompanyHome = () => {
     newCandidates: 0,
     scheduleToday: 0,
     messagesReceived: 0,
+    acceptedCandidates: 0,
   });
   const [latestJobs, setLatestJobs] = useState<Job[]>([]);
   const [companyId, setCompanyId] = useState<number | null>(null);
   const [companyData, setCompanyData] = useState<AuthUser | null>(null);
   const [dateRange] = useState(getCurrentWeekRange(t));
 
+  const isInitialized = React.useRef(false);
+
   useEffect(() => {
+    if (isInitialized.current) return;
     const initDashboard = async () => {
       try {
+        isInitialized.current = true;
         let activeCompanyId;
 
         // 1. Fetch company profile
@@ -178,6 +184,7 @@ const CompanyHome = () => {
                 newCandidates: summaryData.new_candidates || 0,
                 scheduleToday: summaryData.schedule_today || 0,
                 messagesReceived: summaryData.messages_received || 0,
+                acceptedCandidates: summaryData.accepted_candidates || 0,
               });
             }
           } catch (e) {
@@ -212,12 +219,15 @@ const CompanyHome = () => {
     {
       count: dashboardData.newCandidates,
       label: t("مرشحين جدد للمراجعة"),
+      link: "/AllApplicants"
     },
     {
-      count: dashboardData.messagesReceived,
-      label: t("رسائل مستلمة"),
-    },
+      count: dashboardData.acceptedCandidates,
+      label: t("عدد المقبولين"),
+      link: "/chat"
+    }
   ];
+
 
   return (
     <div className={Style.wrapper}>
@@ -291,7 +301,10 @@ const CompanyHome = () => {
 
             <div className={Style.Percentages}>
               {summaryStats.map((stat, index) => (
-                <div key={index} className={Style.NewCandidates}>
+                <div 
+                  key={index} 
+                  className={Style.NewCandidates} 
+                >
                   <div className={Style.NewCandiTExt}>
                     <h3>{stat.count}</h3>
                     <p>
@@ -299,29 +312,14 @@ const CompanyHome = () => {
                       {stat.label.split(" ").slice(2).join(" ")}
                     </p>
                   </div>
-                  <span>
-                    <svg
-                      width="8"
-                      height="14"
-                      viewBox="0 0 8 14"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M1 1L7 7L1 13"
-                        stroke="white"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
                 </div>
               ))}
             </div>
           </div>
 
-          <Statistics companyId={companyId} />
+          <div style={{ marginTop: '30px' }}>
+            {companyId && <Statistics companyId={companyId} />}
+          </div>
 
           <div className={Style.updatesSection}>
             <div className={Style.updatesHeader}>

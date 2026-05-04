@@ -156,29 +156,43 @@ const getAvatarUrl = (path: string | undefined | null) => {
   return `${baseUrl}${path.startsWith("/") ? "" : "/"}${path}`;
 };
 
+import { useParams } from "react-router-dom";
+
 export default function ProfilePage() {
   const { user, apiFetch } = useJobitoAuth();
   const navigate = useNavigate();
+  const { id } = useParams();
   const { t } = useTranslation();
   const [profile, setProfile] = useState<any>(null);
   const [aboutExpanded, setAboutExpanded] = useState(false);
   const [showMoreExp, setShowMoreExp] = useState(false);
   const [showMoreEdu, setShowMoreEdu] = useState(false);
+  const [ratings, setRatings] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await apiFetch(`${API_BASE_URL}/users/me`);
+        const endpoint = id ? `${API_BASE_URL}/users/${id}` : `${API_BASE_URL}/users/me`;
+        const response = await apiFetch(endpoint);
         if (response.ok) {
           const data = await response.json();
           setProfile(data);
+          
+          try {
+            const ratingsRes = await apiFetch(`${API_BASE_URL}/ratings/user/${data.userId || data.id}`);
+            if (ratingsRes.ok) {
+              setRatings(await ratingsRes.json());
+            }
+          } catch(e) {
+            console.error("Failed to fetch user ratings", e);
+          }
         }
       } catch (error) {
         console.error("Failed to fetch profile", error);
       }
     };
     fetchProfile();
-  }, [apiFetch]);
+  }, [apiFetch, id]);
 
 
   const profileUser = profile || user;
@@ -233,7 +247,17 @@ export default function ProfilePage() {
               </div>
             </div>
             <div className={styles.heroInfo}>
-              <div className={styles.heroName}>{displayName}</div>
+              <div className={styles.heroName} style={{ display: 'flex', alignItems: 'center' }}>
+                {displayName}
+                {ratings.length > 0 && (
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", marginLeft: "10px", fontSize: "1rem", color: "#FFB020", background: "rgba(255, 176, 32, 0.15)", padding: "2px 8px", borderRadius: "12px", fontWeight: "600" }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                    {(ratings.reduce((sum, r) => sum + r.ratingValue, 0) / ratings.length).toFixed(1)}
+                  </span>
+                )}
+              </div>
               <div className={styles.heroRole}>
                 {profileUser?.role === "company"
                   ? t("حساب شركة")
@@ -256,12 +280,14 @@ export default function ProfilePage() {
               </div>
             </div>
             <div className={styles.heroActions}>
-              <button
-                className={styles.editProfileBtn}
-                onClick={() => navigate("/edit-profile")}
-              >
-                {t("تعديل الملف الشخصي")}
-              </button>
+              {!id && (
+                <button
+                  className={styles.editProfileBtn}
+                  onClick={() => navigate("/edit-profile")}
+                >
+                  {t("تعديل الملف الشخصي")}
+                </button>
+              )}
               <div className={styles.openBadge}>
                 <div className={styles.openDot} />
                 {t("متاح للفرص")}
@@ -412,6 +438,46 @@ export default function ProfilePage() {
                   />
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+
+        {/* User Ratings */}
+        <div className={styles.card}>
+          <div className={styles.cardBody}>
+            <div className={styles.cardHeader}>
+              <span className={styles.cardTitle}>{t("تقييمات الشركات والعملاء")}</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {ratings.length > 0 ? (
+                ratings.map((rev, idx) => (
+                  <div key={idx} style={{ padding: '1rem', borderRadius: '12px', border: '1px solid var(--border, #eee)', background: 'var(--bg-card, #fff)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.8rem' }}>
+                      <img
+                        src={getAvatarUrl(rev.company?.logoUrl) || `https://api.dicebear.com/7.x/identicon/svg?seed=${rev.company?.name || "Company"}`}
+                        alt={rev.company?.name}
+                        style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }}
+                      />
+                      <div>
+                        <div style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>{t(rev.company?.name || "شركة غير معروفة")}</div>
+                        <div style={{ display: 'flex', gap: '2px', marginTop: '2px' }}>
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <svg key={star} style={{ color: rev.ratingValue >= star ? "#FFD700" : "#E0E0E0", width: 14, height: 14 }} viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                            </svg>
+                          ))}
+                        </div>
+                      </div>
+                      <span style={{ marginLeft: 'auto', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                        {new Date(rev.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    {rev.comment && <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{rev.comment}</p>}
+                  </div>
+                ))
+              ) : (
+                <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>{t("لا توجد تقييمات من الشركات حتى الآن.")}</p>
+              )}
             </div>
           </div>
         </div>

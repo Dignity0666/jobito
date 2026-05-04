@@ -386,7 +386,12 @@ export default function JobDashboard() {
                         </div>
                         <div className={styles.appMeta}>
                           {t(displayName || "") || t("الجهة المعلنة")} ·{" "}
-                          {t(app.job?.jobType || "") || t("دوام كامل")}
+                          {(() => {
+                            const jt = app.job?.jobType;
+                            const firstType = Array.isArray(jt) ? jt[0] : jt;
+                            if (!firstType) return t("دوام كامل");
+                            return firstType === "full-time" ? t("دوام كامل") : t(firstType);
+                          })()}
                         </div>
                       </div>
                       <div className={styles.appDateCol}>

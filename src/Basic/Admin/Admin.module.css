@@ -3,7 +3,7 @@
 body{font-family:'DM Sans',sans-serif;overflow:hidden;}
 
 .layout {
-  --bg: var(--color-bg-secondary);
+  --bg: var(--color-bg);
   --sidebar: var(--color-card-bg);
   --card: var(--color-card-bg);
   --border: var(--color-border);
@@ -15,6 +15,13 @@ body{font-family:'DM Sans',sans-serif;overflow:hidden;}
   --shadow: var(--shadow-sm);
 
   display:flex; height:100vh; background:var(--bg); color:var(--text); overflow:hidden;
+  width: 100%;
+  flex-direction: column;
+}
+
+.dark {
+  --bg: var(--color-bg);
+  --sidebar: var(--color-card-bg);
 }
 
 /* ── Sidebar ── */
@@ -222,4 +229,92 @@ tbody td { padding:10px 0; font-size:12px; color:var(--text); vertical-align:mid
 .actionBtn.reject:hover { background:#dc2626; }
 .actionBtn.view { background:#6366f1; }
 .actionBtn.view:hover { background:#4f46e5; }
+
+.adminNav {
+  background: var(--color-bg-tertiary);
+  padding: 12px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  z-index: 50;
+}
+
+.navTab {
+  background: transparent;
+  color: var(--text);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.navTab:hover {
+  background: var(--border);
+}
+
+.navTabActive {
+  background: var(--accent) !important;
+  color: white !important;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+}
+
+.logoutBtn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.logoutBtn:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+.navDivider {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  margin: 0 8px;
+}
+
+.loadingScreen {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  justify-content: center;
+  align-items: center;
+  color: var(--text);
+  background: var(--bg);
+  font-size: 18px;
+  flex-direction: column;
+  gap: 20px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 

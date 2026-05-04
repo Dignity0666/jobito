@@ -55,6 +55,25 @@ export default function ApplicantDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isDownloaded, setIsDownloaded] = useState(false);
+  const [myCompanyId, setMyCompanyId] = useState<number | null>(null);
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [hasRated, setHasRated] = useState(false);
+
+  useEffect(() => {
+    const fetchMyCompany = async () => {
+      try {
+        const res = await apiFetch(`${API_BASE_URL}/companies/my/profile`);
+        if (res.ok) {
+          const data = await res.json();
+          setMyCompanyId(data.companyId || data.company_id);
+        }
+      } catch(e) {}
+    };
+    fetchMyCompany();
+  }, [apiFetch]);
 
   useEffect(() => {
     const fetchApplication = async () => {
@@ -166,6 +185,35 @@ export default function ApplicantDetails() {
         initialMessage: `${t("مرحباً")} ${u.fullName.split(" ")[0]}، ${t("بخصوص تقديمك على وظيفة")} ${t(app?.job?.title || "المتاحة")}، ${t("نحن مهتمون بملفك ونتمنى التواصل معك قريباً.")}`,
       },
     });
+  };
+
+  const submitRating = async () => {
+    if (!rating || !myCompanyId || !app?.user?.userId) return;
+    setSubmittingReview(true);
+    try {
+      const res = await apiFetch(`${API_BASE_URL}/ratings`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companyId: myCompanyId,
+          targetUserId: app.user.userId,
+          ratingValue: rating,
+          comment,
+          raterType: 'COMPANY'
+        }),
+      });
+      if (res.ok) {
+        showToast(t("تم إرسال التقييم بنجاح"), "success");
+        setHasRated(true);
+      } else {
+        throw new Error("Failed");
+      }
+    } catch (e) {
+      console.error("Failed to submit review", e);
+      showToast(t("حدث خطأ أثناء الإرسال"), "error");
+    } finally {
+      setSubmittingReview(false);
+    }
   };
 
   if (loading) return <div className="details-loading">{t("جاري التحميل...")}</div>;
@@ -727,6 +775,46 @@ export default function ApplicantDetails() {
                       </button>
                     </div>
                   )}
+                </div>
+              </>
+            )}
+
+            {app.status === "hired" && !hasRated && (
+              <>
+                <div className="main-divider" />
+                <div className="main-section">
+                  <h3 className="section-title">{t("تقييم المتقدم")}</h3>
+                  <div style={{ background: 'var(--bg-card, #fff)', padding: '1.5rem', borderRadius: '16px', border: '1px solid var(--border, #eee)' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <svg
+                          key={star}
+                          onClick={() => setRating(star)}
+                          onMouseEnter={() => setHoverRating(star)}
+                          onMouseLeave={() => setHoverRating(0)}
+                          style={{ cursor: "pointer", color: (hoverRating || rating) >= star ? "#FFD700" : "#E0E0E0", width: 28, height: 28, transition: "color 0.2s" }}
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                      ))}
+                    </div>
+                    <textarea
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      placeholder={t("اكتب رأيك في المتقدم هنا...")}
+                      style={{ width: '100%', minHeight: '80px', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border, #eee)', marginBottom: '1rem', fontFamily: 'inherit', resize: 'vertical' }}
+                    />
+                    <button
+                      onClick={submitRating}
+                      disabled={!rating || submittingReview || !myCompanyId}
+                      className="accept-btn"
+                      style={{ opacity: (!rating || submittingReview || !myCompanyId) ? 0.5 : 1, width: 'auto', padding: '10px 24px' }}
+                    >
+                      {submittingReview ? t("جاري الإرسال...") : t("إرسال التقييم")}
+                    </button>
+                  </div>
                 </div>
               </>
             )}

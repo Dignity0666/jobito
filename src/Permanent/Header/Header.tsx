@@ -24,6 +24,8 @@ import {
   Moon,
   Sun,
   Menu,
+  Star,
+  ShieldCheck,
 } from "lucide-react";
 
 export function Header() {
@@ -51,25 +53,37 @@ export function Header() {
 
   const navLinkscompany = useMemo(() => [
     { label: t("الرئيسية"), path: "/home", icon: <Home size={16} /> },
+    { label: t("التقييمات"), path: "/CompanyRatings", icon: <Star size={16} /> },
     { label: t("الرسائل"), path: "/chat", icon: <MessageSquare size={16} /> },
     { label: t("الملف الشخصي"), path: "/Profile", icon: <UserCircle size={16} /> },
     { label: t("قائمة الوظائف"), path: "/JobListing", icon: <List size={16} /> },
   ], [t]);
 
   const navLinkstradesman = useMemo(() => [
+
     { label: t("الرئيسية"), path: "/", icon: <Home size={16} /> },
-    { label: t("بحث عن وظائف"), path: "/Find Jobs", icon: <Search size={16} /> },
-    { label: t("أعمالي"), path: "/JobListing", icon: <List size={16} /> },
+    { label: t("البحث عن عمل"), path: "/Find Jobs", icon: <Search size={16} /> },
+    { label: t("الوظائف"), path: "/JobListing", icon: <List size={16} /> },
+    { label: t("التقييمات"), path: "/CompanyRatings", icon: <Star size={16} /> },
     { label: t("تصفح الشركات"), path: "/Browse Companies", icon: <Building2 size={16} /> },
     { label: t("الملف الشخصي"), path: "/Profile", icon: <UserCircle size={16} /> },
+    { label: t("الدردشة"), path: "/chat", icon: <MessageSquare size={16} /> },
+  ], [t]);
+
+  const adminNavLinks = useMemo(() => [
+    { label: t("الرئيسية"), path: "/", icon: <Home size={16} /> },
+    { label: t("لوحة الإدارة"), path: "/admin", icon: <ShieldCheck size={16} /> },
     { label: t("الرسائل"), path: "/chat", icon: <MessageSquare size={16} /> },
+    { label: t("الملف الشخصي"), path: "/Profile", icon: <UserCircle size={16} /> },
   ], [t]);
 
   const toggleLanguage = () => {
     setLanguage(language === "ar" ? "en" : "ar");
   };
 
-  const navLinksuser = isAuthenticated ? (user?.classification === "tradesman" ? navLinkstradesman : authNavLinks) : guestNavLinks;
+  const navLinksuser = isAuthenticated 
+    ? (role === "admin" ? adminNavLinks : (user?.classification === "tradesman" ? navLinkstradesman : authNavLinks)) 
+    : guestNavLinks;
   const navLinks = role === "company" ? navLinkscompany : navLinksuser;
 
   const isDarkHeader = role === "company";
@@ -81,7 +95,7 @@ export function Header() {
       <header className={isDarkHeader ? styles.rootcompany : styles.rootUser}>
         <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            {isAuthenticated && (
+            {isAuthenticated && role !== "company" && (
               <SidebarMenu />
             )}
             <LogoComponent />

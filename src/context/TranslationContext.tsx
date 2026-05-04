@@ -193,8 +193,17 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
       }
 
       // Priority 3: Explicit Fallback (if provided and translation is missing)
+      // Only use fallback if we are NOT in Arabic mode or if the key is NOT already Arabic
       if (!text && fallbackText) {
-        text = fallbackText;
+        const arabicCharCount = (key.match(/[\u0600-\u06FF]/g) || []).length;
+        const englishCharCount = (key.match(/[a-zA-Z]/g) || []).length;
+        const isMostlyArabicKey = arabicCharCount >= englishCharCount;
+
+        if (language === 'ar' && isMostlyArabicKey) {
+          text = key;
+        } else {
+          text = fallbackText;
+        }
       }
 
       // If still no translation, use key itself
@@ -203,11 +212,15 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
       }
 
       // Priority 4: Dynamic on-demand translation logic (only if not found in static/cache)
-      if (!staticTranslations[key] && !dynamicTranslations[`${language}:${key}`]) {
+      if (typeof key === 'string' && !staticTranslations[key] && !dynamicTranslations[`${language}:${key}`]) {
         const isTranslationKey = /^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)+$/.test(key);
         if (!isTranslationKey) {
-          const isArabicText = /[\u0600-\u06FF]/.test(key);
-          const needsTranslation = (language === 'en' && isArabicText) || (language === 'ar' && !isArabicText);
+          const arabicCharCount = (key.match(/[\u0600-\u06FF]/g) || []).length;
+          const englishCharCount = (key.match(/[a-zA-Z]/g) || []).length;
+          
+          const isMostlyArabic = arabicCharCount >= englishCharCount;
+          
+          const needsTranslation = (language === 'en' && isMostlyArabic) || (language === 'ar' && !isMostlyArabic);
           
           if (needsTranslation) {
             queueTranslation(key);
@@ -226,13 +239,13 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     [language, staticTranslations, dynamicTranslations, queueTranslation]
   );
 
-  const contextValue: TranslationContextType = {
+  const contextValue = React.useMemo(() => ({
     t,
     language,
     setLanguage,
     isLoading: false,
     isRTL: language === 'ar',
-  };
+  }), [t, language, setLanguage]);
 
   return (
     <TranslationContext.Provider value={contextValue}>

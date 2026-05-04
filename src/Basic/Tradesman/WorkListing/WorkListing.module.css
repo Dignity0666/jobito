@@ -49,6 +49,11 @@
   text-transform: uppercase;
 }
 
+:global([dir="rtl"]) .table th,
+:global(.rtl) .table th {
+  text-align: right;
+}
+
 .table tr td {
   padding: 20px;
   transition: background 0.2s;
@@ -91,6 +96,42 @@
   border-right: 1px solid #e2e8f0;
 }
 
+/* ── RTL: Flip border-radius and borders ── */
+:global([dir="rtl"]) .table tr td:first-child {
+  border-radius: 0 12px 12px 0;
+  border-left: none;
+}
+:global([dir="rtl"]) .dark .table tr td:first-child {
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: none;
+}
+:global([dir="rtl"]) .light .table tr td:first-child {
+  border-right: 1px solid #e2e8f0;
+  border-left: none;
+}
+
+:global([dir="rtl"]) .table tr td:last-child {
+  border-radius: 12px 0 0 12px;
+  border-right: none;
+}
+:global([dir="rtl"]) .dark .table tr td:last-child {
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: none;
+}
+:global([dir="rtl"]) .light .table tr td:last-child {
+  border-left: 1px solid #e2e8f0;
+  border-right: none;
+}
+
+/* ── RTL: Header alignment ── */
+:global([dir="rtl"]) .header {
+  text-align: right;
+}
+
+:global([dir="rtl"]) .table tr td {
+  text-align: right;
+}
+
 .jobTitle {
   font-weight: 600;
   font-size: 16px;
@@ -111,6 +152,12 @@
   background: rgba(34, 197, 94, 0.1);
   color: #22c55e;
   border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.statusClosed {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .date {

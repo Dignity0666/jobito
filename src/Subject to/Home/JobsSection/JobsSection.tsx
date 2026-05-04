@@ -45,7 +45,7 @@ interface Job {
     logoUrl?: string;
   };
   address: string;
-  jobType: string;
+  jobType: string | string[];
   salary?: number | string;
   category?: { name: string };
   categoryId?: number;
@@ -71,12 +71,19 @@ const CompanyJobCard: React.FC<{ job: Job; variants: Variants }> = ({ job, varia
   };
 
 
-  const jobTypeLabel =
-    job.jobType === "Full Time" ? t("دوام كامل") :
-    job.jobType === "Part Time" ? t("دوام جزئي") :
-    job.jobType === "Contract" ? t("عقد") :
-    job.jobType === "Internship" ? t("تدريب") :
-    t("دوام كامل");
+  const jobTypeLabel = (() => {
+    const types = Array.isArray(job.jobType) ? job.jobType : [job.jobType].filter(Boolean);
+    if (types.length === 0) return t("دوام كامل");
+    return types.map(type => {
+      const lowerType = String(type).toLowerCase();
+      if (lowerType === "full-time") return t("دوام كامل");
+      if (lowerType === "part-time") return t("دوام جزئي");
+      if (lowerType === "remote") return t("عن بعد");
+      if (lowerType === "internship") return t("تدريب");
+      if (lowerType === "contract") return t("عقد");
+      return t(type);
+    }).join(" / ");
+  })();
 
   return (
     <motion.div variants={variants} whileHover={{ y: -5, transition: { duration: 0.3 } }}>
@@ -249,7 +256,7 @@ const JobsSection = () => {
     >
       <motion.div className={styles.sectionHeader} variants={cardVariants}>
         <h2>
-          {t("jobs")} <span>{t("Featured")}</span>
+          {t("Exceptional")} <span>{t("jobs")}</span>
         </h2>
         <Link to="/Find Jobs" className={styles.showAllLink}>
           {t("Show all jobs")} →

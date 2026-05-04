@@ -1,358 +1,259 @@
 .job-listing-page {
-  padding: 32px;
-  background-color: var(--color-bg);
+  padding: 40px 60px;
+  background-color: var(--color-bg, #0B1020);
   min-height: 100vh;
-  font-family:
-    Inter,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    "Helvetica Neue",
-    sans-serif;
-  color: var(--color-text);
+  font-family: "Inter", sans-serif;
+  color: var(--color-text, #E2E8F0);
 }
 
 .jl-header-area {
-  margin-bottom: 24px;
+  margin-bottom: 40px;
 }
 
 .jl-title-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 24px;
 }
 
 .jl-title {
-  font-size: 24px;
-  font-weight: 800;
+  font-size: 32px;
+  font-weight: 700;
   color: var(--color-text);
-  margin: 0 0 8px 0;
+  margin: 0 0 12px 0;
   letter-spacing: -0.5px;
 }
 
 .jl-subtitle {
-  font-size: 14px;
-  color: var(--color-text-muted);
+  font-size: 16px;
+  color: var(--color-text-secondary, #94A3B8);
   margin: 0;
 }
 
-.jl-date-range-picker {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 16px;
-  background: var(--color-card-bg);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.jl-date-range-picker:hover {
-  border-color: var(--color-primary);
-  box-shadow: 0 2px 4px rgba(70, 64, 222, 0.1);
-}
-
-.jl-date-text {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--color-text-muted);
-}
-
-.jl-date-icon {
-  color: var(--color-primary);
-}
-
-.jl-tabs {
-  display: flex;
-  gap: 32px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.jl-tab-btn {
-  padding: 0 0 12px 0;
-  background: none;
-  border: none;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  position: relative;
-}
-
-.jl-tab-btn.active {
-  color: var(--color-text);
-}
-
-.jl-tab-btn.active::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background-color: var(--color-primary);
-}
-
+/* ─── Main Content Section ─── */
 .jl-main-card {
-  background: var(--color-card-bg);
-  border: 1px solid var(--color-border);
+  background: transparent;
+  border-top: 1px solid var(--color-border, #1E2A45);
+  margin-top: 20px;
 }
 
 .jl-card-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--color-border);
+  padding: 32px 0;
 }
 
 .jl-card-title {
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--color-text);
   margin: 0;
 }
 
-.jl-filter-btn {
+/* ─── Filter Chips ─── */
+.filter-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px; /* Increased gap between chips */
+  align-items: center;
+}
+
+.filter-chip {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: var(--color-card-bg);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
+  gap: 12px; /* Gap between the custom checkbox and the text */
+  padding: 10px 20px;
+  border-radius: 8px;
+  background-color: transparent;
+  border: 1px solid var(--color-border, #1E2A45);
+  color: var(--color-text-secondary, #94A3B8);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+/* Custom Checkbox Indicator */
+.filter-chip::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--color-border, #1E2A45);
+  border-radius: 4px;
+  background-color: transparent;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.filter-chip:hover::before {
+  border-color: var(--color-text-secondary);
+}
+
+.filter-chip-active::before {
+  background-color: var(--color-primary, #6B8CE0);
+  border-color: var(--color-primary, #6B8CE0);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+  background-size: 12px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.filter-chip input[type="checkbox"] {
+  display: none; /* Keep the real input hidden */
+}
+
+.filter-chip:hover {
+  border-color: var(--color-text-secondary);
   color: var(--color-text);
 }
 
+.filter-chip-active {
+  background-color: var(--color-primary-light, #1A2340) !important;
+  border-color: var(--color-primary, #6B8CE0) !important;
+  color: var(--color-primary, #6B8CE0) !important;
+}
+
+/* ─── Table Styling ─── */
 .jl-table {
   width: 100%;
   border-collapse: collapse;
-  text-align: left;
+  margin-top: 10px;
 }
 
 .jl-table th {
   padding: 16px 24px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
-  color: var(--color-text-muted);
-  border-bottom: 1px solid var(--color-border);
-  white-space: nowrap;
+  color: var(--color-text-muted, #64748b);
+  border-bottom: 1px solid var(--color-border, #1E2A45);
+  text-align: left;
 }
 
 .jl-table td {
   padding: 24px;
-  border-bottom: 1px solid var(--color-border);
-  font-size: 14px;
+  border-bottom: 1px solid var(--color-border, #1E2A45);
+  font-size: 15px;
   vertical-align: middle;
-}
-
-.jl-table tbody tr:last-child td {
-  border-bottom: none;
+  color: var(--color-text-secondary);
 }
 
 .jl-col-role {
-  font-weight: 600;
-  color: var(--color-text);
+  font-weight: 700;
+  color: var(--color-text) !important;
 }
 
-.jl-col-date {
-  color: var(--color-text-muted);
-}
-
-.jl-status-badge {
+/* ─── Badges ─── */
+.jl-status-badge, .jl-type-badge {
   display: inline-flex;
-  padding: 6px 16px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px; /* Increased padding for better breathing room */
   border-radius: 99px;
-  font-size: 12px;
-  font-weight: 500;
-  border: 1px solid;
-  background: var(--color-card-bg);
-}
-
-.status-open {
-  color: #56cdad;
-  border-color: #56cdad;
-}
-
-.status-closed {
-  color: #ff6550;
-  border-color: #ff6550;
-}
-
-.jl-type-badge {
-  display: inline-flex;
-  padding: 6px 16px;
-  border-radius: 99px;
-  font-size: 12px;
-  font-weight: 500;
-  border: 1px solid;
-  background: var(--color-card-bg);
-}
-
-.type-fulltime {
-  color: var(--color-primary);
-  border-color: var(--color-primary);
-}
-
-.type-freelance {
-  color: #ffb836;
-  border-color: #ffb836;
-}
-
-.jl-col-appl {
-  color: var(--color-text-muted);
-  font-weight: 500;
-}
-
-.jl-col-needs {
-  font-size: 14px;
-}
-
-.jl-col-needs strong {
-  color: var(--color-text);
+  font-size: 13px;
   font-weight: 600;
+  border: 1px solid;
+  background: transparent;
+  text-transform: capitalize;
+  white-space: nowrap; /* Prevents text from wrapping to two lines */
+  min-width: 100px; /* Ensures a consistent minimum width for pills */
 }
 
+.status-open { color: #56cdad; border-color: rgba(86, 205, 173, 0.4); }
+.status-closed { color: #ff6550; border-color: rgba(255, 101, 80, 0.4); }
+
+.type-fulltime { color: #6B8CE0; border-color: rgba(107, 140, 224, 0.4); }
+.type-freelance { color: #ffb836; border-color: rgba(255, 184, 54, 0.4); }
+.type-parttime { color: #818cf8; border-color: rgba(129, 140, 248, 0.4); }
+.type-remote { color: #56cdad; border-color: rgba(86, 205, 173, 0.4); }
+.type-internship { color: #f472b6; border-color: rgba(244, 114, 182, 0.4); }
+
+/* ─── Action Buttons (White Squares) ─── */
 .jl-actions {
   display: flex;
-  gap: 8px;
-  align-items: center;
+  gap: 10px;
 }
 
 .jl-action-btn {
-  background: none;
-  border: 1px solid var(--color-border);
+  background: #E2E8F0;
+  color: #0B1020;
+  border: none;
   border-radius: 6px;
-  padding: 6px;
-  cursor: pointer;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
-  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
 .jl-action-btn:hover {
-  background-color: var(--color-bg-secondary);
-  border-color: var(--color-text-muted);
-  color: var(--color-text);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-.jl-action-btn.edit:hover {
-  color: var(--color-primary);
-  border-color: var(--color-primary);
-  background-color: var(--color-bg-secondary);
-}
-
-.jl-action-btn.close:hover {
-  color: #ff6550;
-  border-color: #ff6550;
-  background-color: var(--color-bg-secondary);
-}
-
-.jl-action-btn.reopen:hover {
-  color: #56cdad;
-  border-color: #56cdad;
-  background-color: var(--color-bg-secondary);
-}
-
-.jl-action-btn.delete:hover {
-  color: #ff4d4f;
-  border-color: #ff4d4f;
-  background-color: var(--color-bg-secondary);
-}
-
+/* ─── Footer / Pagination ─── */
 .jl-pagination {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24px;
-  border-top: 1px solid var(--color-border);
+  padding: 32px 0;
+  font-size: 14px;
 }
 
 .page-size-wrap {
   display: flex;
   align-items: center;
-  gap: 10px;
-  color: var(--color-text-muted);
-  font-size: 14px;
-  font-weight: 500;
+  gap: 12px;
+  color: var(--color-text-secondary);
 }
 
 .page-select-box {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
   padding: 8px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  font-weight: 600;
-  color: var(--color-text);
-  background: var(--color-card-bg);
+  border: 1px solid var(--color-border, #1E2A45);
+  border-radius: 6px;
+  cursor: pointer;
 }
 
 .page-controls {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
-.page-nav,
+.page-nav {
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.page-nav:hover { color: var(--color-text); }
+
 .page-num {
   width: 32px;
   height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: none;
-  border: none;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-text-muted);
+  border-radius: 6px;
   cursor: pointer;
-  border-radius: 4px;
+  font-weight: 600;
 }
 
 .page-num.active {
-  background: var(--color-primary);
+  background: var(--color-primary, #6B8CE0);
   color: white;
 }
-.jl-post-job-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  background-color: var(--color-primary);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 6px rgba(70, 64, 222, 0.2);
-}
 
-.jl-post-job-btn:hover {
-  background-color: #3530b1;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgba(70, 64, 222, 0.3);
-}
-
-.jl-post-job-btn:active {
-  transform: translateY(0);
-}
-
-.jl-post-job-btn svg {
-  stroke: white;
-}
+/* RTL Support */
+[dir="rtl"] .jl-table th { text-align: right; }
+[dir="rtl"] .jl-table { direction: rtl; }

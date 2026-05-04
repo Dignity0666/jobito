@@ -83,6 +83,7 @@ interface VoiceMessageProps {
   senderName?: string;
   timestamp?: string;
   isOutgoing?: boolean;
+  t: (key: string, fallback?: string, vars?: Record<string, any>) => string;
 }
 
 const VoiceMessage: React.FC<VoiceMessageProps> = ({
@@ -92,6 +93,7 @@ const VoiceMessage: React.FC<VoiceMessageProps> = ({
   senderName,
   timestamp,
   isOutgoing,
+  t,
 }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -211,7 +213,8 @@ function formatMessageTime(date: string | Date | undefined) {
     .toLowerCase();
 }
 
-function formatTimeRelative(date: string | Date | undefined) {
+function formatTimeRelative(date: string | Date | undefined, t?: (key: string, fallback?: string, vars?: Record<string, any>) => string) {
+  const _t = t || ((key: string, fallback?: string) => fallback || key);
   if (!date) return "";
   const d = new Date(date);
   if (isNaN(d.getTime())) return "";
@@ -222,14 +225,14 @@ function formatTimeRelative(date: string | Date | undefined) {
   const oneHour = 60 * oneMin;
   const oneDay = 24 * oneHour;
 
-  if (diff < oneMin) return t("just now", "الآن");
-  if (diff < oneHour) return t("{{mins}} mins ago", "منذ {{mins}} دقيقة", { mins: Math.floor(diff / oneMin) });
+  if (diff < oneMin) return _t("just now", "الآن");
+  if (diff < oneHour) return _t("{{mins}} mins ago", "منذ {{mins}} دقيقة", { mins: Math.floor(diff / oneMin) });
   if (diff < oneDay) {
     const hours = Math.floor(diff / oneHour);
-    if (hours === 1) return t("1 hour ago", "منذ ساعة");
-    return t("{{hours}} hours ago", "منذ {{hours}} ساعة", { hours });
+    if (hours === 1) return _t("1 hour ago", "منذ ساعة");
+    return _t("{{hours}} hours ago", "منذ {{hours}} ساعة", { hours });
   }
-  if (diff < 2 * oneDay) return t("Yesterday", "أمس");
+  if (diff < 2 * oneDay) return _t("Yesterday", "أمس");
   return d.toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
@@ -317,6 +320,8 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [replyingTo, setReplyingTo] = useState<MessageItem | null>(null);
+  const [isOtherTyping, setIsOtherTyping] = useState(false);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Recording state
   const [isRecording, setIsRecording] = useState(false);
@@ -442,6 +447,19 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
       loadChats(); // Refresh unread counts in sidebar
     });
 
+    // ─── Typing Indicator Listener ──────────────────────────────────
+    socket.on("user_typing", (payload: { senderId: string; isTyping: boolean }) => {
+      const currentChat = activeChatRef.current;
+      if (currentChat && payload.senderId === currentChat.oderId) {
+        setIsOtherTyping(payload.isTyping);
+        // Auto-clear after 3 seconds in case stop event is missed
+        if (payload.isTyping) {
+          if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+          typingTimeoutRef.current = setTimeout(() => setIsOtherTyping(false), 3000);
+        }
+      }
+    });
+
     return () => {
       socket.disconnect();
     };
@@ -529,7 +547,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
     if (areaRef.current) {
       areaRef.current.scrollTop = areaRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, isOtherTyping]);
 
   // ─── Send Text Message ────────────────────────────────────────────────
   const sendMessage = async () => {
@@ -537,6 +555,15 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
 
     const content = inputText.trim();
     setInputText("");
+
+    // Stop typing indicator
+    if (socketRef.current && activeChat) {
+      socketRef.current.emit("typing", {
+        senderId: myUserId,
+        recipientId: activeChat.oderId,
+        isTyping: false,
+      });
+    }
 
     const clientId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
@@ -1144,7 +1171,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                         )}
                       </span>
                       <span className={s.chatTime}>
-                        {formatTimeRelative(chat.lastTime)}
+                        {formatTimeRelative(chat.lastTime, t)}
                       </span>
                     </div>
                     <div className={s.chatBottom}>
@@ -1406,6 +1433,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                                     }
                                     timestamp={formatMessageTime(msg.createdAt)}
                                     isOutgoing={isMe}
+                                    t={t}
                                   />
                                 ) : msg.type === "image" ? (
                                   <div style={{ padding: "2px" }}>
@@ -1533,6 +1561,24 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                         );
                       })}
                     </div>
+
+                    {/* ─── Typing Indicator ─── */}
+                    {isOtherTyping && (
+                      <div className={s.typingIndicator}>
+                        {activeChat?.avatar ? (
+                          <img src={getAvatarUrl(activeChat.avatar)} alt="" className={s.messageAvatar} />
+                        ) : (
+                          <div className={s.messageAvatarPlaceholder}>
+                            {getInitials(activeChat?.name || "")}
+                          </div>
+                        )}
+                        <div className={s.typingBubble}>
+                          <span />
+                          <span />
+                          <span />
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
 
@@ -1686,7 +1732,17 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                           uploadingFile ? t("Uploading...", "جاري الرفع...") : t("Reply message", "اكتب رداً...")
                         }
                         value={inputText}
-                        onChange={(e) => setInputText(e.target.value)}
+                        onChange={(e) => {
+                          setInputText(e.target.value);
+                          // Emit typing event
+                          if (socketRef.current && activeChat) {
+                            socketRef.current.emit("typing", {
+                              senderId: myUserId,
+                              recipientId: activeChat.oderId,
+                              isTyping: e.target.value.trim().length > 0,
+                            });
+                          }
+                        }}
                         onKeyDown={(e) =>
                           e.key === "Enter" && !uploadingFile && sendMessage()
                         }

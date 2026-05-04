@@ -18,7 +18,7 @@ interface Job {
     logoUrl?: string;
   };
   address: string;
-  jobType: string;
+  jobType: string | string[];
   salary: number | string;
   createdAt: string;
   category?: { name: string };
@@ -104,15 +104,24 @@ const CompanyJobCard: React.FC<{ job: Job; variants: Variants }> = ({
         <div className={styles.cardBody}>
           {job.description && (
             <p className={styles.jobDesc}>
-              {t(job.description)}
+              {t(job.description)
+                .replace(/\*\*(Job Description|الوصف الوظيفي|المتطلبات|Requirements|Responsibilities)s?:\*\*/gi, "")
+                .replace(/^(Job Description|الوصف الوظيفي):\s*/gi, "")
+                .replace(/\*\*/g, "")
+                .replace(/#/g, "")
+                .trim()}
             </p>
           )}
         </div>
 
         <div className={styles.cardFooter}>
-           {!isServiceJob && (
+           {isServiceJob ? (
              <span className={styles.salaryText}>
-               {job.salary ? `${t(job.salary.toString())}/Hour` : "$1.00/Hour"}
+               {t("قابل للتفاوض")}
+             </span>
+           ) : (
+             <span className={styles.salaryText}>
+               {job.salary ? `${t(job.salary.toString())}` : "$1.00/Hour"}
              </span>
            )}
            <span className={styles.applyBtn}>
@@ -201,7 +210,7 @@ export default function JobsDashboard() {
         <motion.div className={styles.header} variants={cardVariants}>
           <div className={styles.headerContent}>
             <h1 className={styles.todayTitle}>
-              Today <span className={styles.jobOpenText}>job open</span>
+              {t("الوظائف المتاحة")} <span className={styles.jobOpenText}>{t("اليوم")}</span>
             </h1>
           </div>
           <Link to="/Find Jobs" className={styles.showAllLink}>

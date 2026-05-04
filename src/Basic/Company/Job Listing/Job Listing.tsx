@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import "./Job Listing.css";
 import { useNavigate } from "react-router-dom";
 import { useJobitoAuth } from "../../../context/LinkContxt";
@@ -187,10 +187,13 @@ export default function JobListing() {
   };
 
   const getTypeClass = (type: string) => {
-    const t = (type || "").toLowerCase();
-    return t === "full-time" || t === "part-time"
-      ? "type-fulltime"
-      : "type-freelance";
+    const t = String(type || "").toLowerCase();
+    if (t.includes("full")) return "type-fulltime";
+    if (t.includes("part")) return "type-parttime";
+    if (t.includes("free")) return "type-freelance";
+    if (t.includes("remote")) return "type-remote";
+    if (t.includes("intern")) return "type-internship";
+    return "type-fulltime";
   };
 
   const formatDate = (dateString: string) => {
@@ -204,7 +207,14 @@ export default function JobListing() {
   };
 
   const filteredJobs = jobs.filter(job => {
-    const sType = job.jobType?.toLowerCase() || "";
+    let rawType = "";
+    if (Array.isArray(job.jobType)) {
+      rawType = job.jobType.join(" ");
+    } else if (typeof job.jobType === "string") {
+      rawType = job.jobType;
+    }
+    
+    const sType = rawType.toLowerCase();
     const isActive = job.isActive;
 
     const anyStatus = filterStatus.active || filterStatus.closed;
@@ -269,42 +279,34 @@ export default function JobListing() {
 
       <div className="jl-main-card">
         <div className="jl-card-toolbar">
-          <h2 className="jl-card-title">{t("قائمة الوظائف")} ({jobs.length})</h2>
-          <div className="filter-checkboxes" style={{ gap: "10px" }}>
+          <h2 className="jl-card-title">{t("Job List")}</h2>
+          <div className="filter-checkboxes">
             <label className={`filter-chip ${filterStatus.active ? "filter-chip-active filter-chip-hired" : ""}`}>
               <input type="checkbox" checked={filterStatus.active} onChange={() => toggleStatusFilter("active")} />
-              {t("مفتوح")}
+              {t("Live")}
             </label>
             <label className={`filter-chip ${filterStatus.closed ? "filter-chip-active filter-chip-declined" : ""}`}>
               <input type="checkbox" checked={filterStatus.closed} onChange={() => toggleStatusFilter("closed")} />
-              {t("مغلق")}
+              {t("Closed")}
             </label>
             
-            <span style={{ width: "1px", height: "30px", background: "var(--color-border)", margin: "0 10px" }}></span>
+            <span style={{ width: "1px", height: "24px", background: "var(--color-border)", margin: "0 8px" }}></span>
 
             <label className={`filter-chip ${filterType["full-time"] ? "filter-chip-active filter-chip-waitlisted" : ""}`}>
               <input type="checkbox" checked={filterType["full-time"]} onChange={() => toggleTypeFilter("full-time")} />
-              {t("دوام كامل")}
+              {t("Fulltime")}
             </label>
             <label className={`filter-chip ${filterType["part-time"] ? "filter-chip-active filter-chip-inreview" : ""}`}>
               <input type="checkbox" checked={filterType["part-time"]} onChange={() => toggleTypeFilter("part-time")} />
-              {t("دوام جزئي")}
+              {t("Part-Time")}
             </label>
             <label className={`filter-chip ${filterType.freelance ? "filter-chip-active filter-chip-waitlisted" : ""}`}>
               <input type="checkbox" checked={filterType.freelance} onChange={() => toggleTypeFilter("freelance")} />
-              {t("عمل حر (Freelance)")}
-            </label>
-            <label className={`filter-chip ${filterType.internship ? "filter-chip-active filter-chip-inreview" : ""}`}>
-              <input type="checkbox" checked={filterType.internship} onChange={() => toggleTypeFilter("internship")} />
-              {t("تدريب (Internship)")}
-            </label>
-            <label className={`filter-chip ${filterType["one-time"] ? "filter-chip-active filter-chip-declined" : ""}`}>
-              <input type="checkbox" checked={filterType["one-time"]} onChange={() => toggleTypeFilter("one-time")} />
-              {t("عمل لمرة واحدة")}
+              {t("Freelance")}
             </label>
             <label className={`filter-chip ${filterType.remote ? "filter-chip-active filter-chip-hired" : ""}`}>
               <input type="checkbox" checked={filterType.remote} onChange={() => toggleTypeFilter("remote")} />
-              {t("عن بعد (Remote)")}
+              {t("Remote")}
             </label>
           </div>
         </div>
@@ -315,13 +317,14 @@ export default function JobListing() {
           <table className="jl-table">
             <thead>
               <tr>
-                <th>{t("المسمى الوظيفي")}</th>
-                <th>{t("الحالة")}</th>
-                <th>{t("تاريخ النشر")}</th>
-                <th>{t("نوع الوظيفة")}</th>
-                <th>{t("المتقدمون")}</th>
-                <th>{t("المقاعد")}</th>
-                <th>{t("الإجراءات")}</th>
+                <th>{t("Roles")}</th>
+                <th>{t("Status")}</th>
+                <th>{t("Date Posted")}</th>
+                <th>{t("Due Date")}</th>
+                <th>{t("Job Type")}</th>
+                <th>{t("Applicants")}</th>
+                <th>{t("Needs")}</th>
+                <th>{t("Procedures")}</th>
               </tr>
             </thead>
             <tbody>
@@ -337,31 +340,27 @@ export default function JobListing() {
                   <td className="jl-col-role">{job.title}</td>
                   <td>
                     <span
-                      className={`jl-status-badge ${getStatusClass(job.isActive)}`}
+                      className={`jl-status-badge ${job.isActive ? "status-open" : "status-closed"}`}
                     >
-                      {getStatusText(job.isActive)}
+                      {job.isActive ? t("Live") : t("Closed")}
                     </span>
                   </td>
                   <td className="jl-col-date">{formatDate(job.createdAt)}</td>
+                  <td className="jl-col-date">
+                    {job.updatedAt ? formatDate(job.updatedAt) : "24 May 2020"}
+                  </td>
                   <td>
                     <span
-                      className={`jl-type-badge ${getTypeClass(job.jobType)}`}
+                      className={`jl-type-badge ${getTypeClass(Array.isArray(job.jobType) ? job.jobType[0] : String(job.jobType || ""))}`}
                     >
-                      {t(job.jobType) || t("دوام كامل")}
+                      {Array.isArray(job.jobType)
+                        ? t(job.jobType[0])
+                        : (t(String(job.jobType || "")) || t("Fulltime"))}
                     </span>
                   </td>
                   <td className="jl-col-appl">
                     <button
                       className="jl-applicants-link"
-                      style={{
-                        background: "none",
-                        border: "none",
-                        color: "var(--color-primary)",
-                        fontWeight: 600,
-                        cursor: "pointer",
-                        textDecoration: "underline",
-                        fontSize: "inherit",
-                      }}
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(
@@ -373,91 +372,44 @@ export default function JobListing() {
                     </button>
                   </td>
                   <td className="jl-col-needs">
-                    <strong>{job.slotsAvailable}</strong>
+                    {job.appliedCount || 0} / {job.slotsAvailable}
                   </td>
                   <td>
                     <div className="jl-actions">
                       <button
-                        className="jl-action-btn edit"
-                        title={t("تعديل")}
+                        className="jl-action-btn"
+                        title={t("Edit")}
                         onClick={(e) => handleEdit(e, job)}
                       >
-                        <svg
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
                           <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                         </svg>
                       </button>
                       <button
-                        className={`jl-action-btn ${job.isActive ? "close" : "reopen"}`}
-                        title={job.isActive ? t("إغلاق") : t("فتح")}
+                        className="jl-action-btn"
+                        title={job.isActive ? t("Close") : t("Open")}
                         onClick={(e) => handleToggleStatus(e, job)}
                       >
                         {job.isActive ? (
-                          <svg
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <rect
-                              x="3"
-                              y="3"
-                              width="18"
-                              height="18"
-                              rx="2"
-                              ry="2"
-                            />
-                            <line x1="9" y1="9" x2="15" y2="15" />
-                            <line x1="15" y1="9" x2="9" y2="15" />
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
                           </svg>
                         ) : (
-                          <svg
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-                            <polyline points="22 4 12 14.01 9 11.01" />
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <polyline points="20 6 9 17 4 12" />
                           </svg>
                         )}
                       </button>
                       <button
-                        className="jl-action-btn delete"
-                        title={t("حذف")}
+                        className="jl-action-btn"
+                        title={t("Delete")}
                         onClick={(e) => handleDelete(e, job)}
                       >
-                        <svg
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <polyline points="3 6 5 6 21 6" />
                           <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                          <line x1="10" y1="11" x2="10" y2="17" />
-                          <line x1="14" y1="11" x2="14" y2="17" />
                         </svg>
                       </button>
                     </div>

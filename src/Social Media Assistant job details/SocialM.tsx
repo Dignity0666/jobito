@@ -225,7 +225,7 @@ export default function JobDetails() {
 
                     {/* Tabs */}
                     <div className="tabs">
-                        {["Applicants", "Job Details", "Analytics"].map(t => (
+                        {["Applicants", "Job Details"].map(t => (
                             <button key={t} className={`tab ${activeTab === t ? "active" : ""}`} onClick={() => setActiveTab(t)}>{t}</button>
                         ))}
                     </div>

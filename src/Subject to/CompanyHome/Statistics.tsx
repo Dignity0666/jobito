@@ -45,8 +45,10 @@ interface PeriodData {
 // ChartOptions are generated dynamically inside the component
 export default function Statistics({
   companyId,
+  jobId,
 }: {
   companyId: number | null;
+  jobId?: number | null;
 }) {
   const { apiFetch } = useJobitoAuth();
   const { t, language } = useTranslation();
@@ -113,9 +115,11 @@ export default function Statistics({
     const fetchStats = async () => {
       try {
         setIsLoading(true);
-        const response = await apiFetch(
-          `${API_BASE_URL}/companies/${companyId}/statistics?period=${activePeriod}`,
-        );
+        let url = `${API_BASE_URL}/companies/${companyId}/statistics?period=${activePeriod}`;
+        if (jobId) {
+          url += `&jobId=${jobId}`;
+        }
+        const response = await apiFetch(url);
         if (!response.ok) throw new Error("Failed to fetch statistics");
         const result = await response.json();
         if (isMounted) {
@@ -156,7 +160,7 @@ export default function Statistics({
     return () => {
       isMounted = false;
     };
-  }, [activePeriod, companyId, apiFetch, t]);
+  }, [activePeriod, companyId, jobId, apiFetch]);
 
   // Handle Initial Loading
   if (!data && isLoading) {
@@ -264,7 +268,7 @@ export default function Statistics({
             <div className={styles.titleArea}>
               <h2 className={styles.title}>{t("إحصائيات الوظائف")}</h2>
               <p className={styles.subtitle}>
-                {t("عرض")} {tabLabels[activeTab]} {t("لـ")} {periodLabels[activePeriod]}
+                {t("عرض")} {tabLabels[activeTab]} {t("لـ")} {periodLabels[activePeriod]} {jobId ? t("(وظيفة محددة)") : ""}
               </p>
             </div>
             <div className={styles.periodSwitcher}>

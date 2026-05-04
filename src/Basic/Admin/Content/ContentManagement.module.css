@@ -1,0 +1,189 @@
+.root {
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+  background-color: var(--color-bg);
+  min-height: 100vh;
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: var(--gradient-primary);
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 20px rgba(74, 110, 209, 0.2);
+}
+
+.headerTitle {
+  font-size: 24px;
+  font-weight: 800;
+  margin: 0;
+  color: #fff;
+}
+
+.headerSub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.body {
+  flex: 1;
+  padding: 24px 32px;
+  background-color: var(--color-bg-secondary);
+}
+
+.card {
+  background-color: var(--color-card-bg);
+  border-radius: 20px;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.cardHeader {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--color-border-light);
+  background-color: var(--color-bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cardTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.tableContainer {
+  flex: 1;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.th {
+  padding: 16px 24px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.td {
+  padding: 16px 24px;
+  font-size: 14px;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.tr:hover {
+  background-color: var(--color-bg-tertiary);
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.btnPrimary {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+
+.btnPrimary:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.btnDanger {
+  background-color: #ef4444;
+  color: #fff;
+}
+
+.btnDanger:hover {
+  background-color: #dc2626;
+}
+
+.btnOutline {
+  background-color: transparent;
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.btnOutline:hover {
+  background-color: var(--color-bg-tertiary);
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  background-color: var(--color-card-bg);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.modalHeader {
+  padding: 24px;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.modalBody {
+  padding: 24px;
+}
+
+.modalFooter {
+  padding: 20px 24px;
+  background-color: var(--color-bg-tertiary);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.input {
+  width: 100%;
+  background-color: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--color-text);
+  margin-top: 8px;
+}

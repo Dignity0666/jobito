@@ -267,7 +267,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--color-bg-secondary);
   border-radius: 8px;
 }
 
@@ -280,7 +280,14 @@
 .jobInfoColumn {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
+}
+
+.companyJobTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
 }
 
 .jobRowMeta {
@@ -291,18 +298,18 @@
 }
 
 .companyNameText {
-  color: #ffffff;
+  color: var(--color-text);
   font-weight: 600;
 }
 
 .metaCircle {
-  color: #94a3b8;
+  color: var(--color-text-muted);
   font-size: 20px;
   line-height: 1;
 }
 
 .locationNameText {
-  color: #94a3b8;
+  color: var(--color-text-secondary);
 }
 
 .jobRowTags {
@@ -322,27 +329,53 @@
 
 .verticalDivider {
   width: 1px;
-  height: 24px;
-  background: rgba(255, 255, 255, 0.2);
+  height: 20px;
+  background: var(--color-border);
   margin: 0 4px;
 }
 
-.catPillPrimary {
-  border: 1.5px solid #ffb836;
-  color: #ffb836;
+.catPill {
   padding: 5px 14px;
   border-radius: 100px;
   font-size: 13px;
   font-weight: 700;
+  border: 1.5px solid transparent;
 }
 
-.catPillSecondary {
-  border: 1.5px solid #4640de;
+.classificationPill {
+  border-color: #6366f1;
+  color: #6366f1;
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.tagDesign {
+  border-color: #4640de;
   color: #4640de;
-  padding: 5px 14px;
-  border-radius: 100px;
-  font-size: 13px;
-  font-weight: 700;
+  background: rgba(70, 64, 222, 0.05);
+}
+
+.tagMarketing {
+  border-color: #ffb836;
+  color: #ffb836;
+  background: rgba(255, 184, 54, 0.05);
+}
+
+.tagTech {
+  border-color: #56cdad;
+  color: #56cdad;
+  background: rgba(86, 205, 173, 0.05);
+}
+
+.tagSales {
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.05);
+}
+
+.tagDefault {
+  border-color: #94a3b8;
+  color: #94a3b8;
+  background: rgba(148, 163, 184, 0.05);
 }
 
 .jobRowRight {

@@ -20,7 +20,7 @@ interface JobFormData {
   jobTypes: string[];
   salary: number;
   categoryId?: number;
-  categoryName?: string;
+  fieldOfWork?: string[];
   address: string;
   description: string[];
   responsibilities: string[];
@@ -31,6 +31,8 @@ interface JobFormData {
   slotsAvailable: number;
   expiresAt: string;
   classification: "تقني" | "غير تقني" | "خدمات" | "";
+  images?: string[];
+  workTime?: string[];
 }
 
 const PlusIcon = () => (
@@ -169,30 +171,149 @@ function StepBar({
 }
 
 const JOB_TYPE_MAP: Record<string, string> = {
-  "دوام كامل": "full-time",
   "Full Time": "full-time",
-  "دوام جزئي": "part-time",
   "Part Time": "part-time",
-  "عمل حر (Freelance)": "freelance",
   "Freelance": "freelance",
-  "تدريب (Internship)": "internship",
   "Internship": "internship",
-  "عمل لمرة واحدة": "one-time",
-  "One Time": "one-time",
-  "عن بعد (Remote)": "remote",
+  "Contract": "contract",
   "Remote": "remote",
 };
 
 const EMPLOYMENT_TYPES = Object.keys(JOB_TYPE_MAP);
 
+function FieldOfWorkInput({
+  fields,
+  onChange,
+  categories,
+  onCategoryClick,
+}: {
+  fields: string[];
+  onChange: (val: string[]) => void;
+  categories: any[];
+  onCategoryClick: (cat: any) => void;
+}) {
+  const { t } = useTranslation();
+  const [inputValue, setInputValue] = useState("");
+  const [showInput, setShowInput] = useState(false);
+
+  const addField = () => {
+    const trimmed = inputValue.trim();
+    if (trimmed && !fields.includes(trimmed)) {
+      onChange([...fields, trimmed]);
+      setInputValue("");
+    }
+  };
+
+  const removeField = (field: string) => {
+    onChange(fields.filter((f) => f !== field));
+  };
+
+  return (
+    <div>
+      {/* Current tags */}
+      <div className={styles.skillsRow} style={{ marginBottom: fields.length > 0 ? "12px" : "0" }}>
+        {fields.map((field) => (
+          <span key={field} className={styles.skillTag}>
+            {t(field)}
+            <button type="button" onClick={() => removeField(field)}>
+              <XIcon />
+            </button>
+          </span>
+        ))}
+      </div>
+
+      {/* Input */}
+      <div className={styles.skillInputRow}>
+        {!showInput ? (
+          <button
+            type="button"
+            className={styles.addSkillBtn}
+            onClick={() => setShowInput(true)}
+          >
+            <PlusIcon /> {t("أضف مجال عمل")}
+          </button>
+        ) : (
+          <div className={styles.skillInputFlex}>
+            <input
+              type="text"
+              placeholder={t("مثال: هندسة، تصميم، إدارة...")}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addField();
+                }
+              }}
+              className={styles.textInput}
+              autoFocus
+            />
+            <div className={styles.skillActionBtns}>
+              <button
+                type="button"
+                className={styles.primaryBtnSmall}
+                onClick={addField}
+              >
+                {t("إضافة")}
+              </button>
+              <button
+                type="button"
+                className={styles.cancelBtnSmall}
+                onClick={() => setShowInput(false)}
+              >
+                {t("إلغاء")}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Existing category suggestions */}
+      {categories.length > 0 && (
+        <div className={styles.categorySuggestions} style={{ marginTop: "12px" }}>
+          <p style={{ fontSize: "12px", color: "var(--color-text-secondary)", marginBottom: "8px" }}>
+            {t("أقسام موجودة مسبقاً:")}
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+            {categories
+              .filter((c) => !["تقني", "غير تقني", "خدمات"].includes(c.name))
+              .filter((c) => !fields.includes(c.name))
+              .map((cat: any) => (
+                <button
+                  key={cat.categoryId}
+                  type="button"
+                  className={styles.tagSmall}
+                  style={{
+                    padding: "4px 12px",
+                    borderRadius: "99px",
+                    border: "1px solid var(--color-border)",
+                    background: "transparent",
+                    cursor: "pointer",
+                    fontSize: "12px",
+                    color: "var(--color-text)",
+                  }}
+                  onClick={() => onCategoryClick(cat)}
+                >
+                  {t(cat.name)}
+                </button>
+              ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Step1({
   data,
   updateData,
   onNext,
+  categories,
 }: {
   data: JobFormData;
   updateData: (d: Partial<JobFormData>) => void;
   onNext: () => void;
+  categories: any[];
 }) {
   const { t } = useTranslation();
   const [skillInput, setSkillInput] = useState("");
@@ -235,22 +356,57 @@ function Step1({
       <div className={styles.fieldRow}>
         <div className={styles.rowLabel}>
           <strong>{t("نوع التوظيف")}</strong>
-          <span>{t("اختر نوع توظيف واحد فقط")}</span>
+          <span>{t("اختر أنواع التوظيف المتاحة")}</span>
         </div>
         <div className={styles.rowContent}>
-          <div className={styles.radioGrid}>
-            {EMPLOYMENT_TYPES.map((type) => (
-              <label key={type} className={styles.checkRow}>
-                  <input
-                    type="radio"
-                    name="jobType"
-                    value={type}
-                    checked={data.jobTypes[0] === type}
-                    onChange={(e) => updateData({ jobTypes: [e.target.value] })}
-                  />
-                  <span>{t(type)}</span>
-                </label>
-            ))}
+          <div className={styles.pillGrid} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "12px" }}>
+            {EMPLOYMENT_TYPES.map((type) => {
+              const isSelected = data.jobTypes.includes(JOB_TYPE_MAP[type]);
+              return (
+                <div 
+                  key={type} 
+                  className={`${styles.typePill} ${isSelected ? styles.pillSelected : ""}`}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    padding: "12px 16px",
+                    borderRadius: "8px",
+                    border: isSelected ? "2px solid var(--color-primary)" : "1px solid var(--color-border)",
+                    background: isSelected ? "var(--color-primary-light, #4640de15)" : "var(--color-bg-secondary, #f8f9fc)",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease"
+                  }}
+                  onClick={() => {
+                    const value = JOB_TYPE_MAP[type];
+                    const newTypes = isSelected 
+                      ? data.jobTypes.filter(t => t !== value)
+                      : [...data.jobTypes, value];
+                    updateData({ jobTypes: newTypes });
+                  }}
+                >
+                  <div style={{
+                    width: "20px",
+                    height: "20px",
+                    borderRadius: "4px",
+                    border: "2px solid var(--color-primary)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: isSelected ? "var(--color-primary)" : "transparent"
+                  }}>
+                    {isSelected && (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    )}
+                  </div>
+                  <span style={{ fontSize: "14px", fontWeight: isSelected ? "600" : "400", color: "var(--color-text)" }}>
+                    {t(type)}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -298,21 +454,31 @@ function Step1({
       <div className={styles.divider} />
       <div className={styles.fieldRow}>
         <div className={styles.rowLabel}>
-          <strong>{t("التصنيف")}</strong>
-          <span>{t("حدد تصنيف الوظيفة")}</span>
+          <strong>{t("تصنيف الوظيفة")}</strong>
+          <span>{t("اختر التصنيف العام للوظيفة")}</span>
         </div>
         <div className={styles.rowContent}>
-          <div style={{ display: "flex", gap: "20px" }}>
+          <div className={styles.categorySuggestions} style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
             {["تقني", "غير تقني", "خدمات"].map((cls) => (
-              <label key={cls} className={styles.checkRow}>
-                <input
-                  type="radio"
-                  name="classification"
-                  checked={data.classification === cls}
-                  onChange={() => updateData({ classification: cls as any })}
-                />
+              <button
+                key={cls}
+                type="button"
+                className={styles.tagSmall}
+                style={{
+                  padding: "8px 20px",
+                  borderRadius: "99px",
+                  border: data.classification === cls ? "2px solid var(--color-primary)" : "1px solid var(--color-border)",
+                  background: data.classification === cls ? "var(--color-primary-light, #4640de15)" : "var(--color-bg-secondary, #f8f9fc)",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: data.classification === cls ? "600" : "400",
+                  color: data.classification === cls ? "var(--color-primary)" : "var(--color-text)",
+                  transition: "all 0.2s ease"
+                }}
+                onClick={() => updateData({ classification: cls as any })}
+              >
                 {t(cls)}
-              </label>
+              </button>
             ))}
           </div>
         </div>
@@ -321,21 +487,21 @@ function Step1({
 
       <div className={styles.fieldRow}>
         <div className={styles.rowLabel}>
-          <strong>{t("القسم الوظيفي")}</strong>
-          <span>{t("اكتب فئة الوظيفة المناسبة")}</span>
+          <strong>{t("مجال العمل")}</strong>
+          <span>{t("اكتب مجال العمل الدقيق (مثال: هندسة، تسويق، برمجة)")}</span>
         </div>
         <div className={styles.rowContent}>
           <div className={styles.categorySelectionBox}>
-            <label className={styles.categorySelectionLabel}>
-              {t("اكتب فئة الوظيفة")}
-            </label>
-            <input
-              type="text"
-              className={styles.textInput}
-              placeholder={t("مثال: هندسة، تسويق، تصميم...")}
-              value={data.categoryName || ""}
-              onChange={(e) => updateData({ categoryName: e.target.value })}
-              required
+            <FieldOfWorkInput
+              fields={data.fieldOfWork || []}
+              onChange={(val) => updateData({ fieldOfWork: val, categoryId: undefined })}
+              categories={categories}
+              onCategoryClick={(cat) => {
+                const current = data.fieldOfWork || [];
+                if (!current.includes(cat.name)) {
+                  updateData({ fieldOfWork: [...current, cat.name] });
+                }
+              }}
             />
           </div>
         </div>
@@ -796,6 +962,23 @@ export default function PostJob() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { role, isAuthenticated, apiFetch, user } = useJobitoAuth();
 
+  const [categories, setCategories] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchCats = async () => {
+      try {
+        const res = await apiFetch(`${API_BASE_URL}/jobs/categories`);
+        if (res.ok) {
+          const data = await res.json();
+          setCategories(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch categories", err);
+      }
+    };
+    fetchCats();
+  }, [apiFetch]);
+
   useEffect(() => {
     if (isAuthenticated && user?.classification === "tradesman") {
       navigate("/PostWork", { replace: true });
@@ -816,8 +999,11 @@ export default function PostJob() {
     expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
       .toISOString()
       .split("T")[0],
-    categoryName: "",
+    fieldOfWork: [],
     classification: "",
+    categoryId: undefined,
+    images: [],
+    workTime: [],
   });
 
   useEffect(() => {
@@ -877,13 +1063,7 @@ export default function PostJob() {
 
         setFormData({
           title: job.title || "",
-          jobTypes: job.jobType
-            ? [
-                Object.keys(JOB_TYPE_MAP).find(
-                  (k) => JOB_TYPE_MAP[k] === job.jobType.toLowerCase(),
-                ) || job.jobType,
-              ]
-            : [],
+          jobTypes: Array.isArray(job.jobType) ? job.jobType : [job.jobType].filter(Boolean),
           salary: job.salaryMin || job.salary || 0,
           address: job.address || "Remote",
           description: (sections["وصف الوظيفة"].length
@@ -918,13 +1098,19 @@ export default function PostJob() {
               ? sections["مزايا إضافية"]
               : sections["Nice-To-Haves"]
             : [""],
+          classification: (job.classification || "") as any,
           skills: sections["Skills"]?.length ? sections["Skills"] : [],
           benefits: job.benefits || job.company?.benefits || getDefaultBenefits(t),
           slotsAvailable: job.slotsAvailable || 1,
           categoryId: job.categoryId,
-          categoryName: job.category?.name || "",
+          fieldOfWork: Array.isArray(job.fieldOfWork) 
+            ? job.fieldOfWork 
+            : (job.fieldOfWork 
+              ? [job.fieldOfWork] 
+              : (job.categories?.map((c: any) => c.name) || (job.category?.name ? [job.category.name] : []))),
           expiresAt: safeDate(job.expiresAt),
-          classification: (sections["التصنيف"]?.[0] || "") as any,
+          images: job.images || [],
+          workTime: job.workTime || [],
         });
       } catch (err) {
         console.error("Error hydrating form for edit mode:", err);
@@ -998,9 +1184,6 @@ ${formData.skills.join(", ")}
 **التصنيف:**
 ${formData.classification}`;
 
-      const frontendType = formData.jobTypes[0] || "دوام جزئي";
-      const backendJobType = JOB_TYPE_MAP[frontendType] || "part-time";
-
       const payload = {
         title: formData.title,
         description: combinedDescription,
@@ -1008,13 +1191,16 @@ ${formData.classification}`;
         salaryMax: formData.salary ? Number(formData.salary) : undefined,
         salary: formData.salary ? Number(formData.salary) : undefined,
         address: formData.address,
-        jobType: backendJobType,
-        classification: formData.classification,
+        jobType: formData.jobTypes,
+        classification: formData.classification || undefined,
         slotsAvailable: Number(formData.slotsAvailable) || 1,
         categoryId: formData.categoryId ? Number(formData.categoryId) : undefined,
-        categoryName: formData.categoryName,
+        fieldOfWork: formData.fieldOfWork && formData.fieldOfWork.length > 0 ? formData.fieldOfWork : undefined,
         expiresAt: formData.expiresAt || undefined,
         benefits: formData.benefits,
+        skills: formData.skills || [],
+        images: formData.images || [],
+        workTime: formData.workTime || [],
       };
 
       const isEdit = !!location.state?.editJob;
@@ -1143,6 +1329,7 @@ ${formData.classification}`;
               data={formData}
               updateData={updateData}
               onNext={() => setStep(2)}
+              categories={categories}
             />
           )}
           {step === 2 && (

@@ -183,12 +183,21 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
       localStorage.setItem("token", data.access_token);
       window.dispatchEvent(new Event("auth-changed"));
       setShowLogin(false);
-      const isNewUser = localStorage.getItem("isNewUser");
-      if (isNewUser) {
-        localStorage.removeItem("isNewUser");
-        navigate("/complete-profile");
+
+      // Decode token to check role and redirect accordingly
+      const { jwtDecode } = await import("jwt-decode");
+      const decoded: any = jwtDecode(data.access_token);
+      
+      if (decoded.role === "admin") {
+        navigate("/admin");
       } else {
-        navigate("/");
+        const isNewUser = localStorage.getItem("isNewUser");
+        if (isNewUser) {
+          localStorage.removeItem("isNewUser");
+          navigate("/complete-profile");
+        } else {
+          navigate("/");
+        }
       }
     } catch (err: unknown) {
       const message =

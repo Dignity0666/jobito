@@ -1,8 +1,12 @@
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import styles from "./JobDetailsPage.module.css";
 import { ApplyJobModal } from "./ApplyJobModal/ApplyJobModal";
+import { RateTradesmanModal } from "./RateTradesmanModal/RateTradesmanModal";
+import { TradesmanReviews } from "./TradesmanReviews/TradesmanReviews";
+import { GeneralRatingSection } from "./GeneralRatingSection/GeneralRatingSection";
+import { TradesmanRatingForm } from "./TradesmanRatingForm/TradesmanRatingForm";
 import { useJobitoAuth } from "../../context/LinkContxt.js";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import AllApplicants from "../Company/All Applicants/All Applicants";
 import { useTranslation } from "../../context/translation-context";
 import { useToast } from "../../context/ToastContext";
@@ -47,7 +51,7 @@ interface Job {
   description: string;
   descriptionEn?: string;
   address: string;
-  jobType: string;
+  jobType: string | string[];
   salaryMin?: number;
   salaryMax?: number;
   createdAt?: string;
@@ -66,6 +70,8 @@ interface Job {
   applications?: Application[];
   images?: string[];
   user?: {
+    userId?: string;
+    id?: string;
     avatarUrl?: string;
     fullName?: string;
   };
@@ -88,6 +94,8 @@ export const JobDetailsPage = () => {
   const [userApplication, setUserApplication] = useState<Application | null>(
     null,
   );
+  const [tradesmanRating, setTradesmanRating] = useState<string | null>(null);
+  const [isRateModalOpen, setIsRateModalOpen] = useState(false);
 
   const jobId = location.state?.jobId || 1;
 
@@ -95,22 +103,53 @@ export const JobDetailsPage = () => {
     const fetchJobData = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_BASE_URL}/jobs/${jobId}?_t=${Date.now()}`, {
-          headers: getCommonHeaders(),
-        });
+        const res = await fetch(
+          `${API_BASE_URL}/jobs/${jobId}?_t=${Date.now()}`,
+          {
+            headers: getCommonHeaders(),
+          },
+        );
         if (!res.ok) throw new Error("Failed to fetch");
         const data = await res.json();
-        console.log("🔥 [JobDetailsPage] Fresh Job Data:", data);
         setJob(data);
 
-        const simRes = await fetch(`${API_BASE_URL}/jobs/similar/${jobId}?_t=${Date.now()}`, {
-          headers: {
-            "ngrok-skip-browser-warning": "69420",
+        const simRes = await fetch(
+          `${API_BASE_URL}/jobs/similar/${jobId}?_t=${Date.now()}`,
+          {
+            headers: {
+              "ngrok-skip-browser-warning": "69420",
+            },
           },
-        });
+        );
         if (simRes.ok) {
           const simData = await simRes.json();
           setSimilarJobs(simData);
+        }
+
+        const uId = data.user?.userId || data.user?.id;
+        if (uId && (!data.company || !data.company.name)) {
+          try {
+            const ratingsRes = await fetch(
+              `${API_BASE_URL}/ratings/user/${uId}`,
+              {
+                headers: { "ngrok-skip-browser-warning": "69420" },
+              },
+            );
+            if (ratingsRes.ok) {
+              const ratings = await ratingsRes.json();
+              if (ratings && ratings.length > 0) {
+                const avg = (
+                  ratings.reduce(
+                    (sum: number, r: any) => sum + r.ratingValue,
+                    0,
+                  ) / ratings.length
+                ).toFixed(1);
+                setTradesmanRating(avg);
+              }
+            }
+          } catch (e) {
+            console.error("Error fetching tradesman ratings", e);
+          }
         }
       } catch (error) {
         console.error("Error fetching job data:", error);
@@ -137,7 +176,7 @@ export const JobDetailsPage = () => {
     };
     fetchApplicationStatus();
 
-    // 📈 Record View logic
+    // 📈 Record View - runs only once per page load
     const recordView = async () => {
       try {
         let sessionId = localStorage.getItem("jobito_session_id");
@@ -196,7 +235,7 @@ export const JobDetailsPage = () => {
           updatedJob.isActive
             ? t("تم إعادة فتح الوظيفة")
             : t("تم إغلاق الوظيفة"),
-          "success"
+          "success",
         );
       } else {
         throw new Error("Failed to update status");
@@ -242,7 +281,9 @@ export const JobDetailsPage = () => {
   }
 
   const descriptionToUse =
-    lang === "en" && job.descriptionEn ? job.descriptionEn : job.description;
+    lang === "en" && job.descriptionEn
+      ? job.descriptionEn
+      : t(job.description || "");
   const parsedSections: Record<string, string> = {};
 
   if (descriptionToUse) {
@@ -251,7 +292,7 @@ export const JobDetailsPage = () => {
 
     const lines = descriptionToUse.split("\n");
     lines.forEach((line: string) => {
-      const headerMatch = line.match(/^\*\*(.*):\*\*$/);
+      const headerMatch = line.match(/^\*\*\s*(.*?)\s*:?\s*\*\*$/);
       if (headerMatch) {
         parsedSections[currentTitle] = currentLines.join("\n").trim();
         currentTitle = headerMatch[1];
@@ -288,18 +329,27 @@ export const JobDetailsPage = () => {
 
         {/* Tab Navigation for Companies */}
         {role === "company" && (
-          <div className={styles.tabNav}>
+          <div
+            className={styles.tabsContainer}
+            style={{ padding: "0 40px", marginBottom: "0" }}
+          >
             <button
-              className={`${styles.tabItem} ${activeTab === "details" ? styles.activeTab : ""}`}
+              className={`${styles.tab} ${activeTab === "details" ? styles.activeTab : ""}`}
               onClick={() => setActiveTab("details")}
             >
-              {t("تفاصيل الوظيفة")}
+              {t("Job Details")}
             </button>
             <button
-              className={`${styles.tabItem} ${activeTab === "applicants" ? styles.activeTab : ""}`}
+              className={`${styles.tab} ${activeTab === "applicants" ? styles.activeTab : ""}`}
               onClick={() => setActiveTab("applicants")}
             >
-              {t("المتقدمون")} ({job.applications?.length || 0})
+              {t("Applicants")}
+            </button>
+            <button
+              className={styles.tab}
+              onClick={() => navigate(`/JobAnalytics/${jobId}`)}
+            >
+              {t("الإحصائيات")}
             </button>
           </div>
         )}
@@ -317,7 +367,11 @@ export const JobDetailsPage = () => {
                         : `${API_BASE_URL}${job.user.avatarUrl.startsWith("/") ? "" : "/"}${job.user.avatarUrl}`
                     }
                     alt={job.user.fullName || job.title}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
                   />
                 ) : job.company?.logoUrl ? (
                   <img
@@ -327,7 +381,11 @@ export const JobDetailsPage = () => {
                         : `${API_BASE_URL}${job.company.logoUrl.startsWith("/") ? "" : "/"}${job.company.logoUrl}`
                     }
                     alt={job.company.name}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
                   />
                 ) : job.images && job.images.length > 0 ? (
                   <img
@@ -337,25 +395,90 @@ export const JobDetailsPage = () => {
                         : `${API_BASE_URL}${job.images[0].startsWith("/") ? "" : "/"}${job.images[0]}`
                     }
                     alt={job.title}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
                   />
                 ) : (
-                  <span>{job.company?.name?.[0]?.toUpperCase() || job.user?.fullName?.[0]?.toUpperCase() || "C"}</span>
+                  <span>
+                    {job.company?.name?.[0]?.toUpperCase() ||
+                      job.user?.fullName?.[0]?.toUpperCase() ||
+                      "C"}
+                  </span>
                 )}
               </div>
               <div className={styles.headerTitles}>
                 <h1>
-                  {lang === "en" && job.titleEn ? job.titleEn : job.title}
+                  {lang === "en" && job.titleEn
+                    ? job.titleEn
+                    : t(job.title || "")}
                 </h1>
-                <p>
-                  {job.company?.name || t("شركة")} •{" "}
-                  {job.address || t("الموقع")} •{" "}
-                  {job.jobType === "full-time"
-                    ? t("دوام كامل")
-                    : job.jobType === "part-time"
-                      ? t("دوام جزئي")
-                      : t(job.jobType || "دوام كامل")}
-                </p>
+                <div className={styles.subHeaderInfo}>
+                  {job.user?.fullName && !job.company && (
+                    <>
+                      <span
+                        style={{
+                          fontWeight: "600",
+                          color: "var(--color-primary)",
+                        }}
+                      >
+                        {t(job.user.fullName)}
+                        {tradesmanRating && (
+                          <span
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "4px",
+                              marginLeft: "6px",
+                              fontSize: "0.9rem",
+                              color: "#FFB020",
+                              background: "rgba(255, 176, 32, 0.1)",
+                              padding: "2px 6px",
+                              borderRadius: "6px",
+                              verticalAlign: "middle",
+                            }}
+                          >
+                            <svg
+                              width="14"
+                              height="14"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                            >
+                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                            </svg>
+                            {tradesmanRating}
+                          </span>
+                        )}
+                      </span>
+                      <div className={styles.dotSeparator}></div>
+                    </>
+                  )}
+                  <span>
+                    {Array.isArray(job.fieldOfWork) &&
+                    job.fieldOfWork.length > 0
+                      ? job.fieldOfWork.map((f: any) => t(typeof f === "string" ? f : (f?.name || ""))).join(" · ")
+                      : t(
+                          job.category?.name ||
+                            (typeof job.fieldOfWork === "string"
+                              ? job.fieldOfWork
+                              : "") ||
+                            "",
+                        )}
+                  </span>
+                  <div className={styles.dotSeparator}></div>
+                  <span>
+                    {Array.isArray(job.jobType)
+                      ? t(job.jobType[0])
+                      : t(job.jobType || "full-time")}
+                  </span>
+                  <div className={styles.dotSeparator}></div>
+                  <span style={{ color: "var(--color-text)" }}>
+                    {job.applications?.length || 0} / {job.slotsAvailable || 10}{" "}
+                    {t("Hired")}
+                  </span>
+                </div>
               </div>
             </div>
             {role === "company" ? (
@@ -599,11 +722,21 @@ export const JobDetailsPage = () => {
                         className={styles.roleValue}
                         style={{ textTransform: "capitalize" }}
                       >
-                        {job.jobType === "full-time"
-                          ? t("دوام كامل")
-                          : job.jobType === "part-time"
-                            ? t("دوام جزئي")
-                            : t(job.jobType || "دوام كامل")}
+                        {Array.isArray(job.jobType)
+                          ? job.jobType
+                              .map((type) =>
+                                type === "full-time"
+                                  ? t("دوام كامل")
+                                  : type === "part-time"
+                                    ? t("دوام جزئي")
+                                    : t(type),
+                              )
+                              .join(" / ")
+                          : job.jobType === "full-time"
+                            ? t("دوام كامل")
+                            : job.jobType === "part-time"
+                              ? t("دوام جزئي")
+                              : t(job.jobType || "دوام كامل")}
                       </span>
                     </div>
                     <div className={styles.roleRow}>
@@ -614,11 +747,19 @@ export const JobDetailsPage = () => {
                         style={{ display: "inline-block", textAlign: "right" }}
                       >
                         {job.salaryMin === job.salaryMax || !job.salaryMax
-                          ? `${job.salaryMin || 0} EGP`
-                          : `${job.salaryMin || 0} - ${job.salaryMax} EGP`}
+                          ? `${job.salaryMin || 0} ${t("EGP")}`
+                          : `${job.salaryMin || 0} - ${job.salaryMax} ${t("EGP")}`}
                       </span>
                     </div>
                   </div>
+                </div>
+
+                <div className={styles.ratingSection} style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid var(--color-border, #1E2A45)' }}>
+                  <GeneralRatingSection 
+                    companyId={job.company?.companyId || job.company?.company_id}
+                    targetUserId={job.user?.userId || job.user?.id}
+                    targetName={job.company?.name || job.user?.fullName || job.user?.name || job.title || "المعلن"}
+                  />
                 </div>
 
                 <div className={styles.separator}></div>
@@ -642,20 +783,70 @@ export const JobDetailsPage = () => {
                         )}
                       </p>
                     </div>
-                    <div className={styles.separator}></div>
-                  </>
-                )}
 
-                {(job.category || (job as any).categoryName) && (
-                  <>
+                    {((Array.isArray(job.fieldOfWork) &&
+                      job.fieldOfWork.length > 0) ||
+                      (Array.isArray((job as any).categories) &&
+                        (job as any).categories.length > 0) ||
+                      job.category?.name ||
+                      (job as any).classification) && (
+                      <>
+                        <div className={styles.separator}></div>
+                        <div className={styles.widget}>
+                          <h2>{t("مجال العمل")}</h2>
+                          <div className={styles.tagsContainer}>
+                            {Array.isArray(job.fieldOfWork) &&
+                            job.fieldOfWork.length > 0 ? (
+                              job.fieldOfWork.map(
+                                (field: any, idx: number) => {
+                                  const fieldName = typeof field === "string" ? field : (field?.name || "");
+                                  return (
+                                    <span key={idx} className={styles.tagGreen}>
+                                      {t(fieldName)}
+                                    </span>
+                                  );
+                                },
+                              )
+                            ) : Array.isArray((job as any).categories) &&
+                              (job as any).categories.length > 0 ? (
+                              (job as any).categories.map(
+                                (cat: any, idx: number) => (
+                                  <span key={idx} className={styles.tagGreen}>
+                                    {t(cat.name)}
+                                  </span>
+                                ),
+                              )
+                            ) : (
+                              <span className={styles.tagGreen}>
+                                {t(
+                                  job.category?.name ||
+                                    (typeof job.fieldOfWork === "string"
+                                      ? job.fieldOfWork
+                                      : "") ||
+                                    (job as any).classification,
+                                )}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    <div className={styles.separator}></div>
                     <div className={styles.widget}>
-                      <h2>{t("الأقسام")}</h2>
+                      <h2>{t("نوع الوظيفة")}</h2>
                       <div className={styles.tagsContainer}>
-                        <span className={styles.tagYellow}>
-                          {job.category
-                            ? t(job.category.name)
-                            : t((job as any).categoryName)}
-                        </span>
+                        {Array.isArray(job.jobType) ? (
+                          job.jobType.map((type, idx) => (
+                            <span key={idx} className={styles.tagYellow}>
+                              {t(type)}
+                            </span>
+                          ))
+                        ) : (
+                          <span className={styles.tagYellow}>
+                            {t(job.jobType || "دوام كامل")}
+                          </span>
+                        )}
                       </div>
                     </div>
                     <div className={styles.separator}></div>
@@ -694,6 +885,8 @@ export const JobDetailsPage = () => {
                 )}
               </div>
             </div>
+
+
 
             {/* Similar Jobs */}
             <div className={styles.similarJobsSection}>
@@ -741,13 +934,13 @@ export const JobDetailsPage = () => {
                         <img
                           src={
                             simJob.user?.avatarUrl
-                              ? (simJob.user.avatarUrl.startsWith("http")
-                                  ? simJob.user.avatarUrl
-                                  : `${API_BASE_URL}${simJob.user.avatarUrl.startsWith("/") ? "" : "/"}${simJob.user.avatarUrl}`)
+                              ? simJob.user.avatarUrl.startsWith("http")
+                                ? simJob.user.avatarUrl
+                                : `${API_BASE_URL}${simJob.user.avatarUrl.startsWith("/") ? "" : "/"}${simJob.user.avatarUrl}`
                               : simJob.company?.logoUrl
-                                ? (simJob.company.logoUrl.startsWith("http")
+                                ? simJob.company.logoUrl.startsWith("http")
                                   ? simJob.company.logoUrl
-                                  : `${API_BASE_URL}${simJob.company.logoUrl.startsWith("/") ? "" : "/"}${simJob.company.logoUrl}`)
+                                  : `${API_BASE_URL}${simJob.company.logoUrl.startsWith("/") ? "" : "/"}${simJob.company.logoUrl}`
                                 : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(simJob.company?.name || simJob.user?.fullName || "Company")}`
                           }
                           alt={simJob.company?.name || simJob.user?.fullName}
@@ -761,17 +954,29 @@ export const JobDetailsPage = () => {
                       </div>
                       <div className={styles.simDetails}>
                         <div className={styles.simTitleGroup}>
-                          <h3>{simJob.title}</h3>
+                          <h3>{t(simJob.title || "")}</h3>
                           <p>
-                            {simJob.company?.name || "Jobito"} •{" "}
-                            {simJob.address || t("عالمي")}
+                            {simJob.company?.name
+                              ? t(simJob.company.name)
+                              : "Jobito"}{" "}
+                            • {simJob.address ? t(simJob.address) : t("عالمي")}
                           </p>
                         </div>
                         <div className={styles.simTags}>
                           <span className={styles.tagGreen}>
-                            {simJob.jobType === "full-time"
-                              ? t("دوام كامل")
-                              : t("دوام جزئي")}
+                            {Array.isArray(simJob.jobType)
+                              ? simJob.jobType
+                                  .map((type) =>
+                                    type === "full-time"
+                                      ? t("دوام كامل")
+                                      : type === "part-time"
+                                        ? t("دوام جزئي")
+                                        : t(type),
+                                  )
+                                  .join(" / ")
+                              : simJob.jobType === "full-time"
+                                ? t("دوام كامل")
+                                : t("دوام جزئي")}
                           </span>
                           {simJob.category && (
                             <span className={styles.tagYellowOutline}>
@@ -799,11 +1004,30 @@ export const JobDetailsPage = () => {
         isOpen={isApplyModalOpen}
         onClose={() => setIsApplyModalOpen(false)}
         jobId={jobId}
-        isTradesman={!!job?.user || job?.classification === "خدمات" || job?.classification === "services" || job?.classification === "Services"}
+        isTradesman={
+          !!job?.user ||
+          job?.classification === "خدمات" ||
+          job?.classification === "services" ||
+          job?.classification === "Services"
+        }
         jobTitle={t(job?.title || "")}
         companyName={t(job?.company?.name || "شركة")}
         location={t(job?.address || "الموقع")}
-        jobType={job?.jobType === "full-time" ? t("دوام كامل") : t("دوام جزئي")}
+        jobType={
+          Array.isArray(job?.jobType)
+            ? job.jobType
+                .map((t_jt) =>
+                  t_jt === "full-time"
+                    ? t("دوام كامل")
+                    : t_jt === "part-time"
+                      ? t("دوام جزئي")
+                      : t(t_jt),
+                )
+                .join(" / ")
+            : job?.jobType === "full-time"
+              ? t("دوام كامل")
+              : t("دوام جزئي")
+        }
         isActive={job?.isActive}
         logoUrl={
           job?.company?.logoUrl
@@ -812,6 +1036,12 @@ export const JobDetailsPage = () => {
               : `${API_BASE_URL}${job.company.logoUrl}`
             : undefined
         }
+      />
+      <RateTradesmanModal
+        isOpen={isRateModalOpen}
+        onClose={() => setIsRateModalOpen(false)}
+        targetUserId={job?.user?.userId || job?.user?.id || ""}
+        tradesmanName={job?.user?.fullName || "الصنايعي"}
       />
     </div>
   );

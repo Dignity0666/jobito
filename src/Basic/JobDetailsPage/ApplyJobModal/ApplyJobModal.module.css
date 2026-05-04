@@ -3,7 +3,7 @@
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 85vh;
   background-color: rgba(32, 36, 48, 0.4);
   display: flex;
   justify-content: center;
@@ -22,9 +22,9 @@
   background: var(--color-card-bg);
   width: 100%;
   max-width: 530px;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 32px;
-  max-height: 95vh;
+  max-height: 85vh;
   overflow-y: auto;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   position: relative;
@@ -32,11 +32,20 @@
 }
 
 .modalContent::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 .modalContent::-webkit-scrollbar-track {
-  background: var(--color-card-bg);
+  background: transparent;
+}
+
+.modalContent::-webkit-scrollbar-thumb {
+  background: rgba(91, 141, 239, 0.3);
+  border-radius: 10px;
+}
+
+.modalContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(91, 141, 239, 0.6);
 }
 
 .errorBoundaryOverlay {
@@ -56,7 +65,7 @@
   background: var(--color-card-bg);
   border-radius: 12px;
   padding: 32px;
-  maxWidth: 400px;
+  maxwidth: 400px;
   text-align: center;
   border: 1px solid var(--color-border);
 }
@@ -78,7 +87,7 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  fontSize: 14px;
+  fontsize: 14px;
 }
 
 .closeButton {

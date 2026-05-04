@@ -30,7 +30,8 @@ export type AuthUser = {
   avatar?: string;
   avatarUrl?: string;
   phone?: string;
-  role?: "user" | "company";
+  role?: "user" | "company" | "admin";
+  adminRole?: "super_admin" | "operation_manager";
   companyId?: string | number;
   companyName?: string;
   location?: string;
@@ -57,7 +58,7 @@ export type AuthUser = {
 
 export type AuthContextType = {
   user: AuthUser | null;
-  role: "user" | "company" | null;
+  role: "user" | "company" | "admin" | null;
   isAuthenticated: boolean;
   login: (token: string) => void;
   logout: () => void;
@@ -77,7 +78,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [role, setRole] = useState<"user" | "company" | null>(null);
+  const [role, setRole] = useState<"user" | "company" | "admin" | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [googleClientId, setGoogleClientId] = useState<string>("");
   const [isBackendOffline, setIsBackendOffline] = useState(false);
@@ -173,7 +174,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     email: string;
     avatar: string;
     phone: string;
-    role?: "user" | "company";
+    role?: "user" | "company" | "admin";
     companyId?: string | number;
     company_id?: string | number;
     companyName?: string;
@@ -199,6 +200,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     classification?: string;
     banner?: string;
     deletionRequestedAt?: string;
+    adminRole?: "super_admin" | "operation_manager";
   }) => {
     setUser({
       id: decoded.sub,
@@ -208,6 +210,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       avatarUrl: decoded.avatar,
       phone: decoded.phone,
       role: decoded.role,
+      adminRole: decoded.adminRole,
       companyId: decoded.companyId || decoded.company_id,
       companyName: decoded.companyName || decoded.company_name,
       location: decoded.location,
@@ -227,7 +230,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       deletionRequestedAt: decoded.deletionRequestedAt,
     });
     const finalRole = decoded.role === "student" ? "user" : (decoded.role || "user");
-    setRole(finalRole as "user" | "company");
+    setRole(finalRole as "user" | "company" | "admin");
     setIsAuthenticated(true);
   }, []);
 
@@ -284,7 +287,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           email: string;
           avatar: string;
           phone: string;
-          role?: "user" | "company";
+          role?: "user" | "company" | "admin";
         };
 
         // Check if token is expired
@@ -396,21 +399,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     [logout]
   );
 
+  const contextValue = React.useMemo(
+    () => ({
+      user,
+      role,
+      isAuthenticated,
+      login,
+      logout,
+      googleClientId,
+      apiFetch,
+      updateUser,
+      isBackendOffline,
+      isInitialLoading,
+    }),
+    [
+      user,
+      role,
+      isAuthenticated,
+      login,
+      logout,
+      googleClientId,
+      apiFetch,
+      updateUser,
+      isBackendOffline,
+      isInitialLoading,
+    ]
+  );
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        role,
-        isAuthenticated,
-        login,
-        logout,
-        googleClientId,
-        apiFetch,
-        updateUser,
-        isBackendOffline,
-        isInitialLoading,
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

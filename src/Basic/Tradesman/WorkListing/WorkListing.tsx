@@ -47,7 +47,7 @@ const WorkListing = () => {
       const res = await apiFetch(`${API_BASE_URL}/jobs/${work.jobId}?_t=${Date.now()}`);
       if (res.ok) {
         const fullWork = await res.json();
-        navigate("/PostJob", { state: { editJob: fullWork } });
+        navigate("/PostWork", { state: { editJob: fullWork } });
       }
     } catch (error) {
       console.error("Error fetching work for edit:", error);
@@ -65,13 +65,13 @@ const WorkListing = () => {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>{t("Roles")}</th>
-              <th>{t("Rate")}</th>
-              <th>{t("Status")}</th>
-              <th>{t("Date Posted")}</th>
-              <th>{t("Due Date")}</th>
-              <th>{t("Applicants")}</th>
-              <th>{t("Applications")}</th>
+              <th>{t("الأدوار")}</th>
+              <th>{t("التقييم")}</th>
+              <th>{t("الحالة")}</th>
+              <th>{t("تاريخ النشر")}</th>
+              <th>{t("تاريخ الانتهاء")}</th>
+              <th>{t("المتقدمين")}</th>
+              <th>{t("طلبات التقديم")}</th>
             </tr>
           </thead>
           <tbody>
@@ -80,22 +80,28 @@ const WorkListing = () => {
             ) : works.map((work) => (
               <tr key={work.jobId} style={{display: 'table-row'}}>
                 <td>
-                  <div className={styles.jobTitle}>{work.title}</div>
+                  <div className={styles.jobTitle}>{t(work.title)}</div>
                 </td>
                 <td>
                   <div className={styles.rate}>
                     <Star size={14} fill="#fbbf24" stroke="none" />
-                    <span>4.0</span>
+                    <span>{work.rating ? Number(work.rating).toFixed(1) : "0.0"}</span>
                   </div>
                 </td>
                 <td>
-                  <span className={styles.status}>{t("Live")}</span>
+                  <span className={`${styles.status} ${!work.isActive ? styles.statusClosed : ''}`}>
+                    {work.isActive ? t("نشط") : t("مغلق")}
+                  </span>
                 </td>
                 <td>
                   <div className={styles.date}>{new Date(work.createdAt).toLocaleDateString()}</div>
                 </td>
                 <td>
-                  <div className={styles.date}>24 May 2026</div>
+                  <div className={styles.date}>
+                    {work.expiresAt 
+                      ? new Date(work.expiresAt).toLocaleDateString() 
+                      : t("غير محدد")}
+                  </div>
                 </td>
                 <td>
                   <div className={styles.applicants}>{work.appliedCount || 0}</div>
@@ -134,13 +140,7 @@ const WorkListing = () => {
         </table>
       </div>
 
-      <div className={styles.pagination}>
-        <button className={styles.pageBtn}><ChevronLeft size={16} /></button>
-        <button className={`${styles.pageBtn} ${styles.pageBtnActive}`}>1</button>
-        <button className={styles.pageBtn}>2</button>
-        <button className={styles.pageBtn}>3</button>
-        <button className={styles.pageBtn}><ChevronRight size={16} /></button>
-      </div>
+
     </div>
   );
 };

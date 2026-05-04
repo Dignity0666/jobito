@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Upload, X, Plus } from "lucide-react";
 import styles from "./PostWork.module.css";
 import { useTranslation } from "../../../context/translation-context";
@@ -7,13 +7,13 @@ import { useJobitoAuth } from "../../../context/LinkContxt";
 import { API_BASE_URL } from "../../../services/api";
 
 const DAYS = [
-  "Saturday",
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
+  "السبت",
+  "الأحد",
+  "الاثنين",
+  "الثلاثاء",
+  "الأربعاء",
+  "الخميس",
+  "الجمعة",
 ];
 
 const PostWork = () => {
@@ -21,17 +21,21 @@ const PostWork = () => {
   const { user, apiFetch } = useJobitoAuth();
   const navigate = useNavigate();
 
+  const location = useLocation() as { state: { editJob?: any } | null };
+  const editJob = location.state?.editJob;
+  const isEditMode = !!editJob;
+
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    address: "",
-    skills: [] as string[],
-    workTime: [] as string[],
-    images: [] as string[],
+    title: editJob?.title || "",
+    description: editJob?.description || "",
+    address: editJob?.address || "",
+    skills: editJob?.skills || ([] as string[]),
+    workTime: editJob?.workTime || ([] as string[]),
+    images: editJob?.images || ([] as string[]),
   });
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [previews, setPreviews] = useState<string[]>([]);
+  const [previews, setPreviews] = useState<string[]>(editJob?.images || []);
   const [skillInput, setSkillInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -96,6 +100,7 @@ const PostWork = () => {
           method: "POST",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "ngrok-skip-browser-warning": "69420",
           },
           body: formDataUpload,
         });
@@ -122,27 +127,35 @@ const PostWork = () => {
 
     setIsSubmitting(true);
     try {
-      // 1. Upload images first
-      const imageUrls = await uploadImagesToServer();
+      // 1. Upload new images
+      const newImageUrls = await uploadImagesToServer();
+      // Keep existing images (that weren't removed) and add new ones
+      const finalImages = [...formData.images.filter(img => previews.includes(img)), ...newImageUrls];
 
-      // 2. Submit job with image URLs
-      const response = await apiFetch(`${API_BASE_URL}/jobs`, {
-        method: "POST",
+      const payload = {
+        ...formData,
+        images: finalImages,
+        classification: "tradesman_work",
+        jobType: ["one-time"],
+        isActive: true,
+      };
+
+      const url = isEditMode 
+        ? `${API_BASE_URL}/jobs/${editJob.jobId || editJob.job_id}` 
+        : `${API_BASE_URL}/jobs`;
+      const method = isEditMode ? "PATCH" : "POST";
+
+      const response = await apiFetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          images: imageUrls,
-          classification: "tradesman_work",
-          jobType: "one-time",
-          isActive: true,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
-        alert(t("تم نشر العمل بنجاح"));
-        navigate("/JobListing");
+        alert(isEditMode ? t("تم تعديل العمل بنجاح") : t("تم نشر العمل بنجاح"));
+        navigate("/WorkListing");
       } else {
-        alert(t("حدث خطأ أثناء النشر"));
+        alert(t("حدث خطأ أثناء الحفظ"));
       }
     } catch (error) {
       console.error("Error posting work:", error);
@@ -155,7 +168,7 @@ const PostWork = () => {
     <div className={styles.page}>
       <button className={styles.backBtn} onClick={() => navigate(-1)}>
         <ArrowLeft size={24} />
-        <span>{t("نشر عملا")}</span>
+        <span>{isEditMode ? t("تعديل العمل") : t("نشر عملا")}</span>
       </button>
 
       <div className={styles.sectionHeader}>
@@ -305,14 +318,17 @@ const PostWork = () => {
             <p>
               <span>{t("اضغط للاستبدال")}</span> {t("أو اسحب وأفلت")}
             </p>
-            <p>SVG, PNG, JPG or GIF (max. 400 x 400px)</p>
+            <p>{t("SVG, PNG, JPG أو GIF (بحد أقصى 400x400 بكسل)")}</p>
           </div>
 
           {previews.length > 0 && (
             <div className={styles.previewGrid}>
               {previews.map((url, index) => (
                 <div key={url} className={styles.previewItem}>
-                  <img src={url} alt="Work preview" />
+                  <img 
+                    src={url.startsWith("blob:") || url.startsWith("http") ? url : `${API_BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`} 
+                    alt="Work preview" 
+                  />
                   <button
                     className={styles.removePreview}
                     onClick={() => removeFile(index)}
@@ -339,7 +355,7 @@ const PostWork = () => {
           onClick={handleSubmit}
           disabled={isSubmitting || !!user?.deletionRequestedAt}
         >
-          {isSubmitting ? t("جاري النشر...") : t("الخطوة التالية")}
+          {isSubmitting ? t("جاري الحفظ...") : isEditMode ? t("تحديث العمل") : t("نشر العمل")}
         </button>
       </div>
     </div>

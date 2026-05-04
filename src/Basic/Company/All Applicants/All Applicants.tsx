@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import "./All Applicants.css";
+import styles from "./All Applicants.module.css";
 import { useJobitoAuth } from "../../../context/LinkContxt";
 import { useTranslation } from "../../../context/translation-context";
 import { useToast } from "../../../context/ToastContext";
@@ -12,6 +12,7 @@ interface Applicant {
   applicationId: number;
   status: string;
   appliedAt: string;
+  updatedAt?: string;
   portfolioUrl?: string;
   coverLetter?: string;
   resumeUrl?: string;
@@ -42,7 +43,7 @@ const SortIcon = () => (
   </svg>
 );
 
-const CustomCheckbox = () => <div className="custom-checkbox"></div>;
+const CustomCheckbox = () => <div className={styles['custom-checkbox']}></div>;
 
 export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | number | null }) {
   const { t, language } = useTranslation();
@@ -54,7 +55,6 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
   const [applicants, setApplicants] = useState<Applicant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState("Table View");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilters, setStatusFilters] = useState({
     hired: false,
@@ -131,16 +131,16 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
       case "reviewing":
       case "interviewed":
       case "interviewing":
-        return "badge-inreview";
+        return styles['badge-inreview'];
       case "shortlisted":
       case "waitlisted":
-        return "badge-waitlisted";
+        return styles['badge-waitlisted'];
       case "declined":
-        return "badge-declined";
+        return styles['badge-declined'];
       case "hired":
-        return "badge-hired";
+        return styles['badge-hired'];
       default:
-        return "badge-inreview";
+        return styles['badge-inreview'];
     }
   };
 
@@ -217,14 +217,12 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
     return matchesSearch && matchesStatus;
   });
 
-  // Calculate pages
   const totalPages = Math.ceil(filteredApplicants.length / pageSize) || 1;
   const paginatedApplicants = filteredApplicants.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
 
-  // If currentPage is greater than totalPages (e.g. on search or filter change), reset it
   useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) {
       setCurrentPage(1);
@@ -233,10 +231,8 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
 
   if (loading) {
     return (
-      <div className="applicant-page">
-        <div
-          style={{ textAlign: "center", padding: "60px 0", color: "var(--color-text-muted)" }}
-        >
+      <div className={styles['applicant-page']}>
+        <div style={{ textAlign: "center", padding: "60px 0", color: "#7C8493" }}>
           {t("جاري تحميل المتقدمين...")}
         </div>
       </div>
@@ -245,10 +241,8 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
 
   if (error) {
     return (
-      <div className="applicant-page">
-        <div
-          style={{ textAlign: "center", padding: "60px 0", color: "#FF6B6B" }}
-        >
+      <div className={styles['applicant-page']}>
+        <div style={{ textAlign: "center", padding: "60px 0", color: "#FF6B6B" }}>
           ⚠️ {error}
         </div>
       </div>
@@ -256,11 +250,13 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
   }
 
   return (
-    <div className="applicant-page">
-      <div className="top-p-header">
-        <h2 className="top-p-title">{t("إجمالي المتقدمين")} : {applicants.length}</h2>
-        <div className="top-p-actions">
-          <div className="search-box">
+    <div className={styles['applicant-page']}>
+      <div className={styles['top-p-header']}>
+        <h2 className={styles['top-p-title']}>
+          {t("إجمالي المتقدمين")} : {applicants.length}
+        </h2>
+        <div className={styles['top-p-actions']}>
+          <div className={styles['search-box']}>
             <input
               type="text"
               placeholder={t("البحث عن متقدم...")}
@@ -274,10 +270,8 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
         </div>
       </div>
 
-      <div className="filter-checkboxes">
-        <label
-          className={`filter-chip ${statusFilters.hired ? "filter-chip-active filter-chip-hired" : ""}`}
-        >
+      <div className={styles.filterCheckboxes}>
+        <label className={`${styles.filterChip} ${statusFilters.hired ? styles.filterChipActive : ""}`}>
           <input
             type="checkbox"
             checked={statusFilters.hired}
@@ -285,9 +279,7 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
           />
           {t("تم التوظيف")}
         </label>
-        <label
-          className={`filter-chip ${statusFilters.declined ? "filter-chip-active filter-chip-declined" : ""}`}
-        >
+        <label className={`${styles.filterChip} ${statusFilters.declined ? styles.filterChipActive : ""}`}>
           <input
             type="checkbox"
             checked={statusFilters.declined}
@@ -295,9 +287,7 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
           />
           {t("مرفوض")}
         </label>
-        <label
-          className={`filter-chip ${statusFilters.waitlisted ? "filter-chip-active filter-chip-waitlisted" : ""}`}
-        >
+        <label className={`${styles.filterChip} ${statusFilters.waitlisted ? styles.filterChipActive : ""}`}>
           <input
             type="checkbox"
             checked={statusFilters.waitlisted}
@@ -305,9 +295,7 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
           />
           {t("في الانتظار")}
         </label>
-        <label
-          className={`filter-chip ${statusFilters.inreview ? "filter-chip-active filter-chip-inreview" : ""}`}
-        >
+        <label className={`${styles.filterChip} ${statusFilters.inreview ? styles.filterChipActive : ""}`}>
           <input
             type="checkbox"
             checked={statusFilters.inreview}
@@ -317,8 +305,8 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
         </label>
       </div>
 
-      <div className="table-container">
-        <table className="applicant-table">
+      <div className={styles.tableContainer}>
+        <table className={styles.applicantTable}>
           <thead>
             <tr>
               <th style={{ width: 40, textAlign: "center" }}>
@@ -340,21 +328,14 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
                 {t("الهاتف")} <SortIcon />
               </th>
               <th>
-                {t("الإجراء")} <SortIcon />
+                {t("العداد/الإجراء")} <SortIcon />
               </th>
             </tr>
           </thead>
           <tbody>
             {filteredApplicants.length === 0 ? (
               <tr>
-                <td
-                  colSpan={7}
-                  style={{
-                    textAlign: "center",
-                    padding: "40px",
-                    color: "var(--color-text-muted)",
-                  }}
-                >
+                <td colSpan={7} style={{ textAlign: "center", padding: "40px", color: "#7C8493" }}>
                   {t("لا يوجد متقدمون لهذه الوظيفة بعد.")}
                 </td>
               </tr>
@@ -365,40 +346,37 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
                     <CustomCheckbox />
                   </td>
                   <td>
-                    <div className="app-user">
+                    <div 
+                      className={styles.appUser} 
+                      onClick={() => navigate(`/Profile/${app.user?.userId}`)}
+                      style={{ cursor: 'pointer' }}
+                    >
                       <img
-                        src={getAvatarUrl(
-                          app.user?.avatarUrl,
-                          app.user?.fullName,
-                        )}
-                        alt={t(app.user?.fullName || "User")}
+                        src={getAvatarUrl(app.user?.avatarUrl, app.user?.fullName)}
+                        alt={app.user?.fullName || "User"}
                       />
                       <span>{t(app.user?.fullName || "مستخدم")}</span>
                     </div>
                   </td>
-                  <td className="app-role">{t(app.user?.email || "—")}</td>
+                  <td className={styles.appRole}>{t(app.user?.email || "—")}</td>
                   <td>
-                    <span className={`app-badge ${getBadgeClass(app.status)}`}>
+                    <span className={`${styles.appBadge} ${getBadgeClass(app.status)}`}>
                       {getTranslatedStage(app.status)}
                     </span>
                   </td>
-                  <td className="app-date">{formatDate(app.appliedAt)}</td>
-                  <td className="app-role">{t(app.user?.phone || "—")}</td>
+                  <td className={styles.appDate}>{formatDate(app.appliedAt)}</td>
+                  <td className={styles.appRole}>{t(app.user?.phone || "—")}</td>
                   <td>
-                    <div className="app-actions">
+                    <div className={styles.appActions}>
                       {app.resumeUrl && (
                         <a
-                          href={
-                            app.resumeUrl.startsWith("http")
-                              ? app.resumeUrl
-                              : `${API_BASE_URL}${app.resumeUrl}`
-                          }
+                          href={app.resumeUrl.startsWith("http") ? app.resumeUrl : `${API_BASE_URL}${app.resumeUrl}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="see-app-btn"
+                          className={styles.seeAppBtn}
                           style={{ textDecoration: "none" }}
                         >
-                          {t("السيرة الذاتية")}
+                          {t("Resume")}
                         </a>
                       )}
                       {app.portfolioUrl && (
@@ -406,39 +384,62 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
                           href={app.portfolioUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="see-app-btn"
+                          className={styles.seeAppBtn}
                           style={{ textDecoration: "none" }}
                         >
                           {t("Portfolio")}
                         </a>
                       )}
-                      <button
-                        className="see-app-btn"
-                        onClick={() =>
-                          navigate(`/ApplicantDetails/${app.applicationId}`)
-                        }
+                      <button 
+                        className={styles.seeAppBtn}
+                        onClick={() => navigate(`/ApplicantDetails/${app.applicationId}`)}
                       >
-                        {t("عرض الطلب")}
+                        {t("View Application")}
                       </button>
-                      <button
-                        className="delete-app-btn"
-                        onClick={() => handleDeleteApplicant(app.applicationId)}
-                        title="حذف المتقدم"
-                      >
-                        <svg
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <polyline points="3 6 5 6 21 6"></polyline>
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        </svg>
-                      </button>
+
+                      {app.status.toLowerCase() === "hired" && app.updatedAt && (
+                        <div className={styles.timerContainer} style={{ 
+                          marginLeft: '12px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          minWidth: '80px',
+                          padding: '4px 10px',
+                          background: 'rgba(59, 130, 246, 0.1)',
+                          borderRadius: '8px',
+                          border: '1px solid rgba(59, 130, 246, 0.2)'
+                        }}>
+                          {(() => {
+                            const hiredDate = new Date(app.updatedAt).getTime();
+                            const expiryDate = hiredDate + (7 * 24 * 60 * 60 * 1000);
+                            const now = new Date().getTime();
+                            const diff = expiryDate - now;
+
+                            if (diff <= 0) {
+                              return (
+                                <span style={{ color: '#10b981', fontSize: '11px', fontWeight: 700 }}>
+                                  {t("رسمي", "Official")}
+                                </span>
+                              );
+                            }
+
+                            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            
+                            return (
+                              <>
+                                <span style={{ color: '#3b82f6', fontSize: '12px', fontWeight: 800 }}>
+                                  {days}{t("ي", "d")} {hours}{t("س", "h")}
+                                </span>
+                                <span style={{ color: 'rgba(59, 130, 246, 0.7)', fontSize: '9px', textTransform: 'uppercase' }}>
+                                  {t("متبقي", "Left")}
+                                </span>
+                              </>
+                            );
+                          })()}
+                        </div>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -448,116 +449,63 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
         </table>
       </div>
 
-      {filteredApplicants.length > 0 && (
-        <div className="pagination-footer">
-          <div 
-            className="page-size-wrap"
-            style={{ 
-              display: "flex", 
-              alignItems: "center", 
-              gap: "10px", 
-              whiteSpace: "nowrap",
-              color: "var(--color-text)",
-              fontWeight: "500"
-            }}
+      {applicants.length > 10 && (
+        <div className={styles.paginationFooter}>
+          <div className={styles.pageSizeWrap}>
+            {t("إظهار")}
+            <div className={styles.pageSelectBox}>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                style={{ border: 'none', outline: 'none', background: 'transparent', fontWeight: 'inherit', color: 'inherit', cursor: 'pointer' }}
+              >
+                {[10, 20, 50].map((num) => (
+                  <option key={num} value={num}>
+                    {num}
+                  </option>
+                ))}
+              </select>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+            {t("لكل صفحة")}
+          </div>
+          <div className={styles.pageControls}>
+          <button 
+            className={styles.pageNav}
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
           >
-            <span>{t("عرض")}</span>
-            <select
-              style={{
-                background: "transparent",
-                border: `1px solid var(--color-border)`,
-                color: "var(--color-text)",
-                padding: "6px 12px",
-                borderRadius: "6px",
-                outline: "none",
-                cursor: "pointer",
-                fontWeight: "600",
-                fontSize: "14px"
-              }}
-              value={pageSize}
-              onChange={(e) => {
-                setPageSize(Number(e.target.value));
-                setCurrentPage(1);
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNum => (
+            <button 
+              key={pageNum}
+              className={`${styles.pageNum} ${currentPage === pageNum ? styles.active : ""}`}
+              onClick={() => {
+                setCurrentPage(pageNum);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
             >
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                <option key={num} value={num}>
-                  {num}
-                </option>
-              ))}
-            </select>
-            <span>{t("لكل صفحة")}</span>
-          </div>
-          
-          {totalPages > 1 && (
-            <div className="page-controls" style={{ display: "flex", alignItems: "center", gap: "8px", flexDirection: "row" }}>
-              <button
-                className="page-nav"
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                style={{ opacity: currentPage === 1 ? 0.3 : 1, cursor: currentPage === 1 ? "default" : "pointer" }}
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-              </button>
-              
-              <div style={{ display: "flex", gap: "6px", flexDirection: "row" }}>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                  <button
-                    key={pageNum}
-                    onClick={() => setCurrentPage(pageNum)}
-                    style={{
-                      cursor: "pointer",
-                      width: "32px",
-                      height: "32px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: "6px",
-                      border: "none",
-                      fontWeight: "600",
-                      fontSize: "14px",
-                      backgroundColor: currentPage === pageNum ? "var(--color-primary)" : "transparent",
-                      color: currentPage === pageNum ? "#fff" : "var(--color-text)",
-                      transition: "0.2s"
-                    }}
-                  >
-                    {pageNum}
-                  </button>
-                ))}
-              </div>
-              
-              <button
-                className="page-nav"
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                style={{ opacity: currentPage === totalPages ? 0.3 : 1, cursor: currentPage === totalPages ? "default" : "pointer" }}
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-              </button>
-            </div>
-          )}
+              {pageNum}
+            </button>
+          ))}
+          <button 
+            className={styles.pageNav}
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+        </div>
         </div>
       )}
     </div>

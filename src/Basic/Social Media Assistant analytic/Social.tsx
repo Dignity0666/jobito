@@ -7,27 +7,27 @@ const VIEW_DATA = {
   "90d": Array.from({length:90},(_,i)=>Math.floor(100+Math.random()*500)),
 };
 const DATE_LABELS = {
-  "7d":  ["19 Jul","20 Jul","21 Jul","22 Jul","23 Jul","24 Jul","25 Jul"],
-  "30d": Array.from({length:30},(_,i)=>`${i+1} Jul`),
+  "7d":  ["19 يوليو","20 يوليو","21 يوليو","22 يوليو","23 يوليو","24 يوليو","25 يوليو"],
+  "30d": Array.from({length:30},(_,i)=>`${i+1} يوليو`),
   "90d": Array.from({length:90},(_,i)=>`${i+1}`),
 };
 
 const TRAFFIC = [
-  { label:"Direct",  pct:48, color:"#f59e0b" },
-  { label:"Organic", pct:24, color:"#6366f1" },
-  { label:"Social",  pct:23, color:"#06b6d4" },
-  { label:"Other",   pct:5,  color:"#10b981" },
+  { label:"مباشر",  pct:48, color:"#f59e0b" },
+  { label:"محركات بحث", pct:24, color:"#6366f1" },
+  { label:"سوشيال",  pct:23, color:"#06b6d4" },
+  { label:"أخرى",   pct:5,  color:"#10b981" },
 ];
 
 const COUNTRIES = [
-  { name:"USA",         flag:"🇺🇸", visitors:3240, bar:100 },
-  { name:"France",      flag:"🇫🇷", visitors:3188, bar:98 },
-  { name:"Italy",       flag:"🇮🇹", visitors:2938, bar:91 },
-  { name:"Germany",     flag:"🇩🇪", visitors:2624, bar:81 },
-  { name:"Japan",       flag:"🇯🇵", visitors:2414, bar:74 },
-  { name:"Netherlands", flag:"🇳🇱", visitors:1226, bar:38 },
-  { name:"UK",          flag:"🇬🇧", visitors:1108, bar:34 },
-  { name:"Canada",      flag:"🇨🇦", visitors:987,  bar:30 },
+  { name:"الولايات المتحدة",         flag:"🇺🇸", visitors:3240, bar:100 },
+  { name:"فرنسا",      flag:"🇫🇷", visitors:3188, bar:98 },
+  { name:"إيطاليا",       flag:"🇮🇹", visitors:2938, bar:91 },
+  { name:"ألمانيا",     flag:"🇩🇪", visitors:2624, bar:81 },
+  { name:"اليابان",       flag:"🇯🇵", visitors:2414, bar:74 },
+  { name:"هولندا", flag:"🇳🇱", visitors:1226, bar:38 },
+  { name:"بريطانيا",          flag:"🇬🇧", visitors:1108, bar:34 },
+  { name:"كندا",      flag:"🇨🇦", visitors:987,  bar:30 },
 ];
 
 const APPLIED_DATA = {
@@ -145,7 +145,7 @@ const styles = `
   .legend-pct { font-weight:700; color:#111827; }
 
   /* Country list */
-  .country-card { grid-column:3; }
+  .country-card { grid-column:3; }ظ
   .country-title { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; color:#111827; margin-bottom:14px; }
   .country-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
   .country-row:last-child { margin-bottom:0; }
@@ -236,7 +236,7 @@ function LineChart({ data, labels, color="#10b981", height=200 }) {
       </svg>
       {tooltip && (
         <div className="chart-tooltip" style={{ position:"absolute", left:`${Math.min(tooltip.x, 82)}%`, top:`${Math.max(0,tooltip.y-18)}%`, transform:"translate(-50%,-100%)" }}>
-          <div className="tooltip-label">{tooltip.label} · Views</div>
+          <div className="tooltip-label">{tooltip.label} · مشاهدة</div>
           <div className="tooltip-value">{tooltip.v.toLocaleString()}</div>
         </div>
       )}
@@ -281,7 +281,7 @@ function DonutChart({ segments, total }) {
         ) : (
           <>
             <div className="donut-center-val">{total}</div>
-            <div className="donut-center-label">Total</div>
+            <div className="donut-center-label">الإجمالي</div>
           </>
         )}
       </div>
@@ -336,7 +336,7 @@ export default function JobAnalytics() {
           <div className="brand">
             <div className="brand-logo">N</div>
             <div className="brand-info">
-              <div className="brand-company">Company</div>
+              <div className="brand-company">الشركة</div>
               <div className="brand-name">Nomad <span style={{fontSize:10,color:"#9ca3af"}}>▾</span></div>
             </div>
           </div>
@@ -347,7 +347,7 @@ export default function JobAnalytics() {
             </button>
             <button className="post-job-btn">
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
-              Post a job
+              انشر وظيفة
             </button>
           </div>
         </div>
@@ -358,24 +358,24 @@ export default function JobAnalytics() {
             <div>
               <button className="job-back">
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 11L5 7l4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                Back to listings
+                العودة للقائمة
               </button>
-              <div className="job-title">Social Media Assistant</div>
+              <div className="job-title">مساعد تواصل اجتماعي</div>
               <div className="job-meta">
-                <span>Design</span><span className="job-meta-dot">•</span>
-                <span>Full-Time</span><span className="job-meta-dot">•</span>
-                <span>4 / <span className="hired-badge">11 Hired</span></span>
+                <span>تصميم</span><span className="job-meta-dot">•</span>
+                <span>دوام كامل</span><span className="job-meta-dot">•</span>
+                <span>4 / <span className="hired-badge">11 تم التعيين</span></span>
               </div>
             </div>
             <button className="more-action-btn">
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 5l-2 2-2-2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              More Action
+              خيارات إضافية
             </button>
           </div>
 
           {/* Tabs */}
           <div className="tabs">
-            {["Applicants","Job Details","Analytics"].map(t=>(
+            {["المتقدمين","تفاصيل الوظيفة","الإحصائيات"].map(t=>(
               <button key={t} className={`tab ${activeTab===t?"active":""}`} onClick={()=>setActiveTab(t)}>{t}</button>
             ))}
           </div>
@@ -388,7 +388,7 @@ export default function JobAnalytics() {
               <div className="stat-icon" style={{background:"#ede9fe"}}>
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="3" stroke="#6366f1" strokeWidth="1.8"/><path d="M1.5 9C3 5 5.7 3 9 3s6 2 7.5 6c-1.5 4-4.2 6-7.5 6s-6-2-7.5-6z" stroke="#6366f1" strokeWidth="1.8"/></svg>
               </div>
-              <div className="stat-label">Total Views</div>
+              <div className="stat-label">إجمالي المشاهدات</div>
               <div className="stat-value">
                 {animViews.toLocaleString()}
                 <span className="stat-change up">
@@ -396,7 +396,7 @@ export default function JobAnalytics() {
                   6.4%
                 </span>
               </div>
-              <div className="stat-vs">vs last day</div>
+              <div className="stat-vs">مقارنة بالأمس</div>
             </div>
 
             {/* Total Applied */}
@@ -404,7 +404,7 @@ export default function JobAnalytics() {
               <div className="stat-icon" style={{background:"#d1fae5"}}>
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="2" width="12" height="14" rx="2" stroke="#10b981" strokeWidth="1.8"/><path d="M6 6h6M6 9h6M6 12h4" stroke="#10b981" strokeWidth="1.5" strokeLinecap="round"/></svg>
               </div>
-              <div className="stat-label">Total Applied</div>
+              <div className="stat-label">إجمالي التقديمات</div>
               <div className="stat-value">
                 {animApplied}
                 <span className="stat-change down">
@@ -412,12 +412,12 @@ export default function JobAnalytics() {
                   0.4%
                 </span>
               </div>
-              <div className="stat-vs">vs last day</div>
+              <div className="stat-vs">مقارنة بالأمس</div>
             </div>
 
             {/* Traffic Donut */}
             <div className="card donut-card">
-              <div className="donut-title">Traffic channel</div>
+              <div className="donut-title">قنوات الزيارات</div>
               <DonutChart segments={TRAFFIC} total={243}/>
               <div className="traffic-legend">
                 {TRAFFIC.map(t=>(
@@ -432,7 +432,7 @@ export default function JobAnalytics() {
             {/* Line Chart */}
             <div className="card chart-card">
               <div className="chart-header">
-                <div className="chart-title">Job Listing View stats</div>
+                <div className="chart-title">إحصائيات مشاهدات الوظيفة</div>
                 <div style={{position:"relative"}}>
                   <button className="range-select" onClick={e=>{e.stopPropagation();setRangeOpen(o=>!o);}}>
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M9 4l-3 3-3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -454,7 +454,7 @@ export default function JobAnalytics() {
 
             {/* Country list */}
             <div className="card country-card">
-              <div className="country-title">Visitors by country</div>
+              <div className="country-title">الزوار حسب البلد</div>
               {COUNTRIES.map(c=>(
                 <div key={c.name} className="country-row">
                   <div className="country-flag">{c.flag}</div>
@@ -468,8 +468,8 @@ export default function JobAnalytics() {
             {/* Applicant funnel */}
             <div className="card timeline-card">
               <div className="timeline-header">
-                <div className="timeline-title">Applicant Pipeline</div>
-                <div style={{fontSize:12,color:"#9ca3af"}}>Funnel overview</div>
+                <div className="timeline-title">مراحل المتقدمين</div>
+                <div style={{fontSize:12,color:"#9ca3af"}}>نظرة عامة على المراحل</div>
               </div>
               <div className="applicant-stages">
                 {STAGES.map((s,i)=>(

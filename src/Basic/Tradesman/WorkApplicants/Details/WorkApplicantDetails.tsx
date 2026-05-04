@@ -9,46 +9,89 @@ const WorkApplicantDetails = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams();
-  const { role } = useJobitoAuth();
-  const [status, setStatus] = useState<"pending" | "approved" | "rejected">("pending");
+  const { apiFetch } = useJobitoAuth();
+  const { showToast } = useToast();
+  const [app, setApp] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Mock Applicant Data
-  const applicant = {
-    id: id || "1",
-    name: "أحمد محمود كمال",
-    phone: "01023456789",
-    email: "ahmed.mahmoud@gmail.com",
-    avatar: "https://i.pravatar.cc/150?u=ahmed",
-    location: "القاهرة، مدينة نصر",
-    appliedDate: "2024-04-18",
-    appliedTime: "10:30 AM",
-    description: "أحتاج لسباك محترف لإصلاح تسريب كبير في الحمام الرئيسي. التسريب أثر على الجدران المجاورة وأحتاج لمعاينة سريعة وتحديد التكلفة الإجمالية.",
-    address: "١١ شارع عباس العقاد، الدور الخامس، شقة ١٤",
-    budget: "450 EGP",
-    rating: 4.8,
-    totalOrders: 12,
-    images: [
-      "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=300",
-      "https://images.unsplash.com/photo-1542013936693-884638332954?auto=format&fit=crop&q=80&w=300"
-    ]
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        setIsLoading(true);
+        const res = await apiFetch(`${API_BASE_URL}/applications/${id}`);
+        if (res.ok) {
+          const data = await res.json();
+          setApp(data);
+        }
+      } catch (error) {
+        console.error("Error fetching application details:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchDetails();
+  }, [id, apiFetch]);
+
+  const handleUpdateStatus = async (newStatus: string) => {
+    try {
+      const response = await apiFetch(`${API_BASE_URL}/applications/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (response.ok) {
+        setApp(prev => ({ ...prev, status: newStatus }));
+        showToast(t("تم تحديث الحالة بنجاح"), "success");
+      }
+    } catch (error) {
+      showToast(t("فشل تحديث الحالة"), "error");
+    }
   };
 
-  const handleUpdateStatus = (newStatus: "approved" | "rejected") => {
-    setStatus(newStatus);
-    // In a real app, this would use apiFetch
+  if (isLoading) return <div className={styles.container}>{t("جاري التحميل...")}</div>;
+  if (!app) return <div className={styles.container}>{t("المتقدم غير موجود")}</div>;
+
+  const u = app.user;
+  
+  // Parse coverLetter for Address and Description
+  let address = t("غير محدد");
+  let description = app.coverLetter || "";
+  
+  if (app.coverLetter && app.coverLetter.includes("Address:")) {
+    const parts = app.coverLetter.split("\n\nIssue Description:");
+    address = parts[0].replace("Address:", "").trim();
+    description = parts[1] ? parts[1].trim() : parts[0];
+  }
+
+  const applicant = {
+    id: id,
+    name: u?.fullName || t("مستخدم"),
+    phone: u?.phone || "—",
+    email: u?.email || "—",
+    avatar: u?.avatarUrl ? (u.avatarUrl.startsWith('http') ? u.avatarUrl : `${API_BASE_URL}${u.avatarUrl}`) : "https://api.dicebear.com/7.x/initials/svg?seed=" + (u?.fullName || "User"),
+    location: u?.location || "—",
+    appliedDate: new Date(app.appliedAt).toLocaleDateString(),
+    appliedTime: new Date(app.appliedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    description: description,
+    address: address,
+    rating: u?.rating || 0,
+    totalOrders: 0,
+    images: app.resumeUrl ? [app.resumeUrl.startsWith('http') ? app.resumeUrl : `${API_BASE_URL}${app.resumeUrl}`] : []
   };
 
   const statusColors = {
     pending: styles.statusPending,
-    approved: styles.statusApproved,
-    rejected: styles.statusRejected
+    accepted: styles.statusApproved,
+    rejected: styles.statusRejected,
+    reviewing: styles.statusPending,
+    applied: styles.statusPending
   };
 
   return (
     <div className={styles.container}>
       <header className={styles.header}>
         <div className={styles.topNav}>
-          <button className={styles.backBtn} onClick={() => navigate(-1)}>
+          <button className={styles.backBtn} onClick={() => navigate(-1)} style={{background: 'none', border: 'none', color: 'white', cursor: 'pointer'}}>
             <ArrowLeft size={24} />
           </button>
           <div className={styles.headerInfo}>
@@ -68,12 +111,10 @@ const WorkApplicantDetails = () => {
                 <h2>{applicant.name}</h2>
                 <div className={styles.meta}>
                   <span><Star size={14} className={styles.starIcon} /> {applicant.rating}</span>
-                  <span className={styles.dot}>•</span>
-                  <span>{applicant.totalOrders} {t("طلب سابق")}</span>
                 </div>
               </div>
-              <div className={`${styles.statusBadge} ${statusColors[status]}`}>
-                {t(status === "pending" ? "قيد الانتظار" : status === "approved" ? "تمت الموافقة" : "مرفوض")}
+              <div className={`${styles.statusBadge} ${statusColors[app.status] || styles.statusPending}`}>
+                {t(app.status)}
               </div>
             </div>
 
@@ -83,7 +124,7 @@ const WorkApplicantDetails = () => {
               
               <div className={styles.imageGallery}>
                 {applicant.images.map((img, i) => (
-                  <img key={i} src={img} alt="Problem Site" className={styles.previewImage} />
+                  <img key={i} src={img} alt="Problem Site" className={styles.previewImage} onClick={() => window.open(img, '_blank')} style={{cursor: 'pointer'}} />
                 ))}
               </div>
             </div>
@@ -124,40 +165,35 @@ const WorkApplicantDetails = () => {
                   <strong>{applicant.appliedDate}</strong>
                 </div>
               </div>
-              <div className={styles.contactItem}>
-                <Clock size={18} />
-                <div className={styles.contactText}>
-                  <span>{t("وقت التقديم")}</span>
-                  <strong>{applicant.appliedTime}</strong>
-                </div>
-              </div>
             </div>
 
             <div className={styles.actions}>
-              <button className={styles.chatBtn} onClick={() => navigate("/chat")}>
+              <button 
+                className={styles.chatBtn} 
+                onClick={() => navigate("/chat", { 
+                  state: { 
+                    preselectedUser: {
+                      userId: u.userId,
+                      fullName: u.fullName,
+                      avatarUrl: u.avatarUrl
+                    }
+                  } 
+                })}
+              >
                 <MessageSquare size={18} /> {t("بدء محادثة")}
               </button>
               
-              {status === "pending" && (
+              {app.status === "applied" || app.status === "pending" || app.status === "reviewing" ? (
                 <div className={styles.decisionBtns}>
-                  <button className={styles.approveBtn} onClick={() => handleUpdateStatus("approved")}>
+                  <button className={styles.approveBtn} onClick={() => handleUpdateStatus("accepted")}>
                     <Check size={18} /> {t("قبول الطلب")}
                   </button>
                   <button className={styles.rejectBtn} onClick={() => handleUpdateStatus("rejected")}>
                     <X size={18} /> {t("رفض")}
                   </button>
                 </div>
-              )}
+              ) : null}
             </div>
-          </div>
-
-          <div className={`${styles.card} ${styles.summaryCard}`}>
-            <h3>{t("ملخص العرض")}</h3>
-            <div className={styles.summaryItem}>
-              <span>{t("الميزانية المقدرة")}</span>
-              <span className={styles.budgetAmount}>{applicant.budget}</span>
-            </div>
-            <p className={styles.summaryNote}>*{t("السعر قابل للتغيير بعد المعاينة الفعلية")}</p>
           </div>
         </div>
       </div>

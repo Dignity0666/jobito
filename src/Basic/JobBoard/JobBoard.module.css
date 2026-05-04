@@ -1,190 +1,232 @@
+/* ============================================================
+   JobBoard.module.css — Midnight Navy / Cobalt Bloom / Tangerine Petal palette
+   Light-mode redesign — all class names preserved 1-to-1
+   ============================================================ */
+
+/* ─── CSS Variables ─── */
+:root {
+  --navy:        #0B1020;
+  --cobalt:      #4A6ED1;
+  --cobalt-dark: #2f4ac7;
+  --tangerine:   #FF7A2A;
+  --taupe:       #B59A90;
+  --taupe-light: #f0e9e5;
+  --white:       #ffffff;
+  --off-white:   #f7f4f2;
+  --text-main:   #0B1020;
+  --text-muted:  #6b6070;
+  --shadow-sm:   0 2px 8px rgba(11,16,32,0.08);
+  --shadow-md:   0 6px 24px rgba(11,16,32,0.12);
+  --shadow-lg:   0 16px 48px rgba(11,16,32,0.18);
+  --radius:      16px;
+  --radius-sm:   10px;
+}
+
+/* ─── Page ─── */
 .page {
   min-height: 100vh;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  background-color: var(--off-white);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-main);
 }
 
+/* ─── Hero Section ─── */
 .heroSection {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 150px 0;
+  position: relative;
+  background: linear-gradient(135deg, var(--navy) 0%, #152040 55%, #1e2f6e 100%);
+  padding: 96px 24px 80px;
+  overflow: hidden;
 }
 
+/* Decorative radial glows */
+.heroSection::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 75% 20%, rgba(255,122,42,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 15% 85%, rgba(74,110,209,0.22) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Subtle diagonal grid pattern */
+.heroSection::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255,255,255,0.025) 0px,
+    rgba(255,255,255,0.025) 1px,
+    transparent 1px,
+    transparent 44px
+  );
+  pointer-events: none;
+}
+
+/* ─── Container ─── */
 .container {
-  max-width: 1100px;
-  padding: 40px;
+  max-width: 860px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
-.title {
-  font-size: 52px;
+/* ─── Hero Content ─── */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  font-weight: 800;
-  color: var(--color-text);
-  line-height: 1.1;
-  margin-bottom: 25px;
+  gap: 20px;
 }
 
+/* ─── Title ─── */
+.title {
+  font-size: clamp(2rem, 5vw, 3.6rem);
+  font-weight: 900;
+  color: var(--white);
+  margin: 0;
+  line-height: 1.25;
+  letter-spacing: -0.5px;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+/* The accent span (was .purpleText — now Tangerine Petal) */
 .purpleText {
-  color: var(--color-primary);
-}
-
-.blueText {
-  color: var(--color-accent);
+  color: var(--tangerine);
   position: relative;
   display: inline-block;
 }
 
-.description {
-  color: var(--color-text-secondary);
-  font-size: 18px;
-  text-align: center;
-  line-height: 1.6;
-  margin-bottom: 40px;
+.purpleText::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  right: 0;
+  left: 0;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--tangerine), #ffaa60);
+  opacity: 0.7;
 }
 
+/* ─── Description ─── */
+.description {
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.72);
+  margin: 0;
+  max-width: 520px;
+  line-height: 1.7;
+}
+
+/* ─── Search Bar ─── */
 .searchBar {
   display: flex;
   align-items: center;
-  padding: 10px;
-  box-shadow: var(--shadow-md);
-  max-width: 850px;
-  border: 1px solid var(--color-border-light);
-  background-color: var(--color-input-bg);
-  border-radius: 12px;
-}
-
-.inputGroup {
-  display: flex;
-  align-items: center;
-  flex: 1;
-  padding: 0 15px;
-}
-
-.icon {
-  color: var(--color-text);
-  margin-right: 10px;
-}
-
-.inputGroup input {
-  border: none !important;
-  outline: none !important;
+  background: var(--white);
+  border-radius: 100px;
+  padding: 8px 8px 8px 20px;
+  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(74,110,209,0.12);
   width: 100%;
-  font-size: 16px;
-  color: var(--color-text) !important;
-  background-color: var(--color-input-bg) !important;
-  padding: 10px 0;
-  -webkit-appearance: none;
-  appearance: none;
+  max-width: 720px;
+  gap: 0;
+  margin-top: 8px;
 }
 
-.inputGroup select {
-  border: none !important;
-  outline: none !important;
-  width: 100%;
-  font-size: 16px;
-  color: var(--color-text) !important;
-  background-color: var(--color-input-bg) !important;
-  padding: 10px 0;
-  appearance: none;
-}
-
-.inputGroup input::placeholder {
-  color: var(--color-text-muted);
-}
-
-.inputGroup select option {
-  background-color: var(--color-card-bg);
-  color: var(--color-text);
-}
-
-.divider {
-  width: 1px;
-  height: 40px;
-  background-color: var(--color-border);
-}
-
-.searchBtn {
-  background-color: var(--color-primary);
-  color: white;
-  border: none;
-  padding: 14px 28px;
-  font-weight: 600;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.searchBtn:hover {
-  background-color: var(--color-primary-hover);
-}
-
-.popular {
-  margin-top: 20px;
-  color: var(--color-text-muted);
-  font-size: 14px;
-}
-
-.popular strong {
-  color: var(--color-text);
-}
-
-.companiesSection {
-  width: 100%;
-  padding: 40px 0;
-  background-color: var(--color-bg);
-}
-
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-.leadText {
-  color: var(--color-text-muted);
-  font-size: 16px;
-  margin-bottom: 30px;
-  font-family: "Inter", sans-serif;
-}
-
-.logoGrid {
-  display: flex;
-  width: 100%;
-  height: 100px;
-  background-color: var(--color-accent);
-  justify-content: 间-between;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px;
-  flex-wrap: wrap;
-  gap: 30px;
-  opacity: 0.6;
-}
-
-.logo {
-  height: 35px;
-  width: auto;
-  filter: grayscale(100%);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.logo:hover {
-  filter: grayscale(0%);
-  opacity: 1;
-  transform: scale(1.05);
-}
-
-@media (max-width: 768px) {
-  .logoGrid {
-    justify-content: center;
+@media (max-width: 640px) {
+  .searchBar {
+    flex-direction: column;
+    border-radius: var(--radius);
+    padding: 16px;
+    gap: 12px;
+  }
+  .divider {
+    display: none !important;
+  }
+  .searchBtn {
+    width: 100%;
+    border-radius: var(--radius-sm) !important;
   }
 }
 
-.cardJobBoard {
+/* ─── Input Group ─── */
+.inputGroup {
   display: flex;
   align-items: center;
-  width: 100%;
-  padding: 10px;
+  gap: 10px;
+  flex: 1;
+  padding: 0 12px;
 }
+
+.inputGroup input,
+.inputGroup select {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  width: 100%;
+  font-family: inherit;
+  direction: rtl;
+}
+
+.inputGroup select {
+  cursor: pointer;
+}
+
+.inputGroup input::placeholder {
+  color: var(--taupe);
+}
+
+.inputGroup option {
+  color: var(--text-main);
+}
+
+/* ─── Search Icon ─── */
+.icon {
+  color: var(--cobalt);
+  flex-shrink: 0;
+}
+
+/* ─── Divider ─── */
+.divider {
+  width: 1px;
+  height: 28px;
+  background: var(--taupe-light);
+  flex-shrink: 0;
+}
+
+/* ─── Search Button ─── */
+.searchBtn {
+  background: linear-gradient(135deg, var(--tangerine) 0%, #e86010 100%);
+  color: var(--white);
+  border: none;
+  border-radius: 100px;
+  padding: 13px 36px;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 4px 16px rgba(255,122,42,0.45);
+  font-family: inherit;
+  flex-shrink: 0;
+}
+
+.searchBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255,122,42,0.55);
+}
+
+.searchBtn:active {
+  transform: translateY(0);
+}
+
+/* ─── Jobs Section Card ─── */
+.cardJobBoard {
+  max-width: 1200px;
+  margin: 48px auto 80px;
+  padding: 0 24px;
+  background: transparent;
+} 

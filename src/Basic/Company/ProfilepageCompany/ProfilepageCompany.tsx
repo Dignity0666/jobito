@@ -113,6 +113,11 @@ export default function ProfilepageCompany() {
   const { user, apiFetch } = useJobitoAuth();
   const [company, setCompany] = useState<CompanyData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [hoverRating, setHoverRating] = useState(0);
+  const [submittingReview, setSubmittingReview] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { t, language } = useTranslation();
@@ -159,6 +164,16 @@ export default function ProfilepageCompany() {
             companyData.jobs = [];
           }
 
+          try {
+            const reviewsRes = await apiFetch(`${API_BASE_URL}/ratings/company/${companyData.companyId}`);
+            if (reviewsRes.ok) {
+              const reviewsResult = await reviewsRes.json();
+              setReviews(reviewsResult);
+            }
+          } catch (e) {
+            console.error("Failed to fetch reviews", e);
+          }
+
           if (
             companyData.foundedDay &&
             companyData.foundedMonth &&
@@ -182,6 +197,36 @@ export default function ProfilepageCompany() {
       window.removeEventListener("jobito-profile-updated", fetchProfile);
     };
   }, [apiFetch, id]);
+
+  const submitReview = async () => {
+    if (!rating) return;
+    setSubmittingReview(true);
+    try {
+      const res = await apiFetch(`${API_BASE_URL}/ratings`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companyId: company?.companyId,
+          ratingValue: rating,
+          comment,
+        }),
+      });
+      if (res.ok) {
+        const newReview = await res.json();
+        // Since the backend might not return populated user on creation, fetch again or prepend manually
+        const reviewsRes = await apiFetch(`${API_BASE_URL}/ratings/company/${company?.companyId}`);
+        if (reviewsRes.ok) {
+          setReviews(await reviewsRes.json());
+        }
+        setRating(0);
+        setComment("");
+      }
+    } catch (e) {
+      console.error("Failed to submit review", e);
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
 
   if (loading)
     return <div className={styles.loading}>{t("جاري تحميل الملف الشخصي...")}</div>;
@@ -216,7 +261,30 @@ export default function ProfilepageCompany() {
                 />
               </div>
               <div className={styles.basicMeta}>
-                <h1 className={styles.companyName}>{companyName}</h1>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                  <h1 className={styles.companyName}>{companyName}</h1>
+                  {reviews.length > 0 && (
+                    <div style={{ 
+                      display: "flex", 
+                      alignItems: "center", 
+                      gap: "6px", 
+                      background: "rgba(255, 176, 32, 0.1)", 
+                      padding: "4px 10px", 
+                      borderRadius: "20px",
+                      border: "1px solid rgba(255, 176, 32, 0.3)"
+                    }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFB020">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      </svg>
+                      <span style={{ color: "#FFB020", fontWeight: "700", fontSize: "0.95rem" }}>
+                        {(reviews.reduce((sum, r) => sum + r.ratingValue, 0) / reviews.length).toFixed(1)}
+                      </span>
+                      <span style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}>
+                        ({reviews.length})
+                      </span>
+                    </div>
+                  )}
+                </div>
                 <a
                   href={company?.website || "#"}
                   target="_blank"
@@ -289,6 +357,75 @@ export default function ProfilepageCompany() {
 
       {/* Main Content */}
       <main className={styles.contentGrid}>
+        {/* Reviews Section */}
+        <section style={{ marginBottom: '2rem' }}>
+          <div className={styles.sectionHeading}>
+            <h2 className={styles.premiumTitle}>{t("التقييمات والآراء", "Ratings and opinions")}</h2>
+          </div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {/* Submit Review Form (Only show if logged in, not viewing own profile, and hasn't rated yet) */}
+            {user && isReadOnly && (() => {
+              const userReview = reviews.find(r => (r.user?.userId || r.user?.id) === (user?.userId || user?.id));
+              
+              if (userReview) {
+                return (
+                  <div style={{ 
+                    background: 'rgba(16, 185, 129, 0.05)', 
+                    padding: '1.2rem', 
+                    borderRadius: '12px', 
+                    border: '1px solid rgba(16, 185, 129, 0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px'
+                  }}>
+                    <div style={{ background: '#10b981', borderRadius: '50%', padding: '4px' }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </div>
+                    <span style={{ color: '#10b981', fontWeight: '600' }}>{t("لقد قمت بتقييم هذه الشركة مسبقاً", "You have already rated this company")}</span>
+                  </div>
+                );
+              }
+
+              return (
+                <div style={{ background: 'var(--bg-card, #fff)', padding: '1.5rem', borderRadius: '16px', border: '1px solid var(--border, #eee)', boxShadow: 'var(--shadow-sm)' }}>
+                  <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.1rem', color: 'var(--text-primary)' }}>{t("أضف تقييمك", "Add your rating")}</h3>
+                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <svg
+                        key={star}
+                        onClick={() => setRating(star)}
+                        onMouseEnter={() => setHoverRating(star)}
+                        onMouseLeave={() => setHoverRating(0)}
+                        style={{ cursor: "pointer", color: (hoverRating || rating) >= star ? "#FFD700" : "#E0E0E0", width: 28, height: 28, transition: "color 0.2s" }}
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <textarea
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder={t("اكتب رأيك هنا...", "Write your opinion here...")}
+                    style={{ width: '100%', minHeight: '80px', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border, #eee)', marginBottom: '1rem', fontFamily: 'inherit', resize: 'vertical' }}
+                  />
+                    <button
+                      onClick={submitReview}
+                      disabled={!rating || submittingReview}
+                    className={styles.primaryBtn}
+                    style={{ opacity: (!rating || submittingReview) ? 0.5 : 1 }}
+                    >
+                    {submittingReview ? t("جاري الإرسال...", "Submitting...") : t("إرسال التقييم", "Submit Evaluation")}
+                    </button>
+                  </div>
+              );
+            })()}
+          </div>
+        </section>
         {/* Company Profile */}
         <section>
           <div className={styles.sectionHeading}>
@@ -442,15 +579,15 @@ export default function ProfilepageCompany() {
                     </div>
                   </div>
 
-                  <div className={styles.cardFooter}>
-                    <div className={styles.footerDivider} />
-                    <div className={styles.footerProgress}>
-                      <span>
-                        {t("تقدموا")} {job.appliedCount || 0} {t("من")}{" "}
-                        {job.slotsAvailable || 10} {t("متاح")}
-                      </span>
+                    <div className={styles.cardFooter}>
+                      <div className={styles.footerDivider} />
+                      <div className={styles.footerProgress}>
+                        <span>
+                          {t("مقبولين")} {job.acceptedCount || 0} {t("من")}{" "}
+                          {job.slotsAvailable || 10} {t("متاح")}
+                        </span>
+                      </div>
                     </div>
-                  </div>
                 </div>
               ))
             ) : (
@@ -458,6 +595,9 @@ export default function ProfilepageCompany() {
             )}
           </div>
         </section>
+
+
+
       </main>
     </div>
   );

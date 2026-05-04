@@ -53,7 +53,7 @@ interface Job {
     logoUrl?: string;
   };
   address: string;
-  jobType: string;
+  jobType: string | string[];
   slotsAvailable: number;
   salary?: number;
   salaryMin?: number;
@@ -62,6 +62,7 @@ interface Job {
   expiresAt?: string;
   createdAt?: string;
   appliedCount?: number;
+  acceptedCount?: number;
   category?: { name: string };
   user?: {
     avatarUrl?: string;
@@ -70,6 +71,8 @@ interface Job {
   applications?: any[];
   classification?: string;
   images?: string[];
+  skills?: string[];
+  avgRating?: number;
 }
 
 const sidebarVariant: Variants = {
@@ -94,7 +97,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
   const classification = user?.classification;
   const [jobs, setJobs] = useState<Job[]>([]);
   const { t } = useTranslation();
-  
+
   // Mock Maintenance Orders removed - linking to backend real data
 
   const { showToast } = useToast();
@@ -124,9 +127,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
 
   // Filter states
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
-  const [selectedLevels, setSelectedLevels] = useState<string[]>(
-    classification === "tradesman" ? ["tradesman"] : []
-  );
+  const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
   const [selectedSalaries, setSelectedSalaries] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
@@ -179,11 +180,8 @@ const AllJobs: React.FC<AllJobsProps> = ({
         if (searchKeyword && searchKeyword.trim() !== "") {
           // 🧠 AI Smart Search - uses role tagging, query expansion, and scoring
           const smartParams = new URLSearchParams({ q: searchKeyword });
-          if (classification === "tradesman") {
-            smartParams.append("classification", "خدمات");
-          } else {
-            smartParams.append("excludeClassification", "خدمات");
-          }
+          const isTradesman =
+            classification === "tradesman" || classification === "industrial";
           if (safeLocation) smartParams.append("location", safeLocation);
 
           const smartRes = await fetch(
@@ -216,9 +214,6 @@ const AllJobs: React.FC<AllJobsProps> = ({
           const queryParams = new URLSearchParams({
             limit: "100",
             ...(location && { location: location }),
-            ...(classification === "tradesman" 
-              ? { classification: "خدمات" } 
-              : { excludeClassification: "خدمات" }),
           });
 
           const jobsRes = await fetch(
@@ -306,7 +301,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
       abortController.abort();
       fetchInProgress.current = false;
     };
-  }, [searchKeyword, location, isAuthenticated, apiFetch]);
+  }, [searchKeyword, location, isAuthenticated, apiFetch, classification]);
 
   const toggleLike = async (
     e: React.MouseEvent,
@@ -343,19 +338,37 @@ const AllJobs: React.FC<AllJobsProps> = ({
   };
 
   const getJobLevel = (job: Job) => {
-    // 1. Differentiate between Company Services and Individual Tradesmen
-    if (!!job.user) return "tradesman"; 
-    
-    if (job.classification === "خدمات" || job.classification === "services" || job.classification === "Services") return "services";
+    const text = (
+      String(job.title || "") +
+      " " +
+      String(job.description || "")
+    ).toLowerCase();
 
-    // 2. Explicit classification field fallbacks
-    if (job.classification === "tradesman" || job.classification === "tradesman_work") return "tradesman";
+    // Check if the content is technical (for a "Sanaie" / Tradesman)
+    const isTechnicalContent =
+      text.includes("تقني") ||
+      text.includes("صيانة") ||
+      text.includes("سباكة") ||
+      text.includes("كهرباء") ||
+      text.includes("فني") ||
+      text.includes("تركيب") ||
+      job.classification === "تقني";
 
-    const text = (job.title + " " + (job.description || "")).toLowerCase();
+    // 1. Individual Tradesmen (Always "tradesman")
+    if (!!job.user) return "tradesman";
 
-    // 3. Fallback: Check for explicit Classification tags in text
-    if (text.includes("التصنيف: تقني") || text.includes("تقني") || job.classification === "تقني") return "تقني";
-    if (text.includes("التصنيف: غير تقني") || text.includes("غير تقني") || job.classification === "غير تقني")
+    // 2. Company Services
+    if (
+      job.classification === "خدمات" ||
+      job.classification === "services" ||
+      job.classification === "Services"
+    ) {
+      return "services";
+    }
+
+    // 3. Regular Company Jobs (Fallback logic)
+    if (isTechnicalContent) return "تقني";
+    if (text.includes("غير تقني") || job.classification === "غير تقني")
       return "غير تقني";
 
     if (text.includes("director") || text.includes("مدير")) return "مدير";
@@ -363,6 +376,30 @@ const AllJobs: React.FC<AllJobsProps> = ({
     if (text.includes("mid") || text.includes("متوسط")) return "متوسط الخبرة";
     if (text.includes("vp") || text.includes("نائب")) return "نائب رئيس وأعلى";
     return "مبتدئ";
+  };
+
+  const getTagColorClass = (tagName: any = "") => {
+    const name = String(tagName || "").toLowerCase();
+    if (name.includes("design") || name.includes("تصميم"))
+      return styles.tagDesign;
+    if (name.includes("marketing") || name.includes("تسويق"))
+      return styles.tagMarketing;
+    if (
+      name.includes("tech") ||
+      name.includes("تقني") ||
+      name.includes("برمجة")
+    )
+      return styles.tagTech;
+    if (name.includes("sales") || name.includes("مبيعات"))
+      return styles.tagSales;
+    if (
+      name.includes("maintenance") ||
+      name.includes("صيانة") ||
+      name.includes("سباكة") ||
+      name.includes("كهرباء")
+    )
+      return styles.tagTech;
+    return styles.tagDefault;
   };
 
   const getSalaryRange = (job: Job) => {
@@ -375,27 +412,50 @@ const AllJobs: React.FC<AllJobsProps> = ({
   };
 
   const filteredJobs = jobs.filter((job, index) => {
+    const isTradesmanUser =
+      user?.classification === "tradesman" ||
+      user?.classification === "industrial";
+      
+    if (role === "user" && isTradesmanUser) {
+      // Tradesman sees ONLY company jobs that are classified as "services"
+      if (!job.company) return false;
+      if (getJobLevel(job) !== "services") return false;
+    }
+
     const keywordLower = searchKeyword.toLowerCase();
     const keywordMatch =
       !searchKeyword ||
-      job.title?.toLowerCase().includes(keywordLower) ||
-      job.company?.name?.toLowerCase().includes(keywordLower);
+      String(job.title || "")
+        .toLowerCase()
+        .includes(keywordLower) ||
+      String(job.company?.name || "")
+        .toLowerCase()
+        .includes(keywordLower);
 
     const locationMatch =
-      !location || job.address?.toLowerCase().includes(location.toLowerCase());
+      !location ||
+      String(job.address || "")
+        .toLowerCase()
+        .includes(location.toLowerCase());
 
     const typeMatch =
       selectedTypes.length === 0 ||
       selectedTypes.some((t) => {
-        const jt = (job.jobType || "").toLowerCase();
-        if (t === "دوام كامل") return jt === "full-time";
-        if (t === "دوام جزئي") return jt === "part-time";
-        if (t === "عن بعد") return jt === "remote";
-        if (t === "تدريب") return jt === "internship" || jt === "intern";
-        if (t === "عقد") return jt === "contract";
-        if (t === "عمل حر") return jt === "freelance";
-        if (t === "عمل لمرة واحدة") return jt === "one-time";
-        return jt.includes(t.toLowerCase());
+        const types = Array.isArray(job.jobType)
+          ? job.jobType
+          : [job.jobType].filter(Boolean);
+        return types.some((jt) => {
+          const lowerJt = String(jt || "").toLowerCase();
+          if (t === "دوام كامل") return lowerJt === "full-time";
+          if (t === "دوام جزئي") return lowerJt === "part-time";
+          if (t === "عن بعد") return lowerJt === "remote";
+          if (t === "تدريب")
+            return lowerJt === "internship" || lowerJt === "intern";
+          if (t === "عقد") return lowerJt === "contract";
+          if (t === "عمل حر") return lowerJt === "freelance";
+          if (t === "خدمة سريعة") return lowerJt === "one-time";
+          return lowerJt.includes(t.toLowerCase());
+        });
       });
 
     const categoryMatch =
@@ -485,27 +545,94 @@ const AllJobs: React.FC<AllJobsProps> = ({
           <Filter
             title={t("نوع التوظيف")}
             items={[
-              { name: t("دوام كامل"), count: jobs.filter((j) => (j.jobType || "").toLowerCase() === "full-time").length, value: "دوام كامل" },
-              { name: t("دوام جزئي"), count: jobs.filter((j) => (j.jobType || "").toLowerCase() === "part-time").length, value: "دوام جزئي" },
-              { name: t("عن بعد"), count: jobs.filter((j) => (j.jobType || "").toLowerCase() === "remote").length, value: "عن بعد" },
-              { name: t("تدريب"), count: jobs.filter((j) => (j.jobType || "").toLowerCase() === "internship").length, value: "تدريب" },
-              { name: t("عقد"), count: jobs.filter((j) => (j.jobType || "").toLowerCase() === "contract").length, value: "عقد" },
+              {
+                name: t("دوام كامل"),
+                count: jobs.filter((j) =>
+                  Array.isArray(j.jobType)
+                    ? j.jobType.includes("full-time")
+                    : j.jobType === "full-time",
+                ).length,
+                value: "دوام كامل",
+              },
+              {
+                name: t("دوام جزئي"),
+                count: jobs.filter((j) =>
+                  Array.isArray(j.jobType)
+                    ? j.jobType.includes("part-time")
+                    : j.jobType === "part-time",
+                ).length,
+                value: "دوام جزئي",
+              },
+              {
+                name: t("عمل حر (Freelance)"),
+                count: jobs.filter((j) =>
+                  Array.isArray(j.jobType)
+                    ? j.jobType.includes("freelance")
+                    : j.jobType === "freelance",
+                ).length,
+                value: "عمل حر",
+              },
+              {
+                name: t("تدريب (Internship)"),
+                count: jobs.filter((j) =>
+                  Array.isArray(j.jobType)
+                    ? j.jobType.includes("internship")
+                    : j.jobType === "internship",
+                ).length,
+                value: "تدريب",
+              },
+              {
+                name: t("خدمة سريعة"),
+                count: jobs.filter((j) =>
+                  Array.isArray(j.jobType)
+                    ? j.jobType.includes("one-time")
+                    : j.jobType === "one-time",
+                ).length,
+                value: "خدمة سريعة",
+              },
+              {
+                name: t("عن بعد (Remote)"),
+                count: jobs.filter((j) =>
+                  Array.isArray(j.jobType)
+                    ? j.jobType.includes("remote")
+                    : j.jobType === "remote",
+                ).length,
+                value: "عن بعد",
+              },
             ]}
             selected={selectedTypes}
             setSelected={setSelectedTypes}
           />
 
           <Filter
-            title={t("التصنيفات")}
+            title={t("فئة الوظيفة")}
             items={[
-              { name: t("تقني"), count: jobs.filter((j) => getJobLevel(j) === "تقني").length, value: "تقني" },
-              { name: t("غير تقني"), count: jobs.filter((j) => getJobLevel(j) === "غير تقني").length, value: "غير تقني" },
-              { name: "Services", count: jobs.filter((j) => getJobLevel(j) === "services").length, value: "services" },
-              { name: "tradesman", count: jobs.filter((j) => getJobLevel(j) === "tradesman").length, value: "tradesman" },
+              {
+                name: t("تقني"),
+                count: jobs.filter((j) => getJobLevel(j) === "تقني").length,
+                value: "تقني",
+              },
+              {
+                name: t("غير تقني"),
+                count: jobs.filter((j) => getJobLevel(j) === "غير تقني").length,
+                value: "غير تقني",
+              },
+              {
+                name: t("خدمات"),
+                count: jobs.filter((j) => getJobLevel(j) === "services").length,
+                value: "services",
+              },
+              {
+                name: t("حرفي"),
+                count: jobs.filter((j) => getJobLevel(j) === "tradesman")
+                  .length,
+                value: "tradesman",
+              },
             ]}
             selected={selectedLevels}
             setSelected={setSelectedLevels}
           />
+
 
           <Filter
             title={t("نطاق الراتب")}
@@ -542,8 +669,10 @@ const AllJobs: React.FC<AllJobsProps> = ({
 
         <div className={styles.jobsHeader}>
           <div>
-                    <h2>{t("جميع الوظائف")}</h2>
-            <p>{t("عرض")} {filteredJobs.length} {t("نتائج")}</p>
+            <h2>{t("جميع الوظائف")}</h2>
+            <p>
+              {t("عرض")} {filteredJobs.length} {t("نتائج")}
+            </p>
           </div>
 
           <div className={styles.headerRight}>
@@ -597,7 +726,9 @@ const AllJobs: React.FC<AllJobsProps> = ({
             {loading ? (
               <div className={styles.loading}>{t("جاري التحميل...")}</div>
             ) : currentJobs.length === 0 ? (
-              <div className={styles.loading}>{t("لم يتم العثور على وظائف.")}</div>
+              <div className={styles.loading}>
+                {t("لم يتم العثور على وظائف.")}
+              </div>
             ) : (
               currentJobs.map((job, index) => (
                 <motion.div
@@ -612,7 +743,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
                     navigate("/Job details", { state: { jobId: job.jobId } })
                   }
                 >
-                   {view === "list" ? (
+                  {view === "list" ? (
                     <div className={styles.jobRowContent}>
                       {/* Determine if it's a Tradesman/Service job */}
                       {!!job.user ? (
@@ -624,9 +755,9 @@ const AllJobs: React.FC<AllJobsProps> = ({
                                 src={getFullImageUrl(
                                   job.user?.avatarUrl,
                                   job.user?.fullName || job.jobId?.toString(),
-                                  job
+                                  job,
                                 )}
-                                alt={t("Avatar")}
+                                alt={t("صورة المستخدم")}
                                 onError={(e) => {
                                   const target = e.target as HTMLImageElement;
                                   target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${job.jobId}`;
@@ -634,20 +765,32 @@ const AllJobs: React.FC<AllJobsProps> = ({
                               />
                             </div>
                             <div className={styles.jobInfoColumn}>
-                              <h3 className={styles.tradesmanJobTitle}>{t(job.title)}</h3>
+                              <h3 className={styles.tradesmanJobTitle}>
+                                {t(job.title)}
+                              </h3>
                               <div className={styles.jobRowMeta}>
                                 <span className={styles.locationNameText}>
-                                  {t(job.company?.name || job.user?.fullName || "Provider")} • {t(job.address || "Paris, France")}
+                                  {t(
+                                    job.company?.name ||
+                                      job.user?.fullName ||
+                                      "مزود الخدمة",
+                                  )}{" "}
+                                  •{" "}
+                                  {t(
+                                    job.address === "Remote"
+                                      ? "بعيد"
+                                      : job.address || "غير محدد",
+                                  )}
                                 </span>
                               </div>
                             </div>
                           </div>
 
                           <div className={styles.jobRatingMiddle}>
-                             <span className={styles.starIconSmall}>★</span>
-                             <span className={styles.ratingValueText}>
-                               {(3.5 + ((typeof job.jobId === 'number' ? job.jobId : 0) % 15) * 0.1).toFixed(2)}
-                             </span>
+                            <span className={styles.starIconSmall}>★</span>
+                            <span className={styles.ratingValueText}>
+                              {(job.avgRating || 0).toFixed(2)}
+                            </span>
                           </div>
 
                           <div className={styles.jobRowRight}>
@@ -660,7 +803,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
                                 });
                               }}
                             >
-                              {t("Apply")}
+                              {t("تقدم الآن")}
                             </button>
                           </div>
                         </>
@@ -673,9 +816,9 @@ const AllJobs: React.FC<AllJobsProps> = ({
                                 src={getFullImageUrl(
                                   job.company?.logoUrl,
                                   job.company?.name || job.jobId?.toString(),
-                                  job
+                                  job,
                                 )}
-                                alt={t("Logo")}
+                                alt={t("شعار الشركة")}
                                 onError={(e) => {
                                   const target = e.target as HTMLImageElement;
                                   target.src = `https://api.dicebear.com/7.x/identicon/svg?seed=${job.company?.name || job.jobId}`;
@@ -683,22 +826,97 @@ const AllJobs: React.FC<AllJobsProps> = ({
                               />
                             </div>
                             <div className={styles.jobInfoColumn}>
+                              <h3 className={styles.companyJobTitle}>
+                                {t(job.title)}
+                              </h3>
                               <div className={styles.jobRowMeta}>
-                                <span className={styles.companyNameText}>{t(job.company?.name || "Nomad")}</span>
+                                <span className={styles.companyNameText}>
+                                  {t(
+                                    job.company?.name ||
+                                      job.user?.fullName ||
+                                      "جوبيتو",
+                                  )}
+                                </span>
                                 <span className={styles.metaCircle}>•</span>
-                                <span className={styles.locationNameText}>{t(job.address || "Paris, France")}</span>
+                                <span className={styles.locationNameText}>
+                                  {t(job.address || "الموقع")}
+                                </span>
                               </div>
                               <div className={styles.jobRowTags}>
-                                <span className={styles.typePill}>
-                                  {job.jobType === "full-time" ? t("Full-Time") : t(job.jobType)}
-                                </span>
-                                <div className={styles.verticalDivider}></div>
-                                <span className={styles.catPillPrimary}>
-                                  {t(job.category?.name || "Marketing")}
-                                </span>
-                                <span className={styles.catPillSecondary}>
-                                  {t("Design")}
-                                </span>
+                                {/* Multi-select Job Types */}
+                                {Array.isArray(job.jobType) ? (
+                                  job.jobType.map((type, idx) => (
+                                    <span key={idx} className={styles.typePill}>
+                                      {type === "full-time"
+                                        ? t("دوام كامل")
+                                        : type === "part-time"
+                                          ? t("دوام جزئي")
+                                          : t(type)}
+                                    </span>
+                                  ))
+                                ) : (
+                                  <span className={styles.typePill}>
+                                    {job.jobType === "full-time"
+                                      ? t("دوام كامل")
+                                      : job.jobType === "part-time"
+                                        ? t("دوام جزئي")
+                                        : t(job.jobType)}
+                                  </span>
+                                )}
+
+                                {/* Field of Work (Primary Tag) */}
+                                {Array.isArray(job.fieldOfWork) &&
+                                job.fieldOfWork.length > 0 ? (
+                                  <>
+                                    <div
+                                      className={styles.verticalDivider}
+                                    ></div>
+                                    {job.fieldOfWork.map(
+                                      (field: any, idx: number) => {
+                                        const fieldName =
+                                          typeof field === "string"
+                                            ? field
+                                            : field?.name || "";
+                                        return (
+                                          <span
+                                            key={idx}
+                                            className={`${styles.catPill} ${getTagColorClass(fieldName)}`}
+                                          >
+                                            {t(fieldName)}
+                                          </span>
+                                        );
+                                      },
+                                    )}
+                                  </>
+                                ) : job.category?.name ||
+                                  (job as any).fieldOfWork ? (
+                                  <>
+                                    <div
+                                      className={styles.verticalDivider}
+                                    ></div>
+                                    <span
+                                      className={`${styles.catPill} ${getTagColorClass(job.category?.name || (job as any).fieldOfWork)}`}
+                                    >
+                                      {t(
+                                        job.category?.name ||
+                                          (job as any).fieldOfWork,
+                                      )}
+                                    </span>
+                                  </>
+                                ) : (
+                                  job.classification && (
+                                    <>
+                                      <div
+                                        className={styles.verticalDivider}
+                                      ></div>
+                                      <span
+                                        className={`${styles.catPill} ${styles.classificationPill}`}
+                                      >
+                                        {t(job.classification)}
+                                      </span>
+                                    </>
+                                  )
+                                )}
                               </div>
                             </div>
                           </div>
@@ -713,18 +931,21 @@ const AllJobs: React.FC<AllJobsProps> = ({
                                 });
                               }}
                             >
-                              {t("Apply")}
+                              {t("تقدم الآن")}
                             </button>
                             <div className={styles.capacityWrapper}>
-                               <div className={styles.capacityBar}>
-                                  <div 
-                                    className={styles.capacityFill} 
-                                    style={{ width: `${Math.min(((job.appliedCount || job.applications?.length || 0) / (job.slotsAvailable || 10)) * 100, 100)}%` }}
-                                  ></div>
-                               </div>
-                               <span className={styles.capacityLabel}>
-                                 {job.appliedCount || job.applications?.length || 0} of {job.slotsAvailable || 10} capacity
-                               </span>
+                              <div className={styles.capacityBar}>
+                                <div
+                                  className={styles.capacityFill}
+                                  style={{
+                                    width: `${Math.min(((job.acceptedCount || 0) / (job.slotsAvailable || 1)) * 100, 100)}%`,
+                                  }}
+                                ></div>
+                              </div>
+                              <span className={styles.capacityLabel}>
+                                {job.acceptedCount || 0} {t("من")}{" "}
+                                {job.slotsAvailable || 10} {t("مقبول")}
+                              </span>
                             </div>
                           </div>
                         </>
@@ -739,9 +960,9 @@ const AllJobs: React.FC<AllJobsProps> = ({
                             src={getFullImageUrl(
                               job.company?.logoUrl,
                               job.company?.name || job.jobId?.toString(),
-                              job
+                              job,
                             )}
-                            alt={t("Logo")}
+                            alt={t("شعار")}
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
                               target.src = `https://api.dicebear.com/7.x/identicon/svg?seed=${job.company?.name || job.jobId}`;
@@ -765,7 +986,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
                           style={{
                             fontWeight: "bold",
                             fontSize: "0.9rem",
-                            color: "#6b7280",
+                            color: "var(--color-text-secondary)",
                             marginBottom: "8px",
                           }}
                         >
@@ -781,17 +1002,21 @@ const AllJobs: React.FC<AllJobsProps> = ({
                       </div>
                       <div className={styles.cardFooter}>
                         <span className={`${styles.tag} ${styles.fulltime}`}>
-                          {job.jobType === "full-time"
-                            ? t("دوام كامل")
-                            : job.jobType === "part-time"
-                              ? t("دوام جزئي")
-                              : job.jobType === "remote"
-                                ? t("عن بعد")
-                                : job.jobType === "internship"
-                                  ? t("تدريب")
-                                  : job.jobType === "contract"
-                                    ? t("عقد")
-                                    : job.jobType}
+                          {(() => {
+                            const types = Array.isArray(job.jobType)
+                              ? job.jobType
+                              : [job.jobType].filter(Boolean);
+                            return types
+                              .map((jt) => {
+                                if (jt === "full-time") return t("دوام كامل");
+                                if (jt === "part-time") return t("دوام جزئي");
+                                if (jt === "remote") return t("عن بعد");
+                                if (jt === "internship") return t("تدريب");
+                                if (jt === "contract") return t("عقد");
+                                return t(jt);
+                              })
+                              .join(" / ");
+                          })()}
                         </span>
                         {job.address && (
                           <span
@@ -825,7 +1050,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
                             }
                           }}
                         >
-                          {t("تقدم")}
+                          {t("تقديم")}
                         </button>
                       </div>
                     </>
@@ -933,8 +1158,8 @@ const Filter: React.FC<FilterProps> = ({
                   checked={selected.includes(itemValue)}
                   onChange={() => toggleItem(itemValue)}
                 />
-              {t(item.name)}
-              <span className={styles.itemCount}>({item.count})</span>
+                {t(item.name)}
+                <span className={styles.itemCount}>({item.count})</span>
               </label>
             );
           })}

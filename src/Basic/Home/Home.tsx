@@ -49,10 +49,10 @@ export const Home = () => {
         <div className={styles.container}>
           <motion.div className={styles.content} variants={containerVariants}>
             <motion.h1 className={styles.title} variants={itemVariants}>
-              {isTradesman ? (language === "ar" ? "اعرض خدماتك" : "Offer your services") : t("جد وظيفة")} <br />
-              <span className={styles.purpleText}>{isTradesman ? (language === "ar" ? "لعملائك" : "For your customers") : t("أحلامك")}</span> <br />
+              {isTradesman ? t("اعرض خدماتك") : t("جد وظيفة")} <br />
+              <span className={styles.purpleText}>{isTradesman ? t("لعملائك") : t("أحلامك")}</span> <br />
               <span className={styles.blueText}>
-                {isTradesman ? (language === "ar" ? "بسهولة" : "easily") : t("اليوم")}
+                {isTradesman ? t("بسهولة") : t("اليوم")}
                 <svg className={styles.underline} viewBox="0 0 300 20">
                   <motion.path
                     initial={{ pathLength: 0 }}
@@ -120,6 +120,18 @@ export const Home = () => {
               </a>
             </motion.div>
 
+            {!isAuthenticated && (
+              <motion.div 
+                variants={itemVariants} 
+                style={{ 
+                  zoom: 0.7,
+                  marginTop: "20px"
+                }}
+              >
+                <HiringBanner />
+              </motion.div>
+            )}
+
             {/* Popular searches section removed as requested */}
           </motion.div>
         </div>
@@ -137,13 +149,12 @@ export const Home = () => {
           }}
         />
       </motion.section>
+      <JobsDashboard /> 
       <section className={styles.companiesSection}>
         <Testimonial />
       </section>
       <Categories />
-      {!isAuthenticated && <HiringBanner />}
       <JobsSection />
-      <JobsDashboard />
       {/* <Testimonil /> */}
     </>
   );

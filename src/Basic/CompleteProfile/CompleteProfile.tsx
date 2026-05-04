@@ -103,6 +103,17 @@ export default function CompleteProfile() {
   const [workImageFiles, setWorkImageFiles] = useState<File[]>([]);
   const workImageRef = useRef<HTMLInputElement>(null);
 
+  // Criminal Record (Tradesman Only)
+  const [criminalRecordPreview, setCriminalRecordPreview] = useState<string | null>(null);
+  const [selectedCriminalRecord, setSelectedCriminalRecord] = useState<File | null>(null);
+  const criminalRecordInputRef = useRef<HTMLInputElement>(null);
+
+  // Services (Tradesman Only)
+  const PREDEFINED_SERVICES = ["كهربائي", "فني سباكة", "نجار", "منظف بيوت", "نقاش", "ميكانيكي", "حداد"];
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [showServiceInput, setShowServiceInput] = useState(false);
+  const [customService, setCustomService] = useState("");
+
   // Saving
   const [isSaving, setIsSaving] = useState(false);
 
@@ -137,6 +148,16 @@ export default function CompleteProfile() {
           setWorkImages((prev) => [...prev, reader.result as string]);
         reader.readAsDataURL(file);
       });
+    }
+  };
+
+  const handleCriminalRecordUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedCriminalRecord(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setCriminalRecordPreview(reader.result as string);
+      reader.readAsDataURL(file);
     }
   };
 
@@ -228,6 +249,21 @@ export default function CompleteProfile() {
         }
       }
 
+      // Upload Criminal Record
+      let criminalRecordUrl = "";
+      if (selectedCriminalRecord) {
+        const fd = new FormData();
+        fd.append("file", selectedCriminalRecord);
+        const uploadRes = await apiFetch(`${API_BASE_URL}/images/upload`, {
+          method: "POST",
+          body: fd,
+        });
+        if (uploadRes.ok) {
+          const imgData = await uploadRes.json();
+          criminalRecordUrl = imgData.imageUrl || imgData.image_url;
+        }
+      }
+
       // Build update payload
       const updateData: Record<string, unknown> = {
         fullName: formData.fullName,
@@ -247,6 +283,8 @@ export default function CompleteProfile() {
         banner_url: bannerUrl,
         role: "user",
         classification: role,
+        services: selectedServices,
+        criminalRecordUrl: criminalRecordUrl, 
       };
 
       const res = await apiFetch(`${API_BASE_URL}/users/me`, {
@@ -606,9 +644,87 @@ export default function CompleteProfile() {
         </motion.div>
 
         {/* ═══════════════════════════════════════════
+            ─── Service (Tradesman Only) ──────────────
+            ═══════════════════════════════════════════ */}
+        {role === "tradesman" && (
+          <motion.div
+            className={styles.section}
+            custom={2.5}
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            <div className={styles.sectionRow}>
+              <div className={styles.sectionLabel}>
+                <h3>{t("الخدمة")}</h3>
+                <p>{t("اختر الخدمات التي تقدمها لعملائك.")}</p>
+              </div>
+              <div className={styles.sectionContent}>
+                <div className={styles.servicesGrid}>
+                  <div className={styles.serviceTagGroup}>
+                    {PREDEFINED_SERVICES.map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        className={`${styles.serviceItem} ${
+                          selectedServices.includes(s) ? styles.serviceItemActive : ""
+                        }`}
+                        onClick={() => {
+                          if (selectedServices.includes(s)) {
+                            setSelectedServices(selectedServices.filter((item) => item !== s));
+                          } else {
+                            setSelectedServices([...selectedServices, s]);
+                          }
+                        }}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+
+                  {showServiceInput ? (
+                    <div className={styles.customServiceInputRow}>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        placeholder={t("اكتب الخدمة هنا...")}
+                        value={customService}
+                        onChange={(e) => setCustomService(e.target.value)}
+                        autoFocus
+                      />
+                      <button
+                        type="button"
+                        className={styles.addBtnSmall}
+                        onClick={() => {
+                          if (customService.trim()) {
+                            setSelectedServices([...selectedServices, customService.trim()]);
+                            setCustomService("");
+                            setShowServiceInput(false);
+                          }
+                        }}
+                      >
+                        {t("إضافة")}
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className={styles.addServiceBtn}
+                      onClick={() => setShowServiceInput(true)}
+                    >
+                      <i className="fas fa-plus" /> {t("Add new Serves")}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ═══════════════════════════════════════════
             ─── Section 4: About Me ───────────────────
             ═══════════════════════════════════════════ */}
-
         <motion.div
           className={styles.section}
           custom={3}
@@ -645,102 +761,97 @@ export default function CompleteProfile() {
           </div>
         </motion.div>
 
-
-        {/* ═══════════════════════════════════════════
-            ─── Service (Tradesman Only) ──────────────
-            ═══════════════════════════════════════════ */}
-
-
         {/* ═══════════════════════════════════════════
             ─── Section 5: Experiences ────────────────
             ═══════════════════════════════════════════ */}
-
-        <motion.div
-          className={styles.section}
-          custom={4}
-          variants={sectionVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-        >
-          <div className={styles.sectionRow}>
-            <div className={styles.sectionLabel}>
-              <h3>{t("الخبرات")}</h3>
-              <p>{t("أضف خبراتك العملية السابقة.")}</p>
-            </div>
-            <div className={styles.sectionContent}>
-              <div className={styles.listContainer}>
-                <AnimatePresence>
-                  {experiences.map((exp, index) => (
-                    <motion.div
-                      key={index}
-                      className={styles.listItem}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <div className={styles.listHeader}>
-                        <span className={styles.label}>
-                          {t("خبرة")} {index + 1}
-                        </span>
-                        <button
-                          className={styles.removeBtn}
-                          onClick={() =>
-                            setExperiences(
-                              experiences.filter((_, i) => i !== index)
-                            )
-                          }
-                        >
-                          {t("حذف")}
-                        </button>
-                      </div>
-                      <div className={styles.formGrid}>
-                        <div className={`${styles.field} ${styles.fieldFull}`}>
-                          <label className={styles.label}>
-                            {t("المسمى الوظيفي")}
-                          </label>
-                          <input
-                            type="text"
-                            className={styles.input}
-                            value={exp.role}
-                            onChange={(e) => {
-                              const updated = [...experiences];
-                              updated[index].role = e.target.value;
-                              setExperiences(updated);
-                            }}
-                          />
+        {role !== "tradesman" && (
+          <motion.div
+            className={styles.section}
+            custom={4}
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            <div className={styles.sectionRow}>
+              <div className={styles.sectionLabel}>
+                <h3>{t("الخبرات")}</h3>
+                <p>{t("أضف خبراتك العملية السابقة.")}</p>
+              </div>
+              <div className={styles.sectionContent}>
+                <div className={styles.listContainer}>
+                  <AnimatePresence>
+                    {experiences.map((exp, index) => (
+                      <motion.div
+                        key={index}
+                        className={styles.listItem}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <div className={styles.listHeader}>
+                          <span className={styles.label}>
+                            {t("خبرة")} {index + 1}
+                          </span>
+                          <button
+                            className={styles.removeBtn}
+                            onClick={() =>
+                              setExperiences(
+                                experiences.filter((_, i) => i !== index)
+                              )
+                            }
+                          >
+                            {t("حذف")}
+                          </button>
                         </div>
-                        <div className={`${styles.field} ${styles.fieldFull}`}>
-                          <label className={styles.label}>{t("المدة")}</label>
-                          <input
-                            type="text"
-                            className={styles.input}
-                            placeholder={t("مثل: يناير 2020 - مارس 2023")}
-                            value={exp.period}
-                            onChange={(e) => {
-                              const updated = [...experiences];
-                              updated[index].period = e.target.value;
-                              setExperiences(updated);
-                            }}
-                          />
+                        <div className={styles.formGrid}>
+                          <div className={`${styles.field} ${styles.fieldFull}`}>
+                            <label className={styles.label}>
+                              {t("المسمى الوظيفي")}
+                            </label>
+                            <input
+                              type="text"
+                              className={styles.input}
+                              value={exp.role}
+                              onChange={(e) => {
+                                const updated = [...experiences];
+                                updated[index].role = e.target.value;
+                                setExperiences(updated);
+                              }}
+                            />
+                          </div>
+                          <div className={`${styles.field} ${styles.fieldFull}`}>
+                            <label className={styles.label}>{t("المدة")}</label>
+                            <input
+                              type="text"
+                              className={styles.input}
+                              placeholder={t("مثل: يناير 2020 - مارس 2023")}
+                              value={exp.period}
+                              onChange={(e) => {
+                                const updated = [...experiences];
+                                updated[index].period = e.target.value;
+                                setExperiences(updated);
+                              }}
+                            />
+                          </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-                <motion.button
-                  className={styles.addBtn}
-                  onClick={addExperience}
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  + {t("إضافة خبرة جديدة")}
-                </motion.button>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                  <motion.button
+                    className={styles.addBtn}
+                    onClick={addExperience}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    + {t("إضافة خبرة جديدة")}
+                  </motion.button>
+                </div>
               </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        )}
 
 
         {/* ═══════════════════════════════════════════
@@ -942,21 +1053,74 @@ export default function CompleteProfile() {
                     onChange={handleSocialChange}
                   />
                 </div>
-                <div className={`${styles.field} ${styles.fieldFull}`}>
-                  <label className={styles.label}>{t("الموقع الإلكتروني")}</label>
-                  <input
-                    type="text"
-                    name="website"
-                    className={styles.input}
-                    placeholder="https://your-website.com"
-                    value={socialLinks.website}
-                    onChange={handleSocialChange}
-                  />
-                </div>
               </div>
             </div>
           </div>
         </motion.div>
+
+        {/* ═══════════════════════════════════════════
+            ─── Criminal Record Check (Tradesman) ─────
+            ═══════════════════════════════════════════ */}
+        {role === "tradesman" && (
+          <motion.div
+            className={styles.section}
+            custom={7.5}
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            <div className={styles.sectionRow}>
+              <div className={styles.sectionLabel}>
+                <h3>{t("Criminal Record Check")}</h3>
+                <p>
+                  {t(
+                    "Is An Official Document That Shows A Person's Criminal History."
+                  )}
+                </p>
+              </div>
+              <div className={styles.sectionContent}>
+                <div
+                  className={styles.criminalRecordZone}
+                  onClick={() => criminalRecordInputRef.current?.click()}
+                >
+                  {criminalRecordPreview ? (
+                    <div className={styles.previewContainer}>
+                      <img
+                        src={criminalRecordPreview}
+                        alt="Criminal Record"
+                        className={styles.previewImg}
+                      />
+                      <div className={styles.previewOverlay}>
+                        {t("تغيير الملف")}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className={styles.placeholderBox}>
+                      <UploadIcon />
+                      <p className={styles.uploadText}>
+                        <span className={styles.uploadLink}>
+                          {t("Click to replace")}
+                        </span>{" "}
+                        {t("or drag and drop")}
+                      </p>
+                      <p className={styles.uploadHint}>
+                        SVG, PNG, JPG or GIF (max. 400 x 400px)
+                      </p>
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    ref={criminalRecordInputRef}
+                    style={{ display: "none" }}
+                    accept="image/*"
+                    onChange={handleCriminalRecordUpload}
+                  />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* ═══════════════════════════════════════════
             ─── Section 9: Work Images ────────────────

@@ -2,6 +2,17 @@ import { useState } from "react";
 import Marquee from "react-fast-marquee";
 import { useTranslation } from "../../../context/translation-context";
 import styles from "./Partners.module.css";
+import Vodefone from "../../../assets/Vodefone.png";
+import Ahly from "../../../assets/Ahly.png";
+import National from "../../../assets/National-Bank-of-Egypt-01.png";
+import pngclipartegyptpost from "../../../assets/png-clipart-egypt-post-cairo-mail-alexandria-organization-egypt-logo-text-service-thumbnail.png";
+import AR from "../../../assets/images.png";
+import شعار from "../../../assets/20231126101655!شعار_حديد_عز.png";
+import Edita from "../../../assets/إيديتا.png";
+import bab54d145284119 from "../../../assets/bab54d145284119.629b80c91d413-1.png";
+import Asset from "../../../assets/Asset-1obourland-1.png";
+import unnamed from "../../../assets/unnamed.png";
+import egyptair from "../../../assets/egyptair-logo-02-freelogovectors.net_.png";
 
 type Partner = {
   id: number;
@@ -10,14 +21,17 @@ type Partner = {
 };
 
 const EGYPTIAN_PARTNERS: Partner[] = [
-  { id: -1, name: "فودافون مصر", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Vodafone_icon.svg/239px-Vodafone_icon.svg.png" },
-  { id: -2, name: "اتصالات مصر", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Etisalat_logo.svg/2560px-Etisalat_logo.svg.png" },
-  { id: -3, name: "البنك الأهلي المصري", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/National_Bank_of_Egypt.svg/1200px-National_Bank_of_Egypt.svg.png" },
-  { id: -4, name: "أورانج مصر", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Orange_logo.svg/2048px-Orange_logo.svg.png" },
-  { id: -5, name: "طلبات", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Talabat_logo.svg/2560px-Talabat_logo.svg.png" },
-  { id: -6, name: "سويفل", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Swvl_logo.png/800px-Swvl_logo.png" },
-  { id: -7, name: "فوري", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Fawry_logo.png/1200px-Fawry_logo.png" },
-  { id: -8, name: "WE", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Telecom_Egypt_We_logo.svg/2560px-Telecom_Egypt_We_logo.svg.png" },
+  { id: -2, name: "اتصالات", logo: Vodefone },
+  { id: -2, name: "اتصالات", logo: Ahly },
+  { id: -3, name: "البنك الأهلي المصري", logo: pngclipartegyptpost },
+  { id: -4, name: "أورانج", logo: National },
+  { id: -4, name: "أورانج", logo: AR },
+  { id: -4, name: "أورانج", logo: شعار },
+  { id: -5, name: "طلبات", logo: Edita },
+  { id: -6, name: "سويفل", logo: egyptair },
+  { id: -7, name: "فوري", logo: bab54d145284119 },
+  { id: -8, name: "WE", logo: Asset },
+  { id: -8, name: "WE", logo: unnamed },
 ];
 
 export default function Partners() {
@@ -27,7 +41,10 @@ export default function Partners() {
   // Company names are proper nouns — do NOT translate them
   // This prevents animation clash when the translation service updates
   const ReviewCard = ({ logo, name }: { logo?: string; name: string }) => (
-    <figure className={`${styles.reviewCard} ${!logo ? styles.nameOnly : ""}`} title={name}>
+    <figure
+      className={`${styles.reviewCard} ${!logo ? styles.nameOnly : ""}`}
+      title={name}
+    >
       {logo ? (
         <img src={logo} alt={name} className={styles.partnerLogo} />
       ) : (
@@ -38,9 +55,7 @@ export default function Partners() {
 
   return (
     <div className={styles.testimonial}>
-      <h2>
-        {t("نثق بهم ويثقون بنا")}
-      </h2>
+      <h2>{t("نثق بهم ويثقون بنا")}</h2>
 
       <div className={styles.marqueeContainer}>
         {/* Row 1: scrolls left */}
