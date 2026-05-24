@@ -433,4 +433,8 @@
   .companyCapacity {
     order: 3;
   }
+  
+  .sectionHeader h2 {
+    font-size: 24px;
+  }
 }

@@ -7,6 +7,7 @@ import { useJobitoAuth } from "../../../context/LinkContxt.js";
 import { useRef } from "react";
 import { useTranslation } from "../../../context/translation-context";
 import { useToast } from "../../../context/ToastContext";
+import { useTheme } from "../../../context/ThemeContext";
 import {
   FiGrid,
   FiList,
@@ -94,6 +95,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
   location = "",
 }) => {
   const { apiFetch, isAuthenticated, role, user } = useJobitoAuth();
+  const { isDark } = useTheme();
   const classification = user?.classification;
   const [jobs, setJobs] = useState<Job[]>([]);
   const { t } = useTranslation();
@@ -404,10 +406,10 @@ const AllJobs: React.FC<AllJobsProps> = ({
 
   const getSalaryRange = (job: Job) => {
     const s = job.salary || job.salaryMin || 0;
-    if (s >= 3000) return "٣٠٠٠$ أو أكثر";
-    if (s >= 1500) return "١٥٠٠$ - ٢٠٠٠$";
-    if (s >= 1000) return "١٠٠٠$ - ١٥٠٠$";
-    if (s >= 700) return "٧٠٠$ - ١٠٠٠$";
+    if (s >= 3000) return "3000+";
+    if (s >= 1500) return "1500-2000";
+    if (s >= 1000) return "1000-1500";
+    if (s >= 700) return "700-1000";
     return null;
   };
 
@@ -532,7 +534,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
   };
 
   return (
-    <div className={styles.jobsPage}>
+    <div className={`${styles.jobsPage} ${isDark ? styles.darkJobsPage : ""}`}>
       {classification !== "tradesman" && (
         <motion.aside
           className={styles.sidebar}
@@ -543,61 +545,61 @@ const AllJobs: React.FC<AllJobsProps> = ({
         >
           {/* Category Filter including Tradesman items */}
           <Filter
-            title={t("نوع التوظيف")}
+            title={t("Employment Type")}
             items={[
               {
-                name: t("دوام كامل"),
+                name: "Full-time",
                 count: jobs.filter((j) =>
                   Array.isArray(j.jobType)
                     ? j.jobType.includes("full-time")
                     : j.jobType === "full-time",
                 ).length,
-                value: "دوام كامل",
+                value: "Full-time",
               },
               {
-                name: t("دوام جزئي"),
+                name: "Part-time",
                 count: jobs.filter((j) =>
                   Array.isArray(j.jobType)
                     ? j.jobType.includes("part-time")
                     : j.jobType === "part-time",
                 ).length,
-                value: "دوام جزئي",
+                value: "Part-time",
               },
               {
-                name: t("عمل حر (Freelance)"),
+                name: "Freelance",
                 count: jobs.filter((j) =>
                   Array.isArray(j.jobType)
                     ? j.jobType.includes("freelance")
                     : j.jobType === "freelance",
                 ).length,
-                value: "عمل حر",
+                value: "Freelance",
               },
               {
-                name: t("تدريب (Internship)"),
+                name: "Internship",
                 count: jobs.filter((j) =>
                   Array.isArray(j.jobType)
                     ? j.jobType.includes("internship")
                     : j.jobType === "internship",
                 ).length,
-                value: "تدريب",
+                value: "Internship",
               },
               {
-                name: t("خدمة سريعة"),
+                name: "One-time",
                 count: jobs.filter((j) =>
                   Array.isArray(j.jobType)
                     ? j.jobType.includes("one-time")
                     : j.jobType === "one-time",
                 ).length,
-                value: "خدمة سريعة",
+                value: "One-time",
               },
               {
-                name: t("عن بعد (Remote)"),
+                name: "Remote",
                 count: jobs.filter((j) =>
                   Array.isArray(j.jobType)
                     ? j.jobType.includes("remote")
                     : j.jobType === "remote",
                 ).length,
-                value: "عن بعد",
+                value: "Remote",
               },
             ]}
             selected={selectedTypes}
@@ -605,28 +607,27 @@ const AllJobs: React.FC<AllJobsProps> = ({
           />
 
           <Filter
-            title={t("فئة الوظيفة")}
+            title={t("Job Category")}
             items={[
               {
-                name: t("تقني"),
+                name: "Technical",
                 count: jobs.filter((j) => getJobLevel(j) === "تقني").length,
-                value: "تقني",
+                value: "Technical",
               },
               {
-                name: t("غير تقني"),
+                name: "Non-Technical",
                 count: jobs.filter((j) => getJobLevel(j) === "غير تقني").length,
-                value: "غير تقني",
+                value: "Non-Technical",
               },
               {
-                name: t("خدمات"),
+                name: "Services",
                 count: jobs.filter((j) => getJobLevel(j) === "services").length,
-                value: "services",
+                value: "Services",
               },
               {
-                name: t("حرفي"),
-                count: jobs.filter((j) => getJobLevel(j) === "tradesman")
-                  .length,
-                value: "tradesman",
+                name: "Tradesman",
+                count: jobs.filter((j) => getJobLevel(j) === "tradesman").length,
+                value: "Tradesman",
               },
             ]}
             selected={selectedLevels}
@@ -635,27 +636,27 @@ const AllJobs: React.FC<AllJobsProps> = ({
 
 
           <Filter
-            title={t("نطاق الراتب")}
+            title={t("Salary Range")}
             items={[
               {
-                name: "٧٠٠$ - ١٠٠٠$",
-                count: jobs.filter((j) => getSalaryRange(j) === "٧٠٠$ - ١٠٠٠$")
-                  .length,
+                name: "700$ - 1000$",
+                count: jobs.filter((j) => getSalaryRange(j) === "700-1000").length,
+                value: "700-1000",
               },
               {
-                name: "١٠٠٠$ - ١٥٠٠$",
-                count: jobs.filter((j) => getSalaryRange(j) === "١٠٠٠$ - ١٥٠٠$")
-                  .length,
+                name: "1000$ - 1500$",
+                count: jobs.filter((j) => getSalaryRange(j) === "1000-1500").length,
+                value: "1000-1500",
               },
               {
-                name: "١٥٠٠$ - ٢٠٠٠$",
-                count: jobs.filter((j) => getSalaryRange(j) === "١٥٠٠$ - ٢٠٠٠$")
-                  .length,
+                name: "1500$ - 2000$",
+                count: jobs.filter((j) => getSalaryRange(j) === "1500-2000").length,
+                value: "1500-2000",
               },
               {
-                name: "٣٠٠٠$ أو أكثر",
-                count: jobs.filter((j) => getSalaryRange(j) === "٣٠٠٠$ أو أكثر")
-                  .length,
+                name: "3000$ or more",
+                count: jobs.filter((j) => getSalaryRange(j) === "3000+").length,
+                value: "3000+",
               },
             ]}
             selected={selectedSalaries}
@@ -843,7 +844,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
                                 </span>
                               </div>
                               <div className={styles.jobRowTags}>
-                                {/* Multi-select Job Types */}
+                                {/* Display ONLY Job Type as requested */}
                                 {Array.isArray(job.jobType) ? (
                                   job.jobType.map((type, idx) => (
                                     <span key={idx} className={styles.typePill}>
@@ -862,60 +863,6 @@ const AllJobs: React.FC<AllJobsProps> = ({
                                         ? t("دوام جزئي")
                                         : t(job.jobType)}
                                   </span>
-                                )}
-
-                                {/* Field of Work (Primary Tag) */}
-                                {Array.isArray(job.fieldOfWork) &&
-                                job.fieldOfWork.length > 0 ? (
-                                  <>
-                                    <div
-                                      className={styles.verticalDivider}
-                                    ></div>
-                                    {job.fieldOfWork.map(
-                                      (field: any, idx: number) => {
-                                        const fieldName =
-                                          typeof field === "string"
-                                            ? field
-                                            : field?.name || "";
-                                        return (
-                                          <span
-                                            key={idx}
-                                            className={`${styles.catPill} ${getTagColorClass(fieldName)}`}
-                                          >
-                                            {t(fieldName)}
-                                          </span>
-                                        );
-                                      },
-                                    )}
-                                  </>
-                                ) : job.category?.name ||
-                                  (job as any).fieldOfWork ? (
-                                  <>
-                                    <div
-                                      className={styles.verticalDivider}
-                                    ></div>
-                                    <span
-                                      className={`${styles.catPill} ${getTagColorClass(job.category?.name || (job as any).fieldOfWork)}`}
-                                    >
-                                      {t(
-                                        job.category?.name ||
-                                          (job as any).fieldOfWork,
-                                      )}
-                                    </span>
-                                  </>
-                                ) : (
-                                  job.classification && (
-                                    <>
-                                      <div
-                                        className={styles.verticalDivider}
-                                      ></div>
-                                      <span
-                                        className={`${styles.catPill} ${styles.classificationPill}`}
-                                      >
-                                        {t(job.classification)}
-                                      </span>
-                                    </>
-                                  )
                                 )}
                               </div>
                             </div>
@@ -995,7 +942,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
                         <p className={styles.cardDesc}>
                           {job.description
                             ? job.description.length > 80
-                              ? t(job.description.substring(0, 80)) + "..."
+                              ? t(job.description).substring(0, 80) + "..."
                               : t(job.description)
                             : t("لا يوجد وصف لهذه الوظيفة حالياً.")}
                         </p>

@@ -1320,3 +1320,60 @@
   0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
   30% { transform: translateY(-6px); opacity: 1; }
 }
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    max-width: 100%;
+    min-width: 100%;
+  }
+
+  .sidebarHiddenMobile {
+    display: none !important;
+  }
+
+  .main {
+    display: none;
+    width: 100%;
+  }
+
+  .mainVisibleMobile {
+    display: flex !important;
+  }
+
+  .footer {
+    padding: 10px 12px 15px 12px;
+    gap: 8px;
+  }
+
+  .messageRow {
+    max-width: 95%;
+  }
+
+  .bubble {
+    padding: 10px 24px 10px 14px;
+    font-size: 14px;
+  }
+
+  .voiceMessageWhatsApp {
+    min-width: 200px;
+    padding: 6px 10px;
+  }
+
+  .voiceAvatarRight {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .voiceMetaRow {
+    padding-right: 48px;
+  }
+
+  .messagesArea {
+    padding: 16px;
+  }
+
+  .mainHeader {
+    padding: 0 12px;
+  }
+}

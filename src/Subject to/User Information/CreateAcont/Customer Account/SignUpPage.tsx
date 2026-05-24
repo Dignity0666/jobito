@@ -300,6 +300,7 @@ export const SignUpPage: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
                     }
+                    dir="auto"
                     required
                   />
                 </div>
@@ -313,6 +314,7 @@ export const SignUpPage: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
+                    dir="auto"
                     required
                   />
                 </div>
@@ -328,6 +330,7 @@ export const SignUpPage: React.FC = () => {
                         onChange={(e) =>
                           setFormData({ ...formData, password: e.target.value })
                         }
+                        dir="auto"
                         required
                       />
                       <button
@@ -335,7 +338,7 @@ export const SignUpPage: React.FC = () => {
                         onClick={() => setShowPassword(!showPassword)}
                         style={{
                           position: "absolute",
-                          right: "14px",
+                          insetInlineEnd: "14px",
                           background: "none",
                           border: "none",
                           cursor: "pointer",
@@ -366,6 +369,7 @@ export const SignUpPage: React.FC = () => {
                             confirmPassword: e.target.value,
                           })
                         }
+                        dir="auto"
                         required
                       />
                       <button
@@ -375,7 +379,7 @@ export const SignUpPage: React.FC = () => {
                         }
                         style={{
                           position: "absolute",
-                          right: "14px",
+                          insetInlineEnd: "14px",
                           background: "none",
                           border: "none",
                           cursor: "pointer",
@@ -404,10 +408,10 @@ export const SignUpPage: React.FC = () => {
                 </button>
                 <button
                   className={Style.googleFloatingBtn}
+                  type="button"
                   onClick={() => googleLogin()}
                 >
                   <img
-                  className={Style.googleFloatingBtnimg}
                     src="https://www.svgrepo.com/show/475656/google-color.svg"
                     alt="Google"
                     width="24"

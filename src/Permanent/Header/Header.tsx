@@ -28,6 +28,8 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import { motion } from "framer-motion";
+
 export function Header() {
   const { isAuthenticated, user, role } = useJobitoAuth();
   const { language, setLanguage, t } = useTranslation();
@@ -92,14 +94,24 @@ export function Header() {
 
   return (
     <>
-      <header className={isDarkHeader ? styles.rootcompany : styles.rootUser}>
-        <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+      <motion.header 
+        className={isDarkHeader ? styles.rootcompany : styles.rootUser}
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 100, damping: 20 }}
+      >
+        <div className={styles.leftSection}>
+          <motion.div 
+            className={styles.logoSection}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 20 }}
+          >
             {isAuthenticated && role !== "company" && (
               <SidebarMenu />
             )}
             <LogoComponent />
-          </div>
+          </motion.div>
           <NavBar
             mobileOpen={mobileOpen}
             setMobileOpen={setMobileOpen}
@@ -107,7 +119,12 @@ export function Header() {
           />
         </div>
         
-        <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+        <motion.div 
+          className={styles.rightSection}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 20 }}
+        >
           <button
             className={styles.themeToggleBtn}
             onClick={toggleTheme}
@@ -123,8 +140,8 @@ export function Header() {
           ) : (
             <HeaderActions isAuthenticated={isAuthenticated} user={user} />
           )}
-        </div>
-      </header>
+        </motion.div>
+      </motion.header>
     </>
   );
 }

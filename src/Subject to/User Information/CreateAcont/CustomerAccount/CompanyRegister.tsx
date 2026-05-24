@@ -47,6 +47,18 @@ export const CompanyRegister: React.FC = () => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [verifiedStatus, setVerifiedStatus] = useState<null | "success">(null);
 
+  const uploadFile = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch(`${API_BASE_URL}/auth/upload-document`, {
+      method: "POST",
+      body: formData,
+    });
+    if (!res.ok) throw new Error(t("Failed to upload document"));
+    const data = await res.json();
+    return data.url;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
@@ -58,6 +70,23 @@ export const CompanyRegister: React.FC = () => {
 
     try {
       setIsCreating(true);
+
+      // Upload documents first
+      let crDocumentUrl = "";
+      let taxDocumentUrl = "";
+
+      if (formData.commercialRegister instanceof File) {
+        crDocumentUrl = await uploadFile(formData.commercialRegister);
+      } else {
+        throw new Error(t("Commercial register document is required"));
+      }
+
+      if (formData.taxNumber instanceof File) {
+        taxDocumentUrl = await uploadFile(formData.taxNumber);
+      } else {
+        throw new Error(t("Tax register document is required"));
+      }
+
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -68,9 +97,8 @@ export const CompanyRegister: React.FC = () => {
           role: "company",
           phone: formData.companyPhone,
           address: formData.companyAddress,
-          tax_number: formData.taxNumber,
-          commercial_register: formData.commercialRegister,
-          license_number: formData.commercialRegister,
+          tax_document_url: taxDocumentUrl,
+          commercial_register: crDocumentUrl,
           national_id: formData.nationalId,
         }),
       });
@@ -163,14 +191,6 @@ export const CompanyRegister: React.FC = () => {
                       <SmartphoneIcon size={20} />
                       {t("Enter Verification Code")}
                     </button>
-                    <button
-                      className={styles.submitBtn}
-                      onClick={() => setVerifyMethod("link")}
-                      style={{ background: 'white', color: '#4f46e5', border: '2px solid #4f46e5' }}
-                    >
-                      <LinkIcon size={20} />
-                      {t("Use Email Link")}
-                    </button>
                   </div>
                 </>
               ) : (
@@ -234,8 +254,8 @@ export const CompanyRegister: React.FC = () => {
               <form className={styles.form} onSubmit={handleSubmit}>
                 {formError && <div className={styles.errorBox}>{formError}</div>}
 
-                {/* Row 1: Name, Tax, Phone */}
-                <div className={styles.formGrid3}>
+                {/* Row 1: Name, Email */}
+                <div className={styles.formGrid2}>
                   <div className={styles.inputGroup}>
                     <label>{t("Company Name")}</label>
                     <input
@@ -244,74 +264,80 @@ export const CompanyRegister: React.FC = () => {
                       placeholder={t("Example: Akem")}
                       value={formData.companyName}
                       onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                      dir="auto"
                       required
                     />
                   </div>
                   <div className={styles.inputGroup}>
-                    <label>{t("Tax number")}</label>
+                    <label>{t("Company Email")}</label>
                     <input
                       className={styles.inputField}
-                      type="text"
-                      placeholder="123456789"
-                      value={formData.taxNumber}
-                      onChange={(e) => setFormData({ ...formData, taxNumber: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className={styles.inputGroup}>
-                    <label>{t("Company phone")}</label>
-                    <input
-                      className={styles.inputField}
-                      type="tel"
-                      placeholder="+20 (123) 456-"
-                      value={formData.companyPhone}
-                      onChange={(e) => setFormData({ ...formData, companyPhone: e.target.value })}
+                      type="email"
+                      placeholder="hr@acme-inc.com"
+                      value={formData.companyEmail}
+                      onChange={(e) => setFormData({ ...formData, companyEmail: e.target.value })}
+                      dir="auto"
                       required
                     />
                   </div>
                 </div>
 
-                {/* Row 2: Address, Email, Register */}
-                <div className={styles.formGrid3}>
+                {/* Row 2: Phone, Address */}
+                <div className={styles.formGrid2}>
                   <div className={styles.inputGroup}>
-                    <label>{t("Company address")}</label>
+                    <label>{t("Company Phone")}</label>
+                    <input
+                      className={styles.inputField}
+                      type="tel"
+                      placeholder="+20 (123) 456-7890"
+                      value={formData.companyPhone}
+                      onChange={(e) => setFormData({ ...formData, companyPhone: e.target.value })}
+                      dir="auto"
+                      required
+                    />
+                  </div>
+                  <div className={styles.inputGroup}>
+                    <label>{t("Company Address")}</label>
                     <input
                       className={styles.inputField}
                       type="text"
                       placeholder={t("City, state")}
                       value={formData.companyAddress}
                       onChange={(e) => setFormData({ ...formData, companyAddress: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className={styles.inputGroup}>
-                    <label>{t("Company email")}</label>
-                    <input
-                      className={styles.inputField}
-                      type="email"
-                      placeholder="hr@acme-inc.c"
-                      value={formData.companyEmail}
-                      onChange={(e) => setFormData({ ...formData, companyEmail: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className={styles.inputGroup}>
-                    <label>{t("commercial register")}</label>
-                    <input
-                      className={styles.inputField}
-                      type="text"
-                      placeholder="LN-8899221"
-                      value={formData.commercialRegister}
-                      onChange={(e) => setFormData({ ...formData, commercialRegister: e.target.value })}
+                      dir="auto"
                       required
                     />
                   </div>
                 </div>
 
-                {/* Row 3: Passwords */}
+                {/* Row 3: Tax Doc, CR Doc */}
                 <div className={styles.formGrid2}>
                   <div className={styles.inputGroup}>
-                    <label>{t("password")}</label>
+                    <label>{t("Tax Register (PDF)")}</label>
+                    <input
+                      className={styles.inputField}
+                      type="file"
+                      accept=".pdf,.doc,.docx,.jpg,.png"
+                      onChange={(e) => setFormData({ ...formData, taxNumber: e.target.files ? e.target.files[0] : '' as any })}
+                      required
+                    />
+                  </div>
+                  <div className={styles.inputGroup}>
+                    <label>{t("Commercial Register (PDF)")}</label>
+                    <input
+                      className={styles.inputField}
+                      type="file"
+                      accept=".pdf,.doc,.docx,.jpg,.png"
+                      onChange={(e) => setFormData({ ...formData, commercialRegister: e.target.files ? e.target.files[0] : '' as any })}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Row 4: Passwords */}
+                <div className={styles.formGrid2}>
+                  <div className={styles.inputGroup}>
+                    <label>{t("Password")}</label>
                     <div className={styles.passwordWrapper}>
                       <input
                         className={styles.inputField}
@@ -319,6 +345,7 @@ export const CompanyRegister: React.FC = () => {
                         placeholder="••••••••"
                         value={formData.password}
                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        dir="auto"
                         required
                       />
                       <button type="button" className={styles.eyeButton} onClick={() => setShowPassword(!showPassword)}>
@@ -335,6 +362,7 @@ export const CompanyRegister: React.FC = () => {
                         placeholder="••••••••"
                         value={formData.confirmPassword}
                         onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                        dir="auto"
                         required
                       />
                       <button type="button" className={styles.eyeButton} onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
@@ -344,15 +372,16 @@ export const CompanyRegister: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Row 4: National ID */}
+                {/* Row 5: National ID */}
                 <div className={styles.inputGroup}>
-                  <label>{t("The national number of the official")}</label>
+                  <label>{t("National ID of the official")}</label>
                   <input
                     className={styles.inputField}
                     type="text"
                     placeholder="Example: 29901011234567"
                     value={formData.nationalId}
                     onChange={(e) => setFormData({ ...formData, nationalId: e.target.value })}
+                    dir="auto"
                     required
                   />
                 </div>
@@ -362,7 +391,7 @@ export const CompanyRegister: React.FC = () => {
                   type="submit"
                   disabled={isCreating}
                 >
-                  {isCreating ? <LoaderIcon className="animate-spin" /> : t("Create a business account file")}
+                  {isCreating ? <LoaderIcon className="animate-spin" /> : t("Create a business account")}
                 </button>
               </form>
             </motion.div>

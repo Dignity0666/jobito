@@ -39,39 +39,27 @@ export const UserInformation: React.FC = () => {
 
   return (
     <div className={styles.page}>
-      <div className={styles.container}>
-        <BorderAnimatedContainer>
-          <AnimatePresence>
-            {!showLogin && (
-              <motion.div
-                key="header-btns"
-                style={{ position: "absolute", top: 32, right: 32, display: "flex", gap: "12px", zIndex: 10 }}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
+      <header className={styles.header}>
+        <div className={styles.logo}>JOBITO</div>
+        <div className={styles.headerActions}>
+          {!showLogin && (
+            <>
+              <button 
+                className={styles.outlineBtn} 
+                onClick={() => setIsCustomer(!isCustomer)}
               >
-                <motion.button
-                  className={styles.signInBtn}
-                  style={{ position: "static", backgroundColor: "#f8fafc", color: "#4f46e5", border: "1px solid #4f46e5", boxShadow: "none" }}
-                  onClick={() => setIsCustomer(!isCustomer)}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {isCustomer ? t("صاحب عمل؟ حساب شركة") : t("مستخدم ؟ إنشاء حساب")}
-                </motion.button>
-                <motion.button
-                  className={styles.signInBtn}
-                  style={{ position: "static" }}
-                  onClick={toggleLogin}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {t("تسجيل الدخول")}
-                </motion.button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                {isCustomer ? t("صاحب عمل؟ حساب شركة") : t("مستخدم؟ حساب شخصي")}
+              </button>
+              <button className={styles.primaryBtn} onClick={toggleLogin}>
+                {t("Login")}
+              </button>
+            </>
+          )}
+        </div>
+      </header>
+
+      <div className={styles.container}>
+        <div className={styles.formCard}>
 
           <AnimatePresence mode="wait">
             {showLogin ? (
@@ -81,13 +69,13 @@ export const UserInformation: React.FC = () => {
                 initial="hidden"
                 animate="visible"
                 exit="exit"
-                className="w-full h-full"
+                style={{ width: "100%" }}
               >
                 <motion.div
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
-                  className="w-full h-full"
+                  style={{ width: "100%" }}
                 >
                   <LoginPage setShowLogin={setShowLogin} />
                 </motion.div>
@@ -99,21 +87,25 @@ export const UserInformation: React.FC = () => {
                 initial="hidden"
                 animate="visible"
                 exit="exit"
-                className="w-full h-full"
+                style={{ width: "100%" }}
               >
                 <motion.div
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
-                  className="w-full h-full"
+                  style={{ width: "100%" }}
                 >
                   <UI setShowLogin={setShowLogin} isCustomer={isCustomer} setIsCustomer={setIsCustomer} />
                 </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
-        </BorderAnimatedContainer>
+        </div>
       </div>
+
+      <footer className={styles.footer}>
+        Copyright @Jobito 2026 | Privacy Policy
+      </footer>
     </div>
   );
 };

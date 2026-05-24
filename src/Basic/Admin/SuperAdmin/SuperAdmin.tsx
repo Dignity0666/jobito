@@ -6,53 +6,33 @@ import {
   BarElement,
   LineElement,
   PointElement,
+  ArcElement,
   Filler,
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Bar, Line } from 'react-chartjs-2';
-import { 
-  Bell, 
-  Moon, 
-  Sun,
-  ArrowUpRight,
-  MousePointer2
-} from 'lucide-react';
+import { Bar, Line, Doughnut } from 'react-chartjs-2';
 import styles from './SuperAdmin.module.css';
 import { useTranslation } from '../../../context/translation-context';
-import { useTheme } from '../../../context/ThemeContext';
+import { useToast } from '../../../context/ToastContext';
 import { useJobitoAuth } from '../../../context/LinkContxt';
 import { API_BASE_URL } from '../../../services/api';
+import { Settings, PieChart, TrendingUp, Clock } from 'lucide-react';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Filler, Tooltip, Legend);
-
-// ─── Data Defaults ───────────────────────────────────────────────────────────
-const STATS = [
-  { label: 'Active Users', value: '0', change: '', trend: '', color: 'success', sparkData: [] },
-  { label: 'Total Companies', value: '0', change: '', trend: '', color: 'info', sparkData: [] },
-  { label: 'System Uptime', value: '100%', change: '', trend: '', color: 'warn', sparkData: [] },
-  { label: 'Active Security Alerts', value: '0', change: '', trend: '', color: 'danger', sparkData: [] },
-];
-
-const BAR_LABELS = ['3 Jun','4 Jun','5 Jun','6 Jun','7 Jun','8 Jun','9 Jun','10 Jun','11 Jun','12 Jun','13 Jun','14 Jun'];
-const BAR_VALUES = [120, 220, 150, 250, 280, 210, 250, 110, 280, 340, 380, 410];
+ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Filler, Tooltip, Legend);
 
 // ─── Sparkline Component ─────────────────────────────────────────────────────
 const SparkLine = ({ data, color }: { data: number[]; color: string }) => {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
-  
   const colors: Record<string, { border: string; bg: string }> = {
-    success: { border: '#10b981', bg: 'rgba(16,185,129,0.15)' },
-    info:    { border: '#3b82f6', bg: 'rgba(59,130,246,0.15)' },
-    warn:    { border: '#f59e0b', bg: 'rgba(245,158,11,0.15)' },
-    danger:  { border: '#ef4444', bg: 'rgba(239,68,68,0.15)' },
+    success: { border: '#10b981', bg: 'rgba(16,185,129,0.08)' },
+    info:    { border: '#3b82f6', bg: 'rgba(59,130,246,0.08)' },
+    warn:    { border: '#f59e0b', bg: 'rgba(245,158,11,0.08)' },
   };
 
   const c = colors[color] || colors.info;
-  
+
   return (
-    <div className={styles.sparklineWrapper}>
+    <div className={styles.sparklineContainer}>
       <Line
         data={{
           labels: ['M','T','W','T','F','S','S'],
@@ -72,15 +52,10 @@ const SparkLine = ({ data, color }: { data: number[]; color: string }) => {
           maintainAspectRatio: false,
           plugins: { legend: { display: false }, tooltip: { enabled: false } },
           scales: {
-            x: { 
-              display: true, 
-              ticks: { font: { size: 9, weight: 600 }, color: isDark ? '#94a3b8' : '#64748b' }, 
-              grid: { display: false }, 
-              border: { display: false } 
-            },
-            y: { display: false },
+            x: { display: false },
+            y: { display: false, min: Math.min(...data) - 5 },
           },
-          animation: { duration: 800 },
+          animation: { duration: 0 },
         }}
       />
     </div>
@@ -90,45 +65,44 @@ const SparkLine = ({ data, color }: { data: number[]; color: string }) => {
 // ─── Main Component ──────────────────────────────────────────────────────────
 const SuperAdminDashboard: React.FC = () => {
   const { t, language } = useTranslation();
-  const { theme, toggleTheme } = useTheme();
+  const { showToast } = useToast();
   const { apiFetch, user } = useJobitoAuth();
-  const isDark = theme === 'dark';
+  const isSuperAdmin = user?.adminRole === 'super_admin';
 
   const [maintenanceOn, setMaintenanceOn] = useState(false);
   const [statsData, setStatsData] = useState<any>(null);
   const [chartData, setChartData] = useState<any>(null);
-  const [systemRequests, setSystemRequests] = useState<any[]>([]);
+  const [monitoringReports, setMonitoringReports] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [newAdminName, setNewAdminName] = useState('');
   const [newAdminEmail, setNewAdminEmail] = useState('');
   const [newAdminPassword, setNewAdminPassword] = useState('');
+  const [newAdminRole, setNewAdminRole] = useState('Operation Manager');
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [statsRes, chartRes, maintRes, requestsRes] = await Promise.all([
-          apiFetch(`${API_BASE_URL}/admin/dashboard/stats`),
-          apiFetch(`${API_BASE_URL}/admin/dashboard/charts`),
-          apiFetch(`${API_BASE_URL}/admin/maintenance`),
-          apiFetch(`${API_BASE_URL}/admin/system-requests`)
-        ]);
-
-        if (statsRes.ok) setStatsData(await statsRes.json());
-        if (chartRes.ok) setChartData(await chartRes.json());
-        if (maintRes.ok) {
-          const data = await maintRes.json();
-          setMaintenanceOn(data.maintenanceMode);
-        }
-        if (requestsRes.ok) {
-          const data = await requestsRes.json();
-          setSystemRequests(data.data || []);
+        if (isSuperAdmin) {
+          const [statsRes, chartRes, maintRes, monitorRes] = await Promise.all([
+            apiFetch(`${API_BASE_URL}/admin/dashboard/stats`),
+            apiFetch(`${API_BASE_URL}/admin/dashboard/charts`),
+            apiFetch(`${API_BASE_URL}/admin/maintenance`),
+            apiFetch(`${API_BASE_URL}/monitoring/reports`),
+          ]);
+          if (statsRes.ok) setStatsData(await statsRes.json());
+          if (chartRes.ok) setChartData(await chartRes.json());
+          if (maintRes.ok) setMaintenanceOn((await maintRes.json()).maintenanceMode);
+          if (monitorRes.ok) setMonitoringReports(await monitorRes.json());
         }
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
+      } finally {
+        setIsLoading(false);
       }
     };
     loadData();
-  }, [apiFetch]);
+  }, [apiFetch, isSuperAdmin]);
 
   const handleToggleMaintenance = async () => {
     const newVal = !maintenanceOn;
@@ -145,7 +119,7 @@ const SuperAdminDashboard: React.FC = () => {
   };
 
   const handleInviteAdmin = async () => {
-    if (!newAdminName || !newAdminEmail) return;
+    if (!newAdminName || !newAdminEmail || !newAdminPassword) return;
     try {
       const res = await apiFetch(`${API_BASE_URL}/admin/invite`, {
         method: 'POST',
@@ -154,228 +128,351 @@ const SuperAdminDashboard: React.FC = () => {
           fullName: newAdminName, 
           email: newAdminEmail, 
           password: newAdminPassword, 
-          role: 'operation_manager' 
+          role: newAdminRole === 'Operation Manager' ? 'operation_manager' : 'super_admin' 
         })
       });
       if (res.ok) {
         setNewAdminName('');
         setNewAdminEmail('');
         setNewAdminPassword('');
-        alert(t('Admin invited successfully'));
+        showToast(t('Admin invited successfully'));
+      } else {
+        const data = await res.json();
+        showToast(t(data.message || 'Failed to invite admin'));
       }
     } catch (err) {
       console.error('Error inviting admin:', err);
     }
   };
 
-  const handleReviewRequest = async (id: number, action: 'approve' | 'reject') => {
-    try {
-      const res = await apiFetch(`${API_BASE_URL}/admin/system-requests/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, reviewNote: `Reviewed by Super Admin` })
-      });
-      if (res.ok) {
-        const updated = await apiFetch(`${API_BASE_URL}/admin/system-requests`);
-        if (updated.ok) {
-          const data = await updated.json();
-          setSystemRequests(data.data || []);
-        }
-      }
-    } catch (err) {
-      console.error('Error reviewing request:', err);
-    }
-  };
-
-  const currentStats = statsData ? [
-    { label: 'Active Users', value: statsData.activeUsers?.toString() || '0', change: '', trend: '', color: 'success', sparkData: [12, 19, 14, 22, 18, 25, 20] },
-    { label: 'Total Companies', value: statsData.totalCompanies?.toString() || '0', change: '', trend: '', color: 'info', sparkData: [10, 15, 18, 14, 22, 16, 24] },
-    { label: 'System Uptime', value: `${statsData.systemUptime || 100}%`, change: '', trend: '', color: 'warn', sparkData: [20, 22, 21, 23, 24, 22, 25] },
-    { label: 'Active Security Alerts', value: statsData.activeSecurityAlerts?.toString() || '0', change: '', trend: '', color: 'danger', sparkData: [] },
-  ] : STATS;
-
-  const barLabels = chartData?.activity?.map((a: any) => new Date(a.date).toLocaleDateString()) || BAR_LABELS;
-  const barValues = chartData?.activity?.map((a: any) => parseInt(a.count)) || BAR_VALUES;
+  // ─── Chart Configurations ──────────────────────────────────────────────────
+  const activityData = chartData?.activity || [];
+  const barLabels = activityData.map((a: any) => {
+    const d = new Date(a.date);
+    return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+  });
+  const barValues = activityData.map((a: any) => parseInt(a.count));
+  const displayLabels = barLabels.length > 0 ? barLabels : Array(12).fill('');
+  const displayValues = barValues.length > 0 ? barValues : [240, 330, 260, 360, 390, 330, 360, 240, 390, 440, 500, 500];
 
   const barData = {
-    labels: barLabels,
-    datasets: [{
-      label: t('Activity'),
-      data: barValues,
-      backgroundColor: '#3b82f6',
-      borderRadius: 6,
-      borderSkipped: false,
-      barPercentage: 0.5,
-      categoryPercentage: 0.7,
-    }],
+    labels: displayLabels,
+    datasets: [
+      {
+        data: displayValues,
+        backgroundColor: '#3b82f6',
+        borderRadius: 4,
+        barPercentage: 0.35,
+        categoryPercentage: 1.0,
+      },
+      {
+        data: Array(displayValues.length).fill(Math.max(...displayValues, 100) * 1.15), // Background bars
+        backgroundColor: '#f1f5f9',
+        borderRadius: 4,
+        barPercentage: 0.35,
+        categoryPercentage: 1.0,
+        grouped: false,
+      }
+    ],
   };
 
   const barOptions: any = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        backgroundColor: isDark ? '#334155' : '#1e293b',
-        titleFont: { size: 12, weight: 600 },
-        bodyFont: { size: 11 },
-        padding: 10,
-        cornerRadius: 8,
-        displayColors: false,
-      },
-    },
+    plugins: { legend: { display: false }, tooltip: { enabled: false } },
     scales: {
-      x: {
+      x: { grid: { display: false }, border: { display: false } },
+      y: { 
+        beginAtZero: true, 
+        max: Math.max(...displayValues, 100) * 1.2,
+        ticks: { stepSize: 100, color: '#94a3b8', font: { size: 11, weight: '500' } },
         grid: { display: false },
-        border: { display: false },
-        ticks: { font: { size: 11, weight: 600 }, color: isDark ? '#94a3b8' : '#64748b' },
-      },
-      y: {
-        beginAtZero: true,
-        ticks: { font: { size: 11, weight: 600 }, color: isDark ? '#94a3b8' : '#64748b' },
-        grid: { color: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9' },
-        border: { display: false },
+        border: { display: false }
       },
     },
-    animation: { duration: 1000, easing: 'easeOutQuart' as const },
+    layout: { padding: { top: 10, bottom: 0 } }
+  };
+
+  const dist = statsData?.userDistribution || { trainees: 60, companies: 25, staff: 15 };
+  const totalDist = dist.trainees + dist.companies + dist.staff;
+
+  const doughnutData = {
+    labels: ['Trainees', 'Companies', 'Staff'],
+    datasets: [{
+      data: [dist.trainees, dist.companies, dist.staff],
+      backgroundColor: ['#3b82f6', '#8b5cf6', '#f59e0b'],
+      borderWidth: 0,
+      cutout: '78%',
+    }]
+  };
+
+  const doughnutOptions: any = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+  };
+
+  const last14Days = Array.from({ length: 14 }, (_, i) => {
+    const d = new Date();
+    d.setHours(0,0,0,0);
+    d.setDate(d.getDate() - (13 - i));
+    return d;
+  });
+
+  const reportsLabels = last14Days.map((d, i) => {
+    if (i === 0) return '2 Weeks Ago';
+    if (i === 6) return '1 Week Ago';
+    if (i === 13) return 'Today';
+    return '';
+  });
+
+  const reportsValues = last14Days.map(day => {
+    return monitoringReports.filter(r => {
+      const rd = new Date(r.createdAt);
+      return rd.toDateString() === day.toDateString();
+    }).length;
+  });
+
+  const lineData = {
+    labels: reportsLabels,
+    datasets: [{
+      data: reportsValues,
+      borderColor: '#f43f5e',
+      borderWidth: 2,
+      pointBackgroundColor: '#fff',
+      pointBorderColor: '#f43f5e',
+      pointBorderWidth: 2,
+      pointRadius: 4,
+      fill: false,
+      tension: 0.1,
+    }],
+  };
+
+  const lineOptions: any = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+    scales: {
+      x: { 
+        grid: { color: '#f1f5f9' }, 
+        border: { display: false },
+        ticks: { color: '#94a3b8', font: { size: 10 } }
+      },
+      y: { display: false, min: 0 },
+    },
   };
 
   return (
-    <div className={`${styles.container} ${isDark ? styles.dark : ''}`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
-      {/* Header */}
-      <header className={styles.header}>
-        <div className={styles.headerContent}>
-          <div>
-            <h1 className={styles.welcomeTitle}>{t("Hello,")} {user?.name || 'Admin'}</h1>
-            <p className={styles.welcomeSub}>{t("Following Is Your Organization's Performance Summary")}</p>
-          </div>
-          <div className={styles.headerActions}>
-            <div className={styles.actionIcon} onClick={toggleTheme}>
-              {isDark ? <Sun size={20} /> : <Moon size={20} />}
-            </div>
-            <div className={styles.actionIcon}><Bell size={20} /></div>
-            <div className={styles.userPill}>
-              <div className={styles.avatarCircle}>{user?.name?.[0]?.toUpperCase() || 'A'}</div>
-              <span className={styles.userName}>{user?.name || 'Admin'}</span>
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <div className={styles.container} dir={language === 'ar' ? 'rtl' : 'ltr'}>
       <main className={styles.mainContent}>
+        
         {/* KPI Cards */}
-        <div className={styles.statsRow}>
-          {currentStats.map((stat, i) => (
-            <div key={i} className={`${styles.statCard} ${stat.color === 'danger' ? styles.statCardDanger : ''}`}>
-              <div className={styles.statHeader}>
-                <span className={styles.statLabel}>{t(stat.label)}</span>
-                {stat.change && (
-                  <span className={`${styles.statBadge} ${styles[stat.color]}`}>
-                    {stat.change} {stat.trend === 'up' && <ArrowUpRight size={10} />}
-                  </span>
+        <div className={styles.statsGrid}>
+          <div className={styles.kpiCard}>
+            <div className={styles.kpiHeader}>
+              <div className={styles.kpiLabelBox}>
+                <span className={styles.kpiLabel}>Active Users</span>
+                {isLoading ? (
+                  <div className={styles.skeletonLine} style={{ width: '80px', height: '28px', marginTop: '8px' }} />
+                ) : (
+                  <h2 className={styles.kpiValue}>
+                    {statsData?.activeUsers?.toLocaleString() || '3,354'}
+                  </h2>
                 )}
               </div>
-              <div className={styles.statValue}>{stat.value}</div>
-              {stat.sparkData.length > 0 && <SparkLine data={stat.sparkData} color={stat.color} />}
+              {!isLoading && <span className={`${styles.kpiBadge} ${styles.badgeSuccess}`}>20% ↗</span>}
             </div>
-          ))}
-        </div>
-
-        {/* Chart + Controls */}
-        <div className={styles.chartControlsRow}>
-          <div className={styles.chartCard}>
-            <div className={styles.chartWrapper}>
-              <Bar data={barData} options={barOptions} />
-            </div>
-          </div>
-          <div className={styles.controlsCard}>
-            <div>
-              <div className={styles.controlHeader}>
-                <MousePointer2 size={16} className={styles.controlIcon} />
-                <span className={styles.controlTitle}>{t("Quick Controls")}</span>
-              </div>
-              <p className={styles.controlSub}>{t("Quick Access To Critical Functions")}</p>
-            </div>
-            <div className={styles.controlBox}>
-              <span className={styles.controlLabel}>{t("Maintenance Mode")}</span>
-              <p className={styles.controlDesc}>{t("Disable External User Access")}</p>
-              <div
-                className={`${styles.toggleTrack} ${maintenanceOn ? styles.toggleOn : ''}`}
-                onClick={handleToggleMaintenance}
-              >
-                <div className={styles.toggleThumb} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Add Admin Form */}
-        <div className={styles.formCard}>
-          <div className={styles.formHeader}>
-            <div>
-              <h2 className={styles.formTitle}>{t("Add New Admin")}</h2>
-              <p className={styles.formSub}>{t("Invite A New Member To Join The Dashboard With Specific Permissions")}</p>
-            </div>
-            <span className={styles.exclusiveBadge}>{t("Exclusive Access")}</span>
-          </div>
-          <div className={styles.formGrid}>
-            <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>{t("Full Name")}</label>
-              <input type="text" className={styles.inputField} placeholder={t("Full Name")} value={newAdminName} onChange={e => setNewAdminName(e.target.value)} />
-            </div>
-            <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>{t("Email Address")}</label>
-              <input type="email" className={styles.inputField} placeholder="admin@jobito.com" value={newAdminEmail} onChange={e => setNewAdminEmail(e.target.value)} />
-            </div>
-            <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>{t("Password")}</label>
-              <input type="password" className={styles.inputField} placeholder={t("Password")} value={newAdminPassword} onChange={e => setNewAdminPassword(e.target.value)} />
-            </div>
-            <button className={styles.submitBtn} onClick={handleInviteAdmin}>{t("Send invitation")}</button>
-          </div>
-        </div>
-
-        {/* System Requests */}
-        <div className={styles.formCard}>
-          <div className={styles.formHeader}>
-            <div>
-              <h2 className={styles.formTitle}>{t("Pending System Requests")}</h2>
-              <p className={styles.formSub}>{t("Review Requests From Operations Managers")}</p>
-            </div>
-          </div>
-          <div className={styles.tableBody}>
-            {systemRequests.length === 0 ? (
-              <p className={styles.emptyRequests}>{t("No pending requests")}</p>
+            {isLoading ? (
+              <div className={styles.skeletonLine} style={{ width: '100%', height: '40px', marginTop: '16px' }} />
             ) : (
-              systemRequests.map((req, i) => (
-                <div key={i} className={styles.requestItem}>
-                  <div className={styles.requestInfo}>
-                    <div className={styles.requestTitle}>{req.requestType} - {req.candidateName}</div>
-                    <div className={styles.requestSub}>{req.candidateEmail} | {req.description}</div>
-                    <div className={styles.requestMeta}>
-                      {t("From")}: {req.requesterName} | {new Date(req.createdAt).toLocaleString()}
-                    </div>
-                  </div>
-                  {req.status === 'pending' && (
-                    <div className={styles.requestActions}>
-                      <button className={styles.approveBtn} onClick={() => handleReviewRequest(req.requestId, 'approve')}>
-                        {t("Approve")}
-                      </button>
-                      <button className={styles.rejectBtn} onClick={() => handleReviewRequest(req.requestId, 'reject')}>
-                        {t("Reject")}
-                      </button>
-                    </div>
-                  )}
-                  {req.status !== 'pending' && (
-                    <span className={`${styles.statBadge} ${req.status === 'approved' ? styles.success : styles.danger}`}>
-                      {t(req.status)}
-                    </span>
-                  )}
-                </div>
-              ))
+              <SparkLine data={[10, 15, 12, 20, 18, 25, 22]} color="success" />
             )}
           </div>
+
+          <div className={styles.kpiCard}>
+            <div className={styles.kpiHeader}>
+              <div className={styles.kpiLabelBox}>
+                <span className={styles.kpiLabel}>Operations Revenue</span>
+                {isLoading ? (
+                  <div className={styles.skeletonLine} style={{ width: '80px', height: '28px', marginTop: '8px' }} />
+                ) : (
+                  <h2 className={styles.kpiValue}>
+                    {(statsData?.operationsRevenue ?? statsData?.revenue ?? statsData?.totalRevenue ?? statsData?.totalOperationsRevenue ?? 3354).toLocaleString()}
+                  </h2>
+                )}
+              </div>
+              {!isLoading && <span className={`${styles.kpiBadge} ${styles.badgeInfo}`}>20% ↗</span>}
+            </div>
+            {isLoading ? (
+              <div className={styles.skeletonLine} style={{ width: '100%', height: '40px', marginTop: '16px' }} />
+            ) : (
+              <SparkLine data={[12, 18, 15, 22, 19, 28, 25]} color="info" />
+            )}
+          </div>
+
+          <div className={styles.kpiCard}>
+            <div className={styles.kpiHeader}>
+              <div className={styles.kpiLabelBox}>
+                <span className={styles.kpiLabel}>System Uptime</span>
+                {isLoading ? (
+                  <div className={styles.skeletonLine} style={{ width: '80px', height: '28px', marginTop: '8px' }} />
+                ) : (
+                  <h2 className={styles.kpiValue}>{statsData?.systemUptime || '95'}%</h2>
+                )}
+              </div>
+              {!isLoading && <span className={`${styles.kpiBadge} ${styles.badgeWarn}`}>{statsData?.systemUptime || '95'}% ↗</span>}
+            </div>
+            {isLoading ? (
+              <div className={styles.skeletonLine} style={{ width: '100%', height: '40px', marginTop: '16px' }} />
+            ) : (
+              <SparkLine data={[90, 92, 91, 95, 94, 98, 97]} color="warn" />
+            )}
+          </div>
+
+          <div className={styles.kpiCard} style={{ background: '#fff1f2', borderColor: '#ffe4e6' }}>
+            <div className={styles.kpiHeader}>
+              <div className={styles.kpiLabelBox}>
+                <span className={styles.kpiLabel}>Active Security Alerts</span>
+                {isLoading ? (
+                  <div className={styles.skeletonLine} style={{ width: '40px', height: '28px', marginTop: '8px' }} />
+                ) : (
+                  <h2 className={styles.kpiValue}>{statsData?.activeSecurityAlerts || '3'}</h2>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
+
+        {/* Dashboard Layout */}
+        <div className={styles.dashboardLayout}>
+          
+          {/* Left Column */}
+          <div className={styles.leftCol}>
+            <div className={styles.barChartCard}>
+              <div className={styles.barChartContainer}>
+                {isLoading ? (
+                  <div className={styles.skeletonLine} style={{ width: '100%', height: '100%' }} />
+                ) : (
+                  <Bar data={barData} options={barOptions} />
+                )}
+              </div>
+            </div>
+
+            <div className={styles.lineChartCard}>
+              <div className={styles.chartHeaderRow}>
+                <div className={styles.chartTitleBox}>
+                  <TrendingUp size={16} color="#f43f5e" />
+                  <h3 className={styles.chartTitle}>Content Reports Trend (بلاغات)</h3>
+                </div>
+                <span className={styles.timeBadge}>Last 14 Days</span>
+              </div>
+              <div className={styles.lineChartContainer}>
+                <Line data={lineData} options={lineOptions} />
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div className={styles.rightCol}>
+            <div className={styles.donutCard}>
+              <div className={styles.donutHeader}>
+                <PieChart size={16} color="#6366f1" />
+                <h3>User Distribution</h3>
+              </div>
+              
+              <div className={styles.donutBody}>
+                <div className={styles.donutChartContainer}>
+                  <Doughnut data={doughnutData} options={doughnutOptions} />
+                  <div className={styles.donutCenter}>
+                    <h4>{(totalDist / 1000).toFixed(1)}k</h4>
+                    <span>Users</span>
+                  </div>
+                </div>
+                
+                <div className={styles.donutLegend}>
+                  <div className={styles.legendItem}>
+                    <span className={styles.legendDot} style={{ background: '#3b82f6' }}></span>
+                    <span className={styles.legendText}>Trainees ({Math.round((dist.trainees / totalDist) * 100)}%)</span>
+                  </div>
+                  <div className={styles.legendItem}>
+                    <span className={styles.legendDot} style={{ background: '#8b5cf6' }}></span>
+                    <span className={styles.legendText}>Companies ({Math.round((dist.companies / totalDist) * 100)}%)</span>
+                  </div>
+                  <div className={styles.legendItem}>
+                    <span className={styles.legendDot} style={{ background: '#f59e0b' }}></span>
+                    <span className={styles.legendText}>Staff ({Math.round((dist.staff / totalDist) * 100)}%)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.controlsCard}>
+              <div className={styles.controlsHeader}>
+                <Settings size={18} color="#94a3b8" />
+                <h3>Quick Controls</h3>
+              </div>
+              <p className={styles.controlsSub}>Quick Access To Critical Functions</p>
+              
+              <div className={styles.controlItem}>
+                <div className={styles.controlInfo}>
+                  <h4>Maintenance Mode</h4>
+                  <p>Disable External User Access</p>
+                </div>
+                <div 
+                  className={`${styles.toggle} ${maintenanceOn ? styles.toggleOn : ''}`}
+                  onClick={handleToggleMaintenance}
+                >
+                  <div className={styles.toggleCircle}></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Form */}
+        <div className={styles.adminFormCard}>
+          <div className={styles.formHeaderRow}>
+            <div>
+              <h2 className={styles.formTitle}>Add New Admin</h2>
+              <p className={styles.formSub}>Invite A New Member To Join The Dashboard With Specific Permissions</p>
+            </div>
+            <span className={styles.exclusiveBadge}>Exclusive Access</span>
+          </div>
+
+          <div className={styles.formInputsRow}>
+            <div className={styles.inputGroup}>
+              <label>Full Name</label>
+              <input 
+                type="text" 
+                value={newAdminName}
+                onChange={e => setNewAdminName(e.target.value)}
+              />
+            </div>
+            <div className={styles.inputGroup}>
+              <label>Email Address</label>
+              <input 
+                type="email" 
+                placeholder="Admin @jobito.com"
+                value={newAdminEmail}
+                onChange={e => setNewAdminEmail(e.target.value)}
+              />
+            </div>
+            <div className={styles.inputGroup}>
+              <label>Password</label>
+              <input 
+                type="password" 
+                placeholder="••••••••"
+                value={newAdminPassword}
+                onChange={e => setNewAdminPassword(e.target.value)}
+              />
+            </div>
+
+            <button className={styles.inviteBtn} onClick={handleInviteAdmin}>
+              Send invitation
+            </button>
+          </div>
+        </div>
+
       </main>
     </div>
   );

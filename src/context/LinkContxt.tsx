@@ -36,7 +36,11 @@ export type AuthUser = {
   companyName?: string;
   location?: string;
   description?: string;
-  notificationPreferences?: { applications: boolean; jobs: boolean; recs: boolean };
+  notificationPreferences?: {
+    applications: boolean;
+    jobs: boolean;
+    recs: boolean;
+  };
   bio?: string;
   skills?: string[];
   experiences?: ExperienceItem[];
@@ -54,6 +58,8 @@ export type AuthUser = {
   classification?: string;
   banner_url?: string;
   deletionRequestedAt?: string;
+  services?: string[];
+  criminalRecordUrl?: string;
 };
 
 export type AuthContextType = {
@@ -94,21 +100,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const start = Date.now();
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); 
-        
-        const res = await fetch(`${API_BASE_URL}/`, { 
-          method: "GET", 
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+        const res = await fetch(`${API_BASE_URL}/`, {
+          method: "GET",
           cache: "no-store",
           headers: {
             "ngrok-skip-browser-warning": "69420",
           },
-          signal: controller.signal 
+          signal: controller.signal,
         });
         clearTimeout(timeoutId);
-        
+
         const latency = Date.now() - start;
-        
-        const isOfflineResponse = !res.ok && ![404, 401, 403].includes(res.status);
+
+        const isOfflineResponse =
+          !res.ok && ![404, 401, 403].includes(res.status);
         if (isOfflineResponse || latency > 5000) {
           failCountRef.current++;
         } else {
@@ -120,7 +127,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         if (failCountRef.current >= 5) {
           setIsBackendOffline(true);
         }
-
       } catch (err: unknown) {
         failCountRef.current++;
         if (failCountRef.current >= 5) {
@@ -153,7 +159,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           }
         } else {
           // Failure here doesn't mean offline, but it's a sign
-          console.warn("API returned error for config, investigating health...");
+          console.warn(
+            "API returned error for config, investigating health...",
+          );
         }
       } catch (err) {
         setIsBackendOffline(true);
@@ -168,71 +176,89 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     initializeApp();
   }, []); // Run ONLY once on mount to avoid infinite loops
 
-  const applyToken = useCallback((decoded: {
-    sub: string;
-    name: string;
-    email: string;
-    avatar: string;
-    phone: string;
-    role?: "user" | "company" | "admin";
-    companyId?: string | number;
-    company_id?: string | number;
-    companyName?: string;
-    company_name?: string;
-    location?: string;
-    description?: string;
-    notificationPreferences?: { applications: boolean; jobs: boolean; recs: boolean };
-    notification_preferences?: { applications: boolean; jobs: boolean; recs: boolean };
-    bio?: string;
-    skills?: string[];
-    experiences?: ExperienceItem[];
-    educations?: EducationItem[];
-    portfolios?: string[];
-    socialLinks?: {
-      instagram?: string;
-      twitter?: string;
-      website?: string;
-      linkedin?: string;
-    };
-    languages?: string[];
-    dob?: string;
-    gender?: string;
-    classification?: string;
-    banner?: string;
-    deletionRequestedAt?: string;
-    adminRole?: "super_admin" | "operation_manager";
-  }) => {
-    setUser({
-      id: decoded.sub,
-      name: decoded.name,
-      email: decoded.email,
-      avatar: decoded.avatar,
-      avatarUrl: decoded.avatar,
-      phone: decoded.phone,
-      role: decoded.role,
-      adminRole: decoded.adminRole,
-      companyId: decoded.companyId || decoded.company_id,
-      companyName: decoded.companyName || decoded.company_name,
-      location: decoded.location,
-      description: decoded.description,
-      notificationPreferences: decoded.notificationPreferences || decoded.notification_preferences,
-      bio: decoded.bio,
-      skills: decoded.skills,
-      experiences: decoded.experiences,
-      educations: decoded.educations,
-      portfolios: decoded.portfolios,
-      socialLinks: decoded.socialLinks,
-      languages: decoded.languages,
-      dob: decoded.dob,
-      gender: decoded.gender,
-      classification: decoded.classification,
-      banner_url: decoded.banner,
-      deletionRequestedAt: decoded.deletionRequestedAt,
-    });
-    const finalRole = decoded.role === "student" ? "user" : (decoded.role || "user");
-    setRole(finalRole as "user" | "company" | "admin");
-    setIsAuthenticated(true);
-  }, []);
+  const applyToken = useCallback(
+    (decoded: {
+      sub: string;
+      name: string;
+      email: string;
+      avatar: string;
+      phone: string;
+      role?: "user" | "company" | "admin";
+      companyId?: string | number;
+      company_id?: string | number;
+      companyName?: string;
+      company_name?: string;
+      location?: string;
+      description?: string;
+      notificationPreferences?: {
+        applications: boolean;
+        jobs: boolean;
+        recs: boolean;
+      };
+      notification_preferences?: {
+        applications: boolean;
+        jobs: boolean;
+        recs: boolean;
+      };
+      bio?: string;
+      skills?: string[];
+      experiences?: ExperienceItem[];
+      educations?: EducationItem[];
+      portfolios?: string[];
+      socialLinks?: {
+        instagram?: string;
+        twitter?: string;
+        website?: string;
+        linkedin?: string;
+      };
+      languages?: string[];
+      dob?: string;
+      gender?: string;
+      classification?: string;
+      banner?: string;
+      deletionRequestedAt?: string;
+      adminRole?: "super_admin" | "operation_manager";
+      services?: string[];
+      criminalRecordUrl?: string;
+      criminal_record_url?: string;
+    }) => {
+      setUser({
+        id: decoded.sub,
+        name: decoded.name,
+        email: decoded.email,
+        avatar: decoded.avatar,
+        avatarUrl: decoded.avatar,
+        phone: decoded.phone,
+        role: decoded.role,
+        adminRole: decoded.adminRole,
+        companyId: decoded.companyId || decoded.company_id,
+        companyName: decoded.companyName || decoded.company_name,
+        location: decoded.location,
+        description: decoded.description,
+        notificationPreferences:
+          decoded.notificationPreferences || decoded.notification_preferences,
+        bio: decoded.bio,
+        skills: decoded.skills,
+        experiences: decoded.experiences,
+        educations: decoded.educations,
+        portfolios: decoded.portfolios,
+        socialLinks: decoded.socialLinks,
+        languages: decoded.languages,
+        dob: decoded.dob,
+        gender: decoded.gender,
+        classification: decoded.classification,
+        banner_url: decoded.banner,
+        deletionRequestedAt: decoded.deletionRequestedAt,
+        services: decoded.services || [],
+        criminalRecordUrl: decoded.criminalRecordUrl || decoded.criminal_record_url,
+      });
+      const finalRole =
+        decoded.role === "student" ? "user" : decoded.role || "user";
+      setRole(finalRole as "user" | "company" | "admin");
+      setIsAuthenticated(true);
+    },
+    [],
+  );
 
   const updateUser = useCallback((newData: Partial<AuthUser>) => {
     setUser((prev) => (prev ? { ...prev, ...newData } : null));
@@ -246,35 +272,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     window.dispatchEvent(new Event("auth-changed"));
   }, []);
 
-  const refreshToken = useCallback(async (currentToken: string): Promise<boolean> => {
-    if (isRefreshing.current) return false;
-    isRefreshing.current = true;
-    try {
-      const res = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${currentToken}`,
-          "ngrok-skip-browser-warning": "69420",
-        },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.access_token) {
-          localStorage.setItem("token", data.access_token);
-          const decoded = jwtDecode(data.access_token) as any;
-          applyToken(decoded);
-          console.log("🔄 Token refreshed successfully");
-          return true;
+  const refreshToken = useCallback(
+    async (currentToken: string): Promise<boolean> => {
+      if (isRefreshing.current) return false;
+      isRefreshing.current = true;
+      try {
+        const res = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${currentToken}`,
+            "ngrok-skip-browser-warning": "69420",
+          },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.access_token) {
+            localStorage.setItem("token", data.access_token);
+            const decoded = jwtDecode(data.access_token) as any;
+            applyToken(decoded);
+            console.log("🔄 Token refreshed successfully");
+            return true;
+          }
         }
+        return false;
+      } catch {
+        return false;
+      } finally {
+        isRefreshing.current = false;
       }
-      return false;
-    } catch {
-      return false;
-    } finally {
-      isRefreshing.current = false;
-    }
-  }, [applyToken]);
+    },
+    [applyToken],
+  );
 
   const checkAuth = useCallback(async () => {
     const token = localStorage.getItem("token");
@@ -288,6 +317,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           avatar: string;
           phone: string;
           role?: "user" | "company" | "admin";
+          adminRole?: "super_admin" | "operation_manager";
         };
 
         // Check if token is expired
@@ -356,12 +386,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
       } else {
-        
       }
 
-      console.log(`📡 [apiFetch] Requesting: ${url}`, { 
+      console.log(`📡 [apiFetch] Requesting: ${url}`, {
         hasToken: !!token,
-        method: options.method || 'GET'
+        method: options.method || "GET",
       });
 
       try {
@@ -370,10 +399,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         const response = await fetch(url, {
           ...options,
           headers,
-          mode: 'cors',
+          mode: "cors",
         });
 
-        console.log(`✅ [apiFetch] Response: ${response.status} ${response.statusText} for ${url}`);
+        console.log(
+          `✅ [apiFetch] Response: ${response.status} ${response.statusText} for ${url}`,
+        );
 
         if (!response.ok) {
           const clonedRes = response.clone();
@@ -386,8 +417,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
 
         if (response.status === 401) {
-          console.warn("🔐 Auth failed (401). Logging out...");
-          logout();
+          // Don't auto-logout for admin-specific endpoints — the Admin panel
+          // handles its own auth guard. Logging out here would kick a normal
+          // user who accidentally visits /admin, or an admin whose token
+          // is still loading.
+          const isAdminEndpoint = url.includes('/admin/');
+          if (!isAdminEndpoint) {
+            console.warn("🔐 Auth failed (401). Logging out...");
+            logout();
+          } else {
+            console.warn("🔐 Admin endpoint returned 401 — not logging out globally.");
+          }
         }
 
         return response;
@@ -396,7 +436,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         throw error;
       }
     },
-    [logout]
+    [logout],
   );
 
   const contextValue = React.useMemo(
@@ -423,13 +463,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       updateUser,
       isBackendOffline,
       isInitialLoading,
-    ]
+    ],
   );
 
   return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 

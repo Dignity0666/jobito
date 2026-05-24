@@ -19,7 +19,7 @@
   --sma-icon-bg-2: #ede9fe;
 }
 
-[data-theme="dark"] {
+:global([data-theme="dark"]) {
   --sma-bg: #0A111E;
   --sma-card: #111C30;
   --sma-text-main: #ffffff;

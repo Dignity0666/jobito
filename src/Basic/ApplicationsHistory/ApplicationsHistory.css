@@ -246,29 +246,35 @@ h4 {
   text-align: center;
 }
 
-.status-in-review {
+.ah-status-badge.applied {
   color: #ffb836;
   border: 1px solid #ffb836;
+  background: rgba(255, 184, 54, 0.1);
 }
 
-.status-shortlisted {
+.ah-status-badge.reviewing {
+  color: #4640de;
+  border: 1px solid #4640de;
+  background: rgba(70, 64, 222, 0.1);
+}
+
+.ah-status-badge.accepted {
   color: #56cdad;
   border: 1px solid #56cdad;
+  background: rgba(86, 205, 173, 0.1);
 }
 
-.status-offered {
-  color: var(--color-primary);
-  border: 1px solid var(--color-primary);
+.ah-status-badge.hired {
+  color: #56cdad;
+  border: 1px solid #56cdad;
+  background: rgba(86, 205, 173, 0.1);
 }
 
-.status-interviewing {
-  color: #ff9b26;
-  border: 1px solid #ff9b26;
-}
-
-.status-unsuitable {
+.ah-status-badge.declined,
+.ah-status-badge.rejected {
   color: #ff4a3d;
   border: 1px solid #ff4a3d;
+  background: rgba(255, 74, 61, 0.1);
 }
 
 .ah-more-btn {

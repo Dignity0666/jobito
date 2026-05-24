@@ -101,3 +101,32 @@
   background-color: #142233;
 }
 
+.leftSection, .rightSection {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logoSection {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .rootUser, .rootcompany {
+    padding: 10px;
+  }
+  .leftSection, .rightSection {
+    gap: 8px;
+  }
+  .logoSection {
+    gap: 4px;
+  }
+  .themeToggleBtn, .langBtn {
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+  }
+}
+

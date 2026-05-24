@@ -153,7 +153,7 @@ const PostWork = () => {
 
       if (response.ok) {
         alert(isEditMode ? t("تم تعديل العمل بنجاح") : t("تم نشر العمل بنجاح"));
-        navigate("/WorkListing");
+        navigate("/JobListing");
       } else {
         alert(t("حدث خطأ أثناء الحفظ"));
       }

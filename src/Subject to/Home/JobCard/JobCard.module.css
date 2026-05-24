@@ -176,5 +176,8 @@
     flex-direction: column;
     gap: 16px;
   }
+  .todayTitle {
+    font-size: 28px;
+  }
 }
 

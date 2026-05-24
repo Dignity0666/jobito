@@ -80,27 +80,6 @@ const ContentManagement: React.FC = () => {
   return (
     <div className={styles.root} dir={language === 'ar' ? 'rtl' : 'ltr'}>
       {/* Header */}
-      <header className={styles.header}>
-        <div>
-          <h1 className={styles.headerTitle}>{t("Hello,")} {authUser?.name || 'Admin'}</h1>
-          <p className={styles.headerSub}>{t("Following Is Your Organization's Performance Summary")}</p>
-        </div>
-
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <button className={styles.btn} style={{ background: 'rgba(255,255,255,0.15)', color: '#fff' }} onClick={toggleTheme}>
-            {isDark ? '☀️' : '🌙'}
-          </button>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255,255,255,0.15)', padding: '6px 14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.2)' }}>
-             <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800 }}>
-               {authUser?.name?.[0]?.toUpperCase()}
-             </div>
-             <div>
-               <div style={{ fontSize: '13px', fontWeight: 700, color: '#fff' }}>{authUser?.name}</div>
-               <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.6)' }}>{authUser?.email}</div>
-             </div>
-          </div>
-        </div>
-      </header>
 
       {/* Body */}
       <div className={styles.body}>

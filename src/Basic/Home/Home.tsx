@@ -1,6 +1,6 @@
 import styles from "./home.module.css";
-
-import heroSectionImage from "../../assets/WhatsApp Image 2026-02-20 at 12.17.19 AM.jpeg";
+import heroSectionImage from "../../assets/hero-transparent-CQiEc3Un.png";
+import herodarktionImage from "../../assets/hero-transparent-CQiEc3Un.png";
 import Testimonial from "../../Subject to/Home/Partners/Partners";
 import JobsSection from "../../Subject to/Home/JobsSection/JobsSection";
 import HiringBanner from "../../Subject to/Home/HiringBanner/HiringBanner";
@@ -9,10 +9,12 @@ import JobsDashboard from "../../Subject to/Home/JobCard/JobCard";
 import { motion } from "framer-motion";
 import { useJobitoAuth } from "../../context/LinkContxt";
 import { useTranslation } from "../../context/translation-context";
+import { useTheme } from "../../context/ThemeContext";
 
 export const Home = () => {
   const { user, isAuthenticated } = useJobitoAuth();
   const { t, language } = useTranslation();
+  const { isDark } = useTheme();
   const isRTL = language === "ar";
   const isTradesman = user?.classification === "tradesman";
 
@@ -50,7 +52,10 @@ export const Home = () => {
           <motion.div className={styles.content} variants={containerVariants}>
             <motion.h1 className={styles.title} variants={itemVariants}>
               {isTradesman ? t("اعرض خدماتك") : t("جد وظيفة")} <br />
-              <span className={styles.purpleText}>{isTradesman ? t("لعملائك") : t("أحلامك")}</span> <br />
+              <span className={styles.purpleText}>
+                {isTradesman ? t("لعملائك") : t("أحلامك")}
+              </span>{" "}
+              <br />
               <span className={styles.blueText}>
                 {isTradesman ? t("بسهولة") : t("اليوم")}
                 <svg className={styles.underline} viewBox="0 0 300 20">
@@ -68,15 +73,14 @@ export const Home = () => {
             </motion.h1>
 
             <motion.p className={styles.description} variants={itemVariants}>
-              {isTradesman 
+              {isTradesman
                 ? t("سوق لمهاراتك وتواصل مع العملاء الذين يبحثون عن خبراتك.")
-                : t("نربط المحترفين الموهوبين بأفضل الفرص في الشرق الأوسط.")
-              }
+                : t("نربط المحترفين الموهوبين بأفضل الفرص في الشرق الأوسط.")}
             </motion.p>
 
             <motion.div
               variants={itemVariants}
-              style={{ marginTop: "20px", marginBottom: "20px",}}
+              style={{ marginTop: "20px", marginBottom: "20px" }}
             >
               <a
                 href="https://play.google.com/store/apps/details?id=com.jobito.app"
@@ -91,7 +95,7 @@ export const Home = () => {
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  <g clip-path="url(#clip0_1532_46193)">
+                  <g clipPath="url(#clip0_1532_46193)">
                     <path
                       d="M14.5601 13.4405L1.01508 26.9855C0.367578 26.373 0.0175781 25.533 0.0175781 24.623V3.37797C0.0175781 2.45047 0.385078 1.61047 1.05008 0.980469L14.5601 13.4405Z"
                       fill="#2196F3"
@@ -121,11 +125,11 @@ export const Home = () => {
             </motion.div>
 
             {!isAuthenticated && (
-              <motion.div 
-                variants={itemVariants} 
-                style={{ 
+              <motion.div
+                variants={itemVariants}
+                style={{
                   zoom: 0.7,
-                  marginTop: "20px"
+                  marginTop: "20px",
                 }}
               >
                 <HiringBanner />
@@ -136,7 +140,7 @@ export const Home = () => {
           </motion.div>
         </div>
         <motion.img
-          src={heroSectionImage}
+          src={isDark ? herodarktionImage : heroSectionImage}
           alt="Hero Section"
           className={styles.heroImage}
           initial={{ opacity: 0, x: isRTL ? -50 : 50 }}
@@ -149,7 +153,7 @@ export const Home = () => {
           }}
         />
       </motion.section>
-      <JobsDashboard /> 
+      <JobsDashboard />
       <section className={styles.companiesSection}>
         <Testimonial />
       </section>

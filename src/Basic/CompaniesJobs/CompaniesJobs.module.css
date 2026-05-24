@@ -1,6 +1,6 @@
 /* ============================================================
    CompaniesJobs.module.css — Midnight Navy / Cobalt Bloom / Tangerine Petal
-   Light-mode redesign — all class names preserved 1-to-1
+   Redesigned to match Contact page style
    ============================================================ */
 
 /* ─── CSS Variables ─── */
@@ -23,44 +23,55 @@
   --radius-sm:   10px;
 }
 
-/* ─── Hero Section ─── */
+/* ─── Hero Section (Contact-style gradient) ─── */
 .heroSection {
   position: relative;
-  background: linear-gradient(135deg, var(--navy) 0%, #152040 55%, #1e2f6e 100%);
-  padding: 96px 24px 80px;
+  background: linear-gradient(135deg, var(--navy) 0%, #1a2550 60%, var(--cobalt-dark) 100%) !important;
+  padding: 100px 24px 80px;
+  text-align: center;
   overflow: hidden;
+  min-height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
+/* Gradient overlay like Contact page */
 .heroSection::before {
   content: '';
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(ellipse at 75% 20%, rgba(255,122,42,0.18) 0%, transparent 55%),
-    radial-gradient(ellipse at 15% 85%, rgba(74,110,209,0.22) 0%, transparent 50%);
+  background: radial-gradient(ellipse at 70% 30%, rgba(255,122,42,0.15) 0%, transparent 60%),
+              radial-gradient(ellipse at 20% 80%, rgba(74,110,209,0.25) 0%, transparent 55%);
   pointer-events: none;
+  z-index: 0;
 }
 
+/* Pattern overlay like Contact page */
 .heroSection::after {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: repeating-linear-gradient(
-    45deg,
-    rgba(255,255,255,0.025) 0px,
-    rgba(255,255,255,0.025) 1px,
-    transparent 1px,
-    transparent 44px
-  );
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,0.03) 0px,
+      rgba(255,255,255,0.03) 1px,
+      transparent 1px,
+      transparent 40px
+    );
   pointer-events: none;
+  z-index: 0;
 }
 
 /* ─── Container ─── */
 .container {
-  max-width: 860px;
+  max-width: 1200px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
+  width: 100%;
 }
 
 /* ─── Hero Content ─── */
@@ -69,15 +80,23 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 20px;
+  gap: 24px;
+  width: 100%;
+  position: relative;
+  z-index: 10;
+}
+
+/* Override RTL alignment to keep centered */
+:global(html[dir="rtl"]) .content {
+  align-items: center;
 }
 
 /* ─── Title ─── */
 .title {
-  font-size: clamp(2rem, 5vw, 3.6rem);
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
   font-weight: 900;
   color: var(--white);
-  margin: 0;
+  margin: 0 0 8px 0;
   line-height: 1.25;
   letter-spacing: -0.5px;
   text-shadow: 0 4px 20px rgba(0,0,0,0.3);
@@ -103,9 +122,9 @@
 
 /* ─── Description ─── */
 .description {
-  font-size: 1.1rem;
-  color: rgba(255,255,255,0.72);
-  margin: 0;
+  font-size: 1.15rem;
+  color: rgba(255,255,255,0.75);
+  margin: 0 0 12px 0;
   max-width: 520px;
   line-height: 1.7;
 }
@@ -114,55 +133,65 @@
 .searchBar {
   display: flex;
   align-items: center;
-  background: var(--white);
+  background: white !important;
   border-radius: 100px;
   padding: 8px 8px 8px 20px;
-  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(74,110,209,0.12);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   width: 100%;
-  max-width: 640px;
+  max-width: 700px;
   gap: 0;
-  margin-top: 8px;
+  transition: all 0.3s ease;
+  z-index: 100;
 }
 
-@media (max-width: 600px) {
-  .searchBar {
-    flex-direction: column;
-    border-radius: var(--radius);
-    padding: 16px;
-    gap: 12px;
-  }
-  .searchBtn {
-    width: 100%;
-    border-radius: var(--radius-sm) !important;
-  }
+.darkSearchBar {
+  background: white !important;
+}
+
+/* Force transparent background for all elements inside search bar to fix theme overrides */
+.searchBar * {
+  background-color: transparent !important;
 }
 
 .inputGroup {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex: 1;
   padding: 0 12px;
+  background: transparent !important;
 }
 
-.inputGroup input {
-  border: none;
-  outline: none;
-  background: transparent;
+.inputGroup input,
+.inputGroup select,
+.inputGroup option {
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
   font-size: 0.95rem;
-  color: var(--text-main);
+  color: #0b1020 !important;
   width: 100%;
   font-family: inherit;
-  direction: rtl;
+  padding: 8px 0;
 }
 
+/* Ensure placeholder is visible */
 .inputGroup input::placeholder {
-  color: var(--taupe);
+  color: #6b6070 !important;
+  opacity: 1 !important;
 }
 
 .icon {
-  color: var(--cobalt);
+  color: #4A6ED1 !important;
   flex-shrink: 0;
+  background: transparent !important;
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(0,0,0,0.1) !important;
+  margin: 0 12px;
 }
 
 .searchBtn {

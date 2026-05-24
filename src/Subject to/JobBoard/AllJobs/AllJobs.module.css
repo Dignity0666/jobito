@@ -212,6 +212,18 @@
   box-shadow: 0 10px 30px rgba(60, 101, 245, 0.08);
 }
 
+.darkJobsPage .jobRow {
+  background: #141b2d;
+  border-color: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.darkJobsPage .jobRow:hover {
+  background: #1c253d;
+  border-color: var(--color-primary);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
 .jobLeft {
   display: flex;
   gap: 24px;
@@ -404,6 +416,23 @@
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(70, 64, 222, 0.4);
   filter: brightness(1.1);
+}
+
+.darkJobsPage .premiumApplyBtn {
+  box-shadow: 0 4px 15px rgba(70, 64, 222, 0.4);
+}
+
+.darkJobsPage .jobRowTags .typePill {
+  background: rgba(86, 205, 173, 0.15);
+  border: 1px solid rgba(86, 205, 173, 0.2);
+}
+
+.darkJobsPage .metaCircle {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.darkJobsPage .companyNameText {
+  color: #ffffff;
 }
 
 .capacityWrapper {

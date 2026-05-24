@@ -2,6 +2,7 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import styles from "./JobDetailsPage.module.css";
 import { ApplyJobModal } from "./ApplyJobModal/ApplyJobModal";
 import { RateTradesmanModal } from "./RateTradesmanModal/RateTradesmanModal";
+import { ReportJobModal } from "./ReportJobModal/ReportJobModal";
 import { TradesmanReviews } from "./TradesmanReviews/TradesmanReviews";
 import { GeneralRatingSection } from "./GeneralRatingSection/GeneralRatingSection";
 import { TradesmanRatingForm } from "./TradesmanRatingForm/TradesmanRatingForm";
@@ -96,6 +97,7 @@ export const JobDetailsPage = () => {
   );
   const [tradesmanRating, setTradesmanRating] = useState<string | null>(null);
   const [isRateModalOpen, setIsRateModalOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   const jobId = location.state?.jobId || 1;
 
@@ -198,6 +200,11 @@ export const JobDetailsPage = () => {
     };
     recordView();
   }, [jobId, apiFetch, isAuthenticated, role]);
+
+  // Report handler
+  const handleReport = () => {
+    setIsReportModalOpen(true);
+  };
 
   const handleDelete = async () => {
     if (!window.confirm(t("هل أنت متأكد من حذف هذه الوظيفة؟"))) return;
@@ -579,6 +586,14 @@ export const JobDetailsPage = () => {
                     <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
                   </svg>
                 </button>
+                {/* Report Button */}
+                <button className={styles.reportBtn} title={t("إبلاغ عن هذا المحتوى")} onClick={handleReport}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                    <line x1="12" y1="9" x2="12" y2="13" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                  </svg>
+                </button>
                 {userApplication ? (
                   <div className={(styles as any).appliedStatusContainer}>
                     <button className={(styles as any).appliedBtn} disabled>
@@ -662,16 +677,36 @@ export const JobDetailsPage = () => {
                     </section>
                   );
                 })}
-              </div>
 
-              {/* Right Column */}
-              <div className={styles.rightCol}>
-                <div className={styles.widget}>
+                {Array.isArray(job.images) && job.images.length > 0 && (
+                  <section className={styles.section} style={{ marginTop: '24px' }}>
+                    <h2>{t("صور العمل")}</h2>
+                    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '16px' }}>
+                      {job.images.map((imgUrl, idx) => (
+                        <img 
+                          key={idx} 
+                          src={imgUrl.startsWith("http") ? imgUrl : `${API_BASE_URL}${imgUrl.startsWith("/") ? "" : "/"}${imgUrl}`} 
+                          alt={`${job.title} - image ${idx + 1}`}
+                          style={{ 
+                            width: '120px', 
+                            height: '120px', 
+                            objectFit: 'cover', 
+                            borderRadius: '12px',
+                            border: '1px solid var(--color-border)'
+                          }} 
+                        />
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {/* Job Info Moved to Left Column */}
+                <div className={styles.widget} style={{ marginTop: '24px' }}>
                   <h2>{t("عن الوظيفة")}</h2>
                   <div className={styles.capacityBox}>
                     <div className={styles.capacityText}>
                       <span className={styles.boldText}>
-                        {job.applications?.length || 0} {t("تم التقديم")}
+                        {job.applications?.filter((app: any) => app.status === 'accepted' || app.status === 'hired').length || 0} {t("تم قبول")}
                       </span>{" "}
                       {t("من")} {job.slotsAvailable || 10} {t("متاح")}
                     </div>
@@ -680,7 +715,7 @@ export const JobDetailsPage = () => {
                         className={styles.progressFill}
                         style={{
                           width: `${Math.min(
-                            ((job.applications?.length || 0) /
+                            (((job.applications?.filter((app: any) => app.status === 'accepted' || app.status === 'hired').length || 0)) /
                               (job.slotsAvailable || 10)) *
                               100,
                             100,
@@ -739,49 +774,80 @@ export const JobDetailsPage = () => {
                               : t(job.jobType || "دوام كامل")}
                       </span>
                     </div>
+
+                    {job.address && (
+                      <div className={styles.roleRow}>
+                        <span className={styles.roleLabel}>{t("الموقع")}</span>
+                        <span className={styles.roleValue}>{t(job.address)}</span>
+                      </div>
+                    )}
+
+                    {Array.isArray(job.workTime) && job.workTime.length > 0 && (
+                      <div className={styles.roleRow}>
+                        <span className={styles.roleLabel}>{t("وقت العمل")}</span>
+                        <span className={styles.roleValue}>{job.workTime.map((d: string) => t(d)).join(" / ")}</span>
+                      </div>
+                    )}
+
                     <div className={styles.roleRow}>
                       <span className={styles.roleLabel}>{t("الراتب")}</span>
                       <span
                         className={styles.roleValue}
-                        dir="ltr"
-                        style={{ display: "inline-block", textAlign: "right" }}
+                        dir={t("ar-EG") === "ar-EG" ? "rtl" : "ltr"}
+                        style={{ display: "inline-block" }}
                       >
-                        {job.salaryMin === job.salaryMax || !job.salaryMax
-                          ? `${job.salaryMin || 0} ${t("EGP")}`
-                          : `${job.salaryMin || 0} - ${job.salaryMax} ${t("EGP")}`}
+                        {(job.classification === "tradesman_work" || job.classification === "خدمات" || !!job.user) && (!job.salaryMin || job.salaryMin === 0)
+                          ? t("قابل للتفاوض")
+                          : job.salaryMin === job.salaryMax || !job.salaryMax
+                            ? `${job.salaryMin || 0} ${t("جنيه مصري")}`
+                            : `${job.salaryMin} - ${job.salaryMax} ${t("جنيه مصري")}`}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className={styles.ratingSection} style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid var(--color-border, #1E2A45)' }}>
+                {/* Rating Section Moved to Left Column */}
+                <div className={styles.widget} style={{ marginTop: '24px' }}>
                   <GeneralRatingSection 
                     companyId={job.company?.companyId || job.company?.company_id}
                     targetUserId={job.user?.userId || job.user?.id}
                     targetName={job.company?.name || job.user?.fullName || job.user?.name || job.title || "المعلن"}
                   />
                 </div>
+              </div>
 
-                <div className={styles.separator}></div>
-
-                {(parsedSections["المهارات"] || parsedSections["Skills"]) && (
+              {/* Right Column */}
+              <div className={styles.rightCol}>
+                {(parsedSections["المهارات"] || parsedSections["Skills"] || (Array.isArray(job.skills) && job.skills.length > 0)) && (
                   <>
                     <div className={styles.widget}>
                       <h2>{t("المهارات")}</h2>
-                      <p
-                        style={{
-                          fontSize: "15px",
-                          color: "var(--color-text-secondary)",
-                          lineHeight: "1.6",
-                          margin: 0,
-                          fontWeight: 500,
-                        }}
-                      >
-                        {t(
-                          parsedSections["المهارات"] ||
-                            parsedSections["Skills"],
-                        )}
-                      </p>
+                      {(parsedSections["المهارات"] || parsedSections["Skills"]) && (
+                        <p
+                          style={{
+                            fontSize: "15px",
+                            color: "var(--color-text-secondary)",
+                            lineHeight: "1.6",
+                            margin: 0,
+                            fontWeight: 500,
+                          }}
+                        >
+                          {t(
+                            parsedSections["المهارات"] ||
+                              parsedSections["Skills"],
+                          )}
+                        </p>
+                      )}
+                      
+                      {Array.isArray(job.skills) && job.skills.length > 0 && (
+                        <div className={styles.tagsContainer} style={{ marginTop: (parsedSections["المهارات"] || parsedSections["Skills"]) ? '16px' : '0' }}>
+                          {job.skills.map((skill, idx) => (
+                            <span key={idx} className={styles.tagYellow}>
+                              {t(skill)}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     {((Array.isArray(job.fieldOfWork) &&
@@ -855,36 +921,38 @@ export const JobDetailsPage = () => {
               </div>
             </div>
 
-            {/* Perks & Benefits */}
-            <div className={styles.perksSection}>
-              <div className={styles.perksHeader}>
-                <h2>{t("المزايا والفوائد")}</h2>
-                <p>{t("نحن نقدم مزايا رائعة لموظفينا.")}</p>
-              </div>
-              <div className={styles.perksGrid}>
-                {job.company?.benefits && job.company.benefits.length > 0 ? (
-                  job.company.benefits.map((benefit: Benefit, idx: number) => (
-                    <div key={idx} className={styles.perkCard}>
-                      <div
-                        className={styles.perkIcon}
-                        style={{
-                          fontSize: "24px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        {benefit.emoji}
+            {/* Perks & Benefits (Hide for Tradesman) */}
+            {!(job?.classification === "tradesman_work" || job?.classification === "خدمات" || job?.classification === "services" || job?.classification === "Services" || !!job?.user) && (
+              <div className={styles.perksSection}>
+                <div className={styles.perksHeader}>
+                  <h2>{t("المزايا والفوائد")}</h2>
+                  <p>{t("نحن نقدم مزايا رائعة لموظفينا.")}</p>
+                </div>
+                <div className={styles.perksGrid}>
+                  {job.company?.benefits && job.company.benefits.length > 0 ? (
+                    job.company.benefits.map((benefit: Benefit, idx: number) => (
+                      <div key={idx} className={styles.perkCard}>
+                        <div
+                          className={styles.perkIcon}
+                          style={{
+                            fontSize: "24px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          {benefit.emoji}
+                        </div>
+                        <h3>{t(benefit.name)}</h3>
+                        <p>{t(benefit.desc)}</p>
                       </div>
-                      <h3>{t(benefit.name)}</h3>
-                      <p>{t(benefit.desc)}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p>{t("لا توجد مزايا محددة.")}</p>
-                )}
+                    ))
+                  ) : (
+                    <p>{t("لا توجد مزايا محددة.")}</p>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
 
 
@@ -1042,6 +1110,14 @@ export const JobDetailsPage = () => {
         onClose={() => setIsRateModalOpen(false)}
         targetUserId={job?.user?.userId || job?.user?.id || ""}
         tradesmanName={job?.user?.fullName || "الصنايعي"}
+      />
+      <ReportJobModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        jobId={jobId}
+        jobTitle={t(job?.title || "")}
+        postOwnerId={job?.user?.userId || job?.user?.id || String(job?.companyId) || ""}
+        postOwnerName={job?.user?.fullName || job?.company?.name || "Jobito"}
       />
     </div>
   );

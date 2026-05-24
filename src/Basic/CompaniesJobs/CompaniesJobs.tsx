@@ -4,6 +4,9 @@ import { Search, Building2, MapPin } from "lucide-react";
 import { motion, type Variants } from "framer-motion";
 import styles from "./CompaniesJobs.module.css";
 import { useTranslation } from "../../context/translation-context";
+import { useTheme } from "../../context/ThemeContext";
+import lightBg from "../../assets/image copy 2.png";
+import darkBg from "../../assets/WhatsApp Image 2026-05-10 at 2.06.47 AM.jpeg";
 
 
 
@@ -57,6 +60,7 @@ const searchBarVariant: Variants = {
 
 const CompaniesJobs = () => {
   const { t, language } = useTranslation();
+  const { isDark } = useTheme();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [location, setLocation] = useState("");
@@ -232,18 +236,14 @@ const CompaniesJobs = () => {
             animate="visible"
           >
             <motion.h1 className={styles.title} variants={fadeUp}>
-              {t("ابحث عن")}{" "}
-              <span className={styles.purpleText}>
-                {t("الشركات التي تحلم بها")}
-              </span>
+              {t("تصفح الشركات")}
             </motion.h1>
-
             <motion.p className={styles.description} variants={fadeUp}>
-              {t("اكتشف أفضل الشركات وبيئات العمل المثالية لمستقبلك المهني.")}
+              {t("اكتشف أفضل الشركات وابحث عن فرصتك المثالية.")}
             </motion.p>
 
             <motion.div
-              className={styles.searchBar}
+              className={`${styles.searchBar} ${isDark ? styles.darkSearchBar : ""}`}
               variants={searchBarVariant}
             >
               <div className={styles.inputGroup}>
@@ -280,7 +280,7 @@ const CompaniesJobs = () => {
                 className={styles.searchBtn}
                 onClick={handleSearchClick}
               >
-                {t("بحث")}
+                {t("Search", "Search")}
               </button>
             </motion.div>
           </motion.div>

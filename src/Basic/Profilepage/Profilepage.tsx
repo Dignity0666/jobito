@@ -3,6 +3,7 @@ import styles from "./Profilepage.module.css";
 import { useJobitoAuth } from "../../context/LinkContxt";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../../context/translation-context";
+import { useToast } from "../../context/ToastContext";
 import type {
   ExperienceItem as Experience,
   EducationItem as Education,
@@ -169,6 +170,10 @@ export default function ProfilePage() {
   const [showMoreEdu, setShowMoreEdu] = useState(false);
   const [ratings, setRatings] = useState<any[]>([]);
 
+  const [showReportInput, setShowReportInput] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [isReporting, setIsReporting] = useState(false);
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -194,6 +199,39 @@ export default function ProfilePage() {
     fetchProfile();
   }, [apiFetch, id]);
 
+  const { showToast } = useToast();
+  const [hasReported, setHasReported] = useState(false);
+
+  const handleReport = async () => {
+    if (!reportReason.trim()) return;
+    setIsReporting(true);
+    try {
+      const res = await apiFetch(`${API_BASE_URL}/content/reports`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reporterUserId: user?.userId || user?.id,
+          postOwnerId: id || user?.userId || user?.id,
+          postOwnerName: profileUser?.fullName || profileUser?.name,
+          contentType: "profile",
+          contentId: id || user?.userId || user?.id,
+          reason: "other",
+          customReason: reportReason,
+        }),
+      });
+      if (res.ok) {
+        showToast(t("تم إرسال البلاغ بنجاح وسيتم مراجعته من قبل الإدارة."));
+        setHasReported(true);
+        setShowReportInput(false);
+        setReportReason("");
+      }
+    } catch (err) {
+      console.error("Failed to submit report", err);
+      showToast(t("حدث خطأ أثناء إرسال البلاغ."), "error");
+    } finally {
+      setIsReporting(false);
+    }
+  };
 
   const profileUser = profile || user;
   
@@ -247,17 +285,75 @@ export default function ProfilePage() {
               </div>
             </div>
             <div className={styles.heroInfo}>
-              <div className={styles.heroName} style={{ display: 'flex', alignItems: 'center' }}>
+              <div className={styles.heroName} style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                 {displayName}
                 {ratings.length > 0 && (
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", marginLeft: "10px", fontSize: "1rem", color: "#FFB020", background: "rgba(255, 176, 32, 0.15)", padding: "2px 8px", borderRadius: "12px", fontWeight: "600" }}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "1rem", color: "#FFB020", background: "rgba(255, 176, 32, 0.15)", padding: "2px 8px", borderRadius: "12px", fontWeight: "600" }}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                     </svg>
                     {(ratings.reduce((sum, r) => sum + r.ratingValue, 0) / ratings.length).toFixed(1)}
                   </span>
                 )}
+
+                {/* Report Button */}
+                {id && (
+                  <button 
+                    onClick={() => !hasReported && setShowReportInput(!showReportInput)}
+                    disabled={hasReported}
+                    style={{ 
+                      background: hasReported ? "rgba(16, 185, 129, 0.1)" : "rgba(220, 38, 38, 0.1)", 
+                      color: hasReported ? "#10b981" : "#dc2626", 
+                      border: `1px solid ${hasReported ? "rgba(16, 185, 129, 0.2)" : "rgba(220, 38, 38, 0.2)"}`, 
+                      padding: "4px 12px", 
+                      borderRadius: "8px", 
+                      fontSize: "0.85rem", 
+                      fontWeight: "600",
+                      cursor: hasReported ? "default" : "pointer",
+                      transition: "all 0.2s"
+                    }}
+                  >
+                    {hasReported ? t("تم الإبلاغ") : t("إبلاغ")}
+                  </button>
+                )}
               </div>
+
+              {/* Report Input Area */}
+              {showReportInput && (
+                <div style={{ marginTop: '10px', width: '100%', maxWidth: '300px' }}>
+                  <input 
+                    type="text" 
+                    value={reportReason}
+                    onChange={(e) => setReportReason(e.target.value)}
+                    placeholder={t("ما هو سبب الإبلاغ؟")}
+                    style={{ 
+                      width: '100%', 
+                      padding: '8px 12px', 
+                      borderRadius: '8px', 
+                      border: '1px solid #ddd', 
+                      fontSize: '0.9rem',
+                      outline: 'none',
+                      marginBottom: '8px'
+                    }}
+                  />
+                  <button 
+                    onClick={handleReport}
+                    disabled={isReporting || !reportReason.trim()}
+                    style={{ 
+                      background: "#dc2626", 
+                      color: "#fff", 
+                      border: "none", 
+                      padding: "6px 16px", 
+                      borderRadius: "6px", 
+                      fontSize: "0.85rem", 
+                      cursor: "pointer",
+                      opacity: (isReporting || !reportReason.trim()) ? 0.6 : 1
+                    }}
+                  >
+                    {isReporting ? t("جاري الإرسال...") : t("إرسال البلاغ")}
+                  </button>
+                </div>
+              )}
               <div className={styles.heroRole}>
                 {profileUser?.role === "company"
                   ? t("حساب شركة")

@@ -1,10 +1,10 @@
 .root {
-  font-family: 'DM Sans', 'Segoe UI', sans-serif;
   background-color: var(--color-bg);
-  min-height: 100vh;
+  height: 88vh;
   color: var(--color-text);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .header {
@@ -146,10 +146,11 @@
   color: #fff;
   font-size: 14px;
   font-weight: 700;
-  padding: 10px 20px;
+  padding: 10px 24px;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
+  margin: 12px 16px;
 }
 
 .sysBtn:hover {
@@ -161,20 +162,54 @@
   flex: 1;
   display: flex;
   gap: 24px;
-  padding: 24px 32px;
+  padding: 20px 32px;
   background-color: var(--color-bg-secondary);
+  overflow: hidden;
+  height: 0; /* Important for flex child to respect parent height */
+}
+
+:global([dir="rtl"]) .body {
+  flex-direction: row-reverse;
 }
 
 .leftPanel {
   width: 320px;
+  height: 100%;
   flex-shrink: 0;
   background-color: var(--color-card-bg);
   border-radius: 20px;
   border: 1px solid var(--color-border);
-  overflow: hidden;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   box-shadow: var(--shadow-md);
+}
+
+.sidebarTabs {
+  display: flex;
+  background-color: var(--color-bg-tertiary);
+  border-bottom: 1px solid var(--color-border-light);
+  padding: 4px;
+  gap: 4px;
+}
+
+.sideTab {
+  flex: 1;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.sideTabActive {
+  background-color: var(--color-card-bg);
+  color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .panelHeader {
@@ -191,6 +226,11 @@
 .ticketList {
   flex: 1;
   overflow-y: auto;
+  scrollbar-width: none; /* Hide scrollbar Firefox */
+}
+
+.ticketList::-webkit-scrollbar {
+  display: none; /* Hide scrollbar Chrome/Safari */
 }
 
 .ticketItem {
@@ -198,7 +238,7 @@
   border-bottom: 1px solid var(--color-border-light);
   cursor: pointer;
   transition: all 0.2s ease;
-  border-left: 4px solid transparent;
+  border-inline-start: 4px solid transparent;
 }
 
 .ticketItem:hover {
@@ -207,11 +247,47 @@
 
 .activeTicket {
   background-color: var(--color-primary-light) !important;
-  border-left: 4px solid var(--color-primary);
+  border-inline-start: 4px solid var(--color-primary) !important;
 }
 
 .unreadTicket {
-  border-left: 4px solid var(--color-accent);
+  border-inline-start: 4px solid var(--color-accent) !important;
+}
+
+.unreadDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.ticketSubject {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 6px;
+}
+
+.adminAvatarSmall {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--gradient-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.adminRoleLabel {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  text-transform: capitalize;
 }
 
 .ticketTitle {
@@ -230,6 +306,7 @@
 
 .rightPanel {
   flex: 1;
+  height: 100%;
   background-color: var(--color-card-bg);
   border-radius: 20px;
   border: 1px solid var(--color-border);
@@ -295,6 +372,11 @@
   flex-direction: column;
   gap: 16px;
   background-color: var(--color-bg-secondary);
+  scrollbar-width: none;
+}
+
+.messages::-webkit-scrollbar {
+  display: none;
 }
 
 .messageRow {
