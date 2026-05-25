@@ -15,10 +15,6 @@
   gap: 60px;
 }
 
-[dir="rtl"] .heroContainer {
-  flex-direction: row-reverse;
-}
-
 .content {
   flex: 1.1;
   max-width: 650px;
