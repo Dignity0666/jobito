@@ -307,6 +307,7 @@ export default function CompleteProfile() {
       }
 
       localStorage.removeItem("signup_classification");
+      localStorage.removeItem("isNewUser");
       navigate("/");
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Unknown error occurred";

@@ -163,13 +163,21 @@ function AppContent() {
   const mainLayoutRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // If logged in as a normal user, but classification is missing, force redirection to complete-profile
-    if (isAuthenticated && role === "user" && !classification) {
+    // If logged in as a normal user, but profile is incomplete (missing classification, dob, phone, or gender), force redirection to complete-profile
+    const isProfileIncomplete = isAuthenticated && role === "user" && (
+      !classification ||
+      !user?.dob ||
+      !user?.phone ||
+      !user?.gender ||
+      localStorage.getItem("isNewUser") === "true"
+    );
+
+    if (isProfileIncomplete) {
       if (location.pathname.toLowerCase() !== "/complete-profile") {
         navigate("/complete-profile", { replace: true });
       }
     }
-  }, [isAuthenticated, role, classification, location.pathname, navigate]);
+  }, [isAuthenticated, role, classification, user, location.pathname, navigate]);
 
   useEffect(() => {
     setShowHeader(!shouldHide);
