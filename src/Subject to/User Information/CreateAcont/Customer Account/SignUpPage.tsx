@@ -104,6 +104,7 @@ export const SignUpPage: React.FC = () => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Registration failed");
       setSuccess(true);
+      setVerifyMethod("code");
     } catch (err: unknown) {
       clearTimeout(timeoutId);
       if (err instanceof Error && err.name === "AbortError") {
@@ -256,9 +257,12 @@ export const SignUpPage: React.FC = () => {
                   </form>
                    <button
                     className={Style.backBtn}
-                    onClick={() => setVerifyMethod(null)}
+                    onClick={() => {
+                      setSuccess(false);
+                      setVerifyMethod(null);
+                    }}
                   >
-                    {t("العودة للخيارات")}
+                    {t("العودة لإنشاء الحساب")}
                   </button>
                 </div>
               ) : (
