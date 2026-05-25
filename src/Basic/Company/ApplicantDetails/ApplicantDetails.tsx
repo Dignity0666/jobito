@@ -784,7 +784,7 @@ export default function ApplicantDetails() {
                 <div className="main-divider" />
                 <div className="main-section">
                   <h3 className="section-title">{t("تقييم المتقدم")}</h3>
-                  <div style={{ background: 'var(--bg-card, #fff)', padding: '1.5rem', borderRadius: '16px', border: '1px solid var(--border, #eee)' }}>
+                  <div style={{ background: 'var(--color-card-bg)', padding: '1.5rem', borderRadius: '16px', border: '1px solid var(--color-border)' }}>
                     <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
                       {[1, 2, 3, 4, 5].map((star) => (
                         <svg
@@ -804,7 +804,7 @@ export default function ApplicantDetails() {
                       value={comment}
                       onChange={(e) => setComment(e.target.value)}
                       placeholder={t("اكتب رأيك في المتقدم هنا...")}
-                      style={{ width: '100%', minHeight: '80px', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border, #eee)', marginBottom: '1rem', fontFamily: 'inherit', resize: 'vertical' }}
+                      style={{ width: '100%', minHeight: '80px', padding: '1rem', borderRadius: '8px', border: '1px solid var(--color-border)', marginBottom: '1rem', fontFamily: 'inherit', resize: 'vertical' }}
                     />
                     <button
                       onClick={submitRating}
