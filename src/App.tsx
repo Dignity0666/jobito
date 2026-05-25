@@ -5,6 +5,7 @@ import {
   Route,
   useLocation,
   Navigate,
+  useNavigate,
 } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { useState, useEffect, useRef } from "react";
@@ -148,17 +149,27 @@ const SplashScreen = () => (
 );
 
 function AppContent() {
-  const { role, user, isBackendOffline, isInitialLoading } =
+  const { role, user, isAuthenticated, isBackendOffline, isInitialLoading } =
     useJobitoAuth();
   const classification = user?.classification;
   const location = useLocation();
+  const navigate = useNavigate();
   const [showHeader, setShowHeader] = useState(true);
 
   const hideLayoutPaths = ["/user-information", "/complete-profile", "/admin"];
   const currentPath = location.pathname.toLowerCase();
   const shouldHide = hideLayoutPaths.includes(currentPath);
-
+  
   const mainLayoutRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // If logged in as a normal user, but classification is missing, force redirection to complete-profile
+    if (isAuthenticated && role === "user" && !classification) {
+      if (location.pathname.toLowerCase() !== "/complete-profile") {
+        navigate("/complete-profile", { replace: true });
+      }
+    }
+  }, [isAuthenticated, role, classification, location.pathname, navigate]);
 
   useEffect(() => {
     setShowHeader(!shouldHide);
