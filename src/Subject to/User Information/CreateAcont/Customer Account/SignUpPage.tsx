@@ -83,6 +83,9 @@ export const SignUpPage: React.FC = () => {
       return;
     }
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
+
     try {
       setIsSigningUp(true);
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
@@ -94,13 +97,20 @@ export const SignUpPage: React.FC = () => {
           password: formData.password,
           role: "student",
         }),
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Registration failed");
       setSuccess(true);
     } catch (err: any) {
-      setFormError(err.message);
+      clearTimeout(timeoutId);
+      if (err.name === "AbortError") {
+        setFormError(t("استغرق الطلب وقتاً طويلاً. يرجى المحاولة مرة أخرى."));
+      } else {
+        setFormError(err.message);
+      }
     } finally {
       setIsSigningUp(false);
     }
@@ -109,20 +119,32 @@ export const SignUpPage: React.FC = () => {
   const handleVerifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
+
     try {
       setIsVerifying(true);
       const res = await fetch(`${API_BASE_URL}/auth/verify-email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: formData.email, code: verificationCode }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Verification failed");
       localStorage.setItem("isNewUser", "true");
       setVerifiedStatus("success");
       setSuccess(false);
     } catch (err: any) {
-      setFormError(err.message);
+      clearTimeout(timeoutId);
+      if (err.name === "AbortError") {
+        setFormError(t("استغرق الطلب وقتاً طويلاً. يرجى المحاولة مرة أخرى."));
+      } else {
+        setFormError(err.message);
+      }
     } finally {
       setIsVerifying(false);
     }

@@ -789,7 +789,11 @@ export const TRANSLATIONS: Record<string, { ar: string; en: string }> = {
   "تدريب": { ar: "تدريب", en: "Internship" },
   "Internship": { ar: "تدريب", en: "Internship" },
   "عقد": { ar: "عقد", en: "Contract" },
-  "Contract": { ar: "عقد", en: "Contract" }
+  "Contract": { ar: "عقد", en: "Contract" },
+  "استغرق الطلب وقتاً طويلاً. يرجى المحاولة مرة أخرى.": {
+    ar: "استغرق الطلب وقتاً طويلاً. يرجى المحاولة مرة أخرى.",
+    en: "Request took too long. Please try again."
+  }
 };
 
 
