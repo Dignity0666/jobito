@@ -1,4 +1,5 @@
 
+// Trigger automatic deployment after enabling Vercel auto-assign custom domains
 import styles from "./home.module.css";
 import heroSectionImage from "../../assets/hero-transparent-CQiEc3Un.png";
 import herodarktionImage from "../../assets/hero-transparent-CQiEc3Un.png";
