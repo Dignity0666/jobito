@@ -144,7 +144,7 @@ export const Home = () => {
             src={isDark ? herodarktionImage : heroSectionImage}
             alt="Hero Section"
             className={styles.heroImage}
-            initial={{ opacity: 0, x: isRTL ? -50 : 50 }}
+            initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             animate={{ y: [0, -15, 0] }}
             transition={{
