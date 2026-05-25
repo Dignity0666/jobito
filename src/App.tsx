@@ -163,10 +163,9 @@ function AppContent() {
   const mainLayoutRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // If logged in as a normal user, but profile is incomplete (missing classification, dob, phone, or gender), force redirection to complete-profile
+    // If logged in as a normal user, but profile is incomplete (missing classification, phone, or gender), force redirection to complete-profile
     const isProfileIncomplete = isAuthenticated && role === "user" && (
       !classification ||
-      !user?.dob ||
       !user?.phone ||
       !user?.gender ||
       localStorage.getItem("isNewUser") === "true"
