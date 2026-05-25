@@ -1,27 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { useJobitoAuth } from '../../../context/LinkContxt';
+import { useTranslation } from '../../../context/translation-context';
+import { useToast } from '../../../context/ToastContext';
 import { API_BASE_URL } from '../../../services/api';
+import { 
+  Search, 
+  MessageSquare, 
+  AlertTriangle, 
+  Pause, 
+  Ban,
+  Play
+} from 'lucide-react';
 import styles from './UserManagement.module.css';
 
-const TABS = ["User Management", "Company Review", "Content Management", "Technical Support"];
-const VIEWS = ["Table", "Add Manager", "Warning", "Suspension", "Block"];
+type ModalType = "warn" | "suspend" | "block" | null;
 
-type ModalType = "warn" | "suspend" | "block" | "addManager" | null;
-
-// ── Sub-components ─────────────────────────────────────────────
 
 function ActionBadge({ action }: { action: string }) {
-  const cls = action === "Log Out" ? styles.badgeLogout : action === "Delete Account" ? styles.badgeDelete : styles.badgeLogin;
-  const icon = action === "Log Out" ? "↗" : action === "Delete Account" ? "✕" : "↙";
-  return <span className={`${styles.actionBadge} ${cls}`}>{icon} {action}</span>;
+  const { t } = useTranslation();
+  const isNegative = action === "Delete Account" || action === "Inactive" || action === "Suspended" || action === "Banned";
+  const isNeutral = action === "Log Out" || action === "Warned";
+  const cls = isNegative ? styles.badgeDelete : isNeutral ? styles.badgeLogout : styles.badgeLogin;
+  const icon = action === "Log Out" ? "↗" : isNegative ? "✕" : "↙";
+
+  return <span className={`${styles.actionBadge} ${cls}`}>{icon} {t(action)}</span>;
 }
 
 function AccountChip({ type }: { type: string }) {
+  const { t } = useTranslation();
   const cls = type.includes("Student") ? styles.chipStudent : styles.chipBusiness;
-  return <span className={`${styles.accountChip} ${cls}`}>{type}</span>;
+
+  return <span className={`${styles.accountChip} ${cls}`}>{t(type)}</span>;
 }
 
 function RatingDisplay({ r }: { r: number }) {
+  const { t } = useTranslation();
   const cls = r >= 4 ? styles.ratingHigh : r >= 3 ? styles.ratingMid : styles.ratingLow;
   return <span className={`${styles.rating} ${cls}`}>{r.toFixed(1)}/5.0 <span className={styles.star}>★</span></span>;
 }
@@ -102,50 +115,25 @@ const BlockModal = ({ user, onClose, onConfirm }: { user: any; onClose: () => vo
         </div>
       </div>
       <div className={styles.modalFooter}>
-        <button className={styles.btnCancel} onClick={onClose}>Cancel</button>
-        <button className={`${styles.btnConfirm} ${styles.danger}`} onClick={() => onConfirm(reason)}>⚡ Confirm & Execute</button>
+        <button className={styles.btnCancel} onClick={onClose}>{t("Cancel")}</button>
+        <button className={`${styles.btnConfirm} ${styles.danger}`} onClick={() => onConfirm(reason)}>⚡ {t("Confirm & Execute")}</button>
       </div>
     </div>
   </div>
 )};
 
-const AddManagerModal = ({ onClose }: { onClose: () => void }) => (
-  <div className={styles.overlay} onClick={onClose}>
-    <div className={styles.modal} onClick={e => e.stopPropagation()}>
-      <div className={`${styles.accentBar} ${styles.accentCobalt}`} />
-      <div className={styles.modalHeader}>
-        <h2>👤 Request To Add An Operations Manager</h2>
-        <p>As An Operations Manager, You Can Nominate A Colleague To Assist You. This Request Will Be Sent To The System Administrator For Review And Approval.</p>
-      </div>
-      <div className={styles.modalBody}>
-        <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>Candidate name</label>
-          <input className={styles.fieldInput} defaultValue="Khaled Omar" />
-        </div>
-        <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>Candidate email address</label>
-          <input className={styles.fieldInput} type="email" defaultValue="khaled@email.com" />
-        </div>
-        <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>Reason for request (optional)</label>
-          <textarea className={styles.fieldInput} placeholder="Example: Increased workload in the company review department." />
-        </div>
-      </div>
-      <div className={styles.modalFooter}>
-        <button className={styles.btnCancel} onClick={onClose}>Cancel</button>
-        <button className={`${styles.btnConfirm} ${styles.cobalt}`}>⚡ Confirm & Execute</button>
-      </div>
-    </div>
-  </div>
-);
 
 // ── Main Component ────────────────────────────────────────────────
 
-const UserManagement: React.FC = () => {
+interface UserManagementProps {
+  onGoToSupport?: () => void;
+}
+
+const UserManagement: React.FC<UserManagementProps> = ({ onGoToSupport }) => {
   const { apiFetch, user: authUser } = useJobitoAuth();
-  const [activeTab, setActiveTab] = useState("User Management");
+  const { t, language } = useTranslation();
+  const { showToast } = useToast();
   const [modal, setModal] = useState<{ type: ModalType; user: any } | null>(null);
-  const [demoView, setDemoView] = useState("Table");
   const [search, setSearch] = useState("");
   const [users, setUsers] = useState<any[]>([]);
 
@@ -163,7 +151,7 @@ const UserManagement: React.FC = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [apiFetch]);
+  }, [apiFetch, language]);
 
   const executeAction = async (targetUserId: string, actionType: string, reason: string) => {
     try {
@@ -173,7 +161,7 @@ const UserManagement: React.FC = () => {
         body: JSON.stringify({ targetUserId, actionType, reason })
       });
       if (res.ok) {
-        alert(`Action ${actionType} executed successfully`);
+        showToast(t("Action executed successfully"));
         setModal(null);
         fetchUsers();
       }
@@ -187,75 +175,30 @@ const UserManagement: React.FC = () => {
     u.contactInfo?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const demoUser = users[0] || { name: 'Demo User' };
-  const forcedModal: ModalType = demoView === "Add Manager" ? "addManager"
-    : demoView === "Warning"    ? "warn"
-    : demoView === "Suspension" ? "suspend"
-    : demoView === "Block"      ? "block"
-    : null;
 
   return (
     <div className={styles.container}>
       {/* Header */}
-      <header className={styles.header}>
-        <div className={styles.headerLeft}>
-          <h1>{t("Hello,")} {user?.name || 'Admin'}</h1>
-          <p>Following Is Your Organization's Performance Summary</p>
-        </div>
-        <div className={styles.headerRight}>
-          <button className={styles.iconBtn} title="Dark mode">🌙</button>
-          <button className={styles.iconBtn} title="Notifications">🔔</button>
-          <div className={styles.avatarChip}>
-            <div className={styles.avatar}>{authUser?.name?.[0]?.toUpperCase() || 'A'}</div>
-            <div className={styles.avatarInfo}>
-              <div className={styles.avatarName}>{authUser?.name || 'Admin'} ▾</div>
-              <div className={styles.avatarEmail}>{authUser?.email || ''}</div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Nav */}
-      <nav className={styles.navBar}>
-        <div className={styles.navTabs}>
-          {/* Tabs removed to use global Admin navigation */}
-        </div>
-        <button className={styles.sysReqBtn} onClick={() => { setDemoView("Add Manager"); }}>
-          + System request
-        </button>
-      </nav>
-
-      {/* Demo bar */}
-      <div className={styles.demoBar}>
-        <span>Preview:</span>
-        {VIEWS.map(v => (
-          <button key={v} className={`${styles.demoBtn} ${demoView === v ? styles.active : ""}`}
-            onClick={() => setDemoView(v)}>{v}</button>
-        ))}
-      </div>
 
       <div className={styles.toolbar}>
         <div className={styles.searchBox}>
-          <span style={{color: '#8896B0'}}>🔍</span>
-          <input placeholder="search user name or email..." value={search} onChange={e => setSearch(e.target.value)} />
+          <Search size={16} color="#8896B0" />
+          <input placeholder={t("search user name or email...")} value={search} onChange={e => setSearch(e.target.value)} />
         </div>
-        <div className={styles.filters}>
-          <div className={styles.filterSelect}>All States ▾</div>
-          <div className={styles.filterSelect}>All Categories ▾</div>
-        </div>
+
       </div>
 
       <div className={styles.tableCard}>
         <table className={styles.table}>
           <thead className={styles.thead}>
             <tr>
-              <th className={styles.th}>Name</th>
-              <th className={styles.th}>Info</th>
-              <th className={styles.th}>Action Type</th>
-              <th className={styles.th}>Account Type</th>
-              <th className={styles.th}>Status & Rating</th>
-              <th className={styles.th}>Quick Actions</th>
-              <th className={styles.th}>Contact</th>
+              <th className={styles.th}>{t("Name")}</th>
+              <th className={styles.th}>{t("Info")}</th>
+              <th className={styles.th}>{t("Action Type")}</th>
+              <th className={styles.th}>{t("Account Type")}</th>
+              <th className={styles.th}>{t("Status & Rating")}</th>
+              <th className={styles.th}>{t("Quick Actions")}</th>
+              <th className={styles.th}>{t("Contact")}</th>
             </tr>
           </thead>
           <tbody>
@@ -268,13 +211,34 @@ const UserManagement: React.FC = () => {
                 <td className={styles.td}><RatingDisplay r={u.rating?.average || 0} /></td>
                 <td className={styles.td}>
                   <div className={styles.quickActions}>
-                    <button className={`${styles.qaBtn} ${styles.qaWarn}`} title="Warn" onClick={() => setModal({type: "warn", user: u})}>⚠</button>
-                    <button className={`${styles.qaBtn} ${styles.qaSusp}`} title="Suspend" onClick={() => setModal({type: "suspend", user: u})}>⏸</button>
-                    <button className={`${styles.qaBtn} ${styles.qaBlock}`} title="Block" onClick={() => setModal({type: "block", user: u})}>🚫</button>
+                    <button className={`${styles.qaBtn} ${styles.qaBlock}`} title={t("Block")} onClick={() => setModal({type: "block", user: u})}>
+                      <Ban size={14} />
+                    </button>
+                    <button 
+                      className={`${styles.qaBtn} ${styles.qaSusp}`} 
+                      title={u.status === 'suspended' ? t("Unsuspend") : t("Suspend")} 
+                      onClick={() => {
+                        if (u.status === 'suspended') {
+                          if (window.confirm(t("Are you sure you want to unsuspend this user?"))) {
+                            executeAction(u.userId, 'unsuspend', t('Manual unsuspend by admin'));
+                          }
+                        } else {
+                          setModal({type: "suspend", user: u});
+                        }
+                      }}
+                    >
+                      {u.status === 'suspended' ? <Play size={14} /> : <Pause size={14} />}
+                    </button>
+                    <button className={`${styles.qaBtn} ${styles.qaWarn}`} title={t("Warn")} onClick={() => setModal({type: "warn", user: u})}>
+                      <AlertTriangle size={14} />
+                    </button>
                   </div>
                 </td>
                 <td className={styles.td}>
-                  <button className={styles.msgBtn}>💬 Messages</button>
+                  <button className={styles.msgBtn} onClick={onGoToSupport}>
+                    <MessageSquare size={14} />
+                    {t("Messages")}
+                  </button>
                 </td>
               </tr>
             ))}
@@ -286,11 +250,6 @@ const UserManagement: React.FC = () => {
       {modal?.type === "warn"    && <WarningModal    user={modal.user} onClose={() => setModal(null)} onConfirm={(r) => executeAction(modal.user.userId, 'warning', r)} />}
       {modal?.type === "suspend" && <SuspensionModal user={modal.user} onClose={() => setModal(null)} onConfirm={(r) => executeAction(modal.user.userId, 'suspend', r)} />}
       {modal?.type === "block"   && <BlockModal      user={modal.user} onClose={() => setModal(null)} onConfirm={(r) => executeAction(modal.user.userId, 'ban', r)} />}
-
-      {!modal && forcedModal === "addManager" && <AddManagerModal onClose={() => setDemoView("Table")} />}
-      {!modal && forcedModal === "warn"       && <WarningModal    user={demoUser} onClose={() => setDemoView("Table")} onConfirm={(r) => executeAction(demoUser.userId, 'warning', r)} />}
-      {!modal && forcedModal === "suspend"    && <SuspensionModal user={demoUser} onClose={() => setDemoView("Table")} onConfirm={(r) => executeAction(demoUser.userId, 'suspend', r)} />}
-      {!modal && forcedModal === "block"      && <BlockModal      user={demoUser} onClose={() => setDemoView("Table")} onConfirm={(r) => executeAction(demoUser.userId, 'ban', r)} />}
     </div>
   );
 };

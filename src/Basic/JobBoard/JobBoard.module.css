@@ -5,133 +5,99 @@
 
 /* ─── CSS Variables ─── */
 :root {
-  --navy:        #0B1020;
-  --cobalt:      #4A6ED1;
+  --navy: #0b1020;
+  --cobalt: #4a6ed1;
   --cobalt-dark: #2f4ac7;
-  --tangerine:   #FF7A2A;
-  --taupe:       #B59A90;
+  --tangerine: #ff7a2a;
+  --taupe: #b59a90;
   --taupe-light: #f0e9e5;
-  --white:       #ffffff;
-  --off-white:   #f7f4f2;
-  --text-main:   #0B1020;
-  --text-muted:  #6b6070;
-  --shadow-sm:   0 2px 8px rgba(11,16,32,0.08);
-  --shadow-md:   0 6px 24px rgba(11,16,32,0.12);
-  --shadow-lg:   0 16px 48px rgba(11,16,32,0.18);
-  --radius:      16px;
-  --radius-sm:   10px;
+  --white: #ffffff;
+  --off-white: #f7f4f2;
+  --text-main: #0b1020;
+  --text-muted: #6b6070;
+  --shadow-sm: 0 2px 8px rgba(11, 16, 32, 0.08);
+  --shadow-md: 0 6px 24px rgba(11, 16, 32, 0.12);
+  --shadow-lg: 0 16px 48px rgba(11, 16, 32, 0.18);
+  --radius: 16px;
+  --radius-sm: 10px;
 }
 
 /* ─── Page ─── */
 .page {
   min-height: 100vh;
-  background-color: var(--off-white);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: var(--text-main);
 }
 
 /* ─── Hero Section ─── */
 .heroSection {
   position: relative;
-  background: linear-gradient(135deg, var(--navy) 0%, #152040 55%, #1e2f6e 100%);
-  padding: 96px 24px 80px;
+  padding: 200px 80px 100px; /* More top and side padding */
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 500px;
+  background-size: cover;
+  background-position: center;
 }
 
-/* Decorative radial glows */
-.heroSection::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 75% 20%, rgba(255,122,42,0.18) 0%, transparent 55%),
-    radial-gradient(ellipse at 15% 85%, rgba(74,110,209,0.22) 0%, transparent 50%);
-  pointer-events: none;
-}
-
-/* Subtle diagonal grid pattern */
-.heroSection::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: repeating-linear-gradient(
-    45deg,
-    rgba(255,255,255,0.025) 0px,
-    rgba(255,255,255,0.025) 1px,
-    transparent 1px,
-    transparent 44px
-  );
-  pointer-events: none;
-}
-
-/* ─── Container ─── */
 .container {
-  max-width: 860px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 1200px;
+  margin-left: 0 !important;
+  margin-right: auto !important;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
-/* ─── Hero Content ─── */
 .content {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 20px;
+  align-items: flex-start; /* Content starts at left */
+  text-align: left;
+  width: 100%;
+  max-width: 1200px;
 }
 
-/* ─── Title ─── */
-.title {
-  font-size: clamp(2rem, 5vw, 3.6rem);
-  font-weight: 900;
-  color: var(--white);
-  margin: 0;
-  line-height: 1.25;
-  letter-spacing: -0.5px;
-  text-shadow: 0 4px 20px rgba(0,0,0,0.3);
-}
-
-/* The accent span (was .purpleText — now Tangerine Petal) */
-.purpleText {
-  color: var(--tangerine);
-  position: relative;
-  display: inline-block;
-}
-
-.purpleText::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  right: 0;
-  left: 0;
-  height: 3px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, var(--tangerine), #ffaa60);
-  opacity: 0.7;
-}
-
-/* ─── Description ─── */
-.description {
-  font-size: 1.1rem;
-  color: rgba(255,255,255,0.72);
-  margin: 0;
-  max-width: 520px;
-  line-height: 1.7;
-}
+/* ... existing ... */
 
 /* ─── Search Bar ─── */
 .searchBar {
   display: flex;
   align-items: center;
-  background: var(--white);
+  background: var(--color-card-bg, #ffffff);
+  color: var(--color-text, #0b1020);
   border-radius: 100px;
   padding: 8px 8px 8px 20px;
-  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(74,110,209,0.12);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15); /* Stronger shadow */
   width: 100%;
-  max-width: 720px;
+  max-width: 600px; /* Narrower to stay on the left */
   gap: 0;
-  margin-top: 8px;
+  margin-top: 20px;
+  position: relative;
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+@keyframes floating {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.darkSearchBar {
+  background: #1e253a !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 @media (max-width: 640px) {
@@ -163,30 +129,55 @@
 .inputGroup select {
   border: none;
   outline: none;
-  background: transparent;
+  background: transparent; /* Blend with parent */
   font-size: 0.95rem;
-  color: var(--text-main);
+  color: inherit; /* Inherit from searchBar or darkSearchBar */
   width: 100%;
   font-family: inherit;
+  padding: 10px 15px;
+  border-radius: 12px;
   direction: rtl;
+  transition: all 0.3s ease;
+}
+
+.darkSearchBar .inputGroup input,
+.darkSearchBar .inputGroup select {
+  background: transparent !important;
+  color: var(--white) !important;
+}
+
+.inputGroup input::placeholder {
+  color: #a0aec0;
+}
+
+.darkSearchBar .inputGroup input::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
 }
 
 .inputGroup select {
   cursor: pointer;
 }
 
-.inputGroup input::placeholder {
-  color: var(--taupe);
-}
+/* Handled above */
 
 .inputGroup option {
-  color: var(--text-main);
+  color: var(--color-text);
+  background: var(--color-card-bg);
+}
+
+.darkSearchBar .inputGroup option {
+  color: var(--white);
+  background: #1e253a;
 }
 
 /* ─── Search Icon ─── */
 .icon {
-  color: var(--cobalt);
+  color: var(--tangerine, #ff7a2a); /* Match the orange in the image */
   flex-shrink: 0;
+}
+
+.darkSearchBar .icon {
+  color: var(--tangerine, #ff7a2a) !important;
 }
 
 /* ─── Divider ─── */
@@ -208,15 +199,16 @@
   font-weight: 800;
   cursor: pointer;
   white-space: nowrap;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  box-shadow: 0 4px 16px rgba(255,122,42,0.45);
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(255, 122, 42, 0.3);
   font-family: inherit;
   flex-shrink: 0;
+  text-transform: lowercase; /* Matching the image "discussion" style */
 }
 
 .searchBtn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(255,122,42,0.55);
+  box-shadow: 0 8px 24px rgba(255, 122, 42, 0.55);
 }
 
 .searchBtn:active {
@@ -229,4 +221,4 @@
   margin: 48px auto 80px;
   padding: 0 24px;
   background: transparent;
-} 
+}

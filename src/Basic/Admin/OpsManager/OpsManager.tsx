@@ -1,454 +1,411 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useJobitoAuth } from '../../../context/LinkContxt';
+import { useTranslation } from "../../../context/translation-context";
 import { API_BASE_URL } from '../../../services/api';
 import { 
-  Users, 
-  Building2, 
-  AlertTriangle, 
-  Headset, 
-  Search, 
-  Filter, 
-  Plus, 
-  ExternalLink, 
-  Trash2, 
-  Send,
-  X,
-  FileText,
+  Activity,
+  Users,
+  Building2,
   ShieldCheck,
-  Ban
+  LogIn,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  TrendingUp,
+  BarChart3,
+  FileText,
+  AlertTriangle
 } from 'lucide-react';
 import styles from './OpsManager.module.css';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
-type Tab = 'users' | 'companies' | 'content' | 'support';
+interface ActivityLog {
+  logId: number;
+  adminName: string;
+  adminEmail: string;
+  actionType: string;
+  targetEntity: string;
+  targetId: string | null;
+  description: string;
+  createdAt: string;
+}
+
+interface ChartPoint {
+  hour: string;
+  count: number;
+}
+
+interface ActionBreakdown {
+  action_type: string;
+  count: string;
+}
+
+// ─── Helper Functions ────────────────────────────────────────────────────────
+function getEntityClass(entity: string): string {
+  const e = entity?.toLowerCase() || '';
+  if (e.includes('user')) return 'user';
+  if (e.includes('company') || e.includes('compan')) return 'company';
+  if (e.includes('admin')) return 'admin';
+  if (e.includes('content') || e.includes('report')) return 'content';
+  return 'system';
+}
+
+function getActionClass(action: string): string {
+  const a = action?.toUpperCase() || '';
+  if (a.includes('LOGIN') || a.includes('LOGOUT')) return 'login';
+  if (a.includes('CREATE') || a.includes('APPROVE') || a.includes('INVITE') || a.includes('UNSUSPEND') || a.includes('UNBAN')) return 'create';
+  if (a.includes('WARN') || a.includes('SUSPEND')) return 'warning';
+  if (a.includes('BAN') || a.includes('DELETE') || a.includes('REJECT')) return 'danger';
+  return 'info';
+}
+
+function getAvatarInitials(name: string): string {
+  if (!name) return '?';
+  const parts = name.split(' ');
+  return parts.length > 1 
+    ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() 
+    : name.substring(0, 2).toUpperCase();
+}
+
+function timeAgo(dateStr: string, t: (key: string, opts?: Record<string, string | number>) => string): string {
+  const now = Date.now();
+  const then = new Date(dateStr).getTime();
+  const diff = now - then;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return t('Just now');
+  if (mins < 60) return `${mins}${t('m ago')}`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}${t('h ago')}`;
+  const days = Math.floor(hrs / 24);
+  return `${days}${t('d ago')}`;
+}
 
 // ─── Main Component ──────────────────────────────────────────────────────────
 const OpsManagerDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<Tab>('users');
-  const [showBlockModal, setShowBlockModal] = useState(false);
-  const [showReviewModal, setShowReviewModal] = useState(false);
-  const [showRequestModal, setShowRequestModal] = useState(false);
-  const [requestType, setRequestType] = useState('');
-  const [requestDesc, setRequestDesc] = useState('');
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
   const { apiFetch } = useJobitoAuth();
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const { t, language } = useTranslation();
 
-  const handleCreateRequest = async () => {
-    if (!requestType || !requestDesc) return;
+  // ─── State ─────────────────────────────────────────────────────
+  const [activities, setActivities] = useState<ActivityLog[]>([]);
+  const [totalActivities, setTotalActivities] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [filterEntity, setFilterEntity] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Chart & Breakdown
+  const [chartData, setChartData] = useState<ChartPoint[]>([]);
+  const [totalChartActions, setTotalChartActions] = useState(0);
+  const [actionBreakdown, setActionBreakdown] = useState<ActionBreakdown[]>([]);
+
+  // ─── Fetch Activity Logs ───────────────────────────────────────
+  const fetchActivities = useCallback(async (page: number) => {
+    setIsLoading(true);
     try {
-      const res = await apiFetch(`${API_BASE_URL}/admin/ops/system-request`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: requestType, description: requestDesc })
-      });
+      const res = await apiFetch(`${API_BASE_URL}/admin/ops-activities?page=${page}&limit=20`);
       if (res.ok) {
-        setShowRequestModal(false);
-        setRequestType('');
-        setRequestDesc('');
-        alert('Request sent to Super Admin');
+        const data = await res.json();
+        setActivities(data.data || []);
+        setTotalActivities(data.total || 0);
+        setTotalPages(data.totalPages || 1);
       }
     } catch (err) {
-      console.error(err);
+      console.error('Failed to fetch activities:', err);
+    } finally {
+      setIsLoading(false);
     }
+  }, [apiFetch, language]);
+
+  // ─── Fetch Chart Data ─────────────────────────────────────────
+  const fetchChart = useCallback(async () => {
+    try {
+      const res = await apiFetch(`${API_BASE_URL}/admin/ops-chart`);
+      if (res.ok) {
+        const data = await res.json();
+        setChartData(data.hourly || []);
+        setTotalChartActions(data.totalActions || 0);
+        setActionBreakdown(data.actionBreakdown || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch chart data:', err);
+    }
+  }, [apiFetch, language]);
+
+  useEffect(() => {
+    fetchActivities(currentPage);
+  }, [fetchActivities, currentPage]);
+
+  useEffect(() => {
+    fetchChart();
+  }, [fetchChart]);
+
+  // ─── Derived Data ─────────────────────────────────────────────
+  const filteredActivities = activities.filter(a => {
+    const matchEntity = filterEntity === 'all' || getEntityClass(a.targetEntity) === filterEntity;
+    const matchSearch = !searchQuery || 
+      a.adminName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      a.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      a.actionType?.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchEntity && matchSearch;
+  });
+
+  // Count KPIs from current data
+  const loginCount = activities.filter(a => a.actionType?.toUpperCase().includes('LOGIN')).length;
+  const userActionCount = activities.filter(a => getEntityClass(a.targetEntity) === 'user').length;
+  const companyActionCount = activities.filter(a => getEntityClass(a.targetEntity) === 'company').length;
+  const alertCount = activities.filter(a => 
+    a.actionType?.toUpperCase().includes('BAN') || 
+    a.actionType?.toUpperCase().includes('SUSPEND') ||
+    a.actionType?.toUpperCase().includes('DELETE')
+  ).length;
+
+  // Build chart SVG path
+  const chartWidth = 500;
+  const chartHeight = 180;
+  const chartPadding = 20;
+
+  const buildChartPath = () => {
+    if (chartData.length < 2) return { linePath: '', fillPath: '', dots: [] as {x: number, y: number, count: number}[] };
+
+    const maxCount = Math.max(...chartData.map(d => Number(d.count)), 1);
+    const stepX = (chartWidth - chartPadding * 2) / (chartData.length - 1);
+    
+    const points = chartData.map((d, i) => ({
+      x: chartPadding + i * stepX,
+      y: chartHeight - chartPadding - ((Number(d.count) / maxCount) * (chartHeight - chartPadding * 2)),
+      count: Number(d.count),
+    }));
+
+    const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+    const fillPath = `${linePath} L ${points[points.length - 1].x} ${chartHeight - chartPadding} L ${points[0].x} ${chartHeight - chartPadding} Z`;
+
+    return { linePath, fillPath, dots: points };
   };
 
-  const handleUserAction = async (targetUserId: string, actionType: string, reason?: string) => {
-    try {
-      const res = await apiFetch(`${API_BASE_URL}/admin/ops/users/action`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetUserId, actionType, reason })
-      });
-      if (res.ok) setRefreshTrigger(prev => prev + 1);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const { linePath, fillPath, dots } = buildChartPath();
 
-  const handleReviewAction = async (action: 'approve' | 'reject', reason?: string) => {
-    if (!selectedId) return;
-    try {
-      const res = await apiFetch(`${API_BASE_URL}/admin/ops/companies/review`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ companyId: selectedId, action, rejectionReason: reason })
-      });
-      if (res.ok) setRefreshTrigger(prev => prev + 1);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  // Breakdown categories
+  const breakdownCategories = [
+    { key: 'login', label: t('Login Activity'), icon: <LogIn size={16} />, count: loginCount },
+    { key: 'user', label: t('User Actions'), icon: <Users size={16} />, count: userActionCount },
+    { key: 'company', label: t('Company Actions'), icon: <Building2 size={16} />, count: companyActionCount },
+    { key: 'admin', label: t('Admin Actions'), icon: <ShieldCheck size={16} />, count: actionBreakdown.filter(a => a.action_type?.includes('INVITE') || a.action_type?.includes('ADMIN')).reduce((s, a) => s + Number(a.count), 0) },
+    { key: 'content', label: t('Content Actions'), icon: <FileText size={16} />, count: actionBreakdown.filter(a => a.action_type?.includes('CONTENT') || a.action_type?.includes('REPORT')).reduce((s, a) => s + Number(a.count), 0) },
+    { key: 'system', label: t('System Events'), icon: <Activity size={16} />, count: totalChartActions - loginCount - userActionCount - companyActionCount },
+  ];
+
+  const maxBreakdown = Math.max(...breakdownCategories.map(b => b.count), 1);
 
   return (
     <div className={styles.container}>
-      {/* ── Navbar ── */}
-      <nav className={styles.navTabs}>
-        <button 
-          className={`${styles.tab} ${activeTab === 'users' ? styles.active : ''}`}
-          onClick={() => setActiveTab('users')}
-        >
-          User Management
-        </button>
-        <button 
-          className={`${styles.tab} ${activeTab === 'companies' ? styles.active : ''}`}
-          onClick={() => setActiveTab('companies')}
-        >
-          Company Review
-        </button>
-        <button 
-          className={`${styles.tab} ${activeTab === 'content' ? styles.active : ''}`}
-          onClick={() => setActiveTab('content')}
-        >
-          Content Moderation
-        </button>
-        <button 
-          className={`${styles.tab} ${activeTab === 'support' ? styles.active : ''}`}
-          onClick={() => setActiveTab('support')}
-        >
-          Technical Support
-        </button>
 
-        <button className={styles.navActionBtn} onClick={() => setShowRequestModal(true)}>
-          <Plus size={16} /> Request Assistant Addition
-        </button>
-      </nav>
-
-      {/* ── Content Area ── */}
-      <main className={styles.content}>
-        {activeTab === 'users' && (
-          <UserManagementView 
-            refreshKey={refreshTrigger}
-            onBlock={(id) => { setSelectedUserId(id); setShowBlockModal(true); }} 
-            handleUserAction={handleUserAction}
-          />
-        )}
-        {activeTab === 'companies' && (
-          <CompanyReviewView 
-            refreshKey={refreshTrigger}
-            onReview={(id) => { setSelectedId(id); setShowReviewModal(true); }} 
-          />
-        )}
-        {activeTab === 'content' && <ContentModerationView />}
-        {activeTab === 'support' && <TechnicalSupportView />}
-      </main>
-
-      {/* ── Modals ── */}
-      {showBlockModal && (
-        <div className={styles.overlay}>
-          <div className={styles.modal}>
-            <div className={styles.modalHeader}>
-              <h3 className={styles.modalTitle}>Confirm Action: Block</h3>
-              <button onClick={() => setShowBlockModal(false)} style={{background:'none', border:'none', cursor:'pointer'}}><X size={20} /></button>
-            </div>
-            <div className={styles.modalBody}>
-              <div className={styles.inputGroup}>
-                <span className={styles.modalLabel}>User ID:</span>
-                <div className={styles.modalValue}>{selectedUserId}</div>
-              </div>
-              <div className={styles.inputGroup}>
-                <label className={styles.modalLabel}>Reason For Blocking:</label>
-                <textarea className={styles.textarea} placeholder="Write the reason here..."></textarea>
-              </div>
-            </div>
-            <div className={styles.modalFooter}>
-              <button className={styles.cancelBtn} onClick={() => setShowBlockModal(false)}>Cancel</button>
-              <button className={styles.confirmBtn} onClick={() => {
-                const reason = (document.querySelector('textarea') as HTMLTextAreaElement)?.value;
-                if (selectedUserId) handleUserAction(selectedUserId, 'block', reason);
-                setShowBlockModal(false);
-              }}>Confirm Block</button>
-            </div>
-          </div>
+      {/* ── Page Title ── */}
+      <div className={styles.pageTitle}>
+        <div className={styles.pageTitleIcon}>
+          <Activity size={22} />
         </div>
-      )}
-
-      {showReviewModal && selectedId && (
-        <div className={styles.overlay}>
-          <div className={`${styles.modal} ${styles.docModal}`}>
-            <div className={styles.modalHeader}>
-              <h3 className={styles.modalTitle}>Commercial Registration Review</h3>
-              <button onClick={() => setShowReviewModal(false)} style={{background:'none', border:'none', cursor:'pointer'}}><X size={20} /></button>
-            </div>
-            <div className={styles.modalBody}>
-              <div style={{ padding: '20px', background: '#f8fafc', borderRadius: '8px' }}>
-                <p><strong>Company ID:</strong> {selectedId}</p>
-                <p>Please review the uploaded documents in the backend or cloud storage.</p>
-              </div>
-            </div>
-            <div className={styles.modalFooter}>
-              <button className={styles.rejectBtn} onClick={() => {
-                const reason = window.prompt("Reason for rejection:");
-                if (reason) handleReviewAction('reject', reason);
-                setShowReviewModal(false);
-              }}>Reject Request</button>
-              <button className={styles.approveBtn} onClick={() => {
-                handleReviewAction('approve');
-                setShowReviewModal(false);
-              }}>Approve Registration</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showRequestModal && (
-        <div className={styles.overlay}>
-          <div className={styles.modal}>
-            <div className={styles.modalHeader}>
-              <h3 className={styles.modalTitle}>New System Request</h3>
-              <button onClick={() => setShowRequestModal(false)} style={{background:'none', border:'none', cursor:'pointer'}}><X size={20} /></button>
-            </div>
-            <div className={styles.modalBody}>
-              <div className={styles.inputGroup}>
-                <label className={styles.modalLabel}>Request Type:</label>
-                <input 
-                  type="text" 
-                  className={styles.inputField} 
-                  placeholder="e.g., Assistant Addition, Server Upgrade" 
-                  value={requestType}
-                  onChange={e => setRequestType(e.target.value)}
-                />
-              </div>
-              <div className={styles.inputGroup}>
-                <label className={styles.modalLabel}>Description:</label>
-                <textarea 
-                  className={styles.textarea} 
-                  placeholder="Explain why this request is needed..."
-                  value={requestDesc}
-                  onChange={e => setRequestDesc(e.target.value)}
-                ></textarea>
-              </div>
-            </div>
-            <div className={styles.modalFooter}>
-              <button className={styles.cancelBtn} onClick={() => setShowRequestModal(false)}>Cancel</button>
-              <button className={styles.confirmBtn} onClick={handleCreateRequest}>Send Request</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// ─── Sub-Views ──────────────────────────────────────────────────────────────
-
-const UserManagementView = ({ onBlock }: { onBlock: (userId: string) => void }) => {
-  const { apiFetch } = useJobitoAuth();
-  const [users, setUsers] = useState<any[]>([]);
-
-  useEffect(() => {
-    apiFetch(`${API_BASE_URL}/admin/ops/users`).then(r => r.json()).then(d => setUsers(d.data || []));
-  }, [apiFetch]);
-
-  return (
-  <div className={styles.card}>
-    <div className={styles.tableHeader} style={{ gridTemplateColumns: '1fr 1fr 1fr 1fr auto' }}>
-      <span>Full Name</span>
-      <span>Email / Phone</span>
-      <span>User Role</span>
-      <span>Status</span>
-      <span>Actions</span>
-    </div>
-    {users.slice(0, 5).map((user, i) => (
-      <div key={i} className={`${styles.tableRow} ${styles.userGrid}`}>
-        <span className={styles.userCellName}>{user.name}</span>
-        <span className={styles.userCellContact}>{user.contactInfo}</span>
-        <span className={styles.userCellRole}>{user.accountType}</span>
-        <span>
-          <span className={`${styles.statusBadge} ${user.status === 'active' ? styles.statusActive : user.status === 'warned' ? styles.statusWarned : styles.statusBanned}`}>
-            {user.status || 'Active'}
-          </span>
-        </span>
-        <div className={styles.actionGroup}>
-          <div className={styles.iconAction} title="Warn User" onClick={() => {
-            const reason = window.prompt("Reason for warning:");
-            if (reason) handleUserAction(user.userId, 'warn', reason);
-          }}><AlertTriangle size={14} /></div>
-          <div className={styles.iconAction} title="Block User" onClick={() => {
-            setSelectedUserId(user.userId);
-            onBlock(user.userId);
-          }}><Ban size={14} /></div>
-          <div className={styles.iconAction} title="Delete Account" onClick={() => {
-            if (window.confirm("Are you sure?")) handleUserAction(user.userId, 'delete');
-          }}><Trash2 size={14} /></div>
+        {t("Operations Monitor")}
+        <div className={styles.liveIndicator}>
+          <div className={styles.liveDot} />
+          {t("Live")}
         </div>
       </div>
-    ))}
-  </div>
-  );
-};
 
-const CompanyReviewView = ({ onReview }: { onReview: (companyId: number) => void }) => {
-  const { apiFetch } = useJobitoAuth();
-  const [companies, setCompanies] = useState<any[]>([]);
-
-  const fetchCompanies = () => {
-    apiFetch(`${API_BASE_URL}/admin/ops/companies/pending`).then(r => r.json()).then(d => setCompanies(d.data || []));
-  };
-
-  useEffect(() => {
-    fetchCompanies();
-  }, [apiFetch]);
-
-  return (
-  <div className={styles.card}>
-    <div className={styles.tableHeader} style={{ gridTemplateColumns: '1fr 1fr 1fr auto' }}>
-      <span>Company Name</span>
-      <span>Registration Date</span>
-      <span>Status</span>
-      <span>Documents</span>
-    </div>
-    {companies.map((comp, i) => (
-      <div key={i} className={`${styles.tableRow} ${styles.companyGrid}`}>
-        <span className={styles.userCellName}>{comp.name}</span>
-        <span className={styles.companyDate}>{new Date(comp.createdAt).toLocaleDateString()}</span>
-        <span><span className={styles.pendingLabel}>{comp.status}</span></span>
-        <button className={styles.linkBtn} onClick={() => {
-          setSelectedId(comp.companyId);
-          onReview(comp.companyId);
-        }}>
-          <ExternalLink size={14} /> Review
-        </button>
-      </div>
-    ))}
-  </div>
-  );
-};
-
-const ContentModerationView = () => {
-  const { apiFetch } = useJobitoAuth();
-  const [content, setContent] = useState<any[]>([]);
-
-  const fetchContent = () => {
-    apiFetch(`${API_BASE_URL}/admin/ops/content/reported`).then(r => r.json()).then(d => setContent(d.data || []));
-  };
-
-  const handleAction = async (id: number, action: 'delete' | 'dismiss') => {
-    try {
-      const res = await apiFetch(`${API_BASE_URL}/admin/ops/content/review`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reportId: id, action })
-      });
-      if (res.ok) fetchContent();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => {
-    fetchContent();
-  }, [apiFetch]);
-
-  return (
-  <div className={styles.card}>
-    <div className={styles.tableHeader} style={{ gridTemplateColumns: '1fr 2fr 1fr auto' }}>
-      <span>Reported Post</span>
-      <span>Report Reason</span>
-      <span>Reporter</span>
-      <span>Actions</span>
-    </div>
-    {content.map((item, i) => (
-      <div key={i} className={`${styles.tableRow} ${styles.contentGrid}`}>
-        <span className={styles.userCellName}>{item.contentSnippet || item.type}</span>
-        <span><span className={styles.reasonTag}>{item.reason}</span></span>
-        <span className={styles.userCellRole}>{item.reporterName}</span>
-        <div className={styles.actionGroup}>
-          <button className={styles.deleteBtn} onClick={() => handleAction(item.reportId, 'delete')}><Trash2 size={14} /> Delete</button>
-          <div className={styles.iconAction} title="Dismiss Report" onClick={() => handleAction(item.reportId, 'dismiss')}><X size={14} /></div>
+      {/* ── KPI Cards ── */}
+      <div className={styles.kpiRow}>
+        <div className={styles.kpiCard}>
+          <div className={styles.kpiHeader}>
+            <span className={styles.kpiLabel}>{t("Login Sessions")}</span>
+            <div className={`${styles.kpiIcon} ${styles.blue}`}><LogIn size={18} /></div>
+          </div>
+          <div className={styles.kpiValue}>{loginCount}</div>
+          <div className={styles.kpiSub}>{t("From current activity log")}</div>
+        </div>
+        <div className={styles.kpiCard}>
+          <div className={styles.kpiHeader}>
+            <span className={styles.kpiLabel}>{t("User Events")}</span>
+            <div className={`${styles.kpiIcon} ${styles.green}`}><Users size={18} /></div>
+          </div>
+          <div className={styles.kpiValue}>{userActionCount}</div>
+          <div className={styles.kpiSub}>{t("Warn, suspend, ban actions")}</div>
+        </div>
+        <div className={styles.kpiCard}>
+          <div className={styles.kpiHeader}>
+            <span className={styles.kpiLabel}>{t("Company Events")}</span>
+            <div className={`${styles.kpiIcon} ${styles.orange}`}><Building2 size={18} /></div>
+          </div>
+          <div className={styles.kpiValue}>{companyActionCount}</div>
+          <div className={styles.kpiSub}>{t("Review & approval actions")}</div>
+        </div>
+        <div className={styles.kpiCard}>
+          <div className={styles.kpiHeader}>
+            <span className={styles.kpiLabel}>{t("Security Alerts")}</span>
+            <div className={`${styles.kpiIcon} ${styles.red}`}><AlertTriangle size={18} /></div>
+          </div>
+          <div className={styles.kpiValue}>{alertCount}</div>
+          <div className={styles.kpiSub}>{t("Bans, suspensions, deletions")}</div>
         </div>
       </div>
-    ))}
-  </div>
-  );
-};
 
-const TechnicalSupportView = () => {
-  const { apiFetch } = useJobitoAuth();
-  const [tickets, setTickets] = useState<any[]>([]);
-  const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
-  const [selectedTicketData, setSelectedTicketData] = useState<any>(null);
-  const [replyText, setReplyText] = useState('');
+      {/* ── Charts Row ── */}
+      <div className={styles.mainGrid}>
 
-  const fetchTickets = () => {
-    apiFetch(`${API_BASE_URL}/admin/ops/support/tickets`).then(r => r.json()).then(d => setTickets(d.data || []));
-  };
-
-  const fetchMessages = (id: number) => {
-    setSelectedTicketId(id);
-    apiFetch(`${API_BASE_URL}/admin/ops/support/tickets/${id}`).then(r => r.json()).then(d => setSelectedTicketData(d));
-  };
-
-  const handleReply = async () => {
-    if (!replyText.trim() || !selectedTicketId) return;
-    try {
-      const res = await apiFetch(`${API_BASE_URL}/admin/ops/support/tickets/${selectedTicketId}/reply`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: replyText })
-      });
-      if (res.ok) {
-        setReplyText('');
-        fetchMessages(selectedTicketId);
-        fetchTickets();
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => {
-    fetchTickets();
-  }, [apiFetch]);
-
-  return (
-  <div className={styles.card}>
-    <div className={styles.supportLayout}>
-      <aside className={styles.ticketList}>
-        {tickets.map((ticket, i) => (
-          <div key={i} className={`${styles.ticketItem} ${selectedTicketId === ticket.ticketId ? styles.active : ''}`} onClick={() => fetchMessages(ticket.ticketId)}>
-            <h4 className={styles.ticketSubject}>{ticket.subject}</h4>
-            <p className={styles.ticketUser}>{ticket.userName}</p>
-            <p className={styles.ticketEmail}>{ticket.userEmail}</p>
+        {/* Action Breakdown */}
+        <div className={styles.breakdownCard}>
+          <div className={styles.breakdownTitle}>
+            <BarChart3 size={18} className={styles.chartTitleIcon} />
+            {t("Activity Breakdown")}
           </div>
-        ))}
-      </aside>
-      <section className={styles.chatArea}>
-        {selectedTicketData ? (
-          <div className={styles.messagesList}>
-            {selectedTicketData.messages?.map((m: any, i: number) => {
-              const isUser = m.senderType === 'user';
-              return (
-                <div key={i} className={`${styles.messageRow} ${isUser ? styles.msgLeft : styles.msgRight}`}>
-                  <div className={`${styles.bubble} ${isUser ? styles.bubbleUser : styles.bubbleAdmin}`}>
-                    {m.content}
-                  </div>
-                  <div className={styles.msgTime}>{new Date(m.createdAt).toLocaleTimeString()}</div>
+          <div className={styles.breakdownList}>
+            {breakdownCategories.map(cat => (
+              <div key={cat.key} className={styles.breakdownItem}>
+                <div className={`${styles.breakdownIcon} ${styles[cat.key as keyof typeof styles] || ''}`}>
+                  {cat.icon}
                 </div>
+                <div className={styles.breakdownInfo}>
+                  <div className={styles.breakdownName}>{cat.label}</div>
+                  <div className={styles.breakdownBar}>
+                    <div 
+                      className={`${styles.breakdownBarFill} ${styles[cat.key as keyof typeof styles] || ''}`}
+                      style={{ width: `${Math.max(2, (cat.count / maxBreakdown) * 100)}%` }}
+                    />
+                  </div>
+                </div>
+                <div className={styles.breakdownCount}>{cat.count}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Activity Log Table ── */}
+      <div className={styles.activitySection}>
+        <div className={styles.activityHeader}>
+          <div className={styles.activityTitle}>
+            <Activity size={18} />
+            {t("System Activity Log")}
+            <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-muted)', marginLeft: 8 }}>
+              ({totalActivities} {t("total")})
+            </span>
+          </div>
+          <div className={styles.filterRow}>
+            <select 
+              className={styles.filterSelect} 
+              value={filterEntity} 
+              onChange={e => setFilterEntity(e.target.value)}
+            >
+              <option value="all">{t("All Entities")}</option>
+              <option value="user">{t("Users")}</option>
+              <option value="company">{t("Companies")}</option>
+              <option value="admin">{t("Admins")}</option>
+              <option value="content">{t("Content")}</option>
+              <option value="system">{t("System")}</option>
+            </select>
+            <div className={styles.searchWrap}>
+              <Search size={14} className={styles.searchIcon} />
+              <input 
+                type="text" 
+                className={styles.searchInput} 
+                placeholder={t("Search activity...")} 
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Table Header */}
+        <div className={styles.tableHead}>
+          <span>{t("Admin")}</span>
+          <span>{t("Description")}</span>
+          <span>{t("Target")}</span>
+          <span>{t("Action")}</span>
+          <span>{t("Time")}</span>
+        </div>
+
+        {/* Table Body */}
+        <div className={styles.tableBody}>
+          {isLoading ? (
+            <div className={styles.loading}>
+              <div className={styles.spinner} />
+              {t("Loading activity data...")}
+            </div>
+          ) : filteredActivities.length === 0 ? (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyIcon}>📋</div>
+              <div className={styles.emptyText}>{t("No activity records found")}</div>
+            </div>
+          ) : (
+            filteredActivities.map((log) => (
+              <div key={log.logId} className={styles.tableRow}>
+                {/* Admin */}
+                <div className={styles.cellUser}>
+                  <div className={`${styles.cellAvatar} ${styles[getEntityClass('admin') as keyof typeof styles] || ''}`}>
+                    {getAvatarInitials(log.adminName)}
+                  </div>
+                  <span className={styles.cellName}>{log.adminName}</span>
+                </div>
+                {/* Description */}
+                <span className={styles.cellDesc} title={log.description}>
+                  {log.description || log.actionType}
+                </span>
+                {/* Target Entity */}
+                <div className={styles.cellEntity}>
+                  <span className={`${styles.entityBadge} ${styles[getEntityClass(log.targetEntity) as keyof typeof styles] || ''}`}>
+                    {t(log.targetEntity || 'System')}
+                  </span>
+                </div>
+                {/* Action */}
+                <span className={`${styles.actionBadge} ${styles[getActionClass(log.actionType) as keyof typeof styles] || ''}`}>
+                  {t(log.actionType)}
+                </span>
+                {/* Time */}
+                <span className={styles.cellTime} title={new Date(log.createdAt).toLocaleString(language === 'ar' ? 'ar-EG' : 'en-GB')}>
+                  {timeAgo(log.createdAt, t)}
+                </span>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className={styles.pagination}>
+            <button 
+              className={styles.pageBtn} 
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft size={16} />
+            </button>
+            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+              const pageNum = currentPage <= 3 ? i + 1 : currentPage - 2 + i;
+              if (pageNum > totalPages) return null;
+              return (
+                <button 
+                  key={pageNum} 
+                  className={`${styles.pageBtn} ${currentPage === pageNum ? styles.active : ''}`}
+                  onClick={() => setCurrentPage(pageNum)}
+                >
+                  {pageNum}
+                </button>
               );
             })}
-          </div>
-        ) : (
-          <div className={styles.chatEmpty}>
-            <Headset size={64} opacity={0.1} />
-            <p className={styles.emptyText}>{t("Select a ticket to start responding")}</p>
+            <span className={styles.pageInfo}>
+              {t("Page")} {currentPage} / {totalPages}
+            </span>
+            <button 
+              className={styles.pageBtn} 
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              <ChevronRight size={16} />
+            </button>
           </div>
         )}
-        <div className={styles.chatInputArea}>
-          <input 
-            type="text" 
-            className={styles.chatInput} 
-            placeholder="Type your response here..." 
-            value={replyText}
-            onChange={e => setReplyText(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleReply()}
-          />
-          <button className={styles.sendBtn} onClick={handleReply}><Send size={18} /></button>
-        </div>
-      </section>
+      </div>
     </div>
-  </div>
   );
 };
 

@@ -37,6 +37,10 @@ import {
   Heart,
   List,
   LogOut,
+  Video,
+  Phone,
+  ChevronDown,
+  MessageSquare,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { io, Socket } from "socket.io-client";
@@ -134,11 +138,22 @@ const VoiceMessage: React.FC<VoiceMessageProps> = ({
           <div className={s.voiceWaveformBars}>
             <div className={s.voiceBarDot} />
             <div className={s.voiceBarDot} />
-            {[...Array(18)].map((_, i) => (
-              <div
+            {[...Array(24)].map((_, i) => (
+              <motion.div
                 key={i}
-                className={`${s.voiceBarNormal} ${progress > (i / 18) * 100 ? s.active : ""}`}
-                style={{ height: `${Math.random() * 12 + 6}px` }}
+                className={`${s.voiceBarNormal} ${progress > (i / 24) * 100 ? s.active : ""}`}
+                animate={isPlaying ? {
+                  height: [
+                    `${Math.random() * 15 + 5}px`,
+                    `${Math.random() * 15 + 5}px`,
+                    `${Math.random() * 15 + 5}px`
+                  ]
+                } : { height: `${Math.random() * 10 + 5}px` }}
+                transition={isPlaying ? {
+                  repeat: Infinity,
+                  duration: 0.5,
+                  delay: i * 0.05
+                } : {}}
               />
             ))}
             <div className={s.voiceBarDot} />
@@ -150,16 +165,6 @@ const VoiceMessage: React.FC<VoiceMessageProps> = ({
           />
         </div>
 
-        <div className={s.voiceAvatarRight}>
-          <img
-            src={getAvatarUrl(avatar) || "https://i.pravatar.cc/150?u=default"}
-            className={s.voiceLargeAvatar}
-            alt=""
-          />
-          <div className={s.voiceMicBadge}>
-            <Mic size={12} fill="currentColor" />
-          </div>
-        </div>
 
         <div className={s.voiceContextArrow}>
           <Search
@@ -1109,10 +1114,6 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
         >
           <header className={s.sidebarHeader}>
             <h2>{t("Messages", "الرسائل")}</h2>
-            <Plus
-              className={s.addIcon}
-              onClick={() => setShowNewChatModal(true)}
-            />
           </header>
 
           <div className={s.searchSection}>
@@ -1120,11 +1121,16 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
               <Search size={18} className={s.searchIcon} />
               <input
                 type="text"
+                className="transparent"
                 placeholder={t("Search messages", "البحث في الرسائل")}
                 value={sidebarSearchQuery}
                 onChange={(e) => setSidebarSearchQuery(e.target.value)}
               />
             </div>
+            <Plus
+              className={s.addIcon}
+              onClick={() => setShowNewChatModal(true)}
+            />
           </div>
           <div className={s.chatList}>
             {loading ? (
@@ -1164,12 +1170,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                   )}
                   <div className={s.chatDetails}>
                     <div className={s.chatTop}>
-                      <span className={s.chatName}>
-                        {chat.name}
-                        {chat.unreadCount > 0 && (
-                          <span className={s.unreadDot} />
-                        )}
-                      </span>
+                      <span className={s.chatName}>{chat.name}</span>
                       <span className={s.chatTime}>
                         {formatTimeRelative(chat.lastTime, t)}
                       </span>
@@ -1178,6 +1179,9 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                       <span className={s.lastMessage}>
                         {chat.lastMessage || t("Start a conversation", "ابدأ محادثة")}
                       </span>
+                      {chat.unreadCount > 0 && (
+                        <span className={s.unreadBadge}>{chat.unreadCount}</span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1192,7 +1196,6 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
         >
           {activeChat ? (
             <>
-              <div className={s.mainBackground} />
               <header className={s.mainHeader}>
                 <div className={s.headerLeft}>
                   <ArrowLeft
@@ -1226,8 +1229,6 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                   </div>
                 </div>
                 <div className={s.headerActions}>
-                  <Pin size={18} style={{ cursor: "pointer" }} />
-                  <Star size={18} style={{ cursor: "pointer" }} />
                   <MoreVertical
                     size={18}
                     onClick={(e) => {
@@ -1327,10 +1328,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                           className={s.chatBeginningAvatar}
                         />
                       ) : (
-                        <div
-                          className={s.avatarPlaceholder}
-                          style={{ width: 80, height: 80, fontSize: 30 }}
-                        >
+                        <div className={s.avatarPlaceholder + " " + s.chatBeginningAvatar}>
                           {getInitials(activeChat.name)}
                         </div>
                       )}
@@ -1349,8 +1347,11 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                       {messages.map((msg) => {
                         const isMe = msg.senderId === myUserId;
                         return (
-                          <div
+                          <motion.div
                             key={msg._id}
+                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            transition={{ duration: 0.2 }}
                             className={`${s.messageRow} ${isMe ? s.outgoing : s.incoming}`}
                           >
                             {!isMe &&
@@ -1368,7 +1369,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
 
                             <div className={s.messageMeta}>
                               <div
-                                className={s.bubble}
+                                className={`${s.bubble} ${msg.type === "image" ? s.hasImage : ""} ${msg.type === "voice" ? s.isVoice : ""}`}
                                 onContextMenu={(e) =>
                                   handleMessageContextMenu(e, msg, isMe)
                                 }
@@ -1378,20 +1379,19 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                                 onTouchEnd={handleMessageTouchEnd}
                                 onTouchMove={handleMessageTouchEnd}
                               >
-                                <div
-                                  className={s.bubbleAction}
-                                  onClick={(e) =>
-                                    handleMessageContextMenu(e, msg, isMe)
-                                  }
-                                >
-                                  <Search
-                                    size={14}
-                                    style={{
-                                      transform: "rotate(90deg)",
-                                      opacity: 0.7,
-                                    }}
-                                  />
-                                </div>
+                                  <div
+                                    className={s.bubbleAction}
+                                    onClick={(e) =>
+                                      handleMessageContextMenu(e, msg, isMe)
+                                    }
+                                  >
+                                    <ChevronDown
+                                      size={14}
+                                      style={{
+                                        opacity: 0.7,
+                                      }}
+                                    />
+                                  </div>
 
                                 {msg.replyToId && (
                                   <div className={s.quotedMessage}>
@@ -1436,17 +1436,11 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                                     t={t}
                                   />
                                 ) : msg.type === "image" ? (
-                                  <div style={{ padding: "2px" }}>
+                                  <div className={s.messageImageWrapper}>
                                     <img
                                       src={getAvatarUrl(msg.message)}
                                       alt="Chat attachment"
-                                      style={{
-                                        maxWidth: "100%",
-                                        borderRadius: "12px",
-                                        maxHeight: "350px",
-                                        objectFit: "contain",
-                                        display: "block",
-                                      }}
+                                      className={s.messageImage}
                                     />
                                   </div>
                                 ) : msg.type === "file" ? (
@@ -1486,10 +1480,10 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                                         target="_blank"
                                         rel="noreferrer"
                                         style={{
-                                          color: isMe ? "#fff" : "#3b82f6",
+                                          color: "inherit",
                                           textDecoration: "none",
                                           fontSize: "14px",
-                                          fontWeight: 500,
+                                          fontWeight: 600,
                                           wordBreak: "break-all",
                                         }}
                                       >
@@ -1511,35 +1505,19 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                                   </div>
                                 )}
                                 {msg.type !== "voice" && (
-                                  <div
-                                    style={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "flex-end",
-                                      gap: 4,
-                                      marginTop: 4,
-                                    }}
-                                  >
-                                    <span
-                                      className={s.msgTime}
-                                      style={{ marginTop: 0 }}
-                                    >
+                                  <div className={s.messageStatus}>
+                                    <span className={s.msgTime}>
                                       {formatMessageTime(msg.createdAt)}
                                     </span>
-                                    {isMe &&
-                                      (msg.isRead ? (
-                                        <CheckCheck
-                                          size={14}
-                                          color="#ffffff"
-                                          style={{ opacity: 0.9 }}
-                                        />
-                                      ) : (
-                                        <Check
-                                          size={14}
-                                          color="#ffffff"
-                                          style={{ opacity: 0.7 }}
-                                        />
-                                      ))}
+                                    {isMe && (
+                                      <div className={s.statusIcon}>
+                                        {msg.isRead ? (
+                                          <CheckCheck size={14} />
+                                        ) : (
+                                          <Check size={14} />
+                                        )}
+                                      </div>
+                                    )}
                                   </div>
                                 )}
                               </div>
@@ -1557,7 +1535,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                                   {getInitials(user?.name || "Me")}
                                 </div>
                               ))}
-                          </div>
+                          </motion.div>
                         );
                       })}
                     </div>
@@ -1585,7 +1563,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                 {/* Context Menu Removed From Here (Moved to Root) */}
               </div>
 
-              <footer className={s.footer} style={{ position: "relative" }}>
+              <footer className={s.footer}>
                 {isEditing && (
                   <div className={s.editingStatus}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -1728,6 +1706,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                       </AnimatePresence>
                       <input
                         type="text"
+                        className="transparent"
                         placeholder={
                           uploadingFile ? t("Uploading...", "جاري الرفع...") : t("Reply message", "اكتب رداً...")
                         }
@@ -1781,21 +1760,25 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
             </>
           ) : (
             // No chat selected
-            <div className={s.noChatSelected}>
-              <div className={s.noChatIcon}>
-                <MessageCircle size={80} strokeWidth={1} color="#d1d7db" />
+            <div className={s.emptyChatSelection}>
+              <div className={s.welcomeContent}>
+                <div className={s.welcomeIconWrapper}>
+                  <MessageSquare size={60} className={s.welcomeIcon} />
+                </div>
+                <h2 className={s.welcomeTitle}>{t("Jobito Messaging", "رسائل جوبيتو")}</h2>
+                <p className={s.welcomeDesc}>
+                  {t("Connect with recruiters and candidates in real-time.", "تواصل مع الموظفين والمتقدمين في الوقت الفعلي.")} <br /> 
+                  {t("Safe, secure, and professional.", "آمن، موثوق، واحترافي.")}
+                </p>
+                <button
+                  className={s.newChatBtnLarge}
+                  onClick={() => setShowNewChatModal(true)}
+                >
+                  <Plus size={20} /> {t("New Conversation", "محادثة جديدة")}
+                </button>
               </div>
-              <h2>{t("Jobito Chat", "دردشة جوبيتو")}</h2>
-              <p>
-                {t("Send and receive messages with other users.", "أرسل واستقبل الرسائل مع المستخدمين الآخرين.")} <br /> {t("Select a conversation or start a new one.", "اختر محادثة أو ابدأ واحدة جديدة.")}
-              </p>
-              <button
-                className={s.newChatBtn}
-                onClick={() => setShowNewChatModal(true)}
-              >
-                <Plus size={18} /> {t("New Chat", "دردشة جديدة")}
-              </button>
             </div>
+
           )}
 
           {/* ─── File Preview Overlay ────────────────────────────────────── */}

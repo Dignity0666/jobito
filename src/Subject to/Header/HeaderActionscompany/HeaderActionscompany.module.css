@@ -75,3 +75,21 @@
   background: #fff0f0;
   color: #dc2626;
 }
+
+@media (max-width: 1024px) {
+  .logoutBtn {
+    display: none;
+  }
+  
+  .primaryBtn {
+    padding: 8px 16px;
+    width: auto;
+    font-size: 14px;
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+  }
+}
+

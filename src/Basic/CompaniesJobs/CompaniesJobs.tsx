@@ -4,6 +4,9 @@ import { Search, Building2, MapPin } from "lucide-react";
 import { motion, type Variants } from "framer-motion";
 import styles from "./CompaniesJobs.module.css";
 import { useTranslation } from "../../context/translation-context";
+import { useTheme } from "../../context/ThemeContext";
+import lightBg from "../../assets/image copy 2.png";
+import darkBg from "../../assets/WhatsApp Image 2026-05-10 at 2.06.47 AM.jpeg";
 
 
 
@@ -57,6 +60,7 @@ const searchBarVariant: Variants = {
 
 const CompaniesJobs = () => {
   const { t, language } = useTranslation();
+  const { isDark } = useTheme();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [location, setLocation] = useState("");
@@ -71,66 +75,34 @@ const CompaniesJobs = () => {
 
   useEffect(() => {
     let isMounted = true;
-    const fetchCompanies = async () => {
-      try {
-        setIsLoading(true);
-        const params = new URLSearchParams();
-        if (searchTerm) params.append("search", searchTerm);
-
-        const response = await fetch(`${API_BASE_URL}/companies?${params.toString()}`);
-
-        if (!response.ok) {
-          throw new Error(t("خطأ في الخادم:") + ` ${response.status}`);
-        }
-
-        const rawData = await response.json();
-        // Backend now returns { data: [], total: ... }
-        const data = rawData.data || (Array.isArray(rawData) ? rawData : []);
-
-        if (!Array.isArray(data)) {
-          console.error("API returned non-array data:", data);
-          if (isMounted) setCompanies([]);
-          return;
-        }
-
-        interface APIJob {
-          category?: {
-            name?: string;
-          };
-          categoryEn?: {
-            nameEn?: string;
-          };
-        }
-
-        interface APICompany {
-          companyId: number;
-          name?: string;
-          description?: string;
-          logoUrl?: string;
-          industry?: string;
-          classification?: string;
-          employees?: string;
-          jobs?: APIJob[];
-        }
-
-        if (isMounted) {
+    const debounceTimer = setTimeout(() => {
+      const fetchCompanies = async () => {
+        try {
+          setIsLoading(true);
+          const params = new URLSearchParams();
+          if (searchTerm) params.append("search", searchTerm);
+          if (location) params.append("location", location);
+          const response = await fetch(`${API_BASE_URL}/companies?${params.toString()}`);
+          if (!response.ok) {
+            throw new Error(t("خطأ في الخادم:") + ` ${response.status}`);
+          }
+          const rawData = await response.json();
+          const data = rawData.data || (Array.isArray(rawData) ? rawData : []);
+          if (!Array.isArray(data)) {
+            console.error("API returned non-array data:", data);
+            if (isMounted) setCompanies([]);
+            return;
+          }
           const uniqueCompaniesMap = new Map<string, Company>();
-
-          (data as APICompany[]).forEach((item) => {
+          (data as any[]).forEach((item) => {
             const tagsSet = new Set<string>();
-            item.jobs?.forEach((job) => {
+            item.jobs?.forEach((job: any) => {
               if (job.category?.name) tagsSet.add(job.category.name);
             });
-
-            let description =
-              item.description || t("شركة رائدة في مجالها.");
-            if (
-              description.includes("figmeta") ||
-              description.includes("figma")
-            ) {
+            let description = item.description || t("شركة رائدة في مجالها.");
+            if (description.includes("figmeta") || description.includes("figma")) {
               description = "شركة رائدة في مجالها.";
             }
-
             const companyObj: Company = {
               id: item.companyId,
               name: item.name || "شركة غير مسماة",
@@ -142,10 +114,7 @@ const CompaniesJobs = () => {
               classification: item.classification,
               employees: item.employees,
             };
-
-            const existing = uniqueCompaniesMap.get(
-              companyObj.id.toString(),
-            );
+            const existing = uniqueCompaniesMap.get(companyObj.id.toString());
             if (
               !existing ||
               (companyObj.jobsCount > 0 && existing.jobsCount === 0) ||
@@ -154,27 +123,28 @@ const CompaniesJobs = () => {
               uniqueCompaniesMap.set(companyObj.id.toString(), companyObj);
             }
           });
-
-          setCompanies(Array.from(uniqueCompaniesMap.values()));
-          setError(null);
+          if (isMounted) {
+            setCompanies(Array.from(uniqueCompaniesMap.values()));
+            setError(null);
+          }
+        } catch (err) {
+          console.error("Error fetching companies:", err);
+          if (isMounted) {
+            setError(t("تعذر تحميل البيانات."));
+          }
+        } finally {
+          if (isMounted) {
+            setIsLoading(false);
+          }
         }
-      } catch (err) {
-        console.error("Error fetching companies:", err);
-        if (isMounted) {
-          setError(t("تعذر تحميل البيانات."));
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    fetchCompanies();
+      };
+      fetchCompanies();
+    }, 300);
     return () => {
+      clearTimeout(debounceTimer);
       isMounted = false;
     };
-  }, [searchTerm]);
+  }, [searchTerm, location]);
 
   const filteredCompanies = companies.filter((company) => {
     const matchesSearch = company.name
@@ -209,7 +179,8 @@ const CompaniesJobs = () => {
 
   const handleSearchClick = () => {
     setCurrentPage(1);
-    // The useEffect will refetch due to dependencies
+    // Trigger immediate fetch by clearing debounce timer
+    setSearchTerm(searchTerm); // forces effect
   };
 
   const handleIndustryChange = (industry: string) => {
@@ -223,7 +194,15 @@ const CompaniesJobs = () => {
 
   return (
     <div>
-      <section className={styles.heroSection}>
+      <section 
+        className={styles.heroSection}
+        style={{
+          backgroundImage: `url(${isDark ? darkBg : lightBg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
         <div className={styles.container}>
           <motion.div
             className={styles.content}
@@ -231,19 +210,8 @@ const CompaniesJobs = () => {
             initial="hidden"
             animate="visible"
           >
-            <motion.h1 className={styles.title} variants={fadeUp}>
-              {t("ابحث عن")}{" "}
-              <span className={styles.purpleText}>
-                {t("الشركات التي تحلم بها")}
-              </span>
-            </motion.h1>
-
-            <motion.p className={styles.description} variants={fadeUp}>
-              {t("اكتشف أفضل الشركات وبيئات العمل المثالية لمستقبلك المهني.")}
-            </motion.p>
-
             <motion.div
-              className={styles.searchBar}
+              className={`${styles.searchBar} ${isDark ? styles.darkSearchBar : ""}`}
               variants={searchBarVariant}
             >
               <div className={styles.inputGroup}>
@@ -280,7 +248,7 @@ const CompaniesJobs = () => {
                 className={styles.searchBtn}
                 onClick={handleSearchClick}
               >
-                {t("بحث")}
+                {t("Search", "Search")}
               </button>
             </motion.div>
           </motion.div>

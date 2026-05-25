@@ -2,20 +2,34 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../../context/translation-context";
 import { useJobitoAuth } from "../../context/LinkContxt";
-import { Mail, FileText, Info, MessageSquare } from "lucide-react";
+import { useTheme } from "../../context/ThemeContext";
+import { LogOut } from "lucide-react";  
 import styles from "./SidebarMenu.module.css";
 
-const SidebarMenu: React.FC = () => {
-  const { user } = useJobitoAuth();
+interface SidebarMenuProps {
+  navLinks: Array<{
+    label: string;
+    path: string;
+    icon?: React.ReactNode;
+  }>;
+}
+
+const SidebarMenu: React.FC<SidebarMenuProps> = ({ navLinks }) => {
+  const { isAuthenticated, logout } = useJobitoAuth();
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-  const { t } = useTranslation();
-
-  const isTradesman = user?.classification === "tradesman";
+  const { t, language, setLanguage } = useTranslation();
+  const { isDark, toggleTheme } = useTheme();
 
   const handleNavigate = (path: string) => {
     navigate(path);
     setIsOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setIsOpen(false);
+    navigate("/");
   };
 
   return (
@@ -35,35 +49,36 @@ const SidebarMenu: React.FC = () => {
         </svg>
       </label>
 
-      <div className={`${styles.input} ${isOpen ? styles.inputOpen : ""}`}>
-        <button
-          className={styles.value}
-          onClick={() => handleNavigate("/contact")}
-        >
-          <Mail size={20} color="#7D8590" />
-          {t("اتصل بنا")}
-        </button>
-        <button
-          className={styles.value}
-          onClick={() => handleNavigate("/MyApplications")}
-        >
-          <FileText size={20} color="#7D8590" />
-          {t("طلباتي")}
-        </button>
-        <button
-          className={styles.value}
-          onClick={() => handleNavigate("/chat")}
-        >
-          <MessageSquare size={20} color="#7D8590" />
-          {t("الرسائل")}
-        </button>
-        <button
-          className={styles.value}
-          onClick={() => handleNavigate("/about")}
-        >
-          <Info size={20} color="#7D8590" />
-          {t("عن المنصة")}
-        </button>
+      <div
+        className={`${styles.menuDropdown} ${isOpen ? styles.menuOpen : ""}`}
+      >
+        <div className={styles.navLinks}>
+          {navLinks.map((link, index) => (
+            <button
+              key={index}
+              className={styles.menuItem}
+              onClick={() => handleNavigate(link.path)}
+            >
+              {link.icon}
+              <span>{link.label}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className={styles.divider} />
+
+        {isAuthenticated && (
+          <div className={styles.authActions}>
+            <div className={styles.divider} />
+            <button
+              className={`${styles.menuItem} ${styles.logoutBtn}`}
+              onClick={handleLogout}
+            >
+              <LogOut size={20} />
+              <span>{t("تسجيل الخروج")}</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

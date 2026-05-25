@@ -48,6 +48,7 @@ import WorkApplicantDetails from "./Basic/Tradesman/WorkApplicants/Details/WorkA
 import ChatBotWidget from "./Shared/ChatBotWidget/ChatBotWidget";
 import AIChatBot from "./Basic/AIChatBot/AIChatBot";
 import Admin from "./Basic/Admin/Admin";
+import TradesmanReviewStatus from "./Basic/Tradesman/ReviewStatus/TradesmanReviewStatus";
 
 import WorkDetails from "./Basic/Tradesman/WorkListing/Details/WorkDetails";
 import { ToastProvider } from "./context/ToastContext";
@@ -90,7 +91,7 @@ function PageWrapper({ children }: { children: React.ReactNode }) {
       style={{
         willChange: "transform, opacity",
         width: "100%",
-        height: "100%",
+        minHeight: "100%",
       }}
     >
       {children}
@@ -153,7 +154,14 @@ function AppContent() {
   const location = useLocation();
   const [showHeader, setShowHeader] = useState(true);
 
-  const hideLayoutPaths = ["/user-information", "/complete-profile", "/admin"];
+  const hideLayoutPaths = [
+    "/user-information",
+    "/complete-profile",
+    "/admin",
+    "/ai-chat",
+    "/chat",
+    "/messagingapp",
+  ];
   const currentPath = location.pathname.toLowerCase();
   const shouldHide = hideLayoutPaths.includes(currentPath);
 
@@ -206,7 +214,18 @@ function AppContent() {
               {/* ─── Company & Tradesman Management Routes ────────────────────────── */}
               {(role === "company" || classification === "tradesman") && (
                 <>
-                  {role === "company" && (
+                  {classification === "tradesman" && (user?.accountStatus === 'pending' || user?.accountStatus === 'cr_rejected') ? (
+                    <Route
+                      path="*"
+                      element={
+                        <PageWrapper>
+                          <TradesmanReviewStatus />
+                        </PageWrapper>
+                      }
+                    />
+                  ) : (
+                    <>
+                      {role === "company" && (
                     <>
                       <Route path="/" element={<Navigate to="/home" replace />} />
                       <Route
@@ -231,7 +250,7 @@ function AppContent() {
                     path="/PostJobStep3"
                     element={
                       <PageWrapper>
-                        <PostJobStep3 />
+                        <PostJobStep3 />  
                       </PageWrapper>
                     }
                   />
@@ -358,6 +377,8 @@ function AppContent() {
                   />
                 </>
               )}
+              </>
+            )}
 
               {role !== "company" && (
                 <>
@@ -526,7 +547,7 @@ function AppContent() {
         </div>
       </div>
       {/* ─── Global Floating Chat Button ─── */}
-      {showHeader && <ChatBotWidget />}
+      {showHeader && currentPath !== "/chat" && currentPath !== "/messagingapp" && <ChatBotWidget />}
     </div>
   );
 }

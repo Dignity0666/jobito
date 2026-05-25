@@ -40,20 +40,25 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   // 1.5 Sync Language preference to backend (fire-and-forget)
   const syncLanguageToBackend = useCallback((newLang: 'ar' | 'en') => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
 
-    fetch(`${API_BASE_URL}/users/me/language`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-        'ngrok-skip-browser-warning': '69420',
-      },
-      body: JSON.stringify({ language: newLang }),
-    }).catch(() => {
-      // Silently fail — language is already saved in localStorage
-    });
+      console.log('[TranslationContext.tsx] Syncing language to backend:', newLang);
+      fetch(`${API_BASE_URL}/users/me/language`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          'ngrok-skip-browser-warning': '69420',
+        },
+        body: JSON.stringify({ language: newLang }),
+      }).catch((err) => {
+        console.warn('[TranslationContext.tsx] Async backend sync warning:', err);
+      });
+    } catch (e) {
+      console.warn('[TranslationContext.tsx] Backend sync failed synchronously:', e);
+    }
   }, []);
 
   // On mount, try to get the language from the backend profile
@@ -99,7 +104,23 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
         });
         if (response.ok) {
           const data = await response.json();
+        
+        // Add hardcoded fallbacks for stubborn strings
+        const fallbacks: Record<string, string> = {
+          'Company Review': 'مراجعة الشركة',
+          'Operations Revenue': 'إيرادات العمليات',
+          'Operations Monitor': 'مراقب العمليات',
+          'Technical Support': 'الدعم الفني',
+          'Total Revenue': 'إجمالي الإيرادات',
+          'Operations Manager Activity': 'نشاط مدير العمليات',
+          'Criminal Records Review': 'مراجعة السجلات الجنائية'
+        };
+
+        if (language === 'ar') {
+          setStaticTranslations({ ...data, ...fallbacks });
+        } else {
           setStaticTranslations(data);
+        }
         }
       } catch (err) {
         console.warn('[Translation API]: Using fallback values.', err);
@@ -109,8 +130,13 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
   }, [language]);
 
   const setLanguage = useCallback((lang: 'ar' | 'en') => {
+    console.log('[TranslationContext.tsx] setLanguage called with:', lang);
     setLanguageState(lang);
-    syncLanguageToBackend(lang);
+    try {
+      syncLanguageToBackend(lang);
+    } catch (e) {
+      console.error('[TranslationContext.tsx] Failed to sync language to backend:', e);
+    }
   }, [syncLanguageToBackend]);
 
   // 4. Batch Processing for on-demand translations
@@ -121,7 +147,6 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     queueToFetchRef.current.clear();
 
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
       const response = await fetch(`${API_BASE_URL}/translations/batch`, {
         method: 'POST',
         headers: getCommonHeaders({
@@ -132,7 +157,14 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
           target_lang: language,
         })
       });
+      
       const data = await response.json();
+      
+      if (!response.ok || data.error) {
+        console.error('[Translation Batch API Error]:', data);
+        textsToTranslate.forEach(text => pendingQueue.delete(`${language}:${text}`));
+        return;
+      }
       
       if (data.translated_texts) {
         setDynamicTranslations(prev => {
@@ -142,11 +174,12 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
             newMap[cacheKey] = data.translated_texts[index];
             pendingQueue.delete(cacheKey);
           });
+          console.log("[DEBUG processBatch] new dynamicTranslations map:", newMap);
           return newMap;
         });
       }
     } catch (err) {
-      console.error('[Translation Batch API Error]:', err);
+      console.error('[Translation Batch Network Error]:', err);
       textsToTranslate.forEach(text => pendingQueue.delete(`${language}:${text}`));
     }
   }, [language, pendingQueue]);
@@ -199,10 +232,10 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
         const englishCharCount = (key.match(/[a-zA-Z]/g) || []).length;
         const isMostlyArabicKey = arabicCharCount >= englishCharCount;
 
-        if (language === 'ar' && isMostlyArabicKey) {
-          text = key;
+        if (language === 'ar') {
+          text = isMostlyArabicKey ? key : fallbackText;
         } else {
-          text = fallbackText;
+          text = isMostlyArabicKey ? fallbackText : key;
         }
       }
 

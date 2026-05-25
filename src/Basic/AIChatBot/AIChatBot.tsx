@@ -10,9 +10,12 @@ import {
   FileText,
   Pencil,
   Briefcase,
+  ArrowLeft,
+  Languages,
   Sun,
   Moon,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../../context/TranslationContext";
 import { useJobitoAuth } from "../../context/LinkContxt";
 import { useTheme } from "../../context/ThemeContext";
@@ -31,9 +34,10 @@ interface ChatMessage {
 }
 
 const AIChatBot: React.FC = () => {
-  const { t, language } = useTranslation();
+  const { t, language, setLanguage } = useTranslation();
   const { user, apiFetch } = useJobitoAuth();
   const { theme, toggleTheme, isDark } = useTheme();
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -103,7 +107,10 @@ const AIChatBot: React.FC = () => {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     // Strip punctuation so TTS reads words only
-    const cleanText = text.replace(/[.*?!,:;()[\]{}\-_#@&"'`~|/\\<>+=%^$•—–…।॥؟،؛]/g, " ").replace(/\s+/g, " ").trim();
+    const cleanText = text
+      .replace(/[.*?!,:;()[\]{}\-_#@&"'`~|/\\<>+=%^$•—–…।॥؟،؛]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
     const utterance = new SpeechSynthesisUtterance(cleanText);
     const voices = window.speechSynthesis.getVoices();
     const isArabic = language === "ar" || /[\u0600-\u06FF]/.test(text);
@@ -256,7 +263,10 @@ const AIChatBot: React.FC = () => {
       title: t("Professional Writing", "كتابة مهنية"),
       icon: <Pencil size={20} />,
       items: [
-        t("Write a professional Cover Letter", "اكتب خطاب تغطية (Cover Letter) احترافي"),
+        t(
+          "Write a professional Cover Letter",
+          "اكتب خطاب تغطية (Cover Letter) احترافي",
+        ),
         t("Edit my LinkedIn summary", "عدل نبذتي الشخصية لـ LinkedIn"),
       ],
     },
@@ -269,17 +279,45 @@ const AIChatBot: React.FC = () => {
       ],
     },
   ];
+  // Hide body scrollbar when chatbot is open
+  useEffect(() => {
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = originalStyle;
+    };
+  }, []);
+
+  const toggleLanguage = () => {
+    setLanguage(language === "ar" ? "en" : "ar");
+  };
 
   return (
     <div className={s.container}>
-      {/* ─── Top Bar with Theme Toggle ─── */}
-      <div className={s.topBar}>
-        <div className={s.topBarTitle}>
-          <Bot size={20} />
-          <span>{t("Jobito AI", "جوبيتو AI")}</span>
-        </div>
-        <button className={s.themeToggle} onClick={toggleTheme} title={isDark ? "Light mode" : "Dark mode"}>
-          {isDark ? <Sun size={18} /> : <Moon size={18} />}
+      {/* ─── Floating Controls ─── */}
+      <div className={s.floatingControls}>
+        <button 
+          className={s.floatBtn} 
+          onClick={() => navigate(-1)} 
+          title={t("Back", "رجوع")}
+        >
+          <ArrowLeft size={20} />
+        </button>
+        
+        <button 
+          className={s.floatBtn} 
+          onClick={toggleTheme} 
+          title={isDark ? t("Light Mode", "الوضع الفاتح") : t("Dark Mode", "الوضع المظلم")}
+        >
+          {isDark ? <Sun size={20} /> : <Moon size={20} />}
+        </button>
+
+        <button 
+          className={s.floatBtn} 
+          onClick={toggleLanguage} 
+          title={t("Switch Language", "تغيير اللغة")}
+        >
+          <Languages size={20} />
         </button>
       </div>
 
@@ -337,7 +375,7 @@ const AIChatBot: React.FC = () => {
                   </div>
                 )}
                 <div
-                  className={`${s.bubble} ${msg.role === "user" ? s.bubbleUser : s.bubbleBot}`}
+                  className={`${s.bubble} ${msg.role === "user" ? s.bubbleUser : s.bubbleBot} ${s.glassy}`}
                 >
                   {msg.type === "image" ? (
                     <img
@@ -372,7 +410,7 @@ const AIChatBot: React.FC = () => {
         <div ref={chatEndRef} />
       </div>
 
-      {/* ─── Input Area ─── */}
+      {/* ─── Floating Input Area at BOTTOM ─── */}
       <div className={s.inputSection}>
         <div className={s.inputWrapper}>
           <input

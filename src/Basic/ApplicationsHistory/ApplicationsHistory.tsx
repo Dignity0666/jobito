@@ -45,6 +45,7 @@ export const ApplicationsHistory = () => {
     { id: "all", label: t("الكل") },
     { id: "applied", label: t("الانتظار") },
     { id: "reviewing", label: t("قيد المراجعة") },
+    { id: "accepted", label: t("تم قبولك") },
     { id: "hired", label: t("تم التوظيف") },
     { id: "declined", label: t("مرفوض") },
   ];
@@ -77,7 +78,8 @@ export const ApplicationsHistory = () => {
     const tabMatch =
       activeTab === "all" ||
       status === activeTab ||
-      (activeTab === "applied" && status === "waitlisted");
+      (activeTab === "applied" && status === "waitlisted") ||
+      (activeTab === "declined" && status === "rejected");
 
     const searchMatch =
       searchQuery === "" ||
@@ -104,7 +106,10 @@ export const ApplicationsHistory = () => {
         return t("قيد المراجعة");
       case "hired":
         return t("تم التوظيف");
+      case "accepted":
+        return t("تم قبولك");
       case "declined":
+      case "rejected":
         return t("مرفوض");
       default:
         return status;

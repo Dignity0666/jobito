@@ -50,23 +50,24 @@
 .link {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 0 18px;
+  gap: 8px;
+  padding: 8px 16px;
   font-size: 14px;
   font-weight: 500;
-  color: var(--color-text);
+  color: var(--color-text-secondary);
   text-decoration: none;
   position: relative;
   white-space: nowrap;
-  transition: color 0.18s;
-  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
 }
+
 
 .navIcon {
   display: flex;
   align-items: center;
   opacity: 0.7;
-  transition: opacity 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .link:hover .navIcon,
@@ -74,43 +75,30 @@
   opacity: 1;
 }
 
-.link::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 12px;
-  right: 12px;
-  height: 2px;
-  background: #c28c16;
-  border-radius: 2px 2px 0 0;
-  transform: scaleX(0);
-  transition: transform 0.2s ease;
-}
-
 .link:hover {
-  color: #c28c16;
-  background: #FAFBF6;
-}
-
-.link:hover::after,
-.linkActive::after {
-  transform: scaleX(1);
+  color: var(--color-primary);
+  background: rgba(var(--color-primary-rgb), 0.08);
 }
 
 .linkActive {
-  color: #c28c16;
+  color: var(--color-primary);
   font-weight: 600;
-  background: #FAFBF6;
+  background: rgba(var(--color-primary-rgb), 0.12);
+}
+
+
+.navLabel {
+  position: relative;
 }
 
 /* Mobile nav */
 .mobileNav {
   display: flex;
   flex-direction: column;
-  background: #fff;
-  border-top: 1px solid #ececf3;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  font-family: "Poppins", sans-serif;
+  background: var(--color-card-bg);
+  border-top: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  font-family: 'Sora', sans-serif;
   position: absolute;
   top: 62px;
   left: 0;
@@ -125,16 +113,15 @@
   padding: 14px 20px;
   font-size: 15px;
   font-weight: 500;
-  color: #374151;
+  color: var(--color-text-secondary);
   text-decoration: none;
-  border-bottom: 1px solid #f1f5f9;
-  transition:
-    background 0.15s,
-    color 0.15s;
+  border-bottom: 1px solid var(--color-border);
+  transition: all 0.15s ease;
 }
 
 .mobileLink:hover,
 .mobileLinkActive {
-  background: #f5f5ff;
-  color: #4f46e5;
+  background: var(--color-bg-secondary);
+  color: var(--color-primary);
 }
+

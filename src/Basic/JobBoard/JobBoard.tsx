@@ -5,35 +5,9 @@ import { motion, type Variants } from "framer-motion";
 import { useState } from "react";
 import { useTranslation } from "../../context/translation-context";
 import { useJobitoAuth } from "../../context/LinkContxt";
-
-const heroContainer = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.1,
-    },
-  },
-};
-
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] },
-  },
-};
-
-const searchBarVariant: Variants = {
-  hidden: { opacity: 0, y: 24, scale: 0.98 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.45 },
-  },
-};
+import { useTheme } from "../../context/ThemeContext";
+import darkBg from "../../assets/WhatsApp Image 2026-05-10 at 1.22.54 AM.jpeg";
+import lightBg from "../../assets/WhatsApp Image 2026-05-10 at 1.40.25 AM.jpeg";
 
 const sectionVariant: Variants = {
   hidden: { opacity: 0, y: 40 },
@@ -46,6 +20,7 @@ const sectionVariant: Variants = {
 
 export default function JobBoard() {
   const { apiFetch, isAuthenticated, role, user } = useJobitoAuth();
+  const { isDark } = useTheme();
   const classification = user?.classification;
   const [search, setSearch] = useState("");
   const [location, setLocation] = useState("");
@@ -63,40 +38,30 @@ export default function JobBoard() {
   return (
     <div className={Styles.page}>
       {/* ── Hero Section ── */}
-      <section className={Styles.heroSection}>
+      <section
+        className={Styles.heroSection}
+        style={{
+          backgroundImage: `url(${!isDark ? darkBg : lightBg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
         <div className={Styles.container}>
-          <motion.div
-            className={Styles.content}
-            variants={heroContainer}
-            initial="hidden"
-            animate="visible"
-          >
-            {/* Title */}
-            <motion.h1 className={Styles.title} variants={fadeUp}>
-              {classification === "tradesman" ? t("ابحث عن") : t("ابحث عن")}{" "}
-              <span className={Styles.purpleText}>
-                {classification === "tradesman" ? t("طلبات صيانة") : t("وظيفة أحلامك")}{" "}
-              </span>
-            </motion.h1>
-
-            <motion.p className={Styles.description} variants={fadeUp}>
-              {classification === "tradesman" 
-                ? t("الآلاف من طلبات العمل المنزلي في انتظارك. ابدأ العمل الآن.")
-                : t("الآلاف من فرص العمل في انتظارك. ابدأ مسيرتك المهنية اليوم.")}
-            </motion.p>
-
+          <div className={Styles.content}>
             {/* Search Bar */}
             <motion.div
-              className={Styles.searchBar}
-              variants={searchBarVariant}
+              className={`${Styles.searchBar} ${isDark ? Styles.darkSearchBar : ""}`}
+              initial={{ opacity: 1, y: 0 }}
             >
               <div className={Styles.inputGroup}>
                 <Search className={Styles.icon} size={20} />
                 <input
                   type="text"
-                  placeholder={classification === "tradesman" 
-                    ? t("ما هي الخدمة التي تستطيع تقديمها؟ (سباكة، نجارة...)") 
-                    : t("مسمى الوظيفة أو الكلمة الرئيسية...")}
+                  placeholder={
+                    classification === "tradesman"
+                      ? t("ما هي الخدمة التي تستطيع تقديمها؟ (سباكة، نجارة...)")
+                      : t("مسمى الوظيفة أو الكلمة الرئيسية...")
+                  }
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSearch()}
@@ -121,7 +86,7 @@ export default function JobBoard() {
                 {t("بحث")}
               </button>
             </motion.div>
-          </motion.div>
+          </div>
         </div>
       </section>
 

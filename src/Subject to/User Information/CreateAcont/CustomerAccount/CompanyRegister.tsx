@@ -12,16 +12,17 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./CompanyRegister.module.css";
-// Use the matching business characters illustration
-import signupImage from "../../../../assets/signup.png";
+
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../../../../context/translation-context";
+import { useToast } from "../../../../context/ToastContext";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 export const CompanyRegister: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   
   const [formData, setFormData] = useState({
     companyName: "",
@@ -46,6 +47,35 @@ export const CompanyRegister: React.FC = () => {
   const [verificationCode, setVerificationCode] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [verifiedStatus, setVerifiedStatus] = useState<null | "success">(null);
+  const [currentStep, setCurrentStep] = useState(1);
+
+  const nextStep = () => {
+    if (currentStep === 1) {
+      if (!formData.companyName || !formData.companyEmail || !formData.companyPhone || !formData.companyAddress) {
+        showToast(t("Please fill all company details"), "error");
+        return;
+      }
+    } else if (currentStep === 2) {
+      if (!formData.taxNumber || !formData.commercialRegister || !formData.nationalId) {
+        showToast(t("Please upload documents and enter National ID"), "error");
+        return;
+      }
+    }
+    setCurrentStep(prev => Math.min(prev + 1, 3));
+  };
+  const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
+
+  const uploadFile = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch(`${API_BASE_URL}/auth/upload-document`, {
+      method: "POST",
+      body: formData,
+    });
+    if (!res.ok) throw new Error(t("Failed to upload document"));
+    const data = await res.json();
+    return data.url;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,9 +88,29 @@ export const CompanyRegister: React.FC = () => {
 
     try {
       setIsCreating(true);
+
+      // Upload documents first
+      let crDocumentUrl = "";
+      let taxDocumentUrl = "";
+
+      if (formData.commercialRegister instanceof File) {
+        crDocumentUrl = await uploadFile(formData.commercialRegister);
+      } else {
+        throw new Error(t("Commercial register document is required"));
+      }
+
+      if (formData.taxNumber instanceof File) {
+        taxDocumentUrl = await uploadFile(formData.taxNumber);
+      } else {
+        throw new Error(t("Tax register document is required"));
+      }
+
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "69420"
+        },
         body: JSON.stringify({
           name: formData.companyName,
           email: formData.companyEmail,
@@ -68,9 +118,8 @@ export const CompanyRegister: React.FC = () => {
           role: "company",
           phone: formData.companyPhone,
           address: formData.companyAddress,
-          tax_number: formData.taxNumber,
-          commercial_register: formData.commercialRegister,
-          license_number: formData.commercialRegister,
+          tax_document_url: taxDocumentUrl,
+          commercial_register: crDocumentUrl,
           national_id: formData.nationalId,
         }),
       });
@@ -92,7 +141,10 @@ export const CompanyRegister: React.FC = () => {
       setIsVerifying(true);
       const res = await fetch(`${API_BASE_URL}/auth/verify-email`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "69420"
+        },
         body: JSON.stringify({
           email: formData.companyEmail,
           code: verificationCode,
@@ -110,7 +162,6 @@ export const CompanyRegister: React.FC = () => {
 
   return (
     <div className={styles.signupwrapper}>
-
       <motion.div
         className={styles.signupleft}
         initial={{ opacity: 0 }}
@@ -162,14 +213,6 @@ export const CompanyRegister: React.FC = () => {
                     >
                       <SmartphoneIcon size={20} />
                       {t("Enter Verification Code")}
-                    </button>
-                    <button
-                      className={styles.submitBtn}
-                      onClick={() => setVerifyMethod("link")}
-                      style={{ background: 'white', color: '#4f46e5', border: '2px solid #4f46e5' }}
-                    >
-                      <LinkIcon size={20} />
-                      {t("Use Email Link")}
                     </button>
                   </div>
                 </>
@@ -231,155 +274,195 @@ export const CompanyRegister: React.FC = () => {
                   <p className={styles.subtitle}>{t("Create a business account to hire top talent on Jobito")}</p>
               </div>
 
+              {/* Progress Indicator */}
+              <div className={styles.stepIndicator}>
+                <div className={`${styles.step} ${currentStep >= 1 ? styles.active : ""}`}>1</div>
+                <div className={styles.stepLine}></div>
+                <div className={`${styles.step} ${currentStep >= 2 ? styles.active : ""}`}>2</div>
+                <div className={styles.stepLine}></div>
+                <div className={`${styles.step} ${currentStep >= 3 ? styles.active : ""}`}>3</div>
+              </div>
+
               <form className={styles.form} onSubmit={handleSubmit}>
                 {formError && <div className={styles.errorBox}>{formError}</div>}
 
-                {/* Row 1: Name, Tax, Phone */}
-                <div className={styles.formGrid3}>
-                  <div className={styles.inputGroup}>
-                    <label>{t("Company Name")}</label>
-                    <input
-                      className={styles.inputField}
-                      type="text"
-                      placeholder={t("Example: Akem")}
-                      value={formData.companyName}
-                      onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className={styles.inputGroup}>
-                    <label>{t("Tax number")}</label>
-                    <input
-                      className={styles.inputField}
-                      type="text"
-                      placeholder="123456789"
-                      value={formData.taxNumber}
-                      onChange={(e) => setFormData({ ...formData, taxNumber: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className={styles.inputGroup}>
-                    <label>{t("Company phone")}</label>
-                    <input
-                      className={styles.inputField}
-                      type="tel"
-                      placeholder="+20 (123) 456-"
-                      value={formData.companyPhone}
-                      onChange={(e) => setFormData({ ...formData, companyPhone: e.target.value })}
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Row 2: Address, Email, Register */}
-                <div className={styles.formGrid3}>
-                  <div className={styles.inputGroup}>
-                    <label>{t("Company address")}</label>
-                    <input
-                      className={styles.inputField}
-                      type="text"
-                      placeholder={t("City, state")}
-                      value={formData.companyAddress}
-                      onChange={(e) => setFormData({ ...formData, companyAddress: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className={styles.inputGroup}>
-                    <label>{t("Company email")}</label>
-                    <input
-                      className={styles.inputField}
-                      type="email"
-                      placeholder="hr@acme-inc.c"
-                      value={formData.companyEmail}
-                      onChange={(e) => setFormData({ ...formData, companyEmail: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className={styles.inputGroup}>
-                    <label>{t("commercial register")}</label>
-                    <input
-                      className={styles.inputField}
-                      type="text"
-                      placeholder="LN-8899221"
-                      value={formData.commercialRegister}
-                      onChange={(e) => setFormData({ ...formData, commercialRegister: e.target.value })}
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Row 3: Passwords */}
-                <div className={styles.formGrid2}>
-                  <div className={styles.inputGroup}>
-                    <label>{t("password")}</label>
-                    <div className={styles.passwordWrapper}>
-                      <input
-                        className={styles.inputField}
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={formData.password}
-                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                        required
-                      />
-                      <button type="button" className={styles.eyeButton} onClick={() => setShowPassword(!showPassword)}>
-                        {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+                <AnimatePresence mode="wait">
+                  {currentStep === 1 && (
+                    <motion.div 
+                      key="step1"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      className={styles.stepContent}
+                    >
+                      <div className={styles.formGrid2}>
+                        <div className={styles.inputGroup}>
+                          <label>{t("Company Name")}</label>
+                          <input
+                            className={styles.inputField}
+                            type="text"
+                            placeholder={t("Example: Akem")}
+                            value={formData.companyName}
+                            onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                            dir="auto"
+                            required
+                          />
+                        </div>
+                        <div className={styles.inputGroup}>
+                          <label>{t("Company Email")}</label>
+                          <input
+                            className={styles.inputField}
+                            type="email"
+                            placeholder="hr@acme-inc.com"
+                            value={formData.companyEmail}
+                            onChange={(e) => setFormData({ ...formData, companyEmail: e.target.value })}
+                            dir="auto"
+                            required
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className={styles.formGrid2}>
+                        <div className={styles.inputGroup}>
+                          <label>{t("Company Phone")}</label>
+                          <input
+                            className={styles.inputField}
+                            type="tel"
+                            placeholder={t("+20 (123) 456-7890")}
+                            value={formData.companyPhone}
+                            onChange={(e) => setFormData({ ...formData, companyPhone: e.target.value })}
+                            dir="auto"
+                            required
+                          />
+                        </div>
+                        <div className={styles.inputGroup}>
+                          <label>{t("Company Address")}</label>
+                          <input
+                            className={styles.inputField}
+                            type="text"
+                            placeholder={t("City, state")}
+                            value={formData.companyAddress}
+                            onChange={(e) => setFormData({ ...formData, companyAddress: e.target.value })}
+                            dir="auto"
+                            required
+                          />
+                        </div>
+                      </div>
+                      
+                      <button type="button" className={styles.submitBtn} onClick={nextStep}>
+                        {t("Next Step")}
                       </button>
-                    </div>
-                  </div>
-                  <div className={styles.inputGroup}>
-                    <label>{t("Confirm password")}</label>
-                    <div className={styles.passwordWrapper}>
-                      <input
-                        className={styles.inputField}
-                        type={showConfirmPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={formData.confirmPassword}
-                        onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                        required
-                      />
-                      <button type="button" className={styles.eyeButton} onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                        {showConfirmPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                    </motion.div>
+                  )}
 
-                {/* Row 4: National ID */}
-                <div className={styles.inputGroup}>
-                  <label>{t("The national number of the official")}</label>
-                  <input
-                    className={styles.inputField}
-                    type="text"
-                    placeholder="Example: 29901011234567"
-                    value={formData.nationalId}
-                    onChange={(e) => setFormData({ ...formData, nationalId: e.target.value })}
-                    required
-                  />
-                </div>
+                  {currentStep === 2 && (
+                    <motion.div 
+                      key="step2"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      className={styles.stepContent}
+                    >
+                      <div className={styles.formGrid2}>
+                        <div className={styles.inputGroup}>
+                          <label>{t("Tax Register (PDF)")}</label>
+                          <input
+                            className={styles.inputField}
+                            type="file"
+                            onChange={(e) => setFormData({ ...formData, taxNumber: e.target.files ? e.target.files[0] : '' as any })}
+                            required
+                          />
+                        </div>
+                        <div className={styles.inputGroup}>
+                          <label>{t("Commercial Register (PDF)")}</label>
+                          <input
+                            className={styles.inputField}
+                            type="file"
+                            onChange={(e) => setFormData({ ...formData, commercialRegister: e.target.files ? e.target.files[0] : '' as any })}
+                            required
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className={styles.inputGroup}>
+                        <label>{t("National ID of the official")}</label>
+                        <input
+                          className={styles.inputField}
+                          type="text"
+                          placeholder="Example: 29901011234567"
+                          value={formData.nationalId}
+                          onChange={(e) => setFormData({ ...formData, nationalId: e.target.value })}
+                          dir="auto"
+                          required
+                        />
+                      </div>
 
-                <button
-                  className={styles.submitBtn}
-                  type="submit"
-                  disabled={isCreating}
-                >
-                  {isCreating ? <LoaderIcon className="animate-spin" /> : t("Create a business account file")}
-                </button>
+                      <div className={styles.buttonRow}>
+                        <button type="button" className={styles.backStepBtn} onClick={prevStep}>{t("Back")}</button>
+                        <button type="button" className={styles.submitBtn} onClick={nextStep}>{t("Next Step")}</button>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {currentStep === 3 && (
+                    <motion.div 
+                      key="step3"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      className={styles.stepContent}
+                    >
+                      <div className={styles.formGrid2}>
+                        <div className={styles.inputGroup}>
+                          <label>{t("Password")}</label>
+                          <div className={styles.passwordWrapper}>
+                            <input
+                              className={styles.inputField}
+                              type={showPassword ? "text" : "password"}
+                              placeholder="••••••••"
+                              value={formData.password}
+                              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                              dir="auto"
+                              required
+                            />
+                            <button type="button" className={styles.eyeButton} onClick={() => setShowPassword(!showPassword)}>
+                              {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+                            </button>
+                          </div>
+                        </div>
+                        <div className={styles.inputGroup}>
+                          <label>{t("Confirm password")}</label>
+                          <div className={styles.passwordWrapper}>
+                            <input
+                              className={styles.inputField}
+                              type={showConfirmPassword ? "text" : "password"}
+                              placeholder="••••••••"
+                              value={formData.confirmPassword}
+                              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                              dir="auto"
+                              required
+                            />
+                            <button type="button" className={styles.eyeButton} onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                              {showConfirmPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className={styles.buttonRow}>
+                        <button type="button" className={styles.backStepBtn} onClick={prevStep}>{t("Back")}</button>
+                        <button className={styles.submitBtn} type="submit" disabled={isCreating}>
+                          {isCreating ? <LoaderIcon className="animate-spin" /> : t("Create a business account")}
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </form>
             </motion.div>
           )}
         </AnimatePresence>
       </motion.div>
-
-      {/* Right Side Illustration */}
-      <div className={styles.signuplight}>
-        <motion.img
-          layoutId="heroImage"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          src={signupImage}
-          alt="Business Illustration"
-        />
-      </div>
     </div>
   );
 };

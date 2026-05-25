@@ -10,8 +10,10 @@ import {
   Legend,
 } from "chart.js";
 import { useTranslation } from "../../context/translation-context";
+import { useTheme } from "../../context/ThemeContext";
 
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
+
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
@@ -36,6 +38,7 @@ interface Application {
 
 function DoughnutChartComponent({ chartData }: { chartData: number[] }) {
   const { t } = useTranslation();
+  const { isDark } = useTheme();
   const ref = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<Chart | null>(null);
 
@@ -43,7 +46,10 @@ function DoughnutChartComponent({ chartData }: { chartData: number[] }) {
     if (!ref.current) return;
     if (chartRef.current) chartRef.current.destroy();
 
-    // Data mapping: [Applied, Reviewing, Hired, Declined]
+    const chartColors = isDark 
+      ? ["#6B8CE0", "#FF9A55", "#10b981", "#ef4444"] 
+      : ["#3b82f6", "#f59e0b", "#10b981", "#ef4444"];
+
     chartRef.current = new Chart(ref.current, {
       type: "doughnut",
       data: {
@@ -51,7 +57,7 @@ function DoughnutChartComponent({ chartData }: { chartData: number[] }) {
         datasets: [
           {
             data: chartData,
-            backgroundColor: ["#3b82f6", "#f59e0b", "#10b981", "#ef4444"],
+            backgroundColor: chartColors,
             borderWidth: 0,
             hoverOffset: 4,
           },
@@ -73,10 +79,11 @@ function DoughnutChartComponent({ chartData }: { chartData: number[] }) {
         chartRef.current.destroy();
       }
     };
-  }, [chartData, t]);
+  }, [chartData, t, isDark]);
 
   return <canvas ref={ref} />;
 }
+
 
 function CountUp({ target }: { target: number }) {
   const [val, setVal] = useState(0);
@@ -104,8 +111,9 @@ function CountUp({ target }: { target: number }) {
 export default function JobDashboard() {
   const { user, apiFetch } = useJobitoAuth();
   const { t, language } = useTranslation();
-  const location = useLocation();
+  const { isDark } = useTheme();
   const navigate = useNavigate();
+
   const jobTitle = location.state?.jobTitle;
 
   const [applications, setApplications] = useState<Application[]>([]);
@@ -221,20 +229,20 @@ export default function JobDashboard() {
                     <CountUp target={totalApps} />
                   </div>
                   <span className={styles.statIcon}>
-                    {/* Placeholder icon */}
                     <svg
                       width="40"
                       height="40"
                       viewBox="0 0 24 24"
                       fill="none"
-                      stroke="#578BC7"
+                      stroke="currentColor"
                       strokeWidth="2"
-                      style={{ opacity: 0.5 }}
+                      style={{ opacity: 0.2, color: "var(--color-primary)" }}
                     >
                       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                       <polyline points="14 2 14 8 20 8"></polyline>
                     </svg>
                   </span>
+
                 </div>
                 <div className={`${styles.card} ${styles.statCard}`}>
                   <div className={styles.statLabel}>{t("تم النظر في طلبك")}</div>
@@ -247,14 +255,15 @@ export default function JobDashboard() {
                       height="40"
                       viewBox="0 0 24 24"
                       fill="none"
-                      stroke="#578BC7"
+                      stroke="currentColor"
                       strokeWidth="2"
-                      style={{ opacity: 0.5 }}
+                      style={{ opacity: 0.2, color: "var(--color-primary)" }}
                     >
                       <circle cx="12" cy="12" r="10"></circle>
                       <path d="M12 6v6l4 2"></path>
                     </svg>
                   </span>
+
                 </div>
               </div>
 
@@ -271,7 +280,7 @@ export default function JobDashboard() {
                         <div className={styles.legendItem}>
                           <div
                             className={styles.legendDot}
-                            style={{ background: "#3b82f6" }}
+                            style={{ background: isDark ? "#6B8CE0" : "#3b82f6" }}
                           />
                           <div>
                             <div className={styles.legendPct}>
@@ -283,7 +292,7 @@ export default function JobDashboard() {
                         <div className={styles.legendItem}>
                           <div
                             className={styles.legendDot}
-                            style={{ background: "#f59e0b" }}
+                            style={{ background: isDark ? "#FF9A55" : "#f59e0b" }}
                           />
                           <div>
                             <div className={styles.legendPct}>
@@ -294,6 +303,7 @@ export default function JobDashboard() {
                             </div>
                           </div>
                         </div>
+
                         <div className={styles.legendItem}>
                           <div
                             className={styles.legendDot}

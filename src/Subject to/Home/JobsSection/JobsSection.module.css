@@ -82,21 +82,22 @@
 
 .sectionHeader h2 {
   font-size: 32px;
-  font-weight: 500;
-  color: #4640de;
+  font-weight: 800;
+  color: var(--color-primary);
   margin: 0;
 }
 
 .sectionHeader span {
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .showAllLink {
-  color: #4640de;
+  color: var(--color-primary);
   text-decoration: none;
   font-weight: 600;
   font-size: 14px;
 }
+
 
 /* ── GRID layout ── */
 .featuredGrid {
@@ -122,22 +123,24 @@
    ════════════════════════════════════════════════ */
 .companyCard,
 .tradesmanCard {
-  background: #ffffff;
-  border: 1px solid #f3f4f6;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border-light);
   border-radius: 12px;
   padding: 24px;
   text-decoration: none;
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   height: 100%;
 }
 
 .companyCard:hover,
 .tradesmanCard:hover {
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  border-color: #4640de;
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary);
+  transform: translateY(-4px);
 }
+
 
 .cardHeader {
   display: flex;
@@ -163,13 +166,14 @@
 }
 
 .jobTypeBadge {
-  border: 1px solid #4640de;
-  color: #4640de;
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
   padding: 4px 12px;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
 }
+
 
 .cardBody {
   margin-bottom: 20px;
@@ -178,16 +182,17 @@
 .jobTitle {
   font-size: 18px;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text);
   margin: 0 0 8px 0;
   line-height: 1.2;
 }
 
 .companyMeta {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   margin: 0;
 }
+
 
 .cardTags {
   display: flex;
@@ -353,11 +358,12 @@
 
 /* Latest Section */
 .latestSection {
-  background: var(--color-bg-secondary, #f8faff);
-  padding: 60px 40px;
+  background: var(--color-bg-secondary);
+  padding: clamp(24px, 5vw, 60px);
   border-radius: 24px;
   margin-top: 80px;
 }
+
 
 .latestGrid {
   display: grid;
@@ -375,16 +381,19 @@
   display: flex;
   align-items: center;
   gap: 20px;
-  background: var(--color-card-bg, #ffffff);
+  background: var(--color-card-bg);
   padding: 24px;
   border-radius: 16px;
-  border: 1px solid #e5e7eb;
-  transition: border-color 0.2s;
+  border: 1px solid var(--color-border-light);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .latestCard:hover {
-  border-color: var(--color-text);
+  border-color: var(--color-primary);
+  transform: translateX(-4px);
+  box-shadow: var(--shadow-md);
 }
+
 
 .latestCard h4 {
   font-size: 16px;

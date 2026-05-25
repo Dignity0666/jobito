@@ -12,8 +12,9 @@
 .bannerContainer {
   position: relative;
   overflow: hidden;
-  background: var(--color-card-bg, #ffffff);
-  border: 1px solid #f3f4f6;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border-light);
+
   border-radius: 24px;
   padding: 32px;
   display: flex;
@@ -70,7 +71,8 @@
 }
 
 .weAreLabel {
-  color: #9ca3af;
+  color: var(--color-text-muted);
+
   font-weight: 800;
   letter-spacing: 0.2em;
   font-size: 10px;
@@ -92,14 +94,16 @@
 }
 
 .description {
-  color: #6b7280;
+  color: var(--color-text-secondary);
+
   font-size: 14px;
   margin: 0;
 }
 
 .boldText {
   font-weight: 800;
-  color: #1f2937;
+  color: var(--color-text);
+
 }
 
 .mutedText {
@@ -136,7 +140,8 @@
 }
 
 .applyBtn:hover {
-  background-color: #2f54d8;
+  background-color: var(--color-primary-hover);
+
   transform: translateY(-2px);
   box-shadow: 0 15px 30px rgba(60, 101, 245, 0.3);
 }

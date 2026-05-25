@@ -1,42 +1,11 @@
-/* ============================================================
-   Color Palette Variables
-   Midnight Navy  #0B1020
-   Cobalt Bloom   #4A6ED1
-   Tangerine Petal #FF7A2A
-   Dusty Taupe    #B59A90
-   ============================================================ */
-
-:root {
-  --midnight-navy: #0B1020;
-  --cobalt-bloom: #4A6ED1;
-  --tangerine: #FF7A2A;
-  --dusty-taupe: #B59A90;
-
-  --bg-page: #f4f2f0;
-  --bg-card: #ffffff;
-  --bg-card-alt: #faf8f6;
-  --border: rgba(11, 16, 32, 0.1);
-  --text-primary: #0B1020;
-  --text-secondary: #5a5560;
-  --text-muted: #9a8f8a;
-  --shadow-sm: 0 2px 8px rgba(11, 16, 32, 0.07);
-  --shadow-md: 0 4px 20px rgba(11, 16, 32, 0.10);
-  --shadow-lg: 0 8px 32px rgba(11, 16, 32, 0.13);
-  --radius: 16px;
-  --radius-sm: 10px;
-}
-
-/* ============================================================
-   Base Layout
-   ============================================================ */
-
 .dashboard {
   min-height: 100vh;
-  background: var(--bg-page);
+  background: var(--color-bg);
   padding: 32px 28px 48px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: var(--text-primary);
+  font-family: 'Sora', sans-serif;
+  color: var(--color-text);
 }
+
 
 /* ============================================================
    Header
@@ -48,40 +17,42 @@
   justify-content: space-between;
   margin-bottom: 32px;
   padding-bottom: 24px;
-  border-bottom: 2px solid var(--border);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .header h1 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--midnight-navy);
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-text);
   margin: 0 0 6px;
   letter-spacing: -0.5px;
 }
 
 .header p {
-  color: var(--text-secondary);
+  color: var(--color-text-secondary);
   font-size: 0.95rem;
   margin: 0;
 }
+
 
 /* ============================================================
    Cards
    ============================================================ */
 
 .card {
-  background: var(--bg-card);
-  border-radius: var(--radius);
+  background: var(--color-card-bg);
+  border-radius: 20px;
   box-shadow: var(--shadow-md);
-  border: 1px solid var(--border);
+  border: 1px solid var(--color-border);
   overflow: hidden;
-  transition: box-shadow 0.25s ease, transform 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card:hover {
   box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
 }
+
 
 /* ============================================================
    Top Grid
@@ -118,18 +89,18 @@
   right: 0;
   width: 5px;
   height: 100%;
-  background: var(--cobalt-bloom);
-  border-radius: 0 var(--radius) var(--radius) 0;
+  background: var(--color-primary);
+  border-radius: 0 20px 20px 0;
 }
 
 .statCard:last-child::before {
-  background: var(--tangerine);
+  background: var(--color-accent);
 }
 
 .statLabel {
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.6px;
   margin-bottom: 10px;
@@ -138,10 +109,11 @@
 .statNum {
   font-size: 2.6rem;
   font-weight: 800;
-  color: var(--midnight-navy);
+  color: var(--color-text);
   line-height: 1;
   margin-bottom: 6px;
 }
+
 
 .statIcon {
   position: absolute;
@@ -163,11 +135,12 @@
 .chartCard h3 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--midnight-navy);
+  color: var(--color-text);
   margin: 0 0 20px;
   padding-bottom: 14px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--color-border);
 }
+
 
 .chartInner {
   display: flex;
@@ -210,15 +183,16 @@
 .legendPct {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--midnight-navy);
+  color: var(--color-text);
   line-height: 1.2;
 }
 
 .legendLabel {
   font-size: 0.78rem;
-  color: var(--text-muted);
+  color: var(--color-text-muted);
   font-weight: 500;
 }
+
 
 /* ============================================================
    History Section
@@ -234,9 +208,10 @@
 .historyHeader h2 {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--midnight-navy);
+  color: var(--color-text);
   margin: 0;
 }
+
 
 /* ============================================================
    App List
@@ -250,29 +225,30 @@
 }
 
 .appItem {
-  background: var(--bg-card);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
+  background: var(--color-card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
   box-shadow: var(--shadow-sm);
   display: flex;
   align-items: center;
   gap: 14px;
   padding: 16px 18px;
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .appItem:hover {
   box-shadow: var(--shadow-md);
-  transform: translateX(-3px);
-  border-color: rgba(74, 110, 209, 0.25);
+  transform: translateX(-4px);
+  border-color: var(--color-primary);
 }
+
 
 .appLogo {
   width: 44px;
   height: 44px;
   border-radius: 10px;
-  background: var(--bg-card-alt);
-  border: 1px solid var(--border);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -289,7 +265,7 @@
 .appTitle {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--midnight-navy);
+  color: var(--color-text);
   margin-bottom: 3px;
   white-space: nowrap;
   overflow: hidden;
@@ -298,8 +274,9 @@
 
 .appMeta {
   font-size: 0.8rem;
-  color: var(--text-muted);
+  color: var(--color-text-muted);
 }
+
 
 .appDateCol {
   text-align: center;
@@ -308,7 +285,7 @@
 
 .appDateLabel {
   font-size: 0.72rem;
-  color: var(--text-muted);
+  color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 2px;
@@ -317,8 +294,9 @@
 .appDateVal {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--color-text-secondary);
 }
+
 
 /* ============================================================
    Badges
@@ -337,17 +315,19 @@
 
 /* Applied / Reviewing  → Cobalt Bloom tint */
 .badgeReview {
-  background: rgba(74, 110, 209, 0.12);
-  color: var(--cobalt-bloom);
-  border: 1px solid rgba(74, 110, 209, 0.25);
+  background: rgba(var(--color-primary-rgb), 0.12);
+  color: var(--color-primary);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.25);
 }
+
 
 /* Hired → Tangerine tint */
 .badgeShortlisted {
-  background: rgba(255, 122, 42, 0.12);
-  color: var(--tangerine);
-  border: 1px solid rgba(255, 122, 42, 0.25);
+  background: rgba(var(--color-accent-rgb), 0.12);
+  color: var(--color-accent);
+  border: 1px solid rgba(var(--color-accent-rgb), 0.25);
 }
+
 
 /* Declined → Dusty Taupe tint */
 .badgeDeclined {
@@ -361,9 +341,9 @@
    ============================================================ */
 
 .moreBtn {
-  background: var(--bg-card-alt);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
   border-radius: 8px;
   width: 32px;
   height: 32px;
@@ -372,20 +352,21 @@
   justify-content: center;
   font-size: 1.1rem;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition: all 0.2s;
   flex-shrink: 0;
 }
 
 .moreBtn:hover {
-  background: var(--cobalt-bloom);
+  background: var(--color-primary);
   color: #fff;
-  border-color: var(--cobalt-bloom);
+  border-color: var(--color-primary);
 }
+
 
 .viewLink {
   background: none;
   border: none;
-  color: var(--cobalt-bloom);
+  color: var(--color-primary);
   font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
@@ -395,8 +376,9 @@
 }
 
 .viewLink:hover {
-  color: var(--tangerine);
+  color: var(--color-accent);
 }
+
 
 /* ============================================================
    Bottom link row

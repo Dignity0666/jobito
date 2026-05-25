@@ -3,6 +3,7 @@ import styles from "./ProfilepageCompany.module.css";
 import { useJobitoAuth } from "../../../context/LinkContxt";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "../../../context/translation-context";
+import { useToast } from "../../../context/ToastContext";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
@@ -118,6 +119,7 @@ export default function ProfilepageCompany() {
   const [comment, setComment] = useState("");
   const [hoverRating, setHoverRating] = useState(0);
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [hasSubmittedReview, setHasSubmittedReview] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { t, language } = useTranslation();
@@ -198,6 +200,11 @@ export default function ProfilepageCompany() {
     };
   }, [apiFetch, id]);
 
+  const [showReportInput, setShowReportInput] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [isReporting, setIsReporting] = useState(false);
+  const [hasReported, setHasReported] = useState(false);
+
   const submitReview = async () => {
     if (!rating) return;
     setSubmittingReview(true);
@@ -212,8 +219,8 @@ export default function ProfilepageCompany() {
         }),
       });
       if (res.ok) {
-        const newReview = await res.json();
-        // Since the backend might not return populated user on creation, fetch again or prepend manually
+        showToast(t("تم إضافة تقييمك بنجاح. شكرًا لك!"));
+        setHasSubmittedReview(true);
         const reviewsRes = await apiFetch(`${API_BASE_URL}/ratings/company/${company?.companyId}`);
         if (reviewsRes.ok) {
           setReviews(await reviewsRes.json());
@@ -223,8 +230,42 @@ export default function ProfilepageCompany() {
       }
     } catch (e) {
       console.error("Failed to submit review", e);
+      showToast(t("حدث خطأ أثناء إضافة التقييم."), "error");
     } finally {
       setSubmittingReview(false);
+    }
+  };
+
+  const { showToast } = useToast();
+
+  const handleReport = async () => {
+    if (!reportReason.trim()) return;
+    setIsReporting(true);
+    try {
+      const res = await apiFetch(`${API_BASE_URL}/content/reports`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reporterUserId: user?.userId || user?.id,
+          postOwnerId: id || company?.companyId,
+          postOwnerName: companyName,
+          contentType: "company_profile",
+          contentId: id || company?.companyId,
+          reason: "other",
+          customReason: reportReason,
+        }),
+      });
+      if (res.ok) {
+        showToast(t("تم إرسال البلاغ بنجاح وسيتم مراجعته من قبل الإدارة."));
+        setHasReported(true);
+        setShowReportInput(false);
+        setReportReason("");
+      }
+    } catch (err) {
+      console.error("Failed to submit report", err);
+      showToast(t("حدث خطأ أثناء إرسال البلاغ."), "error");
+    } finally {
+      setIsReporting(false);
     }
   };
 
@@ -234,7 +275,7 @@ export default function ProfilepageCompany() {
   const companyName =
     t(company?.name || "") || t(user?.companyName || "") || t(user?.name || "") || t("اسم الشركة");
   const companyEmail = company?.contactEmail || user?.email || "";
-  const companyLogo = company?.logoUrl || user?.avatarUrl || user?.avatar;
+  const companyLogo = company?.logoUrl;
   const companyDesc = t(company?.description || "") || t("لا يوجد وصف للشركة حتى الآن.");
 
   const displayLocation =
@@ -261,7 +302,7 @@ export default function ProfilepageCompany() {
                 />
               </div>
               <div className={styles.basicMeta}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap' }}>
                   <h1 className={styles.companyName}>{companyName}</h1>
                   {reviews.length > 0 && (
                     <div style={{ 
@@ -284,7 +325,65 @@ export default function ProfilepageCompany() {
                       </span>
                     </div>
                   )}
+
+                  {/* Report Button */}
+                  {id && (
+                    <button 
+                      onClick={() => !hasReported && setShowReportInput(!showReportInput)}
+                      disabled={hasReported}
+                      style={{ 
+                        background: hasReported ? "rgba(16, 185, 129, 0.1)" : "rgba(220, 38, 38, 0.1)", 
+                        color: hasReported ? "#10b981" : "#dc2626", 
+                        border: `1px solid ${hasReported ? "rgba(16, 185, 129, 0.2)" : "rgba(220, 38, 38, 0.2)"}`, 
+                        padding: "4px 12px", 
+                        borderRadius: "8px", 
+                        fontSize: "0.85rem", 
+                        fontWeight: "600",
+                        cursor: hasReported ? "default" : "pointer",
+                        transition: "all 0.2s"
+                      }}
+                    >
+                      {hasReported ? t("تم الإبلاغ") : t("إبلاغ")}
+                    </button>
+                  )}
                 </div>
+
+                {/* Report Input Area */}
+                {showReportInput && (
+                  <div style={{ marginTop: '10px', width: '100%', maxWidth: '300px' }}>
+                    <input 
+                      type="text" 
+                      value={reportReason}
+                      onChange={(e) => setReportReason(e.target.value)}
+                      placeholder={t("ما هو سبب الإبلاغ؟")}
+                      style={{ 
+                        width: '100%', 
+                        padding: '8px 12px', 
+                        borderRadius: '8px', 
+                        border: '1px solid #ddd', 
+                        fontSize: '0.9rem',
+                        outline: 'none',
+                        marginBottom: '8px'
+                      }}
+                    />
+                    <button 
+                      onClick={handleReport}
+                      disabled={isReporting || !reportReason.trim()}
+                      style={{ 
+                        background: "#dc2626", 
+                        color: "#fff", 
+                        border: "none", 
+                        padding: "6px 16px", 
+                        borderRadius: "6px", 
+                        fontSize: "0.85rem", 
+                        cursor: "pointer",
+                        opacity: (isReporting || !reportReason.trim()) ? 0.6 : 1
+                      }}
+                    >
+                      {isReporting ? t("جاري الإرسال...") : t("إرسال البلاغ")}
+                    </button>
+                  </div>
+                )}
                 <a
                   href={company?.website || "#"}
                   target="_blank"
@@ -366,9 +465,12 @@ export default function ProfilepageCompany() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {/* Submit Review Form (Only show if logged in, not viewing own profile, and hasn't rated yet) */}
             {user && isReadOnly && (() => {
-              const userReview = reviews.find(r => (r.user?.userId || r.user?.id) === (user?.userId || user?.id));
+              const currentUserId = String(user?.userId || user?.id || "");
+              const userReview = reviews.find(r => 
+                String(r.raterUserId || r.raterUser?.userId || r.raterUser?.id || "") === currentUserId
+              );
               
-              if (userReview) {
+              if (userReview || hasSubmittedReview) {
                 return (
                   <div style={{ 
                     background: 'rgba(16, 185, 129, 0.05)', 

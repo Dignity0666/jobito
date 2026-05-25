@@ -150,67 +150,92 @@
 .sort {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   font-size: 14px;
   color: var(--color-text-secondary);
 }
 
 .sort select {
-  padding: 10px 16px;
-  border-radius: 10px;
+  padding: 10px 32px 10px 16px;
+  border-radius: 12px;
   border: 1px solid var(--color-border);
-  background-color: var(--color-input-bg);
+  background-color: var(--color-card-bg);
   font-weight: 600;
   color: var(--color-text);
   cursor: pointer;
   outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  transition: all 0.2s;
 }
+
+.sort select:hover {
+  border-color: var(--color-primary);
+}
+
+.sort select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1);
+}
+
 
 .viewToggles {
   display: flex;
-  gap: 12px;
+  background: var(--color-bg-secondary);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
 }
 
 .toggleBtn {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  border: 1px solid var(--color-border);
-  background: var(--color-card-bg);
-  color: var(--color-text-muted);
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .toggleBtn.active {
   background: var(--color-primary);
   color: white;
-  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.2);
 }
+
+.toggleBtn:hover:not(.active) {
+  background: rgba(var(--color-primary-rgb), 0.05);
+  color: var(--color-primary);
+}
+
 
 /* Job Row Card */
 .jobRow {
   display: flex;
   padding: 32px;
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: 16px;
   margin-bottom: 24px;
   justify-content: space-between;
-
   background: var(--color-card-bg);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   align-items: center;
+  box-shadow: var(--shadow-sm);
 }
 
 .jobRow:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px);
   border-color: var(--color-primary);
-  box-shadow: 0 10px 30px rgba(60, 101, 245, 0.08);
+  box-shadow: 0 20px 40px rgba(var(--color-primary-rgb), 0.1);
 }
+
 
 .jobLeft {
   display: flex;
@@ -404,6 +429,23 @@
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(70, 64, 222, 0.4);
   filter: brightness(1.1);
+}
+
+.darkJobsPage .premiumApplyBtn {
+  box-shadow: 0 4px 15px rgba(70, 64, 222, 0.4);
+}
+
+.darkJobsPage .jobRowTags .typePill {
+  background: rgba(86, 205, 173, 0.15);
+  border: 1px solid rgba(86, 205, 173, 0.2);
+}
+
+.darkJobsPage .metaCircle {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.darkJobsPage .companyNameText {
+  color: #ffffff;
 }
 
 .capacityWrapper {
@@ -669,20 +711,22 @@
 .jobCard {
   background: var(--color-card-bg);
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: 20px;
   padding: 24px;
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   position: relative;
+  box-shadow: var(--shadow-sm);
 }
 
 .jobCard:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px);
   border-color: var(--color-primary);
-  box-shadow: 0 15px 35px rgba(60, 101, 245, 0.1);
+  box-shadow: 0 25px 50px rgba(var(--color-primary-rgb), 0.15);
 }
+
 
 .cardHeader {
   display: flex;

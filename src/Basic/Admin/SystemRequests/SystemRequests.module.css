@@ -1,0 +1,396 @@
+.container {
+  padding: 20px 30px;
+  min-height: 100vh;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+/* ── Page Header ──────────────────────────────── */
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.headerInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.headerIconBox {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #6366f1, #818cf8);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+}
+
+.pageTitle {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.dark .pageTitle { color: #f1f5f9; }
+
+.pageSubtitle {
+  font-size: 13px;
+  color: #64748b;
+  margin: 2px 0 0;
+}
+
+.dark .pageSubtitle { color: #94a3b8; }
+
+/* ── Stats Row ────────────────────────────────── */
+.statsRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.statChip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.statPending { background: #fef3c7; color: #d97706; }
+.dark .statPending { background: rgba(217, 119, 6, 0.15); }
+
+.statApproved { background: #dcfce7; color: #16a34a; }
+.dark .statApproved { background: rgba(22, 163, 74, 0.15); }
+
+.statRejected { background: #fee2e2; color: #dc2626; }
+.dark .statRejected { background: rgba(220, 38, 38, 0.15); }
+
+/* ── Requests Grid ───────────────────────────── */
+.requestsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 20px;
+}
+
+/* ── Request Card ────────────────────────────── */
+.requestCard {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 24px;
+  transition: all 0.25s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.dark .requestCard {
+  background: #0f172a;
+  border-color: #1e293b;
+}
+
+.requestCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.dark .requestCard:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.pendingCard {
+  border-color: #fbbf24;
+  border-width: 1.5px;
+}
+
+.dark .pendingCard {
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.requestType {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6366f1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statusBadge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.statusPending { background: #fef3c7; color: #d97706; }
+.dark .statusPending { background: rgba(217, 119, 6, 0.15); }
+
+.statusApproved { background: #dcfce7; color: #16a34a; }
+.dark .statusApproved { background: rgba(22, 163, 74, 0.15); }
+
+.statusRejected { background: #fee2e2; color: #dc2626; }
+.dark .statusRejected { background: rgba(220, 38, 38, 0.15); }
+
+/* ── Requester Row ───────────────────────────── */
+.requesterRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 14px;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.dark .requesterRow {
+  background: #1e293b;
+  color: #94a3b8;
+}
+
+.requesterRow strong {
+  color: #0f172a;
+}
+
+.dark .requesterRow strong {
+  color: #e2e8f0;
+}
+
+/* ── Candidate Info ──────────────────────────── */
+.candidateInfo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.candidateAvatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+  color: #4f46e5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.dark .candidateAvatar {
+  background: linear-gradient(135deg, #312e81, #4338ca);
+  color: #a5b4fc;
+}
+
+.candidateName {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.dark .candidateName { color: #f1f5f9; }
+
+.candidateEmail {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.dark .candidateEmail { color: #94a3b8; }
+
+/* ── Reason Box ──────────────────────────────── */
+.reasonBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+  font-size: 13px;
+  color: #475569;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.dark .reasonBox {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+.reasonBox svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #6366f1;
+}
+
+/* ── Card Footer ─────────────────────────────── */
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 14px;
+  border-top: 1px solid #f1f5f9;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dark .cardFooter {
+  border-top-color: #1e293b;
+}
+
+.dateInfo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+/* ── Action Buttons ──────────────────────────── */
+.actionBtns {
+  display: flex;
+  gap: 8px;
+}
+
+.approveBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 18px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.approveBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+}
+
+.rejectBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 18px;
+  border-radius: 10px;
+  border: 1.5px solid #fca5a5;
+  background: transparent;
+  color: #dc2626;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dark .rejectBtn {
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+.rejectBtn:hover:not(:disabled) {
+  background: #fee2e2;
+}
+
+.dark .rejectBtn:hover:not(:disabled) {
+  background: rgba(220, 38, 38, 0.1);
+}
+
+.approveBtn:disabled,
+.rejectBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Empty & Loading States ──────────────────── */
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+  gap: 16px;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e2e8f0;
+  border-top: 3px solid #6366f1;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.dark .spinner {
+  border-color: #334155;
+  border-top-color: #818cf8;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.emptyState {
+  text-align: center;
+  padding: 80px 20px;
+  color: #64748b;
+}
+
+.dark .emptyState { color: #94a3b8; }
+
+.emptyIcon {
+  font-size: 56px;
+  margin-bottom: 16px;
+  opacity: 0.4;
+}
+
+.emptyState h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 8px;
+}
+
+.dark .emptyState h3 { color: #f1f5f9; }
+
+.emptyState p {
+  font-size: 14px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* ── Responsive ──────────────────────────────── */
+@media (max-width: 768px) {
+  .container { padding: 16px; }
+  .requestsGrid { grid-template-columns: 1fr; }
+  .pageHeader { flex-direction: column; align-items: flex-start; }
+  .cardFooter { flex-direction: column; align-items: flex-start; }
+}

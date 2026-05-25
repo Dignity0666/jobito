@@ -28,6 +28,9 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import { motion, AnimatePresence } from "framer-motion";
+
+
 export function Header() {
   const { isAuthenticated, user, role } = useJobitoAuth();
   const { language, setLanguage, t } = useTranslation();
@@ -92,39 +95,98 @@ export function Header() {
 
   return (
     <>
-      <header className={isDarkHeader ? styles.rootcompany : styles.rootUser}>
+      <motion.header 
+        key={`${language}-${role}-${user?.classification || ""}`}
+        className={isDarkHeader ? styles.rootcompany : styles.rootUser}
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 100, damping: 20 }}
+      >
+
         <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            {isAuthenticated && role !== "company" && (
-              <SidebarMenu />
-            )}
-            <LogoComponent />
+          <div className={styles.mobileMenuOnly}>
+            <SidebarMenu navLinks={navLinks} />
           </div>
-          <NavBar
-            mobileOpen={mobileOpen}
-            setMobileOpen={setMobileOpen}
-            navLinks={navLinks}
-          />
+          
+          <LogoComponent />
+
+          <div className={styles.desktopNavOnly}>
+            <NavBar
+              mobileOpen={mobileOpen}
+              setMobileOpen={setMobileOpen}
+              navLinks={navLinks}
+            />
+          </div>
         </div>
         
-        <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-          <button
-            className={styles.themeToggleBtn}
-            onClick={toggleTheme}
-            title={theme === "light" ? "Dark Mode" : "Light Mode"}
-          >
-            {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
-          </button>
-          <button className={styles.langBtn} onClick={toggleLanguage} title={language === "ar" ? "English" : "العربية"}>
-            <span>{language === "ar" ? "EN" : "AR"}</span>
-          </button>
-          {role === "company" ? (
-            <HeaderActionscompany />
-          ) : (
-            <HeaderActions isAuthenticated={isAuthenticated} user={user} />
-          )}
-        </div>
-      </header>
+        <motion.div 
+          key={language}
+          style={{ display: "flex", alignItems: "center", gap: "15px" }}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 20 }}
+        >
+
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <button
+              className={styles.themeToggleBtn}
+              onClick={toggleTheme}
+              title={theme === "light" ? "Dark Mode" : "Light Mode"}
+            >
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={theme}
+                  initial={{ y: -10, opacity: 0, rotate: -90 }}
+                  animate={{ y: 0, opacity: 1, rotate: 0 }}
+                  exit={{ y: 10, opacity: 0, rotate: 90 }}
+                  transition={{ duration: 0.2 }}
+                  style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+                >
+                  {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
+                </motion.div>
+              </AnimatePresence>
+            </button>
+            <button className={styles.langBtn} onClick={toggleLanguage} title={language === "ar" ? "English" : "العربية"}>
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={language}
+                  initial={{ y: -10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: 10, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {language === "ar" ? "EN" : "AR"}
+                </motion.span>
+              </AnimatePresence>
+            </button>
+          </div>
+
+          <AnimatePresence mode="wait">
+            {role === "company" ? (
+              <motion.div
+                key="company-actions"
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <HeaderActionscompany />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="user-actions"
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <HeaderActions isAuthenticated={isAuthenticated} user={user} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+        </motion.div>
+      </motion.header>
     </>
   );
 }

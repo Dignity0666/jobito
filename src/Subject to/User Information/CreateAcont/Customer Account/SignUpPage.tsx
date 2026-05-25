@@ -10,10 +10,10 @@ import {
   UserPlusIcon,
   EyeIcon,
   EyeOffIcon,
+  PhoneIcon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
-import signupImage from "../../../../assets/signup.png";
 import { useTranslation } from "../../../../context/translation-context";
 import { useToast } from "../../../../context/ToastContext";
 
@@ -30,17 +30,19 @@ export const SignUpPage: React.FC = () => {
   const [verifiedStatus, setVerifiedStatus] = useState<
     null | "success" | "error"
   >(null);
-  const [verifyMethod, setVerifyMethod] = useState<null | "code" | "link">(
+  const [verifyMethod, setVerifyMethod] = useState<null | "code" | "link" | "phone">(
     null,
   );
   const [verificationCode, setVerificationCode] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
   });
@@ -54,7 +56,6 @@ export const SignUpPage: React.FC = () => {
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
-        // Exchange access_token for id_token via Google's userinfo + our backend
         const res = await fetch(`${API_BASE_URL}/auth/google-login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -76,6 +77,7 @@ export const SignUpPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("SignUpPage: handleSubmit called", formData);
     setFormError("");
 
     if (formData.password !== formData.confirmPassword) {
@@ -87,10 +89,14 @@ export const SignUpPage: React.FC = () => {
       setIsSigningUp(true);
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "69420"
+        },
         body: JSON.stringify({
           full_name: formData.name,
           email: formData.email,
+          phone: formData.phone,
           password: formData.password,
           role: "student",
         }),
@@ -113,8 +119,61 @@ export const SignUpPage: React.FC = () => {
       setIsVerifying(true);
       const res = await fetch(`${API_BASE_URL}/auth/verify-email`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "69420"
+        },
         body: JSON.stringify({ email: formData.email, code: verificationCode }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Verification failed");
+      localStorage.setItem("isNewUser", "true");
+      setVerifiedStatus("success");
+      setSuccess(false);
+    } catch (err: any) {
+      setFormError(err.message);
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleSendPhoneOtp = async () => {
+    if (!formData.phone) {
+      showToast(t("الرجاء إدخال رقم الهاتف أولاً"), "error");
+      return;
+    }
+    try {
+      setIsSendingOtp(true);
+      const res = await fetch(`${API_BASE_URL}/auth/send-phone-otp`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "69420"
+        },
+        body: JSON.stringify({ phone: formData.phone, email: formData.email }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || t("فشل إرسال الرمز"));
+      showToast(t("تم إرسال رمز التحقق إلى هاتفك!"), "success");
+    } catch (err: any) {
+      showToast(err.message, "error");
+    } finally {
+      setIsSendingOtp(false);
+    }
+  };
+
+  const handleVerifyPhoneOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError("");
+    try {
+      setIsVerifying(true);
+      const res = await fetch(`${API_BASE_URL}/auth/verify-phone-otp`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "69420"
+        },
+        body: JSON.stringify({ phone: formData.phone, email: formData.email, code: verificationCode }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Verification failed");
@@ -130,180 +189,245 @@ export const SignUpPage: React.FC = () => {
 
   return (
     <div className={Style.signupwrapper}>
-      {/* Floating Google Auth Button */}
-
-      <motion.div
-        className={Style.signupleft}
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-      >
-        <AnimatePresence mode="wait">
-          {verifiedStatus === "success" ? (
-            <motion.div
-              key="success-final"
-              className={Style.centeredBox}
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
+      <AnimatePresence mode="wait">
+        {verifiedStatus === "success" ? (
+          <motion.div
+            key="success-final"
+            className={Style.centeredBox}
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+          >
+            <div className={Style.successIcon}>
+              <CheckCircleIcon size={64} />
+            </div>
+            <h2 className={Style.title}>{t("تم تفعيل الحساب!")}</h2>
+            <p className={Style.subtitle}>
+              {t("أهلاً بك في Jobito. ملفك الشخصي مستخدم جاهز الآن.")}
+            </p>
+            <button
+              className={Style.authbtn}
+              onClick={() => navigate("/user-information", { state: { showLogin: true } })}
             >
-              <div className={Style.successIcon}>
-                <CheckCircleIcon size={64} />
-              </div>
-              <h2 className={Style.title}>{t("تم تفعيل الحساب!")}</h2>
-              <p className={Style.subtitle}>
-                {t("أهلاً بك في Jobito. ملفك الشخصي مستخدم جاهز الآن.")}
-              </p>
-              <button
-                className={Style.authbtn}
-                onClick={() => navigate("/user-information", { state: { showLogin: true } })}
-              >
-                {t("الذهاب لتسجيل الدخول")}
-              </button>
-            </motion.div>
-          ) : success ? (
-            <motion.div
-              key="verify-steps"
-              className={Style.centeredBox}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              {!verifyMethod ? (
-                <>
-                  <div className={Style.iconCircle}>
-                    <MailIcon size={32} />
-                  </div>
-                  <h2 className={Style.title}>{t("تفعيل البريد الإلكتروني")}</h2>
-                  <p className={Style.subtitle}>
-                    {t("اختر طريقة التفعيل لـ")} <b>{formData.email}</b>
-                  </p>
-
-                  <div className={Style.methodGrid}>
-                    <button
-                      className={Style.methodCard}
-                      onClick={() => setVerifyMethod("link")}
-                    >
-                      <LinkIcon size={24} />
-                      <div>
-                        <strong>{t("رابط عبر البريد")}</strong>
-                        <span>{t("اضغط على الرابط في صندوق الوارد")}</span>
-                      </div>
-                    </button>
-                    <button
-                      className={Style.methodCard}
-                      onClick={() => setVerifyMethod("code")}
-                    >
-                      <SmartphoneIcon size={24} />
-                      <div>
-                        <strong>{t("رمز مكون من 6 أرقام")}</strong>
-                        <span>{t("أدخل الرمز يدوياً")}</span>
-                      </div>
-                    </button>
-                  </div>
-                  <button
-                    className={Style.backBtn}
-                    onClick={() => setSuccess(false)}
-                  >
-                    {t("العودة لإنشاء الحساب")}
-                  </button>
-                </>
-              ) : verifyMethod === "code" ? (
-                <div style={{ width: "100%" }}>
-                  <h2 className={Style.title}>{t("أدخل الرمز")}</h2>
-                  <p className={Style.subtitle}>
-                    {t("تم إرسال رمز من 6 أرقام إلى بريدك الإلكتروني")}
-                  </p>
-                  <form onSubmit={handleVerifyCode}>
-                    <input
-                      type="text"
-                      className={Style.otpInput}
-                      maxLength={6}
-                      placeholder="000000"
-                      value={verificationCode}
-                      onChange={(e) => setVerificationCode(e.target.value)}
-                    />
-                    <button
-                      className={Style.authbtn}
-                      type="submit"
-                      disabled={isVerifying}
-                    >
-                      {isVerifying ? (
-                        <LoaderIcon className="loader" />
-                      ) : (
-                        t("تفعيل الحساب")
-                      )}
-                    </button>
-                  </form>
-                   <button
-                    className={Style.backBtn}
-                    onClick={() => setVerifyMethod(null)}
-                  >
-                    {t("العودة للخيارات")}
-                  </button>
+              {t("الذهاب لتسجيل الدخول")}
+            </button>
+          </motion.div>
+        ) : success ? (
+          <motion.div
+            key="verify-steps"
+            className={Style.centeredBox}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            {!verifyMethod ? (
+              <>
+                <div className={Style.iconCircle}>
+                  <MailIcon size={32} />
                 </div>
-              ) : (
-                <div style={{ textAlign: "center" }}>
-                  <div className={Style.waitingLoader}>⏳</div>
-                  <h2 className={Style.title}>{t("بانتظار الرابط...")}</h2>
-                  <p className={Style.subtitle}>
-                    {t("يرجى الضغط على الرابط المرسل لبريدك الإلكتروني للتفعيل.")}
-                  </p>
-                  <button
-                    className={Style.backBtn}
-                    onClick={() => setVerifyMethod(null)}
-                  >
-                    {t("استخدم الرمز بدلاً من ذلك")}
-                  </button>
-                </div>
-              )}
-            </motion.div>
-          ) : (
-            <motion.div
-              key="register-form"
-              style={{ width: "100%" }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <div className={Style.header}>
-                <div className={Style.logoIcon}>
-                  <UserPlusIcon size={32} />
-                </div>
-                <h2 className={Style.title}>{t("إنشاء حساب جديد")}</h2>
+                <h2 className={Style.title}>{t("تفعيل الحساب")}</h2>
                 <p className={Style.subtitle}>
-                  {t("ابدأ رحلتك المهنية مع Jobito")}
+                  {t("اختر طريقة التفعيل لحسابك")}
                 </p>
-              </div>
 
-              <form className={Style.form} onSubmit={handleSubmit}>
-                {formError && (
-                  <div className={Style.errorBox}>
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    {formError}
-                  </div>
-                )}
-
-                <div className={Style.inputGroup}>
-                  <label>{t("الاسم بالكامل")}</label>
+                <div className={Style.methodGrid}>
+                  <button
+                    className={Style.methodCard}
+                    onClick={() => setVerifyMethod("link")}
+                  >
+                    <LinkIcon size={24} />
+                    <div>
+                      <strong>{t("رابط عبر البريد")}</strong>
+                      <span>{t("اضغط على الرابط في صندوق الوارد")}</span>
+                    </div>
+                  </button>
+                  <button
+                    className={Style.methodCard}
+                    onClick={() => setVerifyMethod("code")}
+                  >
+                    <MailIcon size={24} />
+                    <div>
+                      <strong>{t("رمز عبر البريد")}</strong>
+                      <span>{t("أدخل الرمز المرسل لبريدك")}</span>
+                    </div>
+                  </button>
+                </div>
+                <button
+                  className={Style.backBtn}
+                  onClick={() => setSuccess(false)}
+                >
+                  {t("العودة لإنشاء الحساب")}
+                </button>
+              </>
+            ) : verifyMethod === "code" ? (
+              <div style={{ width: "100%" }}>
+                <h2 className={Style.title}>{t("أدخل الرمز")}</h2>
+                <p className={Style.subtitle}>
+                  {t("تم إرسال رمز من 6 أرقام إلى بريدك الإلكتروني")}
+                </p>
+                <form onSubmit={handleVerifyCode}>
                   <input
                     type="text"
-                    placeholder={t("أدخل اسمك بالكامل")}
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    required
+                    className={Style.otpInput}
+                    maxLength={6}
+                    placeholder="000000"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value)}
                   />
+                  {formError && <div className={Style.errorBox}>{formError}</div>}
+                  <button
+                    className={Style.authbtn}
+                    type="submit"
+                    disabled={isVerifying}
+                  >
+                    {isVerifying ? (
+                      <LoaderIcon className="loader" />
+                    ) : (
+                      t("تفعيل الحساب")
+                    )}
+                  </button>
+                </form>
+                <button
+                  className={Style.resendBtn}
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const res = await fetch(`${API_BASE_URL}/auth/resend-code`, {
+                        method: "POST",
+                        headers: { 
+                          "Content-Type": "application/json",
+                          "ngrok-skip-browser-warning": "69420"
+                        },
+                        body: JSON.stringify({ email: formData.email }),
+                      });
+                      const data = await res.json();
+                      if (!res.ok) throw new Error(data.message || t("فشل إرسال الرمز"));
+                      showToast(t("تم إعادة إرسال الرمز بنجاح"), "success");
+                    } catch (err: any) {
+                      showToast(err.message, "error");
+                    }
+                  }}
+                >
+                  {t("إعادة إرسال الرمز")}
+                </button>
+                <button
+                  className={Style.backBtn}
+                  onClick={() => { setVerifyMethod(null); setVerificationCode(""); setFormError(""); }}
+                >
+                  {t("العودة للخيارات")}
+                </button>
+              </div>
+            ) : verifyMethod === "phone" ? (
+              <div style={{ width: "100%" }}>
+                <div className={Style.iconCircle}>
+                  <PhoneIcon size={32} />
                 </div>
+                <h2 className={Style.title}>{t("التحقق عبر الهاتف")}</h2>
+                <p className={Style.subtitle}>
+                  {t("أدخل رمز التحقق المرسل إلى")} <b>{formData.phone}</b>
+                </p>
+                <form onSubmit={handleVerifyPhoneOtp}>
+                  <input
+                    type="text"
+                    className={Style.otpInput}
+                    maxLength={6}
+                    placeholder="000000"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value)}
+                  />
+                  {formError && <div className={Style.errorBox}>{formError}</div>}
+                  <button
+                    className={Style.authbtn}
+                    type="submit"
+                    disabled={isVerifying}
+                  >
+                    {isVerifying ? (
+                      <LoaderIcon className="loader" />
+                    ) : (
+                      t("تفعيل الحساب")
+                    )}
+                  </button>
+                </form>
+                <button
+                  className={Style.resendBtn}
+                  type="button"
+                  onClick={handleSendPhoneOtp}
+                  disabled={isSendingOtp}
+                >
+                  {isSendingOtp ? t("جاري الإرسال...") : t("إعادة إرسال الرمز")}
+                </button>
+                <button
+                  className={Style.backBtn}
+                  onClick={() => { setVerifyMethod(null); setVerificationCode(""); setFormError(""); }}
+                >
+                  {t("العودة للخيارات")}
+                </button>
+              </div>
+            ) : (
+              <div style={{ textAlign: "center" }}>
+                <div className={Style.waitingLoader}>⏳</div>
+                <h2 className={Style.title}>{t("بانتظار الرابط...")}</h2>
+                <p className={Style.subtitle}>
+                  {t("يرجى الضغط على الرابط المرسل لبريدك الإلكتروني للتفعيل.")}
+                </p>
+                <button
+                  className={Style.backBtn}
+                  onClick={() => setVerifyMethod(null)}
+                >
+                  {t("استخدم الرمز بدلاً من ذلك")}
+                </button>
+              </div>
+            )}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="register-form"
+            style={{ width: "100%" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <div className={Style.header}>
+              <div className={Style.logoIcon}>
+                <UserPlusIcon size={32} />
+              </div>
+              <h2 className={Style.title}>{t("إنشاء حساب جديد")}</h2>
+              <p className={Style.subtitle}>
+                {t("ابدأ رحلتك المهنية مع Jobito")}
+              </p>
+            </div>
 
+            <form className={Style.form} onSubmit={handleSubmit}>
+              {formError && (
+                <div className={Style.errorBox}>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  {formError}
+                </div>
+              )}
+
+              <div className={Style.inputGroup}>
+                <label>{t("الاسم بالكامل")}</label>
+                <input
+                  type="text"
+                  placeholder={t("أدخل اسمك بالكامل")}
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  dir="auto"
+                  required
+                />
+              </div>
+
+              <div className={Style.row}>
                 <div className={Style.inputGroup}>
                   <label>{t("البريد الإلكتروني")}</label>
                   <input
@@ -313,122 +437,131 @@ export const SignUpPage: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
+                    dir="auto"
                     required
                   />
                 </div>
 
-                <div className={Style.row}>
-                  <div className={Style.inputGroup}>
-                    <label>{t("كلمة المرور")}</label>
-                    <div className={Style.relativeInput}>
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={formData.password}
-                        onChange={(e) =>
-                          setFormData({ ...formData, password: e.target.value })
-                        }
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        style={{
-                          position: "absolute",
-                          right: "14px",
-                          background: "none",
-                          border: "none",
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          color: "#94a3b8",
-                          padding: 0,
-                        }}
-                      >
-                        {showPassword ? (
-                          <EyeOffIcon size={18} />
-                        ) : (
-                          <EyeIcon size={18} />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                  <div className={Style.inputGroup}>
-                    <label>{t("تأكيد كلمة المرور")}</label>
-                    <div className={Style.relativeInput}>
-                      <input
-                        type={showConfirmPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={formData.confirmPassword}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            confirmPassword: e.target.value,
-                          })
-                        }
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setShowConfirmPassword(!showConfirmPassword)
-                        }
-                        style={{
-                          position: "absolute",
-                          right: "14px",
-                          background: "none",
-                          border: "none",
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          color: "#94a3b8",
-                          padding: 0,
-                        }}
-                      >
-                        {showConfirmPassword ? (
-                          <EyeOffIcon size={18} />
-                        ) : (
-                          <EyeIcon size={18} />
-                        )}
-                      </button>
-                    </div>
+                <div className={Style.inputGroup}>
+                  <label>{t("رقم الهاتف")}</label>
+                  <input
+                    type="tel"
+                    placeholder={t("+20 1XX XXX XXXX")}
+                    value={formData.phone}
+                    onChange={(e) =>
+                      setFormData({ ...formData, phone: e.target.value })
+                    }
+                    dir="ltr"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className={Style.row}>
+                <div className={Style.inputGroup}>
+                  <label>{t("كلمة المرور")}</label>
+                  <div className={Style.relativeInput}>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={formData.password}
+                      onChange={(e) =>
+                        setFormData({ ...formData, password: e.target.value })
+                      }
+                      dir="auto"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      style={{
+                        position: "absolute",
+                        insetInlineEnd: "14px",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        color: "#94a3b8",
+                        padding: 0,
+                      }}
+                    >
+                      {showPassword ? (
+                        <EyeOffIcon size={18} />
+                      ) : (
+                        <EyeIcon size={18} />
+                      )}
+                    </button>
                   </div>
                 </div>
+                <div className={Style.inputGroup}>
+                  <label>{t("تأكيد كلمة المرور")}</label>
+                  <div className={Style.relativeInput}>
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={formData.confirmPassword}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          confirmPassword: e.target.value,
+                        })
+                      }
+                      dir="auto"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      style={{
+                        position: "absolute",
+                        insetInlineEnd: "14px",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        color: "#94a3b8",
+                        padding: 0,
+                      }}
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOffIcon size={18} />
+                      ) : (
+                        <EyeIcon size={18} />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
 
-                <button
-                  className={Style.authbtn}
-                  type="submit"
-                  disabled={isSigningUp}
-                >
-                  {isSigningUp ? <LoaderIcon className="loader" /> : t("إنشاء حساب")}
-                </button>
-                <button
-                  className={Style.googleFloatingBtn}
-                  onClick={() => googleLogin()}
-                >
-                  <img
-                  className={Style.googleFloatingBtnimg}
-                    src="https://www.svgrepo.com/show/475656/google-color.svg"
-                    alt="Google"
-                    width="24"
-                    height="24"
-                  />
-                  <span>{t("متابعة باستخدام Google")}</span>
-                </button>
-              </form>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
-
-      <div className={Style.signuplight}>
-        <motion.img
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          src={signupImage}
-          alt="Signup Illustration"
-        />
-      </div>
+              <button
+                className={Style.authbtn}
+                type="submit"
+                disabled={isSigningUp}
+                onClick={() => console.log("SignUpPage: Create account button clicked", formData)}
+              >
+                {isSigningUp ? <LoaderIcon className="loader" /> : t("إنشاء حساب")}
+              </button>
+              <button
+                className={Style.googleFloatingBtn}
+                type="button"
+                onClick={() => googleLogin()}
+              >
+                <img
+                  src="https://www.svgrepo.com/show/475656/google-color.svg"
+                  alt="Google"
+                  width="24"
+                  height="24"
+                />
+                <span>{t("متابعة باستخدام Google")}</span>
+              </button>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

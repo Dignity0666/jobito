@@ -1,12 +1,63 @@
 /* ─── Container ─── */
 .container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
   height: 100vh;
   background-color: var(--color-bg);
   display: flex;
   flex-direction: column;
   color: var(--color-text);
-  font-family: inherit;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  font-family: "Sora", sans-serif;
+  overflow: hidden;
+  z-index: 9999; /* Cover everything including header */
+}
+
+.container::-webkit-scrollbar,
+.chatArea::-webkit-scrollbar {
+  display: none;
+}
+
+.container,
+.chatArea {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* ─── Floating Controls ─── */
+.floatingControls {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  z-index: 100000;
+  pointer-events: all;
+}
+
+.floatBtn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.floatBtn:hover {
+  background: var(--color-primary) !important;
+  color: white;
+  transform: translateY(-5px) scale(1.1);
+  box-shadow: 0 15px 45px rgba(var(--color-primary-rgb), 0.5);
 }
 
 /* ─── Top Bar ─── */
@@ -15,8 +66,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 5%;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-header-bg);
+  border-bottom: 1px solid var(--color-border-light);
+  background: var(--color-bg);
 }
 
 .topBarTitle {
@@ -30,7 +81,7 @@
 
 .themeToggle {
   background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-light);
   color: var(--color-text);
   width: 36px;
   height: 36px;
@@ -44,18 +95,8 @@
 
 .themeToggle:hover {
   background: var(--color-primary);
-  color: #fff;
   border-color: var(--color-primary);
-}
-
-/* ─── Chat Area ─── */
-.chatArea {
-  flex: 1;
-  overflow-y: auto;
-  padding: 25px 5%;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+  color: white;
 }
 
 /* ─── Welcome Screen ─── */
@@ -72,20 +113,21 @@
 }
 
 .botAvatarBig {
-  background: var(--color-primary-light);
+  background: var(--color-bg-secondary);
   padding: 18px;
   border-radius: 50%;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-light);
+  color: var(--color-primary);
 }
 
 .welcomeTitle {
   font-size: 28px;
   font-weight: 800;
-  color: var(--color-primary);
+  color: var(--color-text);
 }
 
 .welcomeSubtitle {
-  color: var(--color-text-secondary);
+  color: var(--color-text-muted);
   font-size: 15px;
   max-width: 450px;
   line-height: 1.6;
@@ -126,7 +168,7 @@
 .sugBtn {
   background: var(--color-card-bg);
   color: var(--color-text);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-light);
   padding: 10px 22px;
   border-radius: 999px;
   cursor: pointer;
@@ -137,10 +179,9 @@
 
 .sugBtn:hover {
   background: var(--color-primary);
-  color: #fff;
   border-color: var(--color-primary);
+  color: white;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(74, 110, 209, 0.25);
 }
 
 /* ─── Messages ─── */
@@ -153,6 +194,7 @@
   margin-left: auto;
   margin-right: auto;
   align-items: flex-end;
+  position: relative;
 }
 
 .msgRowUser {
@@ -161,28 +203,50 @@
 
 .bubble {
   padding: 14px 20px;
-  border-radius: 20px;
   max-width: 75%;
   font-size: 15px;
   line-height: 1.7;
   word-wrap: break-word;
+  position: relative;
 }
 
 .bubbleUser {
   background: var(--color-primary);
   color: #fff;
-  border-bottom-right-radius: 4px;
+  border-radius: 15px 15px 0 15px;
+}
+
+.bubbleUser::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: -10px;
+  width: 0;
+  height: 0;
+  border-top: 15px solid transparent;
+  border-left: 15px solid var(--color-primary);
 }
 
 .bubbleBot {
-  background: var(--color-card-bg);
+  background: var(--color-bg-secondary);
   color: var(--color-text);
-  border: 1px solid var(--color-border);
-  border-bottom-left-radius: 4px;
+  border-radius: 15px 15px 15px 0;
+  border: 1px solid var(--color-border-light);
+}
+
+.bubbleBot::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: -10px;
+  width: 0;
+  height: 0;
+  border-top: 15px solid transparent;
+  border-right: 15px solid var(--color-bg-secondary);
 }
 
 .botAvatarSmall {
-  background: var(--color-primary-light);
+  background: var(--color-bg-secondary);
   color: var(--color-primary);
   width: 30px;
   height: 30px;
@@ -191,7 +255,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-light);
 }
 
 .bubbleActionsInside {
@@ -203,7 +267,7 @@
 .miniActionBtn {
   background: transparent;
   border: none;
-  color: var(--color-text-muted);
+  color: rgba(0, 0, 0, 0.4);
   cursor: pointer;
   padding: 2px;
   transition: color 0.2s;
@@ -215,46 +279,73 @@
 
 /* ─── Input Area ─── */
 .inputSection {
-  padding: 18px 5%;
-  border-top: 1px solid var(--color-border);
-  background: var(--color-header-bg);
+  padding: 0 5% 40px;
+  background: transparent !important;
+  border-top: none;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
 }
 
 .inputWrapper {
-  background: var(--color-input-bg);
-  border: 1px solid var(--color-border);
-  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08) !important; /* Slightly more opaque for better cohesion */
+  backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 30px;
   display: flex;
   align-items: center;
-  padding: 8px 14px;
-  gap: 10px;
+  padding: 6px 20px;
+  gap: 12px;
   max-width: 800px;
   margin: 0 auto;
-  transition: border-color 0.2s;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
 }
 
-.inputWrapper:focus-within {
-  border-color: var(--color-primary);
-}
-
-.inputField {
+/* ─── Chat Area ─── */
+.chatArea {
   flex: 1;
-  background: transparent;
-  border: none;
-  color: var(--color-text);
-  padding: 8px;
-  font-size: 15px;
-  outline: none;
-  text-align: right;
+  overflow-y: auto;
+  padding: 30px 5% 120px; /* Space for bottom floating input */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--color-bg);
+}
+
+/* ─── Glassy Bubbles ─── */
+.glassy {
+  background: rgba(255, 255, 255, 0.03) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Override global input backgrounds */
+.container .inputSection .inputWrapper input.inputField {
+  all: unset !important;
+  flex: 1 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  color: var(--color-text) !important;
+  padding: 12px 0 !important;
+  font-size: 15px !important;
+  outline: none !important;
+  box-shadow: none !important;
+  width: 100% !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
 }
 
 .inputField::placeholder {
-  color: var(--color-text-muted);
+  color: rgba(255, 255, 255, 0.4) !important;
 }
 
 .actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   align-items: center;
 }
 
@@ -266,42 +357,42 @@
   padding: 6px;
   display: flex;
   align-items: center;
-  transition: color 0.2s;
+  transition: all 0.2s;
 }
 
 .actionBtn:hover {
   color: var(--color-primary);
+  transform: scale(1.1);
 }
 
 .sendBtn {
-  background: var(--color-primary);
-  color: #fff;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  background: var(--color-primary) !important;
+  color: #fff !important;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   border: none;
   transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
 }
 
 .sendBtn:hover {
-  background: var(--color-primary-hover);
+  background: var(--color-primary-hover) !important;
+  transform: scale(1.05);
+  box-shadow: var(--shadow-md);
 }
 
 .sendBtn:disabled {
-  opacity: 0.4;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
 .stopBtn {
-  background: var(--color-accent) !important;
-}
-
-.stopBtn:hover {
-  background: var(--color-accent-hover) !important;
+  background: #ef4444 !important;
 }
 
 .stopIcon {
@@ -309,4 +400,73 @@
   height: 12px;
   background: #fff;
   border-radius: 2px;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .topBar {
+    padding: 10px 15px;
+  }
+
+  .chatArea {
+    padding: 15px;
+  }
+
+  .welcomeTitle {
+    font-size: 22px;
+  }
+
+  .welcomeSubtitle {
+    font-size: 14px;
+  }
+
+  .bubble {
+    max-width: 85%;
+    font-size: 14px;
+    padding: 12px 16px;
+  }
+
+  .msgRow {
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+
+  .inputSection {
+    padding: 12px 15px;
+  }
+
+  .inputWrapper {
+    padding: 6px 12px;
+    gap: 8px;
+  }
+
+  .inputField {
+    font-size: 14px;
+  }
+
+  .sendBtn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .sugBtn {
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bubble {
+    max-width: 90%;
+  }
+
+  .catItems {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .sugBtn {
+    width: 100%;
+    text-align: center;
+  }
 }

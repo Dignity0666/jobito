@@ -12,9 +12,12 @@ const SupportDashboard: React.FC = () => {
   const isDark = theme === 'dark';
 
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [sidebarTab, setSidebarTab] = useState<'tickets' | 'admins'>('admins');
   const [reply, setReply] = useState("");
   const [tickets, setTickets] = useState<any[]>([]);
+  const [admins, setAdmins] = useState<any[]>([]);
   const [selectedTicket, setSelectedTicket] = useState<any>(null);
+  const [selectedAdmin, setSelectedAdmin] = useState<any>(null);
 
   const fetchTickets = async () => {
     try {
@@ -28,35 +31,60 @@ const SupportDashboard: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchTickets();
-  }, [apiFetch]);
-
-  const fetchTicketMessages = async (id: number) => {
-    setSelectedId(id);
+  const fetchAdmins = async () => {
     try {
-      const res = await apiFetch(`${API_BASE_URL}/admin/ops/support/tickets/${id}`);
+      const res = await apiFetch(`${API_BASE_URL}/admin/staff`);
       if (res.ok) {
         const data = await res.json();
-        setSelectedTicket(data);
+        setAdmins(data || []);
       }
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleSendReply = async () => {
-    if (!reply.trim() || !selectedId) return;
+  useEffect(() => {
+    if (sidebarTab === 'tickets') fetchTickets();
+    else fetchAdmins();
+  }, [apiFetch, sidebarTab, language]);
+
+  const fetchChatHistory = async (otherId: string) => {
+    setSelectedId(otherId as any);
     try {
-      const res = await apiFetch(`${API_BASE_URL}/admin/ops/support/tickets/${selectedId}/reply`, {
+      const res = await apiFetch(`${API_BASE_URL}/chat/p2p/history?userId=${authUser?.id}&otherId=${otherId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setSelectedTicket({
+          ticket: { userName: selectedAdmin?.fullName, userEmail: selectedAdmin?.email },
+          messages: data || []
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedAdmin) {
+      fetchChatHistory(selectedAdmin.adminId);
+    }
+  }, [selectedAdmin]);
+
+  const handleSendReply = async () => {
+    if (!reply.trim() || !selectedAdmin) return;
+    try {
+      const res = await apiFetch(`${API_BASE_URL}/chat/p2p`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: reply })
+        body: JSON.stringify({ 
+          senderId: authUser?.id,
+          recipientId: selectedAdmin.adminId,
+          content: reply 
+        })
       });
       if (res.ok) {
         setReply("");
-        fetchTicketMessages(selectedId);
-        fetchTickets();
+        fetchChatHistory(selectedAdmin.adminId);
       }
     } catch (err) {
       console.error(err);
@@ -65,7 +93,7 @@ const SupportDashboard: React.FC = () => {
 
   const handleCloseTicket = async () => {
     if (!selectedId) return;
-    if (!window.confirm("Are you sure you want to close this ticket?")) return;
+    if (!window.confirm(t("Are you sure you want to close this ticket?"))) return;
     try {
       const res = await apiFetch(`${API_BASE_URL}/admin/ops/support/tickets/${selectedId}/close`, {
         method: 'PATCH',
@@ -82,58 +110,38 @@ const SupportDashboard: React.FC = () => {
   return (
     <div className={styles.root} dir={language === 'ar' ? 'rtl' : 'ltr'}>
       {/* Header */}
-      <header className={styles.header}>
-        <div className={styles.headerShine} />
-        <div className={styles.headerGlow} />
-        <div className={styles.headerLeft}>
-          <p className={styles.headerTitle}>{t("Hello,")} {authUser?.name || 'Admin'}</p>
-          <p className={styles.headerSub}>{t("Following Is Your Organization's Performance Summary")}</p>
-        </div>
-        <div className={styles.headerActions}>
-          <div className={styles.iconBtn} onClick={toggleTheme}>
-            {isDark ? '☀️' : '🌙'}
-          </div>
-          <div className={styles.iconBtn}>🔔</div>
-          <div className={styles.userPill}>
-            <div className={styles.avatarCircle}>{authUser?.name?.[0]?.toUpperCase() || 'A'}</div>
-            <div>
-              <div className={styles.avatarName}>{authUser?.name || 'Admin'}</div>
-              <div className={styles.avatarEmail}>{authUser?.email || ''}</div>
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* Nav */}
       <nav className={styles.nav}>
         <div className={styles.tabsRow}>
           {/* Tabs removed to use global Admin navigation */}
         </div>
-        <button className={styles.sysBtn}>{t("System request")}</button>
+        {authUser?.adminRole === 'super_admin' && (
+          <button className={styles.sysBtn}>{t("System request")}</button>
+        )}
       </nav>
 
       {/* Body */}
       <div className={styles.body}>
-        {/* Left */}
+        {/* Sidebar */}
         <div className={styles.leftPanel}>
-          <div className={styles.panelHeader}>{t("Name")}</div>
+
           <div className={styles.ticketList}>
-            {tickets.map((t) => (
+            {admins.filter(a => a.adminId !== authUser?.id).map((adm) => (
               <div 
-                key={t.ticketId} 
-                className={`${styles.ticketItem} ${selectedId === t.ticketId ? styles.activeTicket : ''} ${t.status === 'open' ? styles.unreadTicket : ''}`}
-                onClick={() => fetchTicketMessages(t.ticketId)}
+                key={adm.adminId} 
+                className={`${styles.ticketItem} ${selectedAdmin?.adminId === adm.adminId ? styles.activeTicket : ''}`}
+                onClick={() => {
+                  setSelectedAdmin(adm);
+                  // fetchChatHistory will be triggered by useEffect
+                }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                  <div className={styles.ticketTitle}>{t.userName}</div>
-                  {t.status === 'open' && <div style={{ width: 8, height: 8, borderRadius: "50%", background: 'var(--color-accent)', flexShrink: 0 }} />}
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: 6 }}>
-                  {t.subject}
-                </div>
-                <div className={styles.ticketMeta}>
-                  <span>{t.userEmail}</span>
-                  <span>{new Date(t.updatedAt).toLocaleDateString()}</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div className={styles.adminAvatarSmall}>{adm.fullName[0]}</div>
+                  <div>
+                    <div className={styles.ticketTitle}>{adm.fullName}</div>
+                    <div className={styles.adminRoleLabel}>{t(adm.role)}</div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -155,38 +163,28 @@ const SupportDashboard: React.FC = () => {
                   <div className={styles.chatTitle}>{selectedTicket.ticket.userName}</div>
                   <div className={styles.chatSub}>{selectedTicket.ticket.userEmail}</div>
                 </div>
-                <div className={styles.chatBadge}>{t(selectedTicket.ticket.status)}</div>
-                {selectedTicket.ticket.status !== 'closed' && (
-                  <button 
-                    onClick={handleCloseTicket}
-                    className={`${styles.sysBtn} ${styles.closeTicketBtn}`}
-                  >
-                    {t("Close Ticket")}
-                  </button>
-                )}
-              </div>
 
+              </div>
               <div className={styles.messages}>
                 {selectedTicket.messages?.map((m: any, i: number) => {
-                  const isUser = m.senderType === "user";
+                  const isMe = m.senderId === authUser?.id;
                   return (
-                    <div key={i} className={`${styles.messageRow} ${isUser ? styles.messageLeft : styles.messageRight}`}>
-                      <div className={`${styles.bubble} ${isUser ? styles.bubbleLeft : styles.bubbleRight}`}>
-                        {m.content}
+                    <div key={i} className={`${styles.messageRow} ${!isMe ? styles.messageLeft : styles.messageRight}`}>
+                      <div className={`${styles.bubble} ${!isMe ? styles.bubbleLeft : styles.bubbleRight}`}>
+                        {m.message}
                       </div>
-                      <div className={styles.msgTime} style={{ textAlign: isUser ? "left" : "right" }}>
-                        {new Date(m.createdAt).toLocaleTimeString()}
+                      <div className={styles.msgTime} style={{ textAlign: !isMe ? "left" : "right" }}>
+                        {new Date(m.createdAt).toLocaleTimeString(language === 'ar' ? 'ar-EG' : 'en-GB')}
                       </div>
                     </div>
                   );
                 })}
               </div>
 
+
               <div className={styles.inputArea}>
                 <div className={styles.inputWrap}>
-                  <span style={{ fontSize: 14, color: 'var(--color-text-muted)', cursor: "pointer" }}>🔗</span>
                   <input className={styles.inputEl} placeholder={t("Reply message")} value={reply} onChange={(e) => setReply(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSendReply()} />
-                  <span style={{ fontSize: 14, color: 'var(--color-text-muted)', cursor: "pointer" }}>😊</span>
                 </div>
                 <button className={styles.sendBtn} onClick={handleSendReply}>➤</button>
               </div>

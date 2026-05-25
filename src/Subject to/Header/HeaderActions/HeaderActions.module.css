@@ -1,8 +1,7 @@
 .right {
   display: flex;
   align-items: center;
-  margin-left: auto;
-  padding-left: 16px;
+  gap: 12px;
 }
 
 .avatarWrap {
@@ -115,3 +114,15 @@
   background: #4338ca;
   transform: translateY(-1px);
 }
+
+@media (max-width: 1024px) {
+  .logoutBtn {
+    display: none;
+  }
+  
+  .avatar {
+    width: 36px;
+    height: 36px;
+  }
+}
+

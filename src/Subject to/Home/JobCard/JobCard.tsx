@@ -157,9 +157,16 @@ export default function JobsDashboard() {
         const result = await response.json();
         const jobsData = result.data || (Array.isArray(result) ? result : []);
 
+        const todayStr = new Date().toDateString();
+
+        // Only include jobs created on the exact same day
+        const todaysJobs = jobsData.filter((job: Job) => {
+          if (!job.createdAt) return false;
+          return new Date(job.createdAt).toDateString() === todayStr;
+        });
+
         // Sort jobs to show newest first
-        const sortedJobs = jobsData.sort((a: Job, b: Job) => {
-          if (!a.createdAt || !b.createdAt) return 0;
+        const sortedJobs = todaysJobs.sort((a: Job, b: Job) => {
           return (
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );

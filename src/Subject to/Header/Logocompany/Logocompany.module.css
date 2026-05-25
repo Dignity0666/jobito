@@ -73,3 +73,17 @@
 .postJobBtn:hover {
   background-color: #5936a8;
 }
+@media (max-width: 768px) {
+  .companyLogo {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .companyName {
+    font-size: 14px;
+  }
+  
+  .companyLabel {
+    font-size: 10px;
+  }
+}

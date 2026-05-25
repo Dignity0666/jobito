@@ -1,7 +1,7 @@
 /* ─── Floating Action Button ─────────────────────── */
 .fab {
   position: fixed;
-  bottom: 28px;
+  bottom: 80px;
   right: 28px;
   z-index: 9999;
   width: 58px;
