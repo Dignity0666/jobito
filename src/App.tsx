@@ -148,7 +148,7 @@ const SplashScreen = () => (
 );
 
 function AppContent() {
-  const { role, user, isAuthenticated, isBackendOffline, isInitialLoading } =
+  const { role, user, isBackendOffline, isInitialLoading } =
     useJobitoAuth();
   const classification = user?.classification;
   const location = useLocation();
@@ -558,6 +558,41 @@ function RootInner() {
 }
 
 export default function App() {
+  useEffect(() => {
+    // Only block DevTools in Production to avoid breaking local development
+    if (import.meta.env.PROD) {
+      const handleContextMenu = (e: MouseEvent) => {
+        e.preventDefault();
+      };
+      
+      const handleKeyDown = (e: KeyboardEvent) => {
+        const key = e.key.toLowerCase();
+        if (
+          e.key === "F12" ||
+          (e.ctrlKey && e.shiftKey && (key === "i" || key === "j" || key === "c")) ||
+          (e.ctrlKey && (key === "u" || key === "s"))
+        ) {
+          e.preventDefault();
+        }
+      };
+
+      document.addEventListener("contextmenu", handleContextMenu);
+      document.addEventListener("keydown", handleKeyDown);
+
+      // DevTools debugger detection loop to freeze DevTools
+      const interval = setInterval(() => {
+        // eslint-disable-next-line no-debugger
+        debugger;
+      }, 500);
+
+      return () => {
+        document.removeEventListener("contextmenu", handleContextMenu);
+        document.removeEventListener("keydown", handleKeyDown);
+        clearInterval(interval);
+      };
+    }
+  }, []);
+
   return (
     <ThemeProvider>
       <TranslationProvider>
