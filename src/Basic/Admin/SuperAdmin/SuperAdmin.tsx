@@ -17,7 +17,7 @@ import { useTranslation } from '../../../context/translation-context';
 import { useToast } from '../../../context/ToastContext';
 import { useJobitoAuth } from '../../../context/LinkContxt';
 import { API_BASE_URL } from '../../../services/api';
-import { Settings, PieChart, TrendingUp, Clock } from 'lucide-react';
+import { Settings, PieChart, TrendingUp } from 'lucide-react';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Filler, Tooltip, Legend);
 
@@ -62,6 +62,36 @@ const SparkLine = ({ data, color }: { data: number[]; color: string }) => {
   );
 };
 
+interface ActivityItem {
+  date: string;
+  count: string;
+}
+
+interface ChartData {
+  activity?: ActivityItem[];
+}
+
+interface StatsData {
+  activeUsers?: number;
+  operationsRevenue?: number;
+  revenue?: number;
+  totalRevenue?: number;
+  totalOperationsRevenue?: number;
+  systemUptime?: number | string;
+  activeSecurityAlerts?: number | string;
+  userDistribution?: {
+    trainees: number;
+    companies: number;
+    staff: number;
+  };
+}
+
+interface MonitoringReport {
+  id: string;
+  createdAt: string;
+  [key: string]: unknown;
+}
+
 // ─── Main Component ──────────────────────────────────────────────────────────
 const SuperAdminDashboard: React.FC = () => {
   const { t, language } = useTranslation();
@@ -70,9 +100,9 @@ const SuperAdminDashboard: React.FC = () => {
   const isSuperAdmin = user?.adminRole === 'super_admin';
 
   const [maintenanceOn, setMaintenanceOn] = useState(false);
-  const [statsData, setStatsData] = useState<any>(null);
-  const [chartData, setChartData] = useState<any>(null);
-  const [monitoringReports, setMonitoringReports] = useState<any[]>([]);
+  const [statsData, setStatsData] = useState<StatsData | null>(null);
+  const [chartData, setChartData] = useState<ChartData | null>(null);
+  const [monitoringReports, setMonitoringReports] = useState<MonitoringReport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const [newAdminName, setNewAdminName] = useState('');
@@ -114,6 +144,7 @@ const SuperAdminDashboard: React.FC = () => {
         body: JSON.stringify({ enabled: newVal })
       });
     } catch (err) {
+      console.error('Error toggling maintenance:', err);
       setMaintenanceOn(!newVal);
     }
   };
@@ -147,11 +178,11 @@ const SuperAdminDashboard: React.FC = () => {
 
   // ─── Chart Configurations ──────────────────────────────────────────────────
   const activityData = chartData?.activity || [];
-  const barLabels = activityData.map((a: any) => {
+  const barLabels = activityData.map((a: ActivityItem) => {
     const d = new Date(a.date);
     return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
   });
-  const barValues = activityData.map((a: any) => parseInt(a.count));
+  const barValues = activityData.map((a: ActivityItem) => parseInt(a.count));
   const displayLabels = barLabels.length > 0 ? barLabels : Array(12).fill('');
   const displayValues = barValues.length > 0 ? barValues : [240, 330, 260, 360, 390, 330, 360, 240, 390, 440, 500, 500];
 
@@ -176,7 +207,7 @@ const SuperAdminDashboard: React.FC = () => {
     ],
   };
 
-  const barOptions: any = {
+  const barOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: { legend: { display: false }, tooltip: { enabled: false } },
@@ -206,7 +237,7 @@ const SuperAdminDashboard: React.FC = () => {
     }]
   };
 
-  const doughnutOptions: any = {
+  const doughnutOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: { legend: { display: false }, tooltip: { enabled: false } },
@@ -248,7 +279,7 @@ const SuperAdminDashboard: React.FC = () => {
     }],
   };
 
-  const lineOptions: any = {
+  const lineOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: { legend: { display: false }, tooltip: { enabled: false } },
@@ -433,10 +464,53 @@ const SuperAdminDashboard: React.FC = () => {
         <div className={styles.adminFormCard}>
           <div className={styles.formHeaderRow}>
             <div>
-              <h2 className={styles.formTitle}>Add New Admin</h2>
-              <p className={styles.formSub}>Invite A New Member To Join The Dashboard With Specific Permissions</p>
+              <h2 className={styles.formTitle}>{t('Add New Admin')}</h2>
+              <p className={styles.formSub}>{t('Invite A New Member To Join The Dashboard With Specific Permissions')}</p>
             </div>
-            <span className={styles.exclusiveBadge}>Exclusive Access</span>
+            <span className={styles.exclusiveBadge}>{t('Exclusive Access')}</span>
+          </div>
+
+          <div className={styles.formInputsRow}>
+            <div className={styles.inputGroup}>
+              <label>{t('Full Name')}</label>
+              <input
+                type="text"
+                placeholder={t('Enter full name')}
+                value={newAdminName}
+                onChange={(e) => setNewAdminName(e.target.value)}
+              />
+            </div>
+            <div className={styles.inputGroup}>
+              <label>{t('Email')}</label>
+              <input
+                type="email"
+                placeholder={t('Enter email address')}
+                value={newAdminEmail}
+                onChange={(e) => setNewAdminEmail(e.target.value)}
+              />
+            </div>
+            <div className={styles.inputGroup}>
+              <label>{t('Password')}</label>
+              <input
+                type="password"
+                placeholder={t('Enter password')}
+                value={newAdminPassword}
+                onChange={(e) => setNewAdminPassword(e.target.value)}
+              />
+            </div>
+            <div className={styles.inputGroup}>
+              <label>{t('Role')}</label>
+              <select
+                value={newAdminRole}
+                onChange={(e) => setNewAdminRole(e.target.value)}
+              >
+                <option value="Operation Manager">{t('Operation Manager')}</option>
+                <option value="Super Admin">{t('Super Admin')}</option>
+              </select>
+            </div>
+            <button className={styles.inviteBtn} onClick={handleInviteAdmin}>
+              {t('Invite')}
+            </button>
           </div>
         </div>
 
