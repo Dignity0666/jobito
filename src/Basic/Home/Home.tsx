@@ -48,7 +48,7 @@ export const Home = () => {
         viewport={{ amount: 0.2 }}
         variants={containerVariants}
       >
-        <div className={styles.container}>
+        <div className={styles.heroContainer}>
           <motion.div className={styles.content} variants={containerVariants}>
             <motion.h1 className={styles.title} variants={itemVariants}>
               {isTradesman ? t("اعرض خدماتك") : t("جد وظيفة")} <br />
@@ -138,20 +138,21 @@ export const Home = () => {
 
             {/* Popular searches section removed as requested */}
           </motion.div>
+
+          <motion.img
+            src={isDark ? herodarktionImage : heroSectionImage}
+            alt="Hero Section"
+            className={styles.heroImage}
+            initial={{ opacity: 0, x: isRTL ? -50 : 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            animate={{ y: [0, -15, 0] }}
+            transition={{
+              opacity: { duration: 0.8 },
+              x: { duration: 0.8 },
+              y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
+            }}
+          />
         </div>
-        <motion.img
-          src={isDark ? herodarktionImage : heroSectionImage}
-          alt="Hero Section"
-          className={styles.heroImage}
-          initial={{ opacity: 0, x: isRTL ? -50 : 50 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          animate={{ y: [0, -15, 0] }}
-          transition={{
-            opacity: { duration: 0.8 },
-            x: { duration: 0.8 },
-            y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
-          }}
-        />
       </motion.section>
       <JobsDashboard />
       <section className={styles.companiesSection}>
