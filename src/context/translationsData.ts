@@ -289,5 +289,94 @@ export const TRANSLATIONS: Record<string, { ar: string; en: string }> = {
     ar: "لم نتمكن من العثور على الصفحة التي تبحث عنها...",
     en: "We can't find the page you're looking for..."
   },
-  "Take me home": { ar: "خذني للرئيسية", en: "Take me home" }
+  "Take me home": { ar: "خذني للرئيسية", en: "Take me home" },
+
+  // Job Board & Filter Items (English Keys)
+  "Full-time": { ar: "دوام كامل", en: "Full-time" },
+  "Part-time": { ar: "دوام جزئي", en: "Part-time" },
+  "Freelance": { ar: "عمل حر", en: "Freelance" },
+  "Internship": { ar: "تدريب", en: "Internship" },
+  "One-time": { ar: "خدمة سريعة", en: "One-time" },
+  "Remote": { ar: "عن بعد", en: "Remote" },
+  "Technical": { ar: "تقني", en: "Technical" },
+  "Non-Technical": { ar: "غير تقني", en: "Non-Technical" },
+  "Services": { ar: "خدمات", en: "Services" },
+  "Tradesman": { ar: "حرفي", en: "Tradesman" },
+  "700$ - 1000$": { ar: "700$ - 1000$", en: "700$ - 1000$" },
+  "1000$ - 1500$": { ar: "1000$ - 1500$", en: "1000$ - 1500$" },
+  "1500$ - 2000$": { ar: "1500$ - 2000$", en: "1500$ - 2000$" },
+  "3000$ or more": { ar: "3000$ أو أكثر", en: "3000$ or more" },
+  "Cairo": { ar: "القاهرة", en: "Cairo" },
+  "Alexandria": { ar: "الإسكندرية", en: "Alexandria" },
+  "Giza": { ar: "الجيزة", en: "Giza" },
+
+  // Arabic Keys for same filters
+  "دوام كامل": { ar: "دوام كامل", en: "Full-time" },
+  "دوام جزئي": { ar: "دوام جزئي", en: "Part-time" },
+  "عمل حر": { ar: "عمل حر", en: "Freelance" },
+  "خدمة سريعة": { ar: "خدمة سريعة", en: "One-time" },
+  "تقني": { ar: "تقني", en: "Technical" },
+  "غير تقني": { ar: "غير تقني", en: "Non-Technical" },
+  "خدمات": { ar: "خدمات", en: "Services" },
+  "حرفي": { ar: "حرفي", en: "Tradesman" },
+  "القاهرة": { ar: "القاهرة", en: "Cairo" },
+  "الإسكندرية": { ar: "الإسكندرية", en: "Alexandria" },
+  "الجيزة": { ar: "الجيزة", en: "Giza" },
+
+  // Other UI terms
+  "من": { ar: "من", en: "of" },
+  "مقبول": { ar: "مقبول", en: "accepted" },
+  "المتقدمين": { ar: "المتقدمين", en: "applicants" },
+  "عرض": { ar: "عرض", en: "Show" },
+
+  // Home Page (Arabic Keys & English Keys)
+  "اعرض خدماتك": { ar: "اعرض خدماتك", en: "Offer Your Services" },
+  "Offer Your Services": { ar: "اعرض خدماتك", en: "Offer Your Services" },
+  "جد وظيفة": { ar: "جد وظيفة", en: "Find a Job" },
+  "Find a Job": { ar: "جد وظيفة", en: "Find a Job" },
+  "لعملائك": { ar: "لعملائك", en: "to Your Clients" },
+  "to Your Clients": { ar: "لعملائك", en: "to Your Clients" },
+  "أحلامك": { ar: "أحلامك", en: "of Your Dreams" },
+  "of Your Dreams": { ar: "أحلامك", en: "of Your Dreams" },
+  "بسهولة": { ar: "بسهولة", en: "Easily" },
+  "Easily": { ar: "بسهولة", en: "Easily" },
+  "اليوم": { ar: "اليوم", en: "Today" },
+  "Today": { ar: "اليوم", en: "Today" },
+  "سوق لمهاراتك وتواصل مع العملاء الذين يبحثون عن خبراتك.": {
+    ar: "سوق لمهاراتك وتواصل مع العملاء الذين يبحثون عن خبراتك.",
+    en: "Market your skills and connect with clients looking for your expertise."
+  },
+  "Market your skills and connect with clients looking for your expertise.": {
+    ar: "سوق لمهاراتك وتواصل مع العملاء الذين يبحثون عن خبراتك.",
+    en: "Market your skills and connect with clients looking for your expertise."
+  },
+  "نربط المحترفين الموهوبين بأفضل الفرص في الشرق الأوسط.": {
+    ar: "نربط المحترفين الموهوبين بأفضل الفرص في الشرق الأوسط.",
+    en: "We connect talented professionals with the best opportunities in the Middle East."
+  },
+  "We connect talented professionals with the best opportunities in the Middle East.": {
+    ar: "نربط المحترفين الموهوبين بأفضل الفرص في الشرق الأوسط.",
+    en: "We connect talented professionals with the best opportunities in the Middle East."
+  },
+  "احصل عليه من Google Play": { ar: "احصل عليه من Google Play", en: "Get it on Google Play" },
+  "Get it on Google Play": { ar: "احصل عليه من Google Play", en: "Get it on Google Play" },
+
+  // Jobs Section & Job Card Keys
+  "حدث خطأ في تحميل الوظائف": { ar: "حدث خطأ في تحميل الوظائف", en: "An error occurred loading jobs" },
+  "An error occurred loading jobs": { ar: "حدث خطأ في تحميل الوظائف", en: "An error occurred loading jobs" },
+  "Provider": { ar: "مزود الخدمة", en: "Provider" },
+  "قابل للتفاوض": { ar: "قابل للتفاوض", en: "Negotiable" },
+  "Negotiable": { ar: "قابل للتفاوض", en: "Negotiable" },
+  "حدث خطأ في جلب الوظائف": { ar: "حدث خطأ في جلب الوظائف", en: "An error occurred fetching jobs" },
+  "An error occurred fetching jobs": { ar: "حدث خطأ في جلب الوظائف", en: "An error occurred fetching jobs" },
+  "الوظائف المتاحة": { ar: "الوظائف المتاحة", en: "Available Jobs" },
+  "Available Jobs": { ar: "الوظائف المتاحة", en: "Available Jobs" },
+
+  // Categories Keys
+  "عرض كل الوظائف ←": { ar: "عرض كل الوظائف ←", en: "Show all jobs ←" },
+  "Show all jobs ←": { ar: "عرض كل الوظائف ←", en: "Show all jobs ←" },
+  "فشل تحميل الفئات": { ar: "فشل تحميل الفئات", en: "Failed to load categories" },
+  "Failed to load categories": { ar: "فشل تحميل الفئات", en: "Failed to load categories" }
 };
+
+
