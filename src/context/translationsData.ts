@@ -376,7 +376,315 @@ export const TRANSLATIONS: Record<string, { ar: string; en: string }> = {
   "عرض كل الوظائف ←": { ar: "عرض كل الوظائف ←", en: "Show all jobs ←" },
   "Show all jobs ←": { ar: "عرض كل الوظائف ←", en: "Show all jobs ←" },
   "فشل تحميل الفئات": { ar: "فشل تحميل الفئات", en: "Failed to load categories" },
-  "Failed to load categories": { ar: "فشل تحميل الفئات", en: "Failed to load categories" }
+  "Failed to load categories": { ar: "فشل تحميل الفئات", en: "Failed to load categories" },
+
+  // About Page (English Keys & Arabic Keys)
+  "Read more": { ar: "اقرأ المزيد", en: "Read more" },
+  "Flexible Support": { ar: "دعم مرن", en: "Flexible Support" },
+  "Expert Advice": { ar: "نصائح الخبراء", en: "Expert Advice" },
+  "Fast Response": { ar: "استجابة سريعة", en: "Fast Response" },
+  "مطابقة ذكية للوظائف": { ar: "مطابقة ذكية للوظائف", en: "Smart Job Matching" },
+  "Smart Job Matching": { ar: "مطابقة ذكية للوظائف", en: "Smart Job Matching" },
+  "يحلل محركنا المدعوم بالذكاء الاصطناعي ملفك الشخصي لمطابقتك مع الفرص المثالية بناءً على مهاراتك وخبراتك.": {
+    ar: "يحلل محركنا المدعوم بالذكاء الاصطناعي ملفك الشخصي لمطابقتك مع الفرص المثالية بناءً على مهاراتك وخبراتك.",
+    en: "Our AI-powered engine analyzes your profile to match you with ideal opportunities based on your skills and experience."
+  },
+  "Our AI-powered engine analyzes your profile to match you with ideal opportunities based on your skills and experience.": {
+    ar: "يحلل محركنا المدعوم بالذكاء الاصطناعي ملفك الشخصي لمطابقتك مع الفرص المثالية بناءً على مهاراتك وخبراتك.",
+    en: "Our AI-powered engine analyzes your profile to match you with ideal opportunities based on your skills and experience."
+  },
+  "شركات موثوقة": { ar: "شركات موثوقة", en: "Trusted Companies" },
+  "Trusted Companies": { ar: "شركات موثوقة", en: "Trusted Companies" },
+  "نتحقق يدوياً من كل صاحب عمل على منصتنا لضمان تجربة بحث عن عمل آمنة وقانونية ومهنية.": {
+    ar: "نتحقق يدوياً من كل صاحب عمل على منصتنا لضمان تجربة بحث عن عمل آمنة وقانونية ومهنية.",
+    en: "We manually verify every employer on our platform to ensure a safe, legal, and professional job search experience."
+  },
+  "We manually verify every employer on our platform to ensure a safe, legal, and professional job search experience.": {
+    ar: "نتحقق يدوياً من كل صاحب عمل على منصتنا لضمان تجربة بحث عن عمل آمنة وقانونية ومهنية.",
+    en: "We manually verify every employer on our platform to ensure a safe, legal, and professional job search experience."
+  },
+  "تحليلات متقدمة": { ar: "تحليلات متقدمة", en: "Advanced Analytics" },
+  "Advanced Analytics": { ar: "تحليلات متقدمة", en: "Advanced Analytics" },
+  "تتبع حالة طلبك، وشاهد ترتيبك بين المتقدمين الآخرين، واحصل على رؤى حول اتجاهات السوق.": {
+    ar: "تتبع حالة طلبك، وشاهد ترتيبك بين المتقدمين الآخرين، واحصل على رؤى حول اتجاهات السوق.",
+    en: "Track your application status, see your rank among other applicants, and get insights into market trends."
+  },
+  "Track your application status, see your rank among other applicants, and get insights into market trends.": {
+    ar: "تتبع حالة طلبك، وشاهد ترتيبك بين المتقدمين الآخرين، واحصل على رؤى حول اتجاهات السوق.",
+    en: "Track your application status, see your rank among other applicants, and get insights into market trends."
+  },
+  "أدوات تطوير المسار المهني": { ar: "أدوات تطوير المسار المهني", en: "Career Development Tools" },
+  "Career Development Tools": { ar: "أدوات تطوير المسار المهني", en: "Career Development Tools" },
+  "من بناء السيرة الذاتية بالذكاء الاصطناعي إلى التحضير للمقابلات، يوفر جوبيتو الأدوات التي تحتاجها للتميز في مسيرتك المهنية.": {
+    ar: "من بناء السيرة الذاتية بالذكاء الاصطناعي إلى التحضير للمقابلات، يوفر جوبيتو الأدوات التي تحتاجها للتميز في مسيرتك المهنية.",
+    en: "From AI resume builder to interview preparation, Jobito provides the tools you need to excel in your career."
+  },
+  "From AI resume builder to interview preparation, Jobito provides the tools you need to excel in your career.": {
+    ar: "من بناء السيرة الذاتية بالذكاء الاصطناعي إلى التحضير للمقابلات، يوفر جوبيتو الأدوات التي تحتاجها للتميز في مسيرتك المهنية.",
+    en: "From AI resume builder to interview preparation, Jobito provides the tools you need to excel in your career."
+  },
+  "البحث والفلترة عن الوظائف": { ar: "البحث والفلترة عن الوظائف", en: "Job Search and Filtering" },
+  "Job Search and Filtering": { ar: "البحث والفلترة عن الوظائف", en: "Job Search and Filtering" },
+  "اكتشف دورك القادم باستخدام فلاتر قوية للموقع ونطاقات الرواتب والتقنيات المحددة.": {
+    ar: "اكتشف دورك القادم باستخدام فلاتر قوية للموقع ونطاقات الرواتب والتقنيات المحددة.",
+    en: "Discover your next role using powerful filters for location, salary ranges, and specific technologies."
+  },
+  "Discover your next role using powerful filters for location, salary ranges, and specific technologies.": {
+    ar: "اكتشف دورك القادم باستخدام فلاتر قوية للموقع ونطاقات الرواتب والتقنيات المحددة.",
+    en: "Discover your next role using powerful filters for location, salary ranges, and specific technologies."
+  },
+  "بناء السيرة الذاتية الاحترافية": { ar: "بناء السيرة الذاتية الاحترافية", en: "Professional Resume Builder" },
+  "Professional Resume Builder": { ar: "بناء السيرة الذاتية الاحترافية", en: "Professional Resume Builder" },
+  "أنشئ سيرة ذاتية متميزة في دقائق باستخدام قوالبنا المصممة خصيصاً لتجاوز أنظمة ATS الحديثة.": {
+    ar: "أنشئ سيرة ذاتية متميزة في دقائق باستخدام قوالبنا المصممة خصيصاً لتجاوز أنظمة ATS الحديثة.",
+    en: "Create a standout resume in minutes using templates designed to bypass modern ATS systems."
+  },
+  "Create a standout resume in minutes using templates designed to bypass modern ATS systems.": {
+    ar: "أنشئ سيرة ذاتية متميزة في دقائق باستخدام قوالبنا المصممة خصيصاً لتجاوز أنظمة ATS الحديثة.",
+    en: "Create a standout resume in minutes using templates designed to bypass modern ATS systems."
+  },
+  "البحث عن التنفيذيين": { ar: "البحث عن التنفيذيين", en: "Executive Search" },
+  "Executive Search": { ar: "البحث عن التنفيذيين", en: "Executive Search" },
+  "خدمات توظيف مخصصة للإدارة العليا والأدوار القيادية التقنية المتخصصة.": {
+    ar: "خدمات توظيف مخصصة للإدارة العليا والأدوار القيادية التقنية المتخصصة.",
+    en: "Customized recruitment services for top management and specialized technical leadership roles."
+  },
+  "Customized recruitment services for top management and specialized technical leadership roles.": {
+    ar: "خدمات توظيف مخصصة للإدارة العليا والأدوار القيادية التقنية المتخصصة.",
+    en: "Customized recruitment services for top management and specialized technical leadership roles."
+  },
+  "الاستشارات المهنية": { ar: "الاستشارات المهنية", en: "Career Counseling" },
+  "Career Counseling": { ar: "الاستشارات المهنية", en: "Career Counseling" },
+  "توجيهات خبيرة حول مفاوضات الرواتب، وتخطيط المسار المهني، والنجاح في الانتقالات الوظيفية.": {
+    ar: "توجيهات خبيرة حول مفاوضات الرواتب، وتخطيط المسار المهني، والنجاح في الانتقالات الوظيفية.",
+    en: "Expert guidance on salary negotiations, career planning, and successful career transitions."
+  },
+  "Expert guidance on salary negotiations, career planning, and successful career transitions.": {
+    ar: "توجيهات خبيرة حول مفاوضات الرواتب، وتخطيط المسار المهني، والنجاح في الانتقالات الوظيفية.",
+    en: "Expert guidance on salary negotiations, career planning, and successful career transitions."
+  },
+  "التحضير للمقابلات": { ar: "التحضير للمقابلات", en: "Interview Preparation" },
+  "Interview Preparation": { ar: "التحضير للمقابلات", en: "Interview Preparation" },
+  "مقابلات تجريبية وأدلة للأسئلة الشائعة لمساعدتك في الحصول على الوظيفة في كبرى المنظمات.": {
+    ar: "مقابلات تجريبية وأدلة للأسئلة الشائعة لمساعدتك في الحصول على الوظيفة في كبرى المنظمات.",
+    en: "Mock interviews and guides for common questions to help you land the job at top organizations."
+  },
+  "Mock interviews and guides for common questions to help you land the job at top organizations.": {
+    ar: "مقابلات تجريبية وأدلة للأسئلة الشائعة لمساعدتك في الحصول على الوظيفة في كبرى المنظمات.",
+    en: "Mock interviews and guides for common questions to help you land the job at top organizations."
+  },
+  "رؤى سوق الشركات": { ar: "رؤى سوق الشركات", en: "Company Market Insights" },
+  "Company Market Insights": { ar: "رؤى سوق الشركات", en: "Company Market Insights" },
+  "وصول إلى بيانات حول ثقافة الشركات، ومعايير الرواتب، واتجاهات التوظيف في قطاعك المستهدف.": {
+    ar: "وصول إلى بيانات حول ثقافة الشركات، ومعايير الرواتب، واتجاهات التوظيف في قطاعك المستهدف.",
+    en: "Access to data on company culture, salary benchmarks, and hiring trends in your target industry."
+  },
+  "Access to data on company culture, salary benchmarks, and hiring trends in your target industry.": {
+    ar: "وصول إلى بيانات حول ثقافة الشركات، ومعايير الرواتب، واتجاهات التوظيف في قطاعك المستهدف.",
+    en: "Access to data on company culture, salary benchmarks, and hiring trends in your target industry."
+  },
+  "شارات مهارات معتمدة": { ar: "شارات مهارات معتمدة", en: "Certified Skill Badges" },
+  "Certified Skill Badges": { ar: "شارات مهارات معتمدة", en: "Certified Skill Badges" },
+  "قم بإجراء تقييمات للتحقق من مهاراتك التقنية والتميز أمام مسؤولي التوظيف بشارات معتمدة.": {
+    ar: "قم بإجراء تقييمات للتحقق من مهاراتك التقنية والتميز أمام مسؤولي التوظيف بشارات معتمدة.",
+    en: "Take assessments to verify your technical skills and stand out to recruiters with certified badges."
+  },
+  "Take assessments to verify your technical skills and stand out to recruiters with certified badges.": {
+    ar: "قم بإجراء تقييمات للتحقق من مهاراتك التقنية والتميز أمام مسؤولي التوظيف بشارات معتمدة.",
+    en: "Take assessments to verify your technical skills and stand out to recruiters with certified badges."
+  },
+  "عمر خالد": { ar: "عمر خالد", en: "Omar Khaled" },
+  "Omar Khaled": { ar: "عمر خالد", en: "Omar Khaled" },
+  "مطور واجهات وسرية أول": { ar: "مطور واجهات وسرية أول", en: "Senior Frontend Developer" },
+  "Senior Frontend Developer": { ar: "مطور واجهات وسرية أول", en: "Senior Frontend Developer" },
+  "جوبيتو جعل البحث عن عمل سهلاً بشكل مذهل. في غضون أسبوعين، تم طابقتي مع شركة تناسب مهاراتي تماماً.": {
+    ar: "جوبيتو جعل البحث عن عمل سهلاً بشكل مذهل. في غضون أسبوعين، تم طابقتي مع شركة تناسب مهاراتي تماماً.",
+    en: "Jobito made job hunting incredibly easy. Within two weeks, I was matched with a company that fits my skills perfectly."
+  },
+  "Jobito made job hunting incredibly easy. Within two weeks, I was matched with a company that fits my skills perfectly.": {
+    ar: "جوبيتو جعل البحث عن عمل سهلاً بشكل مذهل. في غضون أسبوعين، تم طابقتي مع شركة تناسب مهاراتي تماماً.",
+    en: "Jobito made job hunting incredibly easy. Within two weeks, I was matched with a company that fits my skills perfectly."
+  },
+  "ليلى يوسف": { ar: "ليلى يوسف", en: "Layla Youssef" },
+  "Layla Youssef": { ar: "ليلى يوسف", en: "Layla Youssef" },
+  "مديرة موارد بشرية، CreativeSync": { ar: "مديرة موارد بشرية، CreativeSync", en: "HR Manager, CreativeSync" },
+  "HR Manager, CreativeSync": { ar: "مديرة موارد بشرية، CreativeSync", en: "HR Manager, CreativeSync" },
+  "كمسؤولة توظيف، كان العثور على الموهبة المناسبة يستغرق أشهراً. مع فلاتر جوبيتو الذكية، وجدنا أفضل المرشحين في أيام.": {
+    ar: "كمسؤولة توظيف، كان العثور على الموهبة المناسبة يستغرق أشهراً. مع فلاتر جوبيتو الذكية، وجدنا أفضل المرشحين في أيام.",
+    en: "As a recruiter, finding the right talent used to take months. With Jobito's smart filters, we found the best candidates in days."
+  },
+  "As a recruiter, finding the right talent used to take months. With Jobito's smart filters, we found the best candidates in days.": {
+    ar: "كمسؤولة توظيف، كان العثور على الموهبة المناسبة يستغرق أشهراً. مع فلاتر جوبيتو الذكية، وجدنا أفضل المرشحين في أيام.",
+    en: "As a recruiter, finding the right talent used to take months. With Jobito's smart filters, we found the best candidates in days."
+  },
+  "أحمد موسى": { ar: "أحمد موسى", en: "Ahmed Moussa" },
+  "Ahmed Moussa": { ar: "أحمد موسى", en: "Ahmed Moussa" },
+  "مصمم واجهات وتجربة مستخدم": { ar: "مصمم واجهات وتجربة مستخدم", en: "UI/UX Designer" },
+  "UI/UX Designer": { ar: "مصمم واجهات وتجربة مستخدم", en: "UI/UX Designer" },
+  "أدوات بناء الملف الشخصي والسيرة الذاتية من الطراز الأول. ساعدني ذلك حقاً في البروز أمام أصحاب العمل الدوليين.": {
+    ar: "أدوات بناء الملف الشخصي والسيرة الذاتية من الطراز الأول. ساعدني ذلك حقاً في البروز أمام أصحاب العمل الدوليين.",
+    en: "The profile building and resume tools are top-notch. It really helped me stand out to international employers."
+  },
+  "The profile building and resume tools are top-notch. It really helped me stand out to international employers.": {
+    ar: "أدوات بناء الملف الشخصي والسيرة الذاتية من الطراز الأول. ساعدني ذلك حقاً في البروز أمام أصحاب العمل الدوليين.",
+    en: "The profile building and resume tools are top-notch. It really helped me stand out to international employers."
+  },
+  "تدريب متخصص": { ar: "تدريب متخصص", en: "Specialized Training" },
+  "Specialized Training": { ar: "تدريب متخصص", en: "Specialized Training" },
+  "جذب المواهب": { ar: "جذب المواهب", en: "Talent Acquisition" },
+  "Talent Acquisition": { ar: "جذب المواهب", en: "Talent Acquisition" },
+  "استراتيجيات الموارد البشرية": { ar: "استراتيجيات الموارد البشرية", en: "HR Strategies" },
+  "HR Strategies": { ar: "استراتيجيات الموارد البشرية", en: "HR Strategies" },
+  "تطوير المسار المهني": { ar: "تطوير المسار المهني", en: "Career Development" },
+  "Career Development": { ar: "تطوير المسار المهني", en: "Career Development" },
+  "تحفيز الموظفين": { ar: "تحفيز الموظفين", en: "Employee Motivation" },
+  "Employee Motivation": { ar: "تحفيز الموظفين", en: "Employee Motivation" },
+  "إدارة الأداء": { ar: "إدارة الأداء", en: "Performance Management" },
+  "Performance Management": { ar: "إدارة الأداء", en: "Performance Management" },
+  "التطوير التنظيمي": { ar: "التطوير التنظيمي", en: "Organizational Development" },
+  "Organizational Development": { ar: "التطوير التنظيمي", en: "Organizational Development" },
+  "التخطيط الاستراتيجي": { ar: "التخطيط الاستراتيجي", en: "Strategic Planning" },
+  "Strategic Planning": { ar: "التخطيط الاستراتيجي", en: "Strategic Planning" },
+  "جد وظيفة أحلامك": { ar: "جد وظيفة أحلامك", en: "Find Your Dream Job" },
+  "Find Your Dream Job": { ar: "جد وظيفة أحلامك", en: "Find Your Dream Job" },
+  "في جوبيتو": { ar: "في جوبيتو", en: "at Jobito" },
+  "at Jobito": { ar: "في جوبيتو", en: "at Jobito" },
+  "يربط جوبيتو بين نخبة المواهب وأكثر الشركات ابتكاراً في العالم. رحلتك نحو مستقبل مهني أفضل تبدأ ببحث أذكى عن وظيفتك.": {
+    ar: "يربط جوبيتو بين نخبة المواهب وأكثر الشركات ابتكاراً في العالم. رحلتك نحو مستقبل مهني أفضل تبدأ ببحث أذكى عن وظيفتك.",
+    en: "Jobito connects elite talent with the most innovative companies in the world. Your journey towards a better professional future begins with a smarter search for your job."
+  },
+  "Jobito connects elite talent with the most innovative companies in the world. Your journey towards a better professional future begins with a smarter search for your job.": {
+    ar: "يربط جوبيتو بين نخبة المواهب وأكثر الشركات ابتكاراً في العالم. رحلتك نحو مستقبل مهني أفضل تبدأ ببحث أذكى عن وظيفتك.",
+    en: "Jobito connects elite talent with the most innovative companies in the world. Your journey towards a better professional future begins with a smarter search for your job."
+  },
+  "ابدأ رحلتك": { ar: "ابدأ رحلتك", en: "Start Your Journey" },
+  "Start Your Journey": { ar: "ابدأ رحلتك", en: "Start Your Journey" },
+  "نظرة عامة على الأداء": { ar: "نظرة عامة على الأداء", en: "Performance Overview" },
+  "Performance Overview": { ar: "نظرة عامة على الأداء", en: "Performance Overview" },
+  "نسبة رضا العملاء": { ar: "نسبة رضا العملاء", en: "Customer Satisfaction Rate" },
+  "Customer Satisfaction Rate": { ar: "نسبة رضا العملاء", en: "Customer Satisfaction Rate" },
+  "عميل": { ar: "عميل", en: "client" },
+  "client": { ar: "عميل", en: "client" },
+  "سنوات": { ar: "سنوات", en: "years" },
+  "years": { ar: "سنوات", en: "years" },
+  "دعم": { ar: "دعم", en: "support" },
+  "support": { ar: "دعم", en: "support" },
+  "التزام": { ar: "التزام", en: "commitment" },
+  "commitment": { ar: "التزام", en: "commitment" },
+  "شريك معتمد": { ar: "شريك معتمد", en: "Certified Partner" },
+  "Certified Partner": { ar: "شريك معتمد", en: "Certified Partner" },
+  "شهادة ISO": { ar: "شهادة ISO", en: "ISO Certification" },
+  "ISO Certification": { ar: "شهادة ISO", en: "ISO Certification" },
+  "الأعلى تقييماً": { ar: "الأعلى تقييماً", en: "Top Rated" },
+  "Top Rated": { ar: "الأعلى تقييماً", en: "Top Rated" },
+  "منذ 2014": { ar: "منذ 2014", en: "Since 2014" },
+  "Since 2014": { ar: "منذ 2014", en: "Since 2014" },
+  "ماذا نقدم": { ar: "ماذا نقدم", en: "What We Offer" },
+  "What We Offer": { ar: "ماذا نقدم", en: "What We Offer" },
+  "الخدمات": { ar: "الخدمات", en: "Services" },
+  "التي نوفرها": { ar: "التي نوفرها", en: "That We Provide" },
+  "That We Provide": { ar: "التي نوفرها", en: "That We Provide" },
+  "يوفر جوبيتو حلول توظيف مخصصة لأعمالك بأكثر الطرق مرونة واعتماداً على القيمة.": {
+    ar: "يوفر جوبيتو حلول توظيف مخصصة لأعمالك بأكثر الطرق مرونة واعتماداً على القيمة.",
+    en: "Jobito provides customized recruitment solutions for your business in the most flexible and value-driven way."
+  },
+  "Jobito provides customized recruitment solutions for your business in the most flexible and value-driven way.": {
+    ar: "يوفر جوبيتو حلول توظيف مخصصة لأعمالك بأكثر الطرق مرونة واعتماداً على القيمة.",
+    en: "Jobito provides customized recruitment solutions for your business in the most flexible and value-driven way."
+  },
+  "رؤيتنا": { ar: "رؤيتنا", en: "Our Vision" },
+  "Our Vision": { ar: "رؤيتنا", en: "Our Vision" },
+  "تمكين": { ar: "تمكين", en: "Empowering" },
+  "Empowering": { ar: "تمكين", en: "Empowering" },
+  "المستقبل": { ar: "المستقبل", en: "the Future" },
+  "the Future": { ar: "المستقبل", en: "the Future" },
+  "في جوبيتو، نؤمن بأن العثور على وظيفة يجب أن يكون ممتعاً بقدر البدء فيها. لقد بنينا منصة تزيل العقبات من عملية التوظيف، مما يسهل على المرشحين التألق وعلى الشركات العثور على نجومهم القادمين.": {
+    ar: "في جوبيتو، نؤمن بأن العثور على وظيفة يجب أن يكون ممتعاً بقدر البدء فيها. لقد بنينا منصة تزيل العقبات من عملية التوظيف، مما يسهل على المرشحين التألق وعلى الشركات العثور على نجومهم القادمين.",
+    en: "At Jobito, we believe finding a job should be as fun as starting one. We've built a platform that removes friction from hiring, making it easier for candidates to shine and companies to find their next stars."
+  },
+  "At Jobito, we believe finding a job should be as fun as starting one. We've built a platform that removes friction from hiring, making it easier for candidates to shine and companies to find their next stars.": {
+    ar: "في جوبيتو، نؤمن بأن العثور على وظيفة يجب أن يكون ممتعاً بقدر البدء فيها. لقد بنينا منصة تزيل العقبات من عملية التوظيف، مما يسهل على المرشحين التألق وعلى الشركات العثور على نجومهم القادمين.",
+    en: "At Jobito, we believe finding a job should be as fun as starting one. We've built a platform that removes friction from hiring, making it easier for candidates to shine and companies to find their next stars."
+  },
+  "فريق جوبيتو": { ar: "فريق جوبيتو", en: "Jobito Team" },
+  "Jobito Team": { ar: "فريق جوبيتو", en: "Jobito Team" },
+  "خبراء الابتكار": { ar: "خبراء الابتكار", en: "Innovation Experts" },
+  "Innovation Experts": { ar: "خبراء الابتكار", en: "Innovation Experts" },
+  "Career Growth": { ar: "النمو المهني", en: "Career Growth" },
+  "النمو المهني": { ar: "النمو المهني", en: "Career Growth" },
+  "أفضل التقنيات": { ar: "أفضل التقنيات", en: "Best Technologies" },
+  "Best Technologies": { ar: "أفضل التقنيات", en: "Best Technologies" },
+  "لماذا تختارنا": { ar: "لماذا تختارنا", en: "Why Choose Us" },
+  "Why Choose Us": { ar: "لماذا تختارنا", en: "Why Choose Us" },
+  "نحن نجمع بين الخبرة والتكنولوجيا والاهتمام الحقيقي لتقديم حلول توظيف تحدث فرقاً ملموساً.": {
+    ar: "نحن نجمع بين الخبرة والتكنولوجيا والاهتمام الحقيقي لتقديم حلول توظيف تحدث فرقاً ملموساً.",
+    en: "We combine expertise, technology, and genuine care to deliver recruitment solutions that make a tangible difference."
+  },
+  "We combine expertise, technology, and genuine care to deliver recruitment solutions that make a tangible difference.": {
+    ar: "نحن نجمع بين الخبرة والتكنولوجيا والاهتمام الحقيقي لتقديم حلول توظيف تحدث فرقاً ملموساً.",
+    en: "We combine expertise, technology, and genuine care to deliver recruitment solutions that make a tangible difference."
+  },
+  "ماذا يقول عملاؤنا": { ar: "ماذا يقول عملاؤنا", en: "What Our Clients Say" },
+  "What Our Clients Say": { ar: "ماذا يقول عملاؤنا", en: "What Our Clients Say" },
+  "قصص واقعية، نتائج حقيقية": { ar: "قصص واقعية، نتائج حقيقية", en: "Real Stories, Real Results" },
+  "Real Stories, Real Results": { ar: "قصص واقعية، نتائج حقيقية", en: "Real Stories, Real Results" },
+  "جسر النجاح": { ar: "جسر النجاح", en: "Bridge to Success" },
+  "Bridge to Success": { ar: "جسر النجاح", en: "Bridge to Success" },
+  "دعم مهني": { ar: "دعم مهني", en: "Career Support" },
+  "Career Support": { ar: "دعم مهني", en: "Career Support" },
+  "عندما تحتاجه": { ar: "عندما تحتاجه", en: "When You Need It" },
+  "When You Need It": { ar: "عندما تحتاجه", en: "When You Need It" },
+  "سواء كنت تبحث عن وظيفتك الأولى أو منصب تنفيذي رفيع، يوفر جوبيتو التوجيه والدعم اللازمين للتنقل في سوق العمل التنافسي بنجاح.": {
+    ar: "سواء كنت تبحث عن وظيفتك الأولى أو منصب تنفيذي رفيع، يوفر جوبيتو التوجيه والدعم اللازمين للتنقل في سوق العمل التنافسي بنجاح.",
+    en: "Whether you are looking for your first job or a high executive position, Jobito provides the guidance and support needed to successfully navigate the competitive job market."
+  },
+  "Whether you are looking for your first job or a high executive position, Jobito provides the guidance and support needed to successfully navigate the competitive job market.": {
+    ar: "سواء كنت تبحث عن وظيفتك الأولى أو منصب تنفيذي رفيع، يوفر جوبيتو التوجيه والدعم اللازمين للتنقل في سوق العمل التنافسي بنجاح.",
+    en: "Whether you are looking for your first job or a high executive position, Jobito provides the guidance and support needed to successfully navigate the competitive job market."
+  },
+  "سنوات خبرة": { ar: "سنوات خبرة", en: "years of experience" },
+  "years of experience": { ar: "سنوات خبرة", en: "years of experience" },
+  "جاهز للانطلاق في مسيرتك المهنية؟": { ar: "جاهز للانطلاق في مسيرتك المهنية؟", en: "Ready to launch your career?" },
+  "Ready to launch your career?": { ar: "جاهز للانطلاق في مسيرتك المهنية؟", en: "Ready to launch your career?" },
+  "انضم لآلاف المحترفين الذين يجدون وظائف أحلامهم يومياً على جوبيتو.": {
+    ar: "انضم لآلاف المحترفين الذين يجدون وظائف أحلامهم يومياً على جوبيتو.",
+    en: "Join thousands of professionals who find their dream jobs daily on Jobito."
+  },
+  "Join thousands of professionals who find their dream jobs daily on Jobito.": {
+    ar: "انضم لآلاف المحترفين الذين يجدون وظائف أحلامهم يومياً على جوبيتو.",
+    en: "Join thousands of professionals who find their dream jobs daily on Jobito."
+  },
+  "ابحث عن وظائف الآن": { ar: "ابحث عن وظائف الآن", en: "Search jobs now" },
+  "Search jobs now": { ar: "ابحث عن وظائف الآن", en: "Search jobs now" },
+  "لأصحاب الأعمال": { ar: "لأصحاب الأعمال", en: "For Employers" },
+  "For Employers": { ar: "لأصحاب الأعمال", en: "For Employers" },
+
+  // Browse Companies Page
+  "Search": { ar: "بحث", en: "Search" },
+  "خطأ في الخادم:": { ar: "خطأ في الخادم:", en: "Server Error:" },
+  "تعذر تحميل البيانات.": { ar: "تعذر تحميل البيانات.", en: "Failed to load data." },
+  "التصنيف": { ar: "التصنيف", en: "Classification" },
+  "Classification": { ar: "التصنيف", en: "Classification" },
+  "لا توجد قطاعات.": { ar: "لا توجد قطاعات.", en: "No categories." },
+  "جميع الشركات": { ar: "جميع الشركات", en: "All Companies" },
+  "All Companies": { ar: "جميع الشركات", en: "All Companies" },
+  "إجمالي الشركات المدرجة:": { ar: "إجمالي الشركات المدرجة:", en: "Total listed companies:" },
+  "إعادة المحاولة": { ar: "إعادة المحاولة", en: "Retry" },
+  "شركة رائدة في مجالها.": { ar: "شركة رائدة في مجالها.", en: "A leading company in its field." },
+  "شركة غير مسماة": { ar: "شركة غير مسماة", en: "Unnamed company" },
+  "وظائف شاغرة": { ar: "وظائف شاغرة", en: "Vacancies" },
+  "Vacancies": { ar: "وظائف شاغرة", en: "Vacancies" },
+  "خدمات عامة": { ar: "خدمات عامة", en: "General Services" },
+  "لم يتم العثور على نتائج.": { ar: "لم يتم العثور على نتائج.", en: "No results found." },
+  "حاول البحث بكلمات أخرى.": { ar: "حاول البحث بكلمات أخرى.", en: "Try searching with other words." },
+  "تصفح الشركات": { ar: "تصفح الشركات", en: "Browse Companies" },
+  "Browse Companies": { ar: "تصفح الشركات", en: "Browse Companies" },
+  "اكتشف أفضل الشركات وابحث عن فرصتك المثالية.": {
+    ar: "اكتشف أفضل الشركات وابحث عن فرصتك المثالية.",
+    en: "Discover the best companies and find your perfect opportunity."
+  },
+  "اسم الشركة أو المجال...": { ar: "اسم الشركة أو المجال...", en: "Company name or sector..." }
 };
+
 
 
