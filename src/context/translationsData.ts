@@ -914,7 +914,15 @@ export const TRANSLATIONS: Record<string, { ar: string; en: string }> = {
   "بدء محادثة": { ar: "بدء محادثة", en: "Start conversation" },
   "Start conversation": { ar: "بدء محادثة", en: "Start conversation" },
   "تواصل": { ar: "تواصل", en: "Contact" },
-  "التواصل": { ar: "التواصل", en: "Contact" }
+  "التواصل": { ar: "التواصل", en: "Contact" },
+  "Confirm Action: Warning": { ar: "تأكيد الإجراء: تحذير", en: "Confirm Action: Warning" },
+  "Confirm Action: Temporary Suspension": { ar: "تأكيد الإجراء: إيقاف مؤقت", en: "Confirm Action: Temporary Suspension" },
+  "Confirm Action: Block": { ar: "تأكيد الإجراء: حظر", en: "Confirm Action: Block" },
+  "Target User": { ar: "المستخدم المستهدف", en: "Target User" },
+  "Enter the reason for this warning clearly...": { ar: "أدخل سبب هذا التحذير بشكل واضح...", en: "Enter the reason for this warning clearly..." },
+  "Enter the reason for this Temporary Suspension clearly...": { ar: "أدخل سبب هذا الإيقاف المؤقت بشكل واضح...", en: "Enter the reason for this Temporary Suspension clearly..." },
+  "Enter the reason for this block clearly...": { ar: "أدخل سبب هذا الحظر بشكل واضح...", en: "Enter the reason for this block clearly..." },
+  "Confirm & Execute": { ar: "تأكيد وتنفيذ", en: "Confirm & Execute" }
 };
 
 

@@ -11,6 +11,8 @@
   --border: var(--color-border);
   --text-main: var(--color-text);
   --text-muted: var(--color-text-muted);
+  --warning: #F59E0B;
+  --danger: #EF4444;
   --radius: 12px;
   --radius-sm: 8px;
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
