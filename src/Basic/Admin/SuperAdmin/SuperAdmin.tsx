@@ -438,39 +438,6 @@ const SuperAdminDashboard: React.FC = () => {
             </div>
             <span className={styles.exclusiveBadge}>Exclusive Access</span>
           </div>
-
-          <div className={styles.formInputsRow}>
-            <div className={styles.inputGroup}>
-              <label>Full Name</label>
-              <input 
-                type="text" 
-                value={newAdminName}
-                onChange={e => setNewAdminName(e.target.value)}
-              />
-            </div>
-            <div className={styles.inputGroup}>
-              <label>Email Address</label>
-              <input 
-                type="email" 
-                placeholder="Admin @jobito.com"
-                value={newAdminEmail}
-                onChange={e => setNewAdminEmail(e.target.value)}
-              />
-            </div>
-            <div className={styles.inputGroup}>
-              <label>Password</label>
-              <input 
-                type="password" 
-                placeholder="••••••••"
-                value={newAdminPassword}
-                onChange={e => setNewAdminPassword(e.target.value)}
-              />
-            </div>
-
-            <button className={styles.inviteBtn} onClick={handleInviteAdmin}>
-              Send invitation
-            </button>
-          </div>
         </div>
 
       </main>
