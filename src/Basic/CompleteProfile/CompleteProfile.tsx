@@ -5,6 +5,7 @@ import styles from "./CompleteProfile.module.css";
 import { useJobitoAuth } from "../../context/LinkContxt";
 import { useTranslation } from "../../context/translation-context";
 import { useToast } from "../../context/ToastContext";
+import { useTheme } from "../../context/ThemeContext";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
@@ -45,6 +46,7 @@ const UploadIcon = () => (
 export default function CompleteProfile() {
   const { t, language, setLanguage } = useTranslation();
   const { user, apiFetch, updateUser } = useJobitoAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   // Role state
@@ -354,6 +356,13 @@ export default function CompleteProfile() {
     <div className={styles.page}>
       {/* ─── Language Toggle ─────────────────────── */}
       <div className={styles.topActions}>
+        <button
+          className={styles.themeBtn}
+          onClick={toggleTheme}
+          title={theme === "light" ? "Dark Mode" : "Light Mode"}
+        >
+          {theme === "light" ? <i className="fas fa-moon" /> : <i className="fas fa-sun" />}
+        </button>
         <button
           className={styles.langBtn}
           onClick={() => setLanguage(language === "ar" ? "en" : "ar")}
