@@ -44,7 +44,7 @@ const UploadIcon = () => (
 
 export default function CompleteProfile() {
   const { t, language, setLanguage } = useTranslation();
-  const { user, apiFetch } = useJobitoAuth();
+  const { user, apiFetch, updateUser } = useJobitoAuth();
   const navigate = useNavigate();
 
   // Role state
@@ -303,6 +303,29 @@ export default function CompleteProfile() {
       const result = await res.json();
       if (result.access_token) {
         localStorage.setItem("token", result.access_token);
+        
+        // Sync context user state immediately to avoid routing race conditions
+        updateUser({
+          name: result.fullName,
+          phone: result.phone,
+          email: result.email,
+          dob: result.dob,
+          gender: result.gender,
+          location: result.location,
+          bio: result.bio,
+          socialLinks: result.socialLinks,
+          experiences: result.experiences,
+          educations: result.educations,
+          skills: result.skills,
+          portfolios: result.portfolios,
+          avatar: result.avatarUrl,
+          avatarUrl: result.avatarUrl,
+          banner_url: result.banner_url,
+          classification: result.classification,
+          services: result.services,
+          criminalRecordUrl: result.criminalRecordUrl,
+        });
+
         window.dispatchEvent(new Event("auth-changed"));
       }
 
