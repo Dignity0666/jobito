@@ -7,21 +7,21 @@
    ============================================================ */
 
 :root {
-  --midnight-navy: #0B1020;
-  --cobalt-bloom: #4A6ED1;
-  --tangerine: #FF7A2A;
-  --dusty-taupe: #B59A90;
+  --midnight-navy: var(--color-text);
+  --cobalt-bloom: var(--color-primary);
+  --tangerine: var(--color-accent);
+  --dusty-taupe: var(--color-muted);
 
-  --bg-page: #f4f2f0;
-  --bg-card: #ffffff;
-  --bg-card-alt: #faf8f6;
-  --border: rgba(11, 16, 32, 0.1);
-  --text-primary: #0B1020;
-  --text-secondary: #5a5560;
-  --text-muted: #9a8f8a;
-  --shadow-sm: 0 2px 8px rgba(11, 16, 32, 0.07);
-  --shadow-md: 0 4px 20px rgba(11, 16, 32, 0.10);
-  --shadow-lg: 0 8px 32px rgba(11, 16, 32, 0.13);
+  --bg-page: var(--color-bg);
+  --bg-card: var(--color-card-bg);
+  --bg-card-alt: var(--color-bg-secondary);
+  --border: var(--color-border);
+  --text-primary: var(--color-text);
+  --text-secondary: var(--color-text-secondary);
+  --text-muted: var(--color-text-muted);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
   --radius: 16px;
   --radius-sm: 10px;
 }
