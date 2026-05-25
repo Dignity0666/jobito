@@ -1,4 +1,4 @@
-import styles from "./home.module.css";
+
 import heroSectionImage from "../../assets/hero-transparent-CQiEc3Un.png";
 import herodarktionImage from "../../assets/hero-transparent-CQiEc3Un.png";
 import Testimonial from "../../Subject to/Home/Partners/Partners";
