@@ -1,9 +1,8 @@
 .pageContainer {
-  min-height: 100vh;
+  /* min-height: 100vh; */
   font-family: "Inter", -apple-system, sans-serif;
-  color: var(--color-text, #E2E8F0);
+  color: var(--color-text);
   padding-bottom: 80px;
-  background-color: var(--color-bg-body, #F8FAFC); /* Modern dashboard background */
 }
 
 [data-theme="dark"] .pageContainer {
