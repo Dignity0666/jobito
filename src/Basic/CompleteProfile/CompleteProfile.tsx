@@ -347,10 +347,19 @@ export default function CompleteProfile() {
         transition={{ duration: 0.6 }}
       >
         <h1 className={styles.heroTitle}>
-          {t("يمكنك التسجيل")} <span className={styles.highlight}>{t("كصنايعي")}</span>
-          <br />
-          {t("أو")} <span className={styles.accentText}>{t("باحث عن عمل")}</span>{" "}
-          {t("مع")} <span className={styles.brandText}>Jobito</span>
+          {language === "ar" ? (
+            <>
+              يمكنك تسجيل الدخول <span className={styles.highlight}>كصنايعي</span>
+              <br />
+              أو <span className={styles.accentText}>باحث عن عمل</span> مع <span className={styles.brandText}>Jobito</span>
+            </>
+          ) : (
+            <>
+              You Can SignIn <span className={styles.highlight}>treadsman</span>
+              <br />
+              or <span className={styles.accentText}>a job seeker</span> with <span className={styles.brandText}>Jobito</span>
+            </>
+          )}
           <motion.svg
             className={styles.heroUnderline}
             viewBox="0 0 120 6"
@@ -385,18 +394,20 @@ export default function CompleteProfile() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          {t("باحث عن عمل")}
+          {language === "ar" ? "باحث عن عمل" : "Job Seeker"}
         </motion.button>
 
-        <span className={styles.roleDivider}>{t("أو")}</span>
+        <span className={styles.roleDivider}>
+          {language === "ar" ? "ضد" : "vs"}
+        </span>
 
         <motion.button
-          className={`${styles.roleBtn} ${role === "tradesman" ? styles.roleBtnAccent : ""}`}
+          className={`${styles.roleBtn} ${role === "tradesman" ? styles.roleBtnActive : ""}`}
           onClick={() => setRole("tradesman")}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          {t("صنايعي")}
+          {language === "ar" ? "صنايعي" : "Treadsman"}
         </motion.button>
       </motion.div>
 
@@ -414,11 +425,11 @@ export default function CompleteProfile() {
         >
           <div className={styles.sectionRow}>
             <div className={styles.sectionLabel}>
-              <h3>{t("صورة الملف الشخصي")}</h3>
+              <h3>{language === "ar" ? "صورة الملف الشخصي" : "Profile Photo"}</h3>
               <p>
-                {t(
-                  "تُعرض هذه الصورة للعامة وتساعد أصحاب العمل في التعرف عليك."
-                )}
+                {language === "ar"
+                  ? "تُعرض هذه الصورة للعامة وتساعد أصحاب العمل في التعرف عليك."
+                  : "This Image Will Show System For All Users And Help The Work Provider to Identify you."}
               </p>
             </div>
             <div className={styles.sectionContent}>
@@ -439,9 +450,9 @@ export default function CompleteProfile() {
                   <UploadIcon />
                   <p className={styles.uploadText}>
                     <span className={styles.uploadLink}>
-                      {t("انقر للاستبدال")}
+                      {language === "ar" ? "انقر للاستبدال" : "Click to replace"}
                     </span>{" "}
-                    {t("أو سحب وإفلات")}
+                    {language === "ar" ? "أو سحب وإفلات" : "or drag and drop"}
                   </p>
                   <p className={styles.uploadHint}>
                     SVG, PNG, JPG or GIF (max. 400 x 400px)
@@ -460,7 +471,7 @@ export default function CompleteProfile() {
         </motion.div>
 
         {/* ═══════════════════════════════════════════
-            ─── Section 2: Wallpaper ──────────────────
+            ─── Section 2: Personal Details ───────────
             ═══════════════════════════════════════════ */}
         <motion.div
           className={styles.section}
@@ -472,76 +483,13 @@ export default function CompleteProfile() {
         >
           <div className={styles.sectionRow}>
             <div className={styles.sectionLabel}>
-              <h3>{t("صورة الغلاف")}</h3>
-              <p>
-                {t(
-                  "تُعرض هذه الصورة في خلفية ملفك الشخصي."
-                )}
-              </p>
-            </div>
-            <div className={styles.sectionContent}>
-              <div
-                className={styles.wallpaperZone}
-                onClick={() => wallpaperInputRef.current?.click()}
-              >
-                {wallpaperPreview ? (
-                  <>
-                    <img
-                      src={wallpaperPreview}
-                      alt="Wallpaper"
-                      className={styles.wallpaperPreviewImg}
-                    />
-                    <div className={styles.wallpaperOverlay}>
-                      <UploadIcon />
-                      <span>{t("تغيير الصورة")}</span>
-                    </div>
-                  </>
-                ) : (
-                  <div className={styles.wallpaperPlaceholder}>
-                    <UploadIcon />
-                    <p className={styles.uploadText}>
-                      <span className={styles.uploadLink}>
-                        {t("انقر للاستبدال")}
-                      </span>{" "}
-                      {t("أو سحب وإفلات")}
-                    </p>
-                    <p className={styles.uploadHint}>
-                      SVG, PNG, JPG or GIF (max. 1600 x 600px)
-                    </p>
-                  </div>
-                )}
-                <input
-                  type="file"
-                  ref={wallpaperInputRef}
-                  style={{ display: "none" }}
-                  accept="image/*"
-                  onChange={handleWallpaperUpload}
-                />
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* ═══════════════════════════════════════════
-            ─── Section 3: Personal Details ───────────
-            ═══════════════════════════════════════════ */}
-        <motion.div
-          className={styles.section}
-          custom={2}
-          variants={sectionVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-        >
-          <div className={styles.sectionRow}>
-            <div className={styles.sectionLabel}>
-              <h3>{t("التفاصيل الشخصية")}</h3>
+              <h3>{language === "ar" ? "التفاصيل الشخصية" : "Personal Details"}</h3>
             </div>
             <div className={styles.sectionContent}>
               <div className={styles.formGrid}>
                 <div className={`${styles.field} ${styles.fieldFull}`}>
                   <label className={styles.label}>
-                    {t("الاسم الكامل")} <span>*</span>
+                    {language === "ar" ? "الاسم الكامل" : "Full Name"} <span>*</span>
                   </label>
                   <input
                     type="text"
@@ -552,12 +500,14 @@ export default function CompleteProfile() {
                     onChange={handleChange}
                   />
                   {formErrors.fullName && (
-                    <div className={styles.errorMessage}>{t("هذا الحقل مطلوب")}</div>
+                    <div className={styles.errorMessage}>
+                      {language === "ar" ? "هذا الحقل مطلوب" : "This field is required"}
+                    </div>
                   )}
                 </div>
                 <div className={styles.field}>
                   <label className={styles.label}>
-                    {t("رقم الهاتف")} <span>*</span>
+                    {language === "ar" ? "رقم الهاتف" : "Phone Number"} <span>*</span>
                   </label>
                   <input
                     type="tel"
@@ -568,12 +518,14 @@ export default function CompleteProfile() {
                     onChange={handleChange}
                   />
                   {formErrors.phone && (
-                    <div className={styles.errorMessage}>{t("هذا الحقل مطلوب")}</div>
+                    <div className={styles.errorMessage}>
+                      {language === "ar" ? "هذا الحقل مطلوب" : "This field is required"}
+                    </div>
                   )}
                 </div>
                 <div className={styles.field}>
                   <label className={styles.label}>
-                    {t("البريد الإلكتروني")} <span>*</span>
+                    {language === "ar" ? "البريد الإلكتروني" : "Email"} <span>*</span>
                   </label>
                   <input
                     type="email"
@@ -584,12 +536,14 @@ export default function CompleteProfile() {
                     onChange={handleChange}
                   />
                   {formErrors.email && (
-                    <div className={styles.errorMessage}>{t("هذا الحقل مطلوب")}</div>
+                    <div className={styles.errorMessage}>
+                      {language === "ar" ? "هذا الحقل مطلوب" : "This field is required"}
+                    </div>
                   )}
                 </div>
                 <div className={styles.field}>
                   <label className={styles.label}>
-                    {t("تاريخ الميلاد")} <span>*</span>
+                    {language === "ar" ? "تاريخ الميلاد" : "Date of Birth"} <span>*</span>
                   </label>
                   <input
                     type="date"
@@ -599,12 +553,14 @@ export default function CompleteProfile() {
                     onChange={handleChange}
                   />
                   {formErrors.dob && (
-                    <div className={styles.errorMessage}>{t("هذا الحقل مطلوب")}</div>
+                    <div className={styles.errorMessage}>
+                      {language === "ar" ? "هذا الحقل مطلوب" : "This field is required"}
+                    </div>
                   )}
                 </div>
                 <div className={styles.field}>
                   <label className={styles.label}>
-                    {t("الجنس")} <span>*</span>
+                    {language === "ar" ? "الجنس" : "Gender"} <span>*</span>
                   </label>
                   <select
                     name="gender"
@@ -612,17 +568,19 @@ export default function CompleteProfile() {
                     value={formData.gender}
                     onChange={handleChange}
                   >
-                    <option value="">{t("اختر...")}</option>
-                    <option value="male">{t("ذكر")}</option>
-                    <option value="female">{t("أنثى")}</option>
+                    <option value="">{language === "ar" ? "اختر..." : "Choose..."}</option>
+                    <option value="male">{language === "ar" ? "ذكر" : "Male"}</option>
+                    <option value="female">{language === "ar" ? "أنثى" : "Female"}</option>
                   </select>
                   {formErrors.gender && (
-                    <div className={styles.errorMessage}>{t("هذا الحقل مطلوب")}</div>
+                    <div className={styles.errorMessage}>
+                      {language === "ar" ? "هذا الحقل مطلوب" : "This field is required"}
+                    </div>
                   )}
                 </div>
-                <div className={styles.field}>
+                <div className={`${styles.field} ${styles.fieldFull}`}>
                   <label className={styles.label}>
-                    {t("المحافظة")} <span>*</span>
+                    {language === "ar" ? "المحافظة" : "Governorate"} <span>*</span>
                   </label>
                   <select
                     name="location"
@@ -630,7 +588,7 @@ export default function CompleteProfile() {
                     value={formData.location}
                     onChange={handleChange}
                   >
-                    <option value="">{t("اختر المحافظة...")}</option>
+                    <option value="">{language === "ar" ? "اختر المحافظة..." : "Choose Governorate..."}</option>
                     {GOVERNORATES.map((gov) => (
                       <option key={gov} value={gov}>
                         {gov}
@@ -638,7 +596,9 @@ export default function CompleteProfile() {
                     ))}
                   </select>
                   {formErrors.location && (
-                    <div className={styles.errorMessage}>{t("هذا الحقل مطلوب")}</div>
+                    <div className={styles.errorMessage}>
+                      {language === "ar" ? "هذا الحقل مطلوب" : "This field is required"}
+                    </div>
                   )}
                 </div>
               </div>
@@ -647,12 +607,12 @@ export default function CompleteProfile() {
         </motion.div>
 
         {/* ═══════════════════════════════════════════
-            ─── Service (Tradesman Only) ──────────────
+            ─── Criminal Record Check (Tradesman Only) 
             ═══════════════════════════════════════════ */}
         {role === "tradesman" && (
           <motion.div
             className={styles.section}
-            custom={2.5}
+            custom={2}
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"
@@ -660,65 +620,50 @@ export default function CompleteProfile() {
           >
             <div className={styles.sectionRow}>
               <div className={styles.sectionLabel}>
-                <h3>{t("الخدمة")}</h3>
-                <p>{t("اختر الخدمات التي تقدمها لعملائك.")}</p>
+                <h3>{language === "ar" ? "صحيفة الحالة الجنائية" : "Criminal Record Check"}</h3>
+                <p>
+                  {language === "ar"
+                    ? "صحيفة الحالة الجنائية هي وثيقة رسمية توضح التاريخ الجنائي للشخص."
+                    : "Is An Official Document That Shows A Person's Criminal History."}
+                </p>
               </div>
               <div className={styles.sectionContent}>
-                <div className={styles.servicesGrid}>
-                  <div className={styles.serviceTagGroup}>
-                    {PREDEFINED_SERVICES.map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        className={`${styles.serviceItem} ${
-                          selectedServices.includes(s) ? styles.serviceItemActive : ""
-                        }`}
-                        onClick={() => {
-                          if (selectedServices.includes(s)) {
-                            setSelectedServices(selectedServices.filter((item) => item !== s));
-                          } else {
-                            setSelectedServices([...selectedServices, s]);
-                          }
-                        }}
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-
-                  {showServiceInput ? (
-                    <div className={styles.customServiceInputRow}>
-                      <input
-                        type="text"
-                        className={styles.input}
-                        placeholder={t("اكتب الخدمة هنا...")}
-                        value={customService}
-                        onChange={(e) => setCustomService(e.target.value)}
-                        autoFocus
+                <div
+                  className={styles.criminalRecordZone}
+                  onClick={() => criminalRecordInputRef.current?.click()}
+                >
+                  {criminalRecordPreview ? (
+                    <div className={styles.previewContainer}>
+                      <img
+                        src={criminalRecordPreview}
+                        alt="Criminal Record"
+                        className={styles.previewImg}
                       />
-                      <button
-                        type="button"
-                        className={styles.addBtnSmall}
-                        onClick={() => {
-                          if (customService.trim()) {
-                            setSelectedServices([...selectedServices, customService.trim()]);
-                            setCustomService("");
-                            setShowServiceInput(false);
-                          }
-                        }}
-                      >
-                        {t("إضافة")}
-                      </button>
+                      <div className={styles.previewOverlay}>
+                        {language === "ar" ? "تغيير الملف" : "Change file"}
+                      </div>
                     </div>
                   ) : (
-                    <button
-                      type="button"
-                      className={styles.addServiceBtn}
-                      onClick={() => setShowServiceInput(true)}
-                    >
-                      <i className="fas fa-plus" /> {t("Add new Serves")}
-                    </button>
+                    <div className={styles.placeholderBox}>
+                      <UploadIcon />
+                      <p className={styles.uploadText}>
+                        <span className={styles.uploadLink}>
+                          {language === "ar" ? "Click to replace" : "Click to replace"}
+                        </span>{" "}
+                        {language === "ar" ? "or drag and drop" : "or drag and drop"}
+                      </p>
+                      <p className={styles.uploadHint}>
+                        SVG, PNG, JPG or GIF (max. 400 x 400px)
+                      </p>
+                    </div>
                   )}
+                  <input
+                    type="file"
+                    ref={criminalRecordInputRef}
+                    style={{ display: "none" }}
+                    accept="image/*"
+                    onChange={handleCriminalRecordUpload}
+                  />
                 </div>
               </div>
             </div>
@@ -726,7 +671,7 @@ export default function CompleteProfile() {
         )}
 
         {/* ═══════════════════════════════════════════
-            ─── Section 4: About Me ───────────────────
+            ─── Section 3: About Me ───────────────────
             ═══════════════════════════════════════════ */}
         <motion.div
           className={styles.section}
@@ -738,13 +683,17 @@ export default function CompleteProfile() {
         >
           <div className={styles.sectionRow}>
             <div className={styles.sectionLabel}>
-              <h3>{t("نبذة عني")}</h3>
-              <p>{t("صف مهاراتك وخبراتك باختصار.")}</p>
+              <h3>{language === "ar" ? "نبذة عني" : "About me"}</h3>
+              <p>
+                {language === "ar"
+                  ? "صف مهاراتك وخبراتك باختصار."
+                  : "Tell Us About Yourself."}
+              </p>
             </div>
             <div className={styles.sectionContent}>
               <textarea
                 className={`${styles.textarea} ${formErrors.bio ? styles.inputError : ""}`}
-                placeholder={t("أضف نبذة عن نفسك...")}
+                placeholder={language === "ar" ? "أضف نبذة عن نفسك..." : "Tell Us About Yourself..."}
                 value={bio}
                 onChange={(e) => {
                   setBio(e.target.value);
@@ -758,16 +707,18 @@ export default function CompleteProfile() {
                 }}
               />
               {formErrors.bio && (
-                <div className={styles.errorMessage}>{t("هذا الحقل مطلوب")}</div>
+                <div className={styles.errorMessage}>
+                  {language === "ar" ? "هذا الحقل مطلوب" : "This field is required"}
+                </div>
               )}
             </div>
           </div>
         </motion.div>
 
         {/* ═══════════════════════════════════════════
-            ─── Section 5: Experiences ────────────────
+            ─── Section 4: Education (Job Seeker / Both)
             ═══════════════════════════════════════════ */}
-        {role !== "tradesman" && (
+        {role === "job_seeker" && (
           <motion.div
             className={styles.section}
             custom={4}
@@ -778,8 +729,125 @@ export default function CompleteProfile() {
           >
             <div className={styles.sectionRow}>
               <div className={styles.sectionLabel}>
-                <h3>{t("الخبرات")}</h3>
-                <p>{t("أضف خبراتك العملية السابقة.")}</p>
+                <h3>{language === "ar" ? "التعليم" : "Education"}</h3>
+                <p>
+                  {language === "ar"
+                    ? "أضف مؤهلاتك العلمية."
+                    : "Tell Us About Your Education."}
+                </p>
+              </div>
+              <div className={styles.sectionContent}>
+                <div className={styles.listContainer}>
+                  <AnimatePresence>
+                    {educations.map((edu, index) => (
+                      <motion.div
+                        key={index}
+                        className={styles.listItem}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <div className={styles.listHeader}>
+                          <span className={styles.label}>
+                            {language === "ar" ? `تعليم ${index + 1}` : `Education ${index + 1}`}
+                          </span>
+                          <button
+                            className={styles.removeBtn}
+                            onClick={() =>
+                              setEducations(
+                                educations.filter((_, i) => i !== index)
+                              )
+                            }
+                          >
+                            {language === "ar" ? "حذف" : "Remove"}
+                          </button>
+                        </div>
+                        <div className={styles.formGrid}>
+                          <div className={styles.field}>
+                            <label className={styles.label}>
+                              {language === "ar" ? "المؤسسة التعليمية" : "School"}
+                            </label>
+                            <input
+                              type="text"
+                              className={styles.input}
+                              value={edu.school}
+                              onChange={(e) => {
+                                const updated = [...educations];
+                                updated[index].school = e.target.value;
+                                setEducations(updated);
+                              }}
+                            />
+                          </div>
+                          <div className={styles.field}>
+                            <label className={styles.label}>
+                              {language === "ar" ? "الدرجة العلمية" : "Graduate Degree"}
+                            </label>
+                            <input
+                              type="text"
+                              className={styles.input}
+                              value={edu.degree}
+                              onChange={(e) => {
+                                const updated = [...educations];
+                                updated[index].degree = e.target.value;
+                                setEducations(updated);
+                              }}
+                            />
+                          </div>
+                          <div className={`${styles.field} ${styles.fieldFull}`}>
+                            <label className={styles.label}>
+                              {language === "ar" ? "المدة" : "Period"}
+                            </label>
+                            <input
+                              type="text"
+                              className={styles.input}
+                              placeholder={language === "ar" ? "مثال: 2018 - 2022" : "e.g. 2018 - 2022"}
+                              value={edu.period}
+                              onChange={(e) => {
+                                const updated = [...educations];
+                                updated[index].period = e.target.value;
+                                setEducations(updated);
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                  <motion.button
+                    className={styles.addBtn}
+                    onClick={addEducation}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    + {language === "ar" ? "إضافة تعليم جديد" : "Add Education"}
+                  </motion.button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ═══════════════════════════════════════════
+            ─── Section 5: Experiences (Job Seeker Only)
+            ═══════════════════════════════════════════ */}
+        {role === "job_seeker" && (
+          <motion.div
+            className={styles.section}
+            custom={5}
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            <div className={styles.sectionRow}>
+              <div className={styles.sectionLabel}>
+                <h3>{language === "ar" ? "الخبرات" : "Experiences"}</h3>
+                <p>
+                  {language === "ar"
+                    ? "أضف خبراتك العملية السابقة."
+                    : "Tell Us About Your Work Experience."}
+                </p>
               </div>
               <div className={styles.sectionContent}>
                 <div className={styles.listContainer}>
@@ -795,7 +863,7 @@ export default function CompleteProfile() {
                       >
                         <div className={styles.listHeader}>
                           <span className={styles.label}>
-                            {t("خبرة")} {index + 1}
+                            {language === "ar" ? `خبرة ${index + 1}` : `Experience ${index + 1}`}
                           </span>
                           <button
                             className={styles.removeBtn}
@@ -805,13 +873,13 @@ export default function CompleteProfile() {
                               )
                             }
                           >
-                            {t("حذف")}
+                            {language === "ar" ? "حذف" : "Remove"}
                           </button>
                         </div>
                         <div className={styles.formGrid}>
                           <div className={`${styles.field} ${styles.fieldFull}`}>
                             <label className={styles.label}>
-                              {t("المسمى الوظيفي")}
+                              {language === "ar" ? "المسمى الوظيفي" : "Role"}
                             </label>
                             <input
                               type="text"
@@ -825,11 +893,13 @@ export default function CompleteProfile() {
                             />
                           </div>
                           <div className={`${styles.field} ${styles.fieldFull}`}>
-                            <label className={styles.label}>{t("المدة")}</label>
+                            <label className={styles.label}>
+                              {language === "ar" ? "المدة" : "Period"}
+                            </label>
                             <input
                               type="text"
                               className={styles.input}
-                              placeholder={t("مثل: يناير 2020 - مارس 2023")}
+                              placeholder={language === "ar" ? "مثل: يناير 2020 - مارس 2023" : "e.g. Jan 2020 - Mar 2023"}
                               value={exp.period}
                               onChange={(e) => {
                                 const updated = [...experiences];
@@ -848,7 +918,7 @@ export default function CompleteProfile() {
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    + {t("إضافة خبرة جديدة")}
+                    + {language === "ar" ? "إضافة خبرة جديدة" : "Add Experience"}
                   </motion.button>
                 </div>
               </div>
@@ -856,117 +926,106 @@ export default function CompleteProfile() {
           </motion.div>
         )}
 
-
         {/* ═══════════════════════════════════════════
-            ─── Section 6: Education ──────────────────
+            ─── Service (Tradesman Only) ──────────────
             ═══════════════════════════════════════════ */}
-        <motion.div
-          className={styles.section}
-          custom={5}
-          variants={sectionVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-        >
-          <div className={styles.sectionRow}>
-            <div className={styles.sectionLabel}>
-              <h3>{t("التعليم")}</h3>
-              <p>{t("أضف مؤهلاتك العلمية.")}</p>
-            </div>
-            <div className={styles.sectionContent}>
-              <div className={styles.listContainer}>
-                <AnimatePresence>
-                  {educations.map((edu, index) => (
-                    <motion.div
-                      key={index}
-                      className={styles.listItem}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <div className={styles.listHeader}>
-                        <span className={styles.label}>
-                          {t("تعليم")} {index + 1}
-                        </span>
+        {role === "tradesman" && (
+          <motion.div
+            className={styles.section}
+            custom={6}
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            <div className={styles.sectionRow}>
+              <div className={styles.sectionLabel}>
+                <h3>{language === "ar" ? "الخدمة" : "Service"}</h3>
+                <p>
+                  {language === "ar"
+                    ? "اختر الخدمات التي تقدمها لعملائك."
+                    : "Tell Us About Your Services."}
+                </p>
+              </div>
+              <div className={styles.sectionContent}>
+                <div className={styles.servicesGrid}>
+                  <div className={styles.serviceTagGroup}>
+                    {[
+                      { ar: "كهربائي", en: "Electrician" },
+                      { ar: "فني سباكة", en: "Plumber" },
+                      { ar: "نجار", en: "Carpenter" },
+                      { ar: "منظف بيوت", en: "House Cleaner" },
+                      { ar: "نقاش", en: "Painter" },
+                      { ar: "ميكانيكي", en: "Mechanic" },
+                      { ar: "حداد", en: "Blacksmith" }
+                    ].map((s) => {
+                      const isSelected = selectedServices.includes(s.ar);
+                      return (
                         <button
-                          className={styles.removeBtn}
-                          onClick={() =>
-                            setEducations(
-                              educations.filter((_, i) => i !== index)
-                            )
-                          }
+                          key={s.ar}
+                          type="button"
+                          className={`${styles.serviceItem} ${
+                            isSelected ? styles.serviceItemActive : ""
+                          }`}
+                          onClick={() => {
+                            if (isSelected) {
+                              setSelectedServices(selectedServices.filter((item) => item !== s.ar));
+                            } else {
+                              setSelectedServices([...selectedServices, s.ar]);
+                            }
+                          }}
                         >
-                          {t("حذف")}
+                          {language === "ar" ? s.ar : s.en}
                         </button>
-                      </div>
-                      <div className={styles.formGrid}>
-                        <div className={styles.field}>
-                          <label className={styles.label}>
-                            {t("المؤسسة التعليمية")}
-                          </label>
-                          <input
-                            type="text"
-                            className={styles.input}
-                            value={edu.school}
-                            onChange={(e) => {
-                              const updated = [...educations];
-                              updated[index].school = e.target.value;
-                              setEducations(updated);
-                            }}
-                          />
-                        </div>
-                        <div className={styles.field}>
-                          <label className={styles.label}>
-                            {t("الدرجة العلمية")}
-                          </label>
-                          <input
-                            type="text"
-                            className={styles.input}
-                            value={edu.degree}
-                            onChange={(e) => {
-                              const updated = [...educations];
-                              updated[index].degree = e.target.value;
-                              setEducations(updated);
-                            }}
-                          />
-                        </div>
-                        <div className={`${styles.field} ${styles.fieldFull}`}>
-                          <label className={styles.label}>{t("المدة")}</label>
-                          <input
-                            type="text"
-                            className={styles.input}
-                            value={edu.period}
-                            onChange={(e) => {
-                              const updated = [...educations];
-                              updated[index].period = e.target.value;
-                              setEducations(updated);
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-                <motion.button
-                  className={styles.addBtn}
-                  onClick={addEducation}
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  + {t("إضافة تعليم جديد")}
-                </motion.button>
+                      );
+                    })}
+                  </div>
+
+                  {showServiceInput ? (
+                    <div className={styles.customServiceInputRow}>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        placeholder={language === "ar" ? "اكتب الخدمة هنا..." : "Type service here..."}
+                        value={customService}
+                        onChange={(e) => setCustomService(e.target.value)}
+                        autoFocus
+                      />
+                      <button
+                        type="button"
+                        className={styles.addBtnSmall}
+                        onClick={() => {
+                          if (customService.trim()) {
+                            setSelectedServices([...selectedServices, customService.trim()]);
+                            setCustomService("");
+                            setShowServiceInput(false);
+                          }
+                        }}
+                      >
+                        {language === "ar" ? "إضافة" : "Add"}
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className={styles.addServiceBtn}
+                      onClick={() => setShowServiceInput(true)}
+                    >
+                      <i className="fas fa-plus" /> {language === "ar" ? "إضافة خدمة جديدة" : "Add new Serves"}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        )}
 
         {/* ═══════════════════════════════════════════
-            ─── Section 7: Skills ─────────────────────
+            ─── Section 6: Skills ─────────────────────
             ═══════════════════════════════════════════ */}
         <motion.div
           className={styles.section}
-          custom={6}
+          custom={7}
           variants={sectionVariants}
           initial="hidden"
           whileInView="visible"
@@ -974,16 +1033,18 @@ export default function CompleteProfile() {
         >
           <div className={styles.sectionRow}>
             <div className={styles.sectionLabel}>
-              <h3>{t("المهارات")}</h3>
+              <h3>{language === "ar" ? "المهارات" : "Skills"}</h3>
             </div>
             <div className={styles.sectionContent}>
               <div className={styles.formGrid}>
                 <div className={styles.fieldFull}>
-                  <label className={styles.label}>{t("المهارات")}</label>
+                  <label className={styles.label}>
+                    {language === "ar" ? "المهارات" : "Skills"}
+                  </label>
                   <input
                     type="text"
                     className={styles.input}
-                    placeholder={t("أضف مهارة واضغط Enter")}
+                    placeholder={language === "ar" ? "أضف مهارة واضغط Enter" : "Add a skill and press Enter"}
                     value={skillInput}
                     onChange={(e) => setSkillInput(e.target.value)}
                     onKeyDown={(e) => {
@@ -1009,20 +1070,18 @@ export default function CompleteProfile() {
                       </span>
                     ))}
                   </div>
-
                 </div>
-        
               </div>
             </div>
           </div>
         </motion.div>
 
         {/* ═══════════════════════════════════════════
-            ─── Section 8: Social Links ───────────────
+            ─── Section 7: Social Links ───────────────
             ═══════════════════════════════════════════ */}
         <motion.div
           className={styles.section}
-          custom={7}
+          custom={8}
           variants={sectionVariants}
           initial="hidden"
           whileInView="visible"
@@ -1030,12 +1089,14 @@ export default function CompleteProfile() {
         >
           <div className={styles.sectionRow}>
             <div className={styles.sectionLabel}>
-              <h3>{t("روابط التواصل الاجتماعي")}</h3>
+              <h3>{language === "ar" ? "روابط التواصل الاجتماعي" : "Social Links"}</h3>
             </div>
             <div className={styles.sectionContent}>
               <div className={styles.formGrid}>
                 <div className={styles.field}>
-                  <label className={styles.label}>{t("إنستجرام")}</label>
+                  <label className={styles.label}>
+                    {language === "ar" ? "إنستجرام" : "Instagram"}
+                  </label>
                   <input
                     type="text"
                     name="instagram"
@@ -1046,7 +1107,9 @@ export default function CompleteProfile() {
                   />
                 </div>
                 <div className={styles.field}>
-                  <label className={styles.label}>{t("تويتر")}</label>
+                  <label className={styles.label}>
+                    {language === "ar" ? "تويتر" : "Twitter"}
+                  </label>
                   <input
                     type="text"
                     name="twitter"
@@ -1062,12 +1125,12 @@ export default function CompleteProfile() {
         </motion.div>
 
         {/* ═══════════════════════════════════════════
-            ─── Criminal Record Check (Tradesman) ─────
+            ─── Section 8: Work Images (Tradesman Only)
             ═══════════════════════════════════════════ */}
         {role === "tradesman" && (
           <motion.div
             className={styles.section}
-            custom={7.5}
+            custom={9}
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"
@@ -1075,124 +1138,66 @@ export default function CompleteProfile() {
           >
             <div className={styles.sectionRow}>
               <div className={styles.sectionLabel}>
-                <h3>{t("Criminal Record Check")}</h3>
+                <h3>{language === "ar" ? "صور الأعمال" : "Your work"}</h3>
                 <p>
-                  {t(
-                    "Is An Official Document That Shows A Person's Criminal History."
-                  )}
+                  {language === "ar"
+                    ? "أضف صور لأعمالك السابقة."
+                    : "Tell Us About Your Work."}
                 </p>
               </div>
               <div className={styles.sectionContent}>
                 <div
-                  className={styles.criminalRecordZone}
-                  onClick={() => criminalRecordInputRef.current?.click()}
+                  className={styles.workImageZone}
+                  onClick={() => workImageRef.current?.click()}
                 >
-                  {criminalRecordPreview ? (
-                    <div className={styles.previewContainer}>
-                      <img
-                        src={criminalRecordPreview}
-                        alt="Criminal Record"
-                        className={styles.previewImg}
-                      />
-                      <div className={styles.previewOverlay}>
-                        {t("تغيير الملف")}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className={styles.placeholderBox}>
-                      <UploadIcon />
-                      <p className={styles.uploadText}>
-                        <span className={styles.uploadLink}>
-                          {t("Click to replace")}
-                        </span>{" "}
-                        {t("or drag and drop")}
-                      </p>
-                      <p className={styles.uploadHint}>
-                        SVG, PNG, JPG or GIF (max. 400 x 400px)
-                      </p>
-                    </div>
-                  )}
+                  <div className={styles.wallpaperPlaceholder}>
+                    <UploadIcon />
+                    <p className={styles.uploadText}>
+                      <span className={styles.uploadLink}>
+                        {language === "ar" ? "انقر للاستبدال" : "Click to replace"}
+                      </span>{" "}
+                      {language === "ar" ? "أو سحب وإفلات" : "or drag and drop"}
+                    </p>
+                    <p className={styles.uploadHint}>
+                      SVG, PNG, JPG or GIF (max. 400 x 400px)
+                    </p>
+                  </div>
                   <input
                     type="file"
-                    ref={criminalRecordInputRef}
+                    ref={workImageRef}
                     style={{ display: "none" }}
                     accept="image/*"
-                    onChange={handleCriminalRecordUpload}
+                    multiple
+                    onChange={handleWorkImageUpload}
                   />
                 </div>
+                {workImages.length > 0 && (
+                  <div className={styles.workImageGrid}>
+                    {workImages.map((img, i) => (
+                      <div key={i} className={styles.workImageThumb}>
+                        <img src={img} alt={`Work ${i + 1}`} />
+                        <button
+                          className={styles.workImageRemove}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setWorkImages(
+                              workImages.filter((_, idx) => idx !== i)
+                            );
+                            setWorkImageFiles(
+                              workImageFiles.filter((_, idx) => idx !== i)
+                            );
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>
         )}
-
-        {/* ═══════════════════════════════════════════
-            ─── Section 9: Work Images ────────────────
-            ═══════════════════════════════════════════ */}
-        <motion.div
-          className={styles.section}
-          custom={8}
-          variants={sectionVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-        >
-          <div className={styles.sectionRow}>
-            <div className={styles.sectionLabel}>
-              <h3>{t("صور الأعمال")}</h3>
-              <p>{t("أضف صور لأعمالك السابقة.")}</p>
-            </div>
-            <div className={styles.sectionContent}>
-              <div
-                className={styles.workImageZone}
-                onClick={() => workImageRef.current?.click()}
-              >
-                <div className={styles.wallpaperPlaceholder}>
-                  <UploadIcon />
-                  <p className={styles.uploadText}>
-                    <span className={styles.uploadLink}>
-                      {t("انقر للاستبدال")}
-                    </span>{" "}
-                    {t("أو سحب وإفلات")}
-                  </p>
-                  <p className={styles.uploadHint}>
-                    SVG, PNG, JPG or GIF (max. 400 x 400px)
-                  </p>
-                </div>
-                <input
-                  type="file"
-                  ref={workImageRef}
-                  style={{ display: "none" }}
-                  accept="image/*"
-                  multiple
-                  onChange={handleWorkImageUpload}
-                />
-              </div>
-              {workImages.length > 0 && (
-                <div className={styles.workImageGrid}>
-                  {workImages.map((img, i) => (
-                    <div key={i} className={styles.workImageThumb}>
-                      <img src={img} alt={`Work ${i + 1}`} />
-                      <button
-                        className={styles.workImageRemove}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setWorkImages(
-                            workImages.filter((_, idx) => idx !== i)
-                          );
-                          setWorkImageFiles(
-                            workImageFiles.filter((_, idx) => idx !== i)
-                          );
-                        }}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </motion.div>
 
         {/* ═══════════════════════════════════════════
             ─── Submit Row ────────────────────────────
@@ -1214,7 +1219,7 @@ export default function CompleteProfile() {
             {isSaving ? (
               <span className={styles.loader} />
             ) : (
-              t("حفظ وإكمال الملف الشخصي")
+              language === "ar" ? "حفظ وإكمال الملف الشخصي" : "Save Changes"
             )}
           </motion.button>
         </motion.div>
