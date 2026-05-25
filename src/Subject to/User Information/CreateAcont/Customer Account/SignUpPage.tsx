@@ -10,6 +10,9 @@ import {
   UserPlusIcon,
   EyeIcon,
   EyeOffIcon,
+  BriefcaseIcon,
+  WrenchIcon,
+  ArrowLeftIcon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
@@ -24,6 +27,8 @@ export const SignUpPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const [step, setStep] = useState<"role_select" | "form">("role_select");
+  const [classification, setClassification] = useState<"job_seeker" | "tradesman">("job_seeker");
   const [isSigningUp, setIsSigningUp] = useState(false);
   const [success, setSuccess] = useState(false);
   const [formError, setFormError] = useState("");
@@ -88,6 +93,7 @@ export const SignUpPage: React.FC = () => {
 
     try {
       setIsSigningUp(true);
+      localStorage.setItem("signup_classification", classification);
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -96,6 +102,7 @@ export const SignUpPage: React.FC = () => {
           email: formData.email,
           password: formData.password,
           role: "student",
+          classification: classification,
         }),
         signal: controller.signal,
       });
@@ -104,12 +111,12 @@ export const SignUpPage: React.FC = () => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Registration failed");
       setSuccess(true);
-    } catch (err: any) {
+    } catch (err: unknown) {
       clearTimeout(timeoutId);
-      if (err.name === "AbortError") {
+      if (err instanceof Error && err.name === "AbortError") {
         setFormError(t("استغرق الطلب وقتاً طويلاً. يرجى المحاولة مرة أخرى."));
       } else {
-        setFormError(err.message);
+        setFormError(err instanceof Error ? err.message : String(err));
       }
     } finally {
       setIsSigningUp(false);
@@ -138,12 +145,12 @@ export const SignUpPage: React.FC = () => {
       localStorage.setItem("isNewUser", "true");
       setVerifiedStatus("success");
       setSuccess(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
       clearTimeout(timeoutId);
-      if (err.name === "AbortError") {
+      if (err instanceof Error && err.name === "AbortError") {
         setFormError(t("استغرق الطلب وقتاً طويلاً. يرجى المحاولة مرة أخرى."));
       } else {
-        setFormError(err.message);
+        setFormError(err instanceof Error ? err.message : String(err));
       }
     } finally {
       setIsVerifying(false);
@@ -277,6 +284,70 @@ export const SignUpPage: React.FC = () => {
                 </div>
               )}
             </motion.div>
+          ) : step === "role_select" ? (
+            <motion.div
+              key="role-select"
+              style={{ width: "100%" }}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className={Style.header}>
+                <div className={Style.logoIcon}>
+                  <UserPlusIcon size={32} />
+                </div>
+                <h2 className={Style.title}>{t("اختر نوع الحساب")}</h2>
+                <p className={Style.subtitle}>
+                  {t("كيف ترغب في استخدام منصة Jobito؟")}
+                </p>
+              </div>
+
+              <div className={Style.roleSelectContainer}>
+                <div
+                  className={`${Style.roleCard} ${
+                    classification === "job_seeker" ? Style.roleCardActive : ""
+                  }`}
+                  onClick={() => setClassification("job_seeker")}
+                >
+                  <div className={Style.roleCardCheck}>
+                    <CheckCircleIcon size={20} />
+                  </div>
+                  <div className={Style.roleCardIcon}>
+                    <BriefcaseIcon size={28} />
+                  </div>
+                  <h3 className={Style.roleCardTitle}>{t("باحث عن عمل")}</h3>
+                  <p className={Style.roleCardDesc}>
+                    {t("أبحث عن وظائف، تدريب مهني، وتطوير لمهاراتي")}
+                  </p>
+                </div>
+
+                <div
+                  className={`${Style.roleCard} ${
+                    classification === "tradesman" ? Style.roleCardActive : ""
+                  }`}
+                  onClick={() => setClassification("tradesman")}
+                >
+                  <div className={Style.roleCardCheck}>
+                    <CheckCircleIcon size={20} />
+                  </div>
+                  <div className={Style.roleCardIcon}>
+                    <WrenchIcon size={28} />
+                  </div>
+                  <h3 className={Style.roleCardTitle}>{t("صنايعي / فني")}</h3>
+                  <p className={Style.roleCardDesc}>
+                    {t("أقدم خدمات مهنية وصيانة وأبحث عن طلبات عمل")}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                className={Style.authbtn}
+                onClick={() => setStep("form")}
+              >
+                {t("متابعة")}
+              </button>
+            </motion.div>
           ) : (
             <motion.div
               key="register-form"
@@ -284,6 +355,28 @@ export const SignUpPage: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                <button
+                  type="button"
+                  onClick={() => setStep("role_select")}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "var(--color-text-secondary)",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    fontWeight: 600,
+                    fontSize: "14px",
+                    padding: 0,
+                  }}
+                >
+                  <ArrowLeftIcon size={16} />
+                  {t("تغيير نوع الحساب")}
+                </button>
+              </div>
+
               <div className={Style.header}>
                 <div className={Style.logoIcon}>
                   <UserPlusIcon size={32} />

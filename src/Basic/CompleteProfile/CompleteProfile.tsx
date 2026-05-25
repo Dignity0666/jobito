@@ -48,7 +48,9 @@ export default function CompleteProfile() {
   const navigate = useNavigate();
 
   // Role state
-  const [role, setRole] = useState<"job_seeker" | "tradesman">("job_seeker");
+  const [role, setRole] = useState<"job_seeker" | "tradesman">(
+    (localStorage.getItem("signup_classification") as "job_seeker" | "tradesman") || "job_seeker"
+  );
 
   // Profile photo
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -304,6 +306,7 @@ export default function CompleteProfile() {
         window.dispatchEvent(new Event("auth-changed"));
       }
 
+      localStorage.removeItem("signup_classification");
       navigate("/");
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Unknown error occurred";
