@@ -910,7 +910,11 @@ export const TRANSLATIONS: Record<string, { ar: string; en: string }> = {
   "نسخ": { ar: "نسخ", en: "Copy" },
   "تثبيت": { ar: "تثبيت", en: "Pin" },
   "تعديل": { ar: "تعديل", en: "Edit" },
-  "حذف": { ar: "حذف", en: "Delete" }
+  "حذف": { ar: "حذف", en: "Delete" },
+  "بدء محادثة": { ar: "بدء محادثة", en: "Start conversation" },
+  "Start conversation": { ar: "بدء محادثة", en: "Start conversation" },
+  "تواصل": { ar: "تواصل", en: "Contact" },
+  "التواصل": { ar: "التواصل", en: "Contact" }
 };
 
 

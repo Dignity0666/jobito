@@ -920,12 +920,15 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
   }, [newChatQuery, searchUsers]);
 
   const startChatWithUser = useCallback(
-    (selectedUser: UserSearchResult) => {
+    (selectedUser: any) => {
+      const targetUserId = selectedUser?.userId || selectedUser?.id || selectedUser?.oderId || "";
+      if (!targetUserId) return;
+
       const newContact: ChatContact = {
-        oderId: selectedUser.userId,
-        name: selectedUser.fullName,
-        avatar: selectedUser.avatarUrl,
-        email: selectedUser.email,
+        oderId: targetUserId,
+        name: selectedUser.fullName || selectedUser.name || "User",
+        avatar: selectedUser.avatarUrl || selectedUser.avatar || null,
+        email: selectedUser.email || "",
         lastMessage: "",
         lastTime: new Date().toISOString(),
         senderId: myUserId,
@@ -934,7 +937,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
 
       // Check if already exists
       setChats((prev) => {
-        const exists = prev.find((c) => c.oderId === selectedUser.userId);
+        const exists = prev.find((c) => c.oderId === targetUserId);
         if (exists) {
           selectChat(exists);
           return prev;
