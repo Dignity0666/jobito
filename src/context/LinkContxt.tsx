@@ -147,21 +147,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         await checkAuth();
 
         // 2. Then, fetch global config
-        const res = await fetch(`${API_BASE_URL}/config`, {
-          headers: {
-            "ngrok-skip-browser-warning": "69420",
-          },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.GOOGLE_CLIENT_ID) {
-            setGoogleClientId(data.GOOGLE_CLIENT_ID);
-          }
+        if (import.meta.env.VITE_GOOGLE_CLIENT_ID) {
+          setGoogleClientId(import.meta.env.VITE_GOOGLE_CLIENT_ID);
         } else {
-          // Failure here doesn't mean offline, but it's a sign
-          console.warn(
-            "API returned error for config, investigating health...",
-          );
+          const res = await fetch(`${API_BASE_URL}/config`, {
+            headers: {
+              "ngrok-skip-browser-warning": "69420",
+            },
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.GOOGLE_CLIENT_ID) {
+              setGoogleClientId(data.GOOGLE_CLIENT_ID);
+            }
+          } else {
+            // Failure here doesn't mean offline, but it's a sign
+            console.warn(
+              "API returned error for config, investigating health...",
+            );
+          }
         }
       } catch (err) {
         setIsBackendOffline(true);
