@@ -3,10 +3,7 @@ import Style from "./SignUpPage.module.css";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CheckCircleIcon,
-  LinkIcon,
   LoaderIcon,
-  MailIcon,
-  SmartphoneIcon,
   UserPlusIcon,
   EyeIcon,
   EyeOffIcon,
@@ -189,97 +186,42 @@ export const SignUpPage: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              {!verifyMethod ? (
-                <>
-                  <div className={Style.iconCircle}>
-                    <MailIcon size={32} />
-                  </div>
-                  <h2 className={Style.title}>{t("تفعيل البريد الإلكتروني")}</h2>
-                  <p className={Style.subtitle}>
-                    {t("اختر طريقة التفعيل لـ")} <b>{formData.email}</b>
-                  </p>
-
-                  <div className={Style.methodGrid}>
-                    <button
-                      className={Style.methodCard}
-                      onClick={() => setVerifyMethod("link")}
-                    >
-                      <LinkIcon size={24} />
-                      <div>
-                        <strong>{t("رابط عبر البريد")}</strong>
-                        <span>{t("اضغط على الرابط في صندوق الوارد")}</span>
-                      </div>
-                    </button>
-                    <button
-                      className={Style.methodCard}
-                      onClick={() => setVerifyMethod("code")}
-                    >
-                      <SmartphoneIcon size={24} />
-                      <div>
-                        <strong>{t("رمز مكون من 6 أرقام")}</strong>
-                        <span>{t("أدخل الرمز يدوياً")}</span>
-                      </div>
-                    </button>
-                  </div>
+              <div style={{ width: "100%" }}>
+                <h2 className={Style.title}>{t("أدخل الرمز")}</h2>
+                <p className={Style.subtitle}>
+                  {t("تم إرسال رمز من 6 أرقام إلى بريدك الإلكتروني")}
+                </p>
+                <form onSubmit={handleVerifyCode}>
+                  <input
+                    type="text"
+                    className={Style.otpInput}
+                    maxLength={6}
+                    placeholder="000000"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value)}
+                  />
                   <button
-                    className={Style.backBtn}
-                    onClick={() => setSuccess(false)}
+                    className={Style.authbtn}
+                    type="submit"
+                    disabled={isVerifying}
                   >
-                    {t("العودة لإنشاء الحساب")}
+                    {isVerifying ? (
+                      <LoaderIcon className="loader" />
+                    ) : (
+                      t("تفعيل الحساب")
+                    )}
                   </button>
-                </>
-              ) : verifyMethod === "code" ? (
-                <div style={{ width: "100%" }}>
-                  <h2 className={Style.title}>{t("أدخل الرمز")}</h2>
-                  <p className={Style.subtitle}>
-                    {t("تم إرسال رمز من 6 أرقام إلى بريدك الإلكتروني")}
-                  </p>
-                  <form onSubmit={handleVerifyCode}>
-                    <input
-                      type="text"
-                      className={Style.otpInput}
-                      maxLength={6}
-                      placeholder="000000"
-                      value={verificationCode}
-                      onChange={(e) => setVerificationCode(e.target.value)}
-                    />
-                    <button
-                      className={Style.authbtn}
-                      type="submit"
-                      disabled={isVerifying}
-                    >
-                      {isVerifying ? (
-                        <LoaderIcon className="loader" />
-                      ) : (
-                        t("تفعيل الحساب")
-                      )}
-                    </button>
-                  </form>
-                   <button
-                    className={Style.backBtn}
-                    onClick={() => {
-                      setSuccess(false);
-                      setVerifyMethod(null);
-                    }}
-                  >
-                    {t("العودة لإنشاء الحساب")}
-                  </button>
-                </div>
-              ) : (
-                <div style={{ textAlign: "center" }}>
-                  <div className={Style.waitingLoader}>⏳</div>
-                  <h2 className={Style.title}>{t("بانتظار الرابط...")}</h2>
-                  <p className={Style.subtitle}>
-                    {t("يرجى الضغط على الرابط المرسل لبريدك الإلكتروني للتفعيل.")}
-                  </p>
-                  <button
-                    className={Style.backBtn}
-                    onClick={() => setVerifyMethod(null)}
-                  >
-                    {t("استخدم الرمز بدلاً من ذلك")}
-                  </button>
-                </div>
-              )}
+                </form>
+                 <button
+                  className={Style.backBtn}
+                  onClick={() => {
+                    setSuccess(false);
+                    setVerifyMethod(null);
+                  }}
+                >
+                  {t("العودة لإنشاء الحساب")}
+                </button>
+              </div>
             </motion.div>
           ) : (
             <motion.div
