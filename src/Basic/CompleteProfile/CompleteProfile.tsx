@@ -492,15 +492,18 @@ export default function CompleteProfile() {
                   <label className={styles.label}>
                     {language === "ar" ? "الاسم الكامل" : "Full Name"} <span>*</span>
                   </label>
-                  <input
-                    type="text"
-                    name="fullName"
-                    className={`${styles.input} ${formErrors.fullName ? styles.inputError : ''}`}
-                    placeholder="Jake Gyll"
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    dir="auto"
-                  />
+                  <div className={styles.inputWrapper}>
+                    <i className={`fas fa-user ${styles.inputIcon}`} />
+                    <input
+                      type="text"
+                      name="fullName"
+                      className={`${styles.input} ${styles.inputWithIcon} ${formErrors.fullName ? styles.inputError : ''}`}
+                      placeholder="Jake Gyll"
+                      value={formData.fullName}
+                      onChange={handleChange}
+                      dir="auto"
+                    />
+                  </div>
                   {formErrors.fullName && (
                     <div className={styles.errorMessage}>
                       {language === "ar" ? "هذا الحقل مطلوب" : "This field is required"}
@@ -511,16 +514,18 @@ export default function CompleteProfile() {
                   <label className={styles.label}>
                     {language === "ar" ? "رقم الهاتف" : "Phone Number"} <span>*</span>
                   </label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    className={`${styles.input} ${formErrors.phone ? styles.inputError : ''}`}
-                    placeholder="+44 1245 572 135"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    dir="ltr"
-                    style={{ textAlign: "left" }}
-                  />
+                  <div className={`${styles.inputWrapper} ${styles.ltrWrapper}`}>
+                    <i className={`fas fa-phone ${styles.inputIcon}`} />
+                    <input
+                      type="tel"
+                      name="phone"
+                      className={`${styles.input} ${styles.ltrInput} ${formErrors.phone ? styles.inputError : ''}`}
+                      placeholder="01xxxxxxxxx"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      dir="ltr"
+                    />
+                  </div>
                   {formErrors.phone && (
                     <div className={styles.errorMessage}>
                       {language === "ar" ? "هذا الحقل مطلوب" : "This field is required"}
@@ -531,16 +536,18 @@ export default function CompleteProfile() {
                   <label className={styles.label}>
                     {language === "ar" ? "البريد الإلكتروني" : "Email"} <span>*</span>
                   </label>
-                  <input
-                    type="email"
-                    name="email"
-                    className={`${styles.input} ${formErrors.email ? styles.inputError : ''}`}
-                    placeholder="jakegyll@gmail.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    dir="ltr"
-                    style={{ textAlign: "left" }}
-                  />
+                  <div className={`${styles.inputWrapper} ${styles.ltrWrapper}`}>
+                    <i className={`fas fa-envelope ${styles.inputIcon}`} />
+                    <input
+                      type="email"
+                      name="email"
+                      className={`${styles.input} ${styles.ltrInput} ${formErrors.email ? styles.inputError : ''}`}
+                      placeholder="jakegyll@gmail.com"
+                      value={formData.email}
+                      onChange={handleChange}
+                      dir="ltr"
+                    />
+                  </div>
                   {formErrors.email && (
                     <div className={styles.errorMessage}>
                       {language === "ar" ? "هذا الحقل مطلوب" : "This field is required"}
