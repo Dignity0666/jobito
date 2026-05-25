@@ -499,6 +499,7 @@ export default function CompleteProfile() {
                     placeholder="Jake Gyll"
                     value={formData.fullName}
                     onChange={handleChange}
+                    dir="auto"
                   />
                   {formErrors.fullName && (
                     <div className={styles.errorMessage}>
@@ -517,6 +518,8 @@ export default function CompleteProfile() {
                     placeholder="+44 1245 572 135"
                     value={formData.phone}
                     onChange={handleChange}
+                    dir="ltr"
+                    style={{ textAlign: "left" }}
                   />
                   {formErrors.phone && (
                     <div className={styles.errorMessage}>
@@ -535,6 +538,8 @@ export default function CompleteProfile() {
                     placeholder="jakegyll@gmail.com"
                     value={formData.email}
                     onChange={handleChange}
+                    dir="ltr"
+                    style={{ textAlign: "left" }}
                   />
                   {formErrors.email && (
                     <div className={styles.errorMessage}>
