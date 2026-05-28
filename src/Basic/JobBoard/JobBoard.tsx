@@ -40,6 +40,7 @@ export default function JobBoard() {
       {/* ── Hero Section ── */}
       <section
         className={Styles.heroSection}
+        dir="ltr"
         style={{
           backgroundImage: `url(${!isDark ? darkBg : lightBg})`,
           backgroundSize: "cover",
@@ -52,6 +53,7 @@ export default function JobBoard() {
             <motion.div
               className={`${Styles.searchBar} ${isDark ? Styles.darkSearchBar : ""}`}
               initial={{ opacity: 1, y: 0 }}
+              dir="ltr"
             >
               <div className={Styles.inputGroup}>
                 <Search className={Styles.icon} size={20} />

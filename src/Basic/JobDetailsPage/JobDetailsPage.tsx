@@ -700,8 +700,21 @@ export const JobDetailsPage = () => {
                   </section>
                 )}
 
-                {/* Job Info Moved to Left Column */}
+
+                {/* Rating Section Moved to Left Column */}
                 <div className={styles.widget} style={{ marginTop: '24px' }}>
+                  <GeneralRatingSection 
+                    companyId={job.company?.companyId || job.company?.company_id}
+                    targetUserId={job.user?.userId || job.user?.id}
+                    targetName={job.company?.name || job.user?.fullName || job.user?.name || job.title || "المعلن"}
+                  />
+                </div>
+              </div>
+
+              {/* Right Column */}
+              <div className={styles.rightCol}>
+                {/* About the Job - moved above Skills */}
+                <div className={styles.widget}>
                   <h2>{t("عن الوظيفة")}</h2>
                   <div className={styles.capacityBox}>
                     <div className={styles.capacityText}>
@@ -777,14 +790,14 @@ export const JobDetailsPage = () => {
 
                     {job.address && (
                       <div className={styles.roleRow}>
-                        <span className={styles.roleLabel}>{t("الموقع")}</span>
+                        <span className={styles.roleLabel}>{t("مكان العمل")}</span>
                         <span className={styles.roleValue}>{t(job.address)}</span>
                       </div>
                     )}
 
                     {Array.isArray(job.workTime) && job.workTime.length > 0 && (
                       <div className={styles.roleRow}>
-                        <span className={styles.roleLabel}>{t("وقت العمل")}</span>
+                        <span className={styles.roleLabel}>{t("أيام العمل")}</span>
                         <span className={styles.roleValue}>{job.workTime.map((d: string) => t(d)).join(" / ")}</span>
                       </div>
                     )}
@@ -806,18 +819,8 @@ export const JobDetailsPage = () => {
                   </div>
                 </div>
 
-                {/* Rating Section Moved to Left Column */}
-                <div className={styles.widget} style={{ marginTop: '24px' }}>
-                  <GeneralRatingSection 
-                    companyId={job.company?.companyId || job.company?.company_id}
-                    targetUserId={job.user?.userId || job.user?.id}
-                    targetName={job.company?.name || job.user?.fullName || job.user?.name || job.title || "المعلن"}
-                  />
-                </div>
-              </div>
+                <div className={styles.separator}></div>
 
-              {/* Right Column */}
-              <div className={styles.rightCol}>
                 {(parsedSections["المهارات"] || parsedSections["Skills"] || (Array.isArray(job.skills) && job.skills.length > 0)) && (
                   <>
                     <div className={styles.widget}>
@@ -932,15 +935,7 @@ export const JobDetailsPage = () => {
                   {job.company?.benefits && job.company.benefits.length > 0 ? (
                     job.company.benefits.map((benefit: Benefit, idx: number) => (
                       <div key={idx} className={styles.perkCard}>
-                        <div
-                          className={styles.perkIcon}
-                          style={{
-                            fontSize: "24px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
+                        <div className={styles.perkIcon}>
                           {benefit.emoji}
                         </div>
                         <h3>{t(benefit.name)}</h3>

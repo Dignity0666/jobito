@@ -175,7 +175,7 @@ const JOB_TYPE_MAP: Record<string, string> = {
   "Part Time": "part-time",
   "Freelance": "freelance",
   "Internship": "internship",
-  "Contract": "contract",
+  "One-time": "one-time",
   "Remote": "remote",
 };
 
@@ -337,7 +337,7 @@ function Step1({
 
       <div className={styles.fieldRow}>
         <div className={styles.rowLabel}>
-          <strong>{t("عنوان الوظيفة")}</strong>
+          <strong>{t("عنوان الوظيفة")} <span style={{ color: "red" }}>*</span></strong>
           <span>{t("يجب أن يصف العنوان وظيفة واحدة فقط")}</span>
         </div>
         <div className={styles.rowContent}>
@@ -454,7 +454,7 @@ function Step1({
       <div className={styles.divider} />
       <div className={styles.fieldRow}>
         <div className={styles.rowLabel}>
-          <strong>{t("تصنيف الوظيفة")}</strong>
+          <strong>{t("تصنيف الوظيفة")} <span style={{ color: "red" }}>*</span></strong>
           <span>{t("اختر التصنيف العام للوظيفة")}</span>
         </div>
         <div className={styles.rowContent}>
@@ -596,7 +596,7 @@ function Step1({
         <motion.button
           className={styles.nextBtn}
           onClick={onNext}
-          disabled={!data.title}
+          disabled={!data.title || !data.classification}
           whileHover={{ y: -2, boxShadow: "0 8px 20px rgba(70,64,222,0.35)" }}
           whileTap={{ scale: 0.97 }}
         >
@@ -956,7 +956,7 @@ function Step3({
 export default function PostJob() {
   const location = useLocation() as { state: { editJob?: any } | null };
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, isRTL } = useTranslation();
   const { showToast } = useToast();
   const [step, setStep] = useState<Step>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -1249,7 +1249,7 @@ ${formData.classification}`;
 
   if (!isAuthenticated) {
     return (
-      <div className={styles.page}>
+      <div className={`${styles.page} ${isRTL ? styles.rtl : ""}`} dir={isRTL ? "rtl" : "ltr"}>
         <div
           style={{
             textAlign: "center",
@@ -1287,7 +1287,7 @@ ${formData.classification}`;
 
   if (role !== "company") {
     return (
-      <div className={styles.page}>
+      <div className={`${styles.page} ${isRTL ? styles.rtl : ""}`} dir={isRTL ? "rtl" : "ltr"}>
         <div
           style={{
             textAlign: "center",
@@ -1313,7 +1313,7 @@ ${formData.classification}`;
   }
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} ${isRTL ? styles.rtl : ""}`} dir={isRTL ? "rtl" : "ltr"}>
       <StepBar current={step} onStepClick={(s) => setStep(s)} />
 
       <AnimatePresence mode="wait">

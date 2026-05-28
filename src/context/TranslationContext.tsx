@@ -113,7 +113,17 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
           'Technical Support': 'الدعم الفني',
           'Total Revenue': 'إجمالي الإيرادات',
           'Operations Manager Activity': 'نشاط مدير العمليات',
-          'Criminal Records Review': 'مراجعة السجلات الجنائية'
+          'Criminal Records Review': 'مراجعة السجلات الجنائية',
+          'One-time': 'خدمة سريعة',
+          'One Time': 'خدمة سريعة',
+          'Full Time': 'دوام كامل',
+          'Part Time': 'دوام جزئي',
+          'Freelance': 'عمل حر',
+          'Internship': 'تدريب',
+          'Remote': 'عن بعد',
+          'Tradesman': 'صنايعي',
+          'Technical': 'تقني',
+          'Non-Technical': 'غير تقني'
         };
 
         if (language === 'ar') {
@@ -205,6 +215,26 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
       options?: Record<string, string | number>
     ): string => {
       if (!key) return '';
+
+      // Hardcoded high-priority overrides for stubborn strings in both Arabic and English
+      if (language === 'en') {
+        const englishOverrides: Record<string, string> = {
+          'بحث': 'Search',
+          'أي مكان': 'Anywhere',
+          'القاهرة، مصر': 'Cairo, Egypt',
+          'الإسكندرية، مصر': 'Alexandria, Egypt',
+          'مسمى الوظيفة أو الكلمة الرئيسية...': 'Job title or keyword...',
+          'ما هي الخدمة التي تستطيع تقديمها؟ (سباكة، نجارة...)': 'What service can you provide? (Plumbing, carpentry...)',
+          'طلبات التقديم': 'My Applications'
+        };
+        if (englishOverrides[key]) return englishOverrides[key];
+      } else if (language === 'ar') {
+        const arabicOverrides: Record<string, string> = {
+          'Search': 'بحث',
+          'Anywhere': 'أي مكان',
+        };
+        if (arabicOverrides[key]) return arabicOverrides[key];
+      }
 
       // Determine fallback and options
       let fallbackText: string | undefined;

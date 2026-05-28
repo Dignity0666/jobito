@@ -105,6 +105,7 @@ export const SignUpPage: React.FC = () => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Registration failed");
       setSuccess(true);
+      setVerifyMethod("code");
     } catch (err: any) {
       setFormError(err.message);
     } finally {
@@ -229,16 +230,6 @@ export const SignUpPage: React.FC = () => {
                 </p>
 
                 <div className={Style.methodGrid}>
-                  <button
-                    className={Style.methodCard}
-                    onClick={() => setVerifyMethod("link")}
-                  >
-                    <LinkIcon size={24} />
-                    <div>
-                      <strong>{t("رابط عبر البريد")}</strong>
-                      <span>{t("اضغط على الرابط في صندوق الوارد")}</span>
-                    </div>
-                  </button>
                   <button
                     className={Style.methodCard}
                     onClick={() => setVerifyMethod("code")}

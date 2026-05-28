@@ -117,14 +117,14 @@ const WorkListing = () => {
                     </button>
                     <button 
                       className={styles.actionBtn}
-                      onClick={() => navigate(`/WorkApplicants?jobId=${work.jobId}`)}
+                      onClick={() => navigate(`/WorkManagement/${work.jobId}`, { state: { tab: "applicants" } })}
                       title={t("المتقدمين")}
                     >
                       <Users size={16} />
                     </button>
                     <button 
                       className={styles.actionBtn}
-                      onClick={() => navigate(`/WorkManagement/${work.jobId}`)}
+                      onClick={() => navigate(`/WorkManagement/${work.jobId}`, { state: { tab: "details" } })}
                       title={t("عرض")}
                     >
                       <Eye size={16} />

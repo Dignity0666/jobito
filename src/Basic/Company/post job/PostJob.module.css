@@ -6,7 +6,7 @@
   max-width: 1200px;
   margin: 0 auto;
   font-family: "Outfit", sans-serif;
-  direction: ltr;
+  direction: inherit;
   position: relative;
 }
 
@@ -140,7 +140,7 @@
 
 .sectionHeader {
   margin-bottom: 50px;
-  text-align: left;
+  text-align: inherit;
 }
 
 .sectionTitle {
@@ -483,34 +483,36 @@
 /* ── Work Time (Day Selector) ────────────────── */
 .daySelector {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 200px;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 100%;
 }
 
 .dayBtn {
   background: var(--color-input-bg);
   border: 1px solid var(--color-border);
   color: var(--color-text-secondary);
-  padding: 14px 24px;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 700;
-  text-align: left;
+  padding: 10px 20px;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dayBtn:hover {
   border-color: var(--color-primary);
   color: var(--color-primary);
+  background: var(--color-primary-light);
+  transform: translateY(-2px);
 }
 
 .dayBtnActive {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-  border-color: var(--color-primary);
-  box-shadow: 0 4px 15px rgba(74, 110, 209, 0.1);
+  background: var(--color-primary) !important;
+  color: #fff !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 6px 16px rgba(74, 110, 209, 0.3) !important;
 }
 
 /* ── Work Image (Dropzone) ──────────────────── */

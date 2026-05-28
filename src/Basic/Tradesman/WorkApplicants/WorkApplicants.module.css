@@ -282,21 +282,37 @@
   background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  padding-top: 8vh;
   z-index: 1000;
   backdrop-filter: blur(4px);
 }
 
 .modalContent {
-  background: #000c18;
   width: 90%;
   max-width: 500px;
   border-radius: 24px;
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
+  max-height: 85vh;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
   animation: modalFadeIn 0.3s ease-out;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.modalContent::-webkit-scrollbar {
+  display: none;
+}
+
+.dark .modalContent {
+  background: #000c18;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.light .modalContent {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
 }
 
 @keyframes modalFadeIn {
@@ -310,14 +326,23 @@
   right: 15px;
   background: none;
   border: none;
-  color: #94a3b8;
   cursor: pointer;
   z-index: 10;
   transition: color 0.2s;
 }
 
-.closeButton:hover {
+.dark .closeButton {
+  color: #94a3b8;
+}
+.dark .closeButton:hover {
   color: white;
+}
+
+.light .closeButton {
+  color: #64748b;
+}
+.light .closeButton:hover {
+  color: #1e293b;
 }
 
 .modalHeader {
@@ -339,19 +364,37 @@
 .headerText h2 {
   font-size: 18px;
   margin: 0;
+}
+
+.dark .headerText h2 {
   color: white;
+}
+.light .headerText h2 {
+  color: #1e293b;
 }
 
 .headerText p {
   font-size: 14px;
-  color: #94a3b8;
   margin: 4px 0 0;
+}
+
+.dark .headerText p {
+  color: #94a3b8;
+}
+.light .headerText p {
+  color: #64748b;
 }
 
 .divider {
   border: none;
-  border-top: 1px solid rgba(148, 163, 184, 0.1);
   margin: 0;
+}
+
+.dark .divider {
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+}
+.light .divider {
+  border-top: 1px solid #e2e8f0;
 }
 
 .modalBody {
@@ -366,28 +409,50 @@
   display: block;
   font-size: 14px;
   font-weight: 600;
-  color: #f8fafc;
   margin-bottom: 10px;
 }
 
+.dark .formGroup label {
+  color: #f8fafc;
+}
+.light .formGroup label {
+  color: #334155;
+}
+
 .valueBox {
-  background: #0b223f;
   padding: 12px 16px;
   border-radius: 8px;
-  color: white;
   font-size: 14px;
+}
+
+.dark .valueBox {
+  background: #0b223f;
+  color: white;
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.light .valueBox {
+  background: #f8fafc;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
 }
 
 .textareaValueBox {
-  background: #0b223f;
   padding: 15px 20px;
   border-radius: 24px;
-  color: white;
   font-size: 14px;
   min-height: 100px;
   line-height: 1.6;
+}
+
+.dark .textareaValueBox {
+  background: #0b223f;
+  color: white;
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.light .textareaValueBox {
+  background: #f8fafc;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
 }
 
 .modalActions {
@@ -398,8 +463,6 @@
 
 .approveModalBtn {
   flex: 1;
-  background: #5888bd;
-  color: #000c18;
   border: none;
   padding: 12px;
   border-radius: 18px;
@@ -410,6 +473,15 @@
   justify-content: center;
   gap: 8px;
   transition: transform 0.2s;
+}
+
+.dark .approveModalBtn {
+  background: #5888bd;
+  color: #000c18;
+}
+.light .approveModalBtn {
+  background: #3b82f6;
+  color: white;
 }
 
 .rejectModalBtn {

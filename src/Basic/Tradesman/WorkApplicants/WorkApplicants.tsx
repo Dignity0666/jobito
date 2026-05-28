@@ -23,6 +23,18 @@ const WorkApplicants = () => {
   const [expandedApplicantId, setExpandedApplicantId] = useState<string | null>(null);
   const [selectedApplication, setSelectedApplication] = useState<any>(null);
 
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (selectedApplication) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [selectedApplication]);
+
   useEffect(() => {
     const fetchData = async () => {
       if (!jobId) return;

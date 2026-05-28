@@ -488,3 +488,69 @@
   border-radius: 50%;
 }
 
+/* ─── Media Queries (Responsiveness) ─── */
+
+@media (max-width: 1200px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .dashboardLayout {
+    flex-direction: column;
+  }
+  
+  .leftCol, .rightCol {
+    flex: 1;
+    width: 100%;
+  }
+
+  .formInputsRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .inviteBtn {
+    width: 100%;
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .mainContent {
+    padding: 16px;
+    gap: 20px;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .kpiCard {
+    height: 140px;
+  }
+
+  .barChartCard {
+    padding: 16px;
+    height: 320px;
+  }
+
+  .donutBody {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .formHeaderRow {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .adminFormCard {
+    padding: 16px;
+  }
+}
+

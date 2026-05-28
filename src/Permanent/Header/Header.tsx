@@ -49,6 +49,7 @@ export function Header() {
     { label: t("الرئيسية"), path: "/", icon: <Home size={16} /> },
     { label: t("بحث عن وظائف"), path: "/Find Jobs", icon: <Search size={16} /> },
     { label: t("لوحة التحكم"), path: "/JobDashboard", icon: <LayoutDashboard size={16} /> },
+    { label: t("طلبات التقديم"), path: "/MyApplications", icon: <FileText size={16} /> },
     { label: t("تصفح الشركات"), path: "/Browse Companies", icon: <Building2 size={16} /> },
     { label: t("الملف الشخصي"), path: "/Profile", icon: <UserCircle size={16} /> },
     { label: t("الرسائل"), path: "/chat", icon: <MessageSquare size={16} /> },

@@ -189,7 +189,6 @@ export const Home = () => {
       </section>
       <Categories />
       <JobsSection />
-      {/* <Testimonil /> */}
     </>
   );
 };

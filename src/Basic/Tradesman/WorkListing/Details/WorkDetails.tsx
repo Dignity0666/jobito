@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { 
   ArrowLeft, Calendar, Clock, MapPin, DollarSign, 
   Users, Share2, MoreVertical, CheckCircle2, AlertCircle,
   Wrench, ShieldCheck, MessageSquare, Search, Filter, X, Plus,
   Trash2, ChevronDown, MoveVertical as ArrowVertical,
-  Briefcase, Target, Info, Camera, Pencil
+  Briefcase, Target, Info, Camera, Pencil, Eye
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./WorkDetails.module.css";
@@ -20,13 +20,22 @@ const WorkDetails = () => {
   const { id } = useParams();
   const { apiFetch } = useJobitoAuth();
   const { theme, isDark } = useTheme();
+  const location = useLocation();
   
-  const [activeTab, setActiveTab] = useState("details");
+  const [activeTab, setActiveTab] = useState(() => {
+    return location.state?.tab || "details";
+  });
   const [work, setWork] = useState<any>(null);
   const [applicants, setApplicants] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAppsLoading, setIsAppsLoading] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (location.state?.tab) {
+      setActiveTab(location.state.tab);
+    }
+  }, [location.state?.tab]);
 
   useEffect(() => {
     const fetchWorkDetails = async () => {
@@ -131,6 +140,14 @@ const WorkDetails = () => {
           <button 
             className={styles.backBtn} 
             style={{ marginLeft: '10px' }}
+            onClick={() => navigate(`/Job details`, { state: { jobId: work.jobId || work.job_id || id } })}
+            title={t("عرض الصفحة العامة للعمل")}
+          >
+            <Eye size={18} />
+          </button>
+          <button 
+            className={styles.backBtn} 
+            style={{ marginLeft: '10px' }}
             onClick={() => navigate(`/PostJob`, { state: { editJob: work } })}
             title={t("تعديل")}
           >
@@ -221,12 +238,12 @@ const WorkDetails = () => {
 
               <aside className={styles.sideSection}>
                 <section className={styles.card}>
-                  <h3 className={styles.sectionTitle}><MapPin size={18} /> {t("الموقع")}</h3>
+                  <h3 className={styles.sectionTitle}><MapPin size={18} /> {t("مكان العمل")}</h3>
                   <p className={styles.sectionText}>{work.address}</p>
                 </section>
 
                 <section className={styles.card}>
-                  <h3 className={styles.sectionTitle}><Clock size={18} /> {t("وقت العمل")}</h3>
+                  <h3 className={styles.sectionTitle}><Clock size={18} /> {t("أيام العمل")}</h3>
                   <div className={styles.workTimeInfo}>
                     <span>{work.workTime?.map((d: string) => t(d)).join(', ') || t("غير محدد")}</span>
                   </div>

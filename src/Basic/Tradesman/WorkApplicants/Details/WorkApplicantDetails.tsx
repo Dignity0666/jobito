@@ -4,6 +4,9 @@ import { ArrowLeft, Phone, Mail, MapPin, Calendar, Clock, Check, X, MessageSquar
 import styles from "./WorkApplicantDetails.module.css";
 import { useTranslation } from "../../../../context/translation-context";
 import { useJobitoAuth } from "../../../../context/LinkContxt";
+import { useTheme } from "../../../../context/ThemeContext";
+import { useToast } from "../../../../context/ToastContext";
+import { API_BASE_URL } from "../../../../services/api";
 
 const WorkApplicantDetails = () => {
   const { t } = useTranslation();
@@ -11,6 +14,7 @@ const WorkApplicantDetails = () => {
   const { id } = useParams();
   const { apiFetch } = useJobitoAuth();
   const { showToast } = useToast();
+  const { theme, isDark } = useTheme();
   const [app, setApp] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -48,8 +52,8 @@ const WorkApplicantDetails = () => {
     }
   };
 
-  if (isLoading) return <div className={styles.container}>{t("جاري التحميل...")}</div>;
-  if (!app) return <div className={styles.container}>{t("المتقدم غير موجود")}</div>;
+  if (isLoading) return <div className={`${styles.container} ${isDark ? styles.dark : styles.light}`}>{t("جاري التحميل...")}</div>;
+  if (!app) return <div className={`${styles.container} ${isDark ? styles.dark : styles.light}`}>{t("المتقدم غير موجود")}</div>;
 
   const u = app.user;
   
@@ -88,7 +92,7 @@ const WorkApplicantDetails = () => {
   };
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${isDark ? styles.dark : styles.light}`} data-theme={theme}>
       <header className={styles.header}>
         <div className={styles.topNav}>
           <button className={styles.backBtn} onClick={() => navigate(-1)} style={{background: 'none', border: 'none', color: 'white', cursor: 'pointer'}}>

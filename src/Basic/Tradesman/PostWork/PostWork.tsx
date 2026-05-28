@@ -17,7 +17,7 @@ const DAYS = [
 ];
 
 const PostWork = () => {
-  const { t } = useTranslation();
+  const { t, isRTL } = useTranslation();
   const { user, apiFetch } = useJobitoAuth();
   const navigate = useNavigate();
 
@@ -165,11 +165,10 @@ const PostWork = () => {
   };
 
   return (
-    <div className={styles.page}>
-      <button className={styles.backBtn} onClick={() => navigate(-1)}>
-        <ArrowLeft size={24} />
-        <span>{isEditMode ? t("تعديل العمل") : t("نشر عملا")}</span>
-      </button>
+    <div className={`${styles.page} ${isRTL ? styles.rtl : ""}`} dir={isRTL ? "rtl" : "ltr"}>
+      <h1 className={styles.pageTitle}>
+        {isEditMode ? t("تعديل العمل") : t("نشر عملا")}
+      </h1>
 
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>{t("معلومات أساسية")}</h2>
@@ -255,7 +254,7 @@ const PostWork = () => {
 
       <div className={styles.fieldRow}>
         <div className={styles.rowLabel}>
-          <strong>{t("الموقع")}</strong>
+          <strong>{t("مكان العمل")}</strong>
         </div>
         <div className={styles.rowContent}>
           <select
@@ -277,7 +276,7 @@ const PostWork = () => {
 
       <div className={styles.fieldRow}>
         <div className={styles.rowLabel}>
-          <strong>{t("وقت العمل")}</strong>
+          <strong>{t("أيام العمل")}</strong>
         </div>
         <div className={styles.rowContent}>
           <div className={styles.daySelector}>

@@ -85,6 +85,22 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
     e.preventDefault();
     if (!jobId) return;
 
+    // Enforce CV upload for standard jobs
+    if (!isTradesman && !resumeFile) {
+      showToast(t("الرجاء اختيار ملف السيرة الذاتية (PDF) أولاً"), "error");
+      return;
+    }
+
+    // Validate Portfolio URL if filled
+    if (!isTradesman && portfolioUrl.trim()) {
+      const trimmedPort = portfolioUrl.trim();
+      const isUrlValid = trimmedPort.startsWith("http://") || trimmedPort.startsWith("https://") || (trimmedPort.includes(".") && !trimmedPort.includes(" "));
+      if (!isUrlValid || trimmedPort.length < 5) {
+        showToast(t("الرجاء إدخال رابط معرض أعمال صحيح (مثال: https://mywork.com)"), "error");
+        return;
+      }
+    }
+
     try {
       setIsSubmitting(true);
       let resumeUrl = "";
@@ -93,6 +109,10 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
       if (resumeFile) {
         const formData = new FormData();
         formData.append("file", resumeFile);
+        formData.append("entity_type", "user");
+        formData.append("entity_id", user?.id || "anonymous");
+        formData.append("image_type", "gallery");
+        
         const uploadRes = await apiFetch(`${API_BASE_URL}/images/upload`, {
           method: "POST",
           body: formData,
@@ -100,6 +120,8 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
         if (uploadRes.ok) {
           const uploadData = await uploadRes.json();
           resumeUrl = uploadData.imageUrl;
+        } else {
+          throw new Error(t("فشل رفع السيرة الذاتية"));
         }
       }
 
@@ -108,12 +130,18 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
         ? `Address: ${address}\n\nIssue Description: ${issueDescription}` 
         : coverLetter;
 
+      // Clean up portfolioUrl format before sending
+      let finalPortfolioUrl = portfolioUrl.trim();
+      if (finalPortfolioUrl && !finalPortfolioUrl.startsWith("http")) {
+        finalPortfolioUrl = `https://${finalPortfolioUrl}`;
+      }
+
       const res = await apiFetch(`${API_BASE_URL}/applications`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           job_id: Number(jobId),
-          portfolioUrl,
+          portfolioUrl: finalPortfolioUrl,
           coverLetter: finalCoverLetter,
           resumeUrl,
         }),
@@ -126,8 +154,8 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
         const errorData = await res.json();
         showToast(errorData.message || t("فشل التقديم"), "error");
       }
-    } catch (err) {
-      showToast(t("حدث خطأ في الاتصال"), "error");
+    } catch (err: any) {
+      showToast(err.message || t("حدث خطأ في الاتصال"), "error");
     } finally {
       setIsSubmitting(false);
     }

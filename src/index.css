@@ -119,7 +119,7 @@ body {
 /* Layout */
 .main-layout {
   flex: 1;
-  min-height: 100vh; /* يخليه ياخد طول الشاشة على الأقل ويطول مع المحتوى */
+  min-height: 100vh; /* يخليه ياخد طول الشاشة على الأقل ويطول مع المحتوى */   
   display: flex;
   flex-direction: column;
 }

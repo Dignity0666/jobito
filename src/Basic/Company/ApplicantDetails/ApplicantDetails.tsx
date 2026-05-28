@@ -720,25 +720,40 @@ export default function ApplicantDetails() {
 
             {app.resumeUrl && (
               <>
-                <div className="main-divider" />
                 <div className="main-section">
                   <h3 className="section-title">{t("السيرة الذاتية المرفقة")}</h3>
                   {app.resumeUrl.toLowerCase().endsWith(".pdf") ? (
-                    <iframe
-                      src={
-                        app.resumeUrl.startsWith("http")
-                          ? app.resumeUrl
-                          : `${API_BASE_URL}${app.resumeUrl.startsWith("/") ? "" : "/"}${app.resumeUrl}`
-                      }
-                      width="100%"
-                      height="800px"
-                      style={{
-                        border: "1px solid #e2e8f0",
-                        borderRadius: "12px",
-                        marginTop: "16px",
-                      }}
-                      title={t("CV")}
-                    />
+                    <div style={{ marginTop: "16px", display: "flex", gap: "16px" }}>
+                      <button
+                        className="see-app-btn"
+                        onClick={() => {
+                          const val = app.resumeUrl!.trim();
+                          const isValid = val.startsWith("http") || val.includes("/") || val.startsWith(".");
+                          if (!isValid || val.length < 4) {
+                            showToast(`${t("قيمة تالفة:")} "${val}"`, "warning");
+                          }
+                          const url = val.startsWith("http")
+                            ? val
+                            : val.includes("/") || val.startsWith(".")
+                            ? `${API_BASE_URL}${val.startsWith("/") ? "" : "/"}${val}`
+                            : `https://${val}`;
+                          window.open(url, "_blank", "noopener,noreferrer");
+                        }}
+                        style={{
+                          background: "linear-gradient(135deg, #4A6ED1 0%, #3B5CBD 100%)",
+                          color: "white",
+                          border: "none",
+                          padding: "12px 24px",
+                          borderRadius: "30px",
+                          cursor: "pointer",
+                          fontWeight: "bold",
+                          fontSize: "15px",
+                          boxShadow: "0 4px 15px rgba(74, 110, 209, 0.3)",
+                        }}
+                      >
+                        👁️ {t("فتح السيرة الذاتية مباشرة")}
+                      </button>
+                    </div>
                   ) : (
                     <div
                       style={{

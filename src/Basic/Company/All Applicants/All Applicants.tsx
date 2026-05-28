@@ -369,26 +369,46 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
                   <td>
                     <div className={styles.appActions}>
                       {app.resumeUrl && (
-                        <a
-                          href={app.resumeUrl.startsWith("http") ? app.resumeUrl : `${API_BASE_URL}${app.resumeUrl}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
                           className={styles.seeAppBtn}
-                          style={{ textDecoration: "none" }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const val = app.resumeUrl!.trim();
+                            const isValid = val.startsWith("http") || val.includes("/") || val.startsWith(".");
+                            if (!isValid || val.length < 4) {
+                              showToast(`${t("قيمة تالفة:")} "${val}"`, "warning");
+                            }
+                            const url = val.startsWith("http")
+                              ? val
+                              : val.includes("/") || val.startsWith(".")
+                              ? `${API_BASE_URL}${val.startsWith("/") ? "" : "/"}${val}`
+                              : `https://${val}`;
+                            window.open(url, "_blank", "noopener,noreferrer");
+                          }}
                         >
                           {t("Resume")}
-                        </a>
+                        </button>
                       )}
                       {app.portfolioUrl && (
-                        <a
-                          href={app.portfolioUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
                           className={styles.seeAppBtn}
-                          style={{ textDecoration: "none" }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const val = app.portfolioUrl!.trim();
+                            const isValid = val.startsWith("http") || val.includes("/") || val.startsWith(".");
+                            if (!isValid || val.length < 4) {
+                              showToast(`${t("قيمة تالفة:")} "${val}"`, "warning");
+                            }
+                            const url = val.startsWith("http")
+                              ? val
+                              : val.includes("/") || val.startsWith(".")
+                              ? `${API_BASE_URL}${val.startsWith("/") ? "" : "/"}${val}`
+                              : `https://${val}`;
+                            window.open(url, "_blank", "noopener,noreferrer");
+                          }}
                         >
                           {t("Portfolio")}
-                        </a>
+                        </button>
                       )}
                       <button 
                         className={styles.seeAppBtn}

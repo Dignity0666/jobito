@@ -448,14 +448,13 @@ const AllJobs: React.FC<AllJobsProps> = ({
           : [job.jobType].filter(Boolean);
         return types.some((jt) => {
           const lowerJt = String(jt || "").toLowerCase();
-          if (t === "دوام كامل") return lowerJt === "full-time";
-          if (t === "دوام جزئي") return lowerJt === "part-time";
-          if (t === "عن بعد") return lowerJt === "remote";
-          if (t === "تدريب")
+          if (t === "Full-time") return lowerJt === "full-time" || lowerJt === "1";
+          if (t === "Part-time") return lowerJt === "part-time" || lowerJt === "0";
+          if (t === "Remote") return lowerJt === "remote";
+          if (t === "Internship")
             return lowerJt === "internship" || lowerJt === "intern";
-          if (t === "عقد") return lowerJt === "contract";
-          if (t === "عمل حر") return lowerJt === "freelance";
-          if (t === "خدمة سريعة") return lowerJt === "one-time";
+          if (t === "Freelance") return lowerJt === "freelance";
+          if (t === "One-time") return lowerJt === "one-time" || lowerJt === "2" || lowerJt === "quick service";
           return lowerJt.includes(t.toLowerCase());
         });
       });
@@ -483,7 +482,15 @@ const AllJobs: React.FC<AllJobsProps> = ({
       });
 
     const levelMatch =
-      selectedLevels.length === 0 || selectedLevels.includes(getJobLevel(job));
+      selectedLevels.length === 0 ||
+      selectedLevels.some((level) => {
+        const jobLevel = getJobLevel(job);
+        if (level === "Technical") return jobLevel === "تقني";
+        if (level === "Non-Technical") return jobLevel === "غير تقني";
+        if (level === "Services") return jobLevel === "services";
+        if (level === "Tradesman") return jobLevel === "tradesman";
+        return jobLevel.toLowerCase() === level.toLowerCase();
+      });
 
     const salaryMatch =
       selectedSalaries.length === 0 ||

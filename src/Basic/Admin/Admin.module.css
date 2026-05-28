@@ -383,13 +383,55 @@ tbody td { padding:10px 0; font-size:12px; color:var(--text); vertical-align:mid
 }
 
 @media (max-width: 900px) {
+  .adminHeader {
+    padding: 12px 16px;
+  }
   .headerContent {
     flex-direction: column-reverse;
     gap: 15px;
     align-items: stretch;
   }
+  .headerLeft {
+    justify-content: center;
+  }
   .headerRight {
     align-items: center;
+    width: 100%;
+  }
+  .greetingTitle {
+    font-size: 24px;
+    text-align: center;
+  }
+  .tabsRow {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    gap: 6px;
+  }
+  .headerTab {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+  .addAssistantBtn {
+    margin-right: 0;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .greetingTitle {
+    font-size: 20px;
+  }
+  .tabsRow {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 5px;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+  .headerTab {
+    flex-shrink: 0;
   }
 }
 

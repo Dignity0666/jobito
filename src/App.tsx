@@ -25,6 +25,7 @@ import JobDashboard from "./Basic/DoughnutChart/DoughnutChart";
 import ProfilePage from "./Basic/Profilepage/Profilepage";
 import Applicants from "./Basic/Social Media Assistant applicant/Social Media As";
 import AllApplicants from "./Basic/Company/All Applicants/All Applicants";
+import CVViewer from "./Basic/Company/All Applicants/CVViewer";
 import PostJobStep3 from "./Basic/Company/Perks & Benefits/Perks&Benefits";
 import PostJob from "./Basic/Company/post job/PostJobForm";
 import { AuthProvider, useJobitoAuth } from "./context/LinkContxt";
@@ -323,6 +324,14 @@ function AppContent() {
                     element={
                       <PageWrapper>
                         <ApplicantDetails />
+                      </PageWrapper>
+                    }
+                  />
+                  <Route
+                    path="/CVViewer"
+                    element={
+                      <PageWrapper>
+                        <CVViewer />
                       </PageWrapper>
                     }
                   />
