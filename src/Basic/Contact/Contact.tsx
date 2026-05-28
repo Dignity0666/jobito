@@ -198,6 +198,7 @@ export default function ContactPage() {
 
               <form
                 onSubmit={handleSubmit}
+                autoComplete="off"
                 style={{
                   display: "flex",
                   flexDirection: "column",
@@ -213,6 +214,7 @@ export default function ContactPage() {
                       value={formData.name}
                       onChange={handleChange}
                       required
+                      autoComplete="off"
                       className={styles.inputField}
                       placeholder={t("أدخل اسمك الكامل")}
                     />
@@ -227,6 +229,7 @@ export default function ContactPage() {
                       value={formData.email}
                       onChange={handleChange}
                       required
+                      autoComplete="off"
                       className={styles.inputField}
                       placeholder="mohamednasseremam380@gmail.com"
                     />
@@ -242,6 +245,7 @@ export default function ContactPage() {
                       value={formData.subject}
                       onChange={handleChange}
                       required
+                      autoComplete="off"
                       className={styles.inputField}
                       placeholder={t("كيف يمكننا مساعدتك؟")}
                     />
@@ -253,6 +257,7 @@ export default function ContactPage() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
+                      autoComplete="off"
                       className={styles.inputField}
                       placeholder="+20 15466210"
                     />
@@ -266,6 +271,7 @@ export default function ContactPage() {
                     value={formData.message}
                     onChange={handleChange}
                     required
+                    autoComplete="off"
                     className={styles.textareaField}
                     placeholder={t("اكتب رسالتك هنا...")}
                   ></textarea>
