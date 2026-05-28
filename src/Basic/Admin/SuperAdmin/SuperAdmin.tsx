@@ -194,7 +194,7 @@ const SuperAdminDashboard: React.FC = () => {
     layout: { padding: { top: 10, bottom: 0 } }
   };
 
-  const dist = statsData?.userDistribution || { trainees: 60, companies: 25, staff: 15 };
+  const dist = statsData?.userDistribution || { trainees: 0, companies: 0, staff: 0 };
   const totalDist = dist.trainees + dist.companies + dist.staff;
 
   const doughnutData = {
@@ -441,15 +441,15 @@ const SuperAdminDashboard: React.FC = () => {
                   <div className={styles.donutLegend}>
                     <div className={styles.legendItem}>
                       <span className={styles.legendDot} style={{ background: '#3b82f6' }}></span>
-                      <span className={styles.legendText}>{t("Trainees")} ({Math.round((dist.trainees / totalDist) * 100)}%)</span>
+                      <span className={styles.legendText}>{t("Trainees")} ({totalDist > 0 ? Math.round((dist.trainees / totalDist) * 100) : 0}%)</span>
                     </div>
                     <div className={styles.legendItem}>
                       <span className={styles.legendDot} style={{ background: '#8b5cf6' }}></span>
-                      <span className={styles.legendText}>{t("Companies")} ({Math.round((dist.companies / totalDist) * 100)}%)</span>
+                      <span className={styles.legendText}>{t("Companies")} ({totalDist > 0 ? Math.round((dist.companies / totalDist) * 100) : 0}%)</span>
                     </div>
                     <div className={styles.legendItem}>
                       <span className={styles.legendDot} style={{ background: '#f59e0b' }}></span>
-                      <span className={styles.legendText}>{t("Staff")} ({Math.round((dist.staff / totalDist) * 100)}%)</span>
+                      <span className={styles.legendText}>{t("Staff")} ({totalDist > 0 ? Math.round((dist.staff / totalDist) * 100) : 0}%)</span>
                     </div>
                   </div>
                 </div>
