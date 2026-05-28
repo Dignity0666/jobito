@@ -44,7 +44,7 @@ const UploadIcon = () => (
 
 export default function CompleteProfile() {
   const { t, language, setLanguage } = useTranslation();
-  const { user, apiFetch } = useJobitoAuth();
+  const { user, apiFetch, logout } = useJobitoAuth();
   const navigate = useNavigate();
 
   // Role state
@@ -299,6 +299,15 @@ export default function CompleteProfile() {
       }
 
       const result = await res.json();
+      if (role === "tradesman" && criminalRecordUrl) {
+        showToast(t("تم تقديم طلبك بنجاح! حسابك قيد المراجعة الآن، وسيتم تسجيل خروجك لحين موافقة الإدارة."), "success");
+        setTimeout(() => {
+          logout();
+          navigate("/login");
+        }, 3000);
+        return;
+      }
+
       if (result.access_token) {
         localStorage.setItem("token", result.access_token);
         window.dispatchEvent(new Event("auth-changed"));

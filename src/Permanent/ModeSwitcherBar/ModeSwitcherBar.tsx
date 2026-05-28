@@ -13,7 +13,7 @@ const ALLOWED_FILE_TYPES = ["application/pdf", "image/jpeg", "image/jpg", "image
 const ALLOWED_EXTENSIONS = [".pdf", ".jpg", ".jpeg", ".png"];
 
 const ModeSwitcherBar: React.FC = () => {
-  const { user, isAuthenticated, role, apiFetch, updateUser, login } = useJobitoAuth();
+  const { user, isAuthenticated, role, apiFetch, updateUser, login, logout } = useJobitoAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -88,6 +88,16 @@ const ModeSwitcherBar: React.FC = () => {
       });
 
       if (response.ok) {
+        if (newType === "tradesman" && extraPayload.criminalRecordUrl) {
+          setIsModalOpen(false);
+          showToast(t("تم تقديم طلبك بنجاح! حسابك قيد المراجعة الآن، وسيتم تسجيل خروجك لحين موافقة الإدارة."), "success");
+          setTimeout(() => {
+            logout();
+            navigate("/login");
+          }, 3000);
+          return;
+        }
+
         const data = await response.json();
         if (data.access_token) {
           login(data.access_token);
