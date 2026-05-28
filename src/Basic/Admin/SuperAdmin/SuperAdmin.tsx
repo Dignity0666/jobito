@@ -129,7 +129,7 @@ const SuperAdminDashboard: React.FC = () => {
           fullName: newAdminName, 
           email: newAdminEmail, 
           password: newAdminPassword, 
-          role: newAdminRole === 'Operation Manager' ? 'operation_manager' : 'super_admin' 
+          role: 'operation_manager'
         })
       });
       if (res.ok) {
@@ -427,7 +427,13 @@ const SuperAdminDashboard: React.FC = () => {
                   <div className={styles.donutChartContainer}>
                     <Doughnut data={doughnutData} options={doughnutOptions} />
                     <div className={styles.donutCenter}>
-                      <h4>{(totalDist / 1000).toFixed(1)}k</h4>
+                      <h4>
+                        {statsData?.activeUsers !== undefined && statsData?.activeUsers !== null
+                          ? statsData.activeUsers >= 1000
+                            ? `${(statsData.activeUsers / 1000).toFixed(1)}k`
+                            : statsData.activeUsers
+                          : '0'}
+                      </h4>
                       <span>{t("Users")}</span>
                     </div>
                   </div>
@@ -509,13 +515,6 @@ const SuperAdminDashboard: React.FC = () => {
                 value={newAdminPassword}
                 onChange={e => setNewAdminPassword(e.target.value)}
               />
-            </div>
-            <div className={styles.inputGroup}>
-              <label>{t("Assigned Role")}</label>
-              <select value={newAdminRole} onChange={e => setNewAdminRole(e.target.value)}>
-                <option value="Operation Manager">{t("Operation Manager")}</option>
-                <option value="Support Agent">{t("Support Agent")}</option>
-              </select>
             </div>
             <button className={styles.inviteBtn} onClick={handleInviteAdmin}>
               {t("Send invitation")}
