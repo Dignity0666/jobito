@@ -217,7 +217,7 @@ function AppContent() {
       <div className="main-layout" ref={mainLayoutRef}>
         {showHeader && <Header />}
         {showHeader && role === "user" && <ModeSwitcherBar />}
-        <div className="page-content">
+        <div className={`page-content ${shouldHide ? "full-screen-page" : ""}`}>
           <AnimatePresence mode="wait" initial={false}>
             <Routes location={location} key={location.pathname}>
               {/* ─── Company & Tradesman Management Routes ────────────────────────── */}
