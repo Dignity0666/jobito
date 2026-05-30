@@ -165,7 +165,20 @@ const AllJobs: React.FC<AllJobsProps> = ({
     const categoryParam = searchParams.get("category");
     if (categoryParam) {
       console.log(`🎯 [AllJobs] Activating filter from URL: ${categoryParam}`);
-      setSelectedLevels([categoryParam]);
+      
+      let mappedLevel = categoryParam;
+      const lowerParam = categoryParam.trim().toLowerCase();
+      if (lowerParam === "تقني" || lowerParam === "technical") {
+        mappedLevel = "Technical";
+      } else if (lowerParam === "غير تقني" || lowerParam === "non-technical") {
+        mappedLevel = "Non-Technical";
+      } else if (lowerParam === "خدمات" || lowerParam === "services" || lowerParam === "صنيعي" || lowerParam === "حرفي") {
+        mappedLevel = "Services";
+      } else if (lowerParam === "tradesman") {
+        mappedLevel = "Tradesman";
+      }
+      
+      setSelectedLevels([mappedLevel]);
       // Remove query param from URL without refreshing
       const newParams = new URLSearchParams(searchParams);
       newParams.delete("category");
