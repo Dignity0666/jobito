@@ -113,6 +113,22 @@ const AllJobs: React.FC<AllJobsProps> = ({
       .trim();
   };
 
+  const matchesType = (job: Job, t: string) => {
+    const types = Array.isArray(job.jobType)
+      ? job.jobType
+      : [job.jobType].filter(Boolean);
+    return types.some((jt) => {
+      const lowerJt = String(jt || "").toLowerCase();
+      if (t === "Full-time") return lowerJt === "full-time" || lowerJt === "1" || lowerJt === "دوام كامل";
+      if (t === "Part-time") return lowerJt === "part-time" || lowerJt === "0" || lowerJt === "دوام جزئي";
+      if (t === "Remote") return lowerJt === "remote" || lowerJt === "عن بعد";
+      if (t === "Internship") return lowerJt === "internship" || lowerJt === "intern" || lowerJt === "تدريب";
+      if (t === "Freelance") return lowerJt === "freelance" || lowerJt === "عمل حر";
+      if (t === "One-time") return lowerJt === "one-time" || lowerJt === "2" || lowerJt === "quick service" || lowerJt === "عمل لمرة واحدة";
+      return lowerJt.includes(t.toLowerCase());
+    });
+  };
+
   const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -435,40 +451,19 @@ const AllJobs: React.FC<AllJobsProps> = ({
       if (getJobLevel(job) !== "services") return false;
     }
 
-    const keywordLower = searchKeyword.toLowerCase();
-    const keywordMatch =
-      !searchKeyword ||
-      String(job.title || "")
-        .toLowerCase()
-        .includes(keywordLower) ||
-      String(job.company?.name || "")
-        .toLowerCase()
-        .includes(keywordLower);
-
     const locationMatch =
       !location ||
       String(job.address || "")
         .toLowerCase()
-        .includes(location.toLowerCase());
+        .includes(location.toLowerCase()) ||
+      (location.toLowerCase() === "cairo" && (String(job.address || "").includes("القاهرة") || String(job.address || "").includes("Cairo"))) ||
+      (location.toLowerCase() === "alexandria" && (String(job.address || "").includes("الإسكندرية") || String(job.address || "").includes("Alexandria")));
+
+    const keywordMatch = true;
 
     const typeMatch =
       selectedTypes.length === 0 ||
-      selectedTypes.some((t) => {
-        const types = Array.isArray(job.jobType)
-          ? job.jobType
-          : [job.jobType].filter(Boolean);
-        return types.some((jt) => {
-          const lowerJt = String(jt || "").toLowerCase();
-          if (t === "Full-time") return lowerJt === "full-time" || lowerJt === "1";
-          if (t === "Part-time") return lowerJt === "part-time" || lowerJt === "0";
-          if (t === "Remote") return lowerJt === "remote";
-          if (t === "Internship")
-            return lowerJt === "internship" || lowerJt === "intern";
-          if (t === "Freelance") return lowerJt === "freelance";
-          if (t === "One-time") return lowerJt === "one-time" || lowerJt === "2" || lowerJt === "quick service";
-          return lowerJt.includes(t.toLowerCase());
-        });
-      });
+      selectedTypes.some((t) => matchesType(job, t));
 
     const categoryMatch =
       selectedCategories.length === 0 ||
@@ -567,56 +562,32 @@ const AllJobs: React.FC<AllJobsProps> = ({
             items={[
               {
                 name: "Full-time",
-                count: jobs.filter((j) =>
-                  Array.isArray(j.jobType)
-                    ? j.jobType.includes("full-time")
-                    : j.jobType === "full-time",
-                ).length,
+                count: jobs.filter((j) => matchesType(j, "Full-time")).length,
                 value: "Full-time",
               },
               {
                 name: "Part-time",
-                count: jobs.filter((j) =>
-                  Array.isArray(j.jobType)
-                    ? j.jobType.includes("part-time")
-                    : j.jobType === "part-time",
-                ).length,
+                count: jobs.filter((j) => matchesType(j, "Part-time")).length,
                 value: "Part-time",
               },
               {
                 name: "Freelance",
-                count: jobs.filter((j) =>
-                  Array.isArray(j.jobType)
-                    ? j.jobType.includes("freelance")
-                    : j.jobType === "freelance",
-                ).length,
+                count: jobs.filter((j) => matchesType(j, "Freelance")).length,
                 value: "Freelance",
               },
               {
                 name: "Internship",
-                count: jobs.filter((j) =>
-                  Array.isArray(j.jobType)
-                    ? j.jobType.includes("internship")
-                    : j.jobType === "internship",
-                ).length,
+                count: jobs.filter((j) => matchesType(j, "Internship")).length,
                 value: "Internship",
               },
               {
                 name: "One-time",
-                count: jobs.filter((j) =>
-                  Array.isArray(j.jobType)
-                    ? j.jobType.includes("one-time")
-                    : j.jobType === "one-time",
-                ).length,
+                count: jobs.filter((j) => matchesType(j, "One-time")).length,
                 value: "One-time",
               },
               {
                 name: "Remote",
-                count: jobs.filter((j) =>
-                  Array.isArray(j.jobType)
-                    ? j.jobType.includes("remote")
-                    : j.jobType === "remote",
-                ).length,
+                count: jobs.filter((j) => matchesType(j, "Remote")).length,
                 value: "Remote",
               },
             ]}
