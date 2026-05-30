@@ -124,32 +124,6 @@ const STATS = [
   { num: "95%", label: "نسبة النجاح" },
 ];
 
-const TESTIMONIALS = [
-  {
-    name: "عمر خالد",
-    role: "مطور واجهات وسرية أول",
-    quote:
-      "جوبيتو جعل البحث عن عمل سهلاً بشكل مذهل. في غضون أسبوعين، تم طابقتي مع شركة تناسب مهاراتي تماماً.",
-    initials: "ع",
-    c: "#4A6ED1",
-  },
-  {
-    name: "ليلى يوسف",
-    role: "مديرة موارد بشرية، CreativeSync",
-    quote:
-      "كمسؤولة توظيف، كان العثور على الموهبة المناسبة يستغرق أشهراً. مع فلاتر جوبيتو الذكية، وجدنا أفضل المرشحين في أيام.",
-    initials: "ل",
-    c: "#FF7A2A",
-  },
-  {
-    name: "أحمد موسى",
-    role: "مصمم واجهات وتجربة مستخدم",
-    quote:
-      "أدوات بناء الملف الشخصي والسيرة الذاتية من الطراز الأول. ساعدني ذلك حقاً في البروز أمام أصحاب العمل الدوليين.",
-    initials: "أ",
-    c: "#0B1020",
-  },
-];
 
 function useReveal() {
   const observersRef = useRef({});
@@ -451,57 +425,6 @@ export function About() {
           </div>
         </section>
 
-        {/* ═══ TESTIMONIALS ═══ */}
-        <section className={styles["testi-sec"]}>
-          <div className={styles.container}>
-            <div
-              ref={r("tst-h")}
-              className={`${styles["sec-header"]} ${rv(vis, "tst-h", "u")}`}
-            >
-              <div className={`${styles.eyebrow} ${styles.co}`}>
-                <span className={styles.pdot} />
-                {t("ماذا يقول عملاؤنا")}
-              </div>
-              <h2 className={styles.dtitle}>
-                {t("قصص واقعية، نتائج حقيقية")}
-              </h2>
-            </div>
-            <div className={styles["testi-grid"]}>
-              {TESTIMONIALS.map((testi, i) => (
-                <div
-                  key={i}
-                  ref={r(`t${i}`)}
-                  className={`${styles["testi-card"]} ${rv(vis, `t${i}`, "u")}`}
-                  style={{ animationDelay: `${i * 150}ms` }}
-                >
-                  <div className={styles["testi-stars"]}>
-                    {[...Array(5)].map((_, si) => (
-                      <Icon
-                        key={si}
-                        size={16}
-                        fill="var(--orange)"
-                        stroke="var(--orange)"
-                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                        className={styles.ts}
-                      />
-                    ))}
-                  </div>
-                  <div className={styles["testi-qm"]}>“</div>
-                  <div className={styles["testi-txt"]}>{t(testi.quote)}</div>
-                  <div className={styles["testi-author"]}>
-                    <div className={styles["testi-av"]} style={{ background: testi.c }}>
-                      {testi.initials}
-                    </div>
-                    <div>
-                      <div className={styles["testi-name"]}>{t(testi.name)}</div>
-                      <div className={styles["testi-role"]}>{t(testi.role)}</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* ═══ HELP SECTION ═══ */}
         <section className={styles["help-sec"]}>
