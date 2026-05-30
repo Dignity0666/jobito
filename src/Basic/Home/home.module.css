@@ -209,7 +209,7 @@
 
   .container {
     padding: 0 20px;
-    order: 1;
+    order: 2;
   }
 
   .title {
@@ -233,11 +233,11 @@
     width: 100% !important;
     max-width: 450px !important;
     height: auto !important;
-    margin: 30px auto 0 !important;
+    margin: 0 auto -50px !important;
     opacity: 1 !important;
     z-index: 1 !important;
     display: block !important;
-    order: 2 !important;
+    order: 1 !important;
   }
 
   [dir="rtl"] .heroImage {
