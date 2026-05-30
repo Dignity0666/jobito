@@ -93,9 +93,10 @@ export default function CompleteProfile() {
 
   // Social Links
   const [socialLinks, setSocialLinks] = useState({
-    instagram: "",
-    twitter: "",
-    website: "",
+    instagram: user?.socialLinks?.instagram || "",
+    twitter: user?.socialLinks?.twitter || "",
+    website: user?.socialLinks?.website || "",
+    linkedin: user?.socialLinks?.linkedin || "",
   });
 
   // Work Images
@@ -1024,20 +1025,35 @@ export default function CompleteProfile() {
               <div className={styles.formGrid}>
                 <div className={styles.fieldFull}>
                   <label className={styles.label}>{t("المهارات")}</label>
-                  <input
-                    type="text"
-                    className={styles.input}
-                    placeholder={t("أضف مهارة واضغط Enter")}
-                    value={skillInput}
-                    onChange={(e) => setSkillInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && skillInput.trim()) {
-                        e.preventDefault();
-                        setSkills([...skills, skillInput.trim()]);
-                        setSkillInput("");
-                      }
-                    }}
-                  />
+                  <div className={styles.skillInputWrapper}>
+                    <input
+                      type="text"
+                      className={styles.input}
+                      style={{ flex: 1 }}
+                      placeholder={t("أضف مهارة واضغط Enter أو زر الـ +")}
+                      value={skillInput}
+                      onChange={(e) => setSkillInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && skillInput.trim()) {
+                          e.preventDefault();
+                          setSkills([...skills, skillInput.trim()]);
+                          setSkillInput("");
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className={styles.addSkillBtn}
+                      onClick={() => {
+                        if (skillInput.trim()) {
+                          setSkills([...skills, skillInput.trim()]);
+                          setSkillInput("");
+                        }
+                      }}
+                    >
+                      +
+                    </button>
+                  </div>
                   <div className={styles.tagContainer}>
                     {skills.map((skill, i) => (
                       <span key={i} className={styles.tag}>
@@ -1097,6 +1113,28 @@ export default function CompleteProfile() {
                     className={styles.input}
                     placeholder="twitter.com/username"
                     value={socialLinks.twitter}
+                    onChange={handleSocialChange}
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label}>{t("الموقع الإلكتروني / معرض الأعمال")}</label>
+                  <input
+                    type="text"
+                    name="website"
+                    className={styles.input}
+                    placeholder="https://myportfolio.com"
+                    value={socialLinks.website}
+                    onChange={handleSocialChange}
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label}>{t("لينكد إن")}</label>
+                  <input
+                    type="text"
+                    name="linkedin"
+                    className={styles.input}
+                    placeholder="linkedin.com/in/username"
+                    value={socialLinks.linkedin}
                     onChange={handleSocialChange}
                   />
                 </div>
