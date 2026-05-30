@@ -144,7 +144,9 @@ export function Header() {
             <SidebarMenu navLinks={desktopMenuLinks} />
           </div>
           
-          <LogoComponent />
+          <div className={styles.logoWrapper}>
+            <LogoComponent />
+          </div>
 
           <div className={styles.desktopNavOnly}>
             <NavBar
@@ -163,6 +165,7 @@ export function Header() {
           transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 20 }}
         >
 
+          {role !== "company" && (
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <button
               className={styles.themeToggleBtn}
@@ -196,6 +199,7 @@ export function Header() {
               </AnimatePresence>
             </button>
           </div>
+          )}
 
           <AnimatePresence mode="wait">
             {role === "company" ? (

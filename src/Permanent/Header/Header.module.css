@@ -120,3 +120,14 @@
     height: 38px;
   }
 }
+
+.logoWrapper {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 309px) {
+  .logoWrapper {
+    display: none;
+  }
+}

@@ -272,3 +272,77 @@
 .capacityText {
   color: var(--color-text-muted);
 }
+
+@media (max-width: 768px) {
+  .main {
+    padding: 16px;
+  }
+  
+  .headerTop {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  
+  .dateSelector {
+    width: fit-content;
+  }
+  
+  .Percentages {
+    gap: 12px;
+  }
+  
+  .NewCandidates {
+    min-width: 100%;
+    height: auto;
+    padding: 16px;
+  }
+  
+  .NewCandiTExt h3 {
+    font-size: 36px;
+  }
+  
+  .NewCandiTExt p {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main {
+    padding: 12px;
+  }
+  
+  .headerTitle {
+    font-size: 1.25rem;
+  }
+  
+  .NewCandiTExt {
+    gap: 10px;
+  }
+  
+  .NewCandiTExt h3 {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 398px) {
+  .main {
+    padding: 10px !important;
+  }
+  
+  .headerTitle {
+    font-size: 1.15rem !important;
+  }
+  
+  .NewCandidates {
+    padding: 12px !important;
+  }
+  
+  .NewCandiTExt h3 {
+    font-size: 28px !important;
+  }
+  
+  .NewCandiTExt p {
+    font-size: 12px !important;
+  }
+}

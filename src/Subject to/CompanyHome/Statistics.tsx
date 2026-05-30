@@ -95,7 +95,12 @@ export default function Statistics({
         grid: { display: false },
         ticks: {
           color: axisTextColor,
-          font: { size: language === "ar" ? 19 : 14, weight: "bold" },
+          font: {
+            size: typeof window !== "undefined" && window.innerWidth < 480 
+              ? (language === "ar" ? 11 : 9) 
+              : (language === "ar" ? 16 : 13),
+            weight: "bold"
+          },
         },
       },
       y: {
@@ -300,7 +305,7 @@ export default function Statistics({
           <div className={styles.cardContent}>
             <div className={styles.chartContainer}>
               <div className={styles.chartArea}>
-                <div style={{ width: "100%", height: "260px" }}>
+                <div style={{ width: "100%", height: "100%" }}>
                   <Bar
                     data={chartData}
                     options={chartOptions}

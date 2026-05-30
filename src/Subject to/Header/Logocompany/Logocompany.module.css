@@ -87,3 +87,9 @@
     font-size: 10px;
   }
 }
+
+@media (max-width: 406px) {
+  .Logocompanycompany {
+    display: none !important;
+  }
+}

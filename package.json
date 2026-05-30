@@ -1,11 +1,14 @@
 {
   "name": "Jobito",
+  "homepage": "https://ebrahimnasser820-jpg.github.io/Jobito",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
     "autopush": "git add . && git commit -m \"auto update %date% %time%\" && git push",
     "push": "git add . && git commit -m \"\" && git push",
     "lint": "eslint .",
@@ -55,6 +58,7 @@
     "eslint": "^9.36.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.22",
+    "gh-pages": "^6.3.0",
     "globals": "^16.4.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.18",
