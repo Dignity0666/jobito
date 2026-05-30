@@ -200,6 +200,11 @@
     width: 100%;
     max-width: 450px;
   }
+
+  .heroImage {
+    opacity: 0.3;
+    width: 60%;
+  }
 }
 
 @media (max-width: 768px) {
@@ -228,22 +233,26 @@
   }
 
   .heroImage {
-    position: relative;
-    translate: 0;
-    width: 100%;
-    max-width: 320px;
-    height: auto;
-    margin: 0 auto 30px;
-    opacity: 1;
-    z-index: 1;
-    display: block;
-    order: 1;
-    transform: none;
-    top: auto;
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    left: auto !important;
+    translate: 0 !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: 280px !important;
+    height: auto !important;
+    margin: 0 auto 30px !important;
+    opacity: 1 !important;
+    z-index: 1 !important;
+    display: block !important;
+    order: 1 !important;
   }
 
   [dir="rtl"] .heroImage {
-    translate: 0;
+    translate: 0 !important;
+    left: auto !important;
+    right: auto !important;
   }
 
   .heroDownloadBtn {
@@ -275,6 +284,11 @@
   .searchBtn {
     width: 100%;
   }
+
+  .hiringBannerContainer {
+    margin: 20px auto 0 !important;
+    max-width: 100% !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -284,6 +298,10 @@
 
   .container {
     padding: 0 15px;
+  }
+
+  .heroImage {
+    max-width: 220px !important;
   }
 }
 
@@ -337,23 +355,9 @@
   display: inline-block;
 }
 
-@media (max-width: 992px) {
-  .heroImage {
-    opacity: 0.3;
-    width: 60%;
-  }
-}
-
 .hiringBannerContainer {
   margin-top: 20px;
   max-width: 500px;
   width: 100%;
   box-sizing: border-box;
-}
-
-@media (max-width: 768px) {
-  .hiringBannerContainer {
-    margin: 20px auto 0;
-    max-width: 100%;
-  }
 }
