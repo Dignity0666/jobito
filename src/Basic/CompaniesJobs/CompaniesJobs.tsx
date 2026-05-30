@@ -203,6 +203,11 @@ const CompaniesJobs = () => {
           backgroundRepeat: "no-repeat",
         }}
       >
+        <img
+          src={isDark ? darkBg : lightBg}
+          alt="Banner"
+          className={styles.mobileBanner}
+        />
         <div className={styles.container}>
           <motion.div
             className={styles.content}

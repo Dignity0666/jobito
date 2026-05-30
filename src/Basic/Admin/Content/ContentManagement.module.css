@@ -186,3 +186,110 @@
   color: var(--color-text);
   margin-top: 8px;
 }
+
+/* ─── Mobile Responsiveness ─── */
+@media (max-width: 768px) {
+  .body {
+    padding: 12px;
+  }
+
+  .card {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  .cardHeader {
+    padding: 12px 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    background: transparent;
+    border-bottom: none;
+  }
+
+  .cardTitle {
+    font-size: 18px;
+    text-align: center;
+  }
+
+  .tableContainer {
+    overflow-x: visible;
+  }
+
+  /* Hide table header */
+  .table thead {
+    display: none;
+  }
+
+  /* Make standard table tags block elements */
+  .table,
+  .table tbody,
+  .tr,
+  .td {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Transform row into card */
+  .tr {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .tr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+  }
+
+  .td {
+    padding: 8px 0;
+    border-bottom: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+  }
+
+  /* Display field title using data-label on the left */
+  .td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Special header cell styling for post owner */
+  .td:first-child {
+    border-bottom: 1px dashed var(--color-border-light);
+    padding-bottom: 12px;
+    margin-bottom: 10px;
+  }
+
+  .td:first-child::before {
+    display: none;
+  }
+
+  /* Center the actual text cell */
+  .td[data-label="Content"] {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    background: var(--color-bg-secondary);
+    padding: 10px 12px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+
+  .td[data-label="Content"]::before {
+    margin-bottom: 2px;
+  }
+}

@@ -158,7 +158,7 @@ export default function ApplicantDetails() {
 
       const link = document.createElement("a");
       link.href = blobUrl;
-      const cleanName = u.fullName.split(" ")[0] || "Applicant";
+      const cleanName = (app?.user?.fullName || "Applicant").split(" ")[0] || "Applicant";
       link.download = `${cleanName}_CV.pdf`;
       document.body.appendChild(link);
       link.click();
@@ -182,7 +182,7 @@ export default function ApplicantDetails() {
           avatarUrl: u.avatarUrl || null,
           email: u.email,
         },
-        initialMessage: `${t("مرحباً")} ${u.fullName.split(" ")[0]}، ${t("بخصوص تقديمك على وظيفة")} ${t(app?.job?.title || "المتاحة")}، ${t("نحن مهتمون بملفك ونتمنى التواصل معك قريباً.")}`,
+        initialMessage: `${t("مرحباً")} ${(u?.fullName || "Applicant").split(" ")[0]}، ${t("بخصوص تقديمك على وظيفة")} ${t(app?.job?.title || "المتاحة")}، ${t("نحن مهتمون بملفك ونتمنى التواصل معك قريباً.")}`,
       },
     });
   };
@@ -221,7 +221,24 @@ export default function ApplicantDetails() {
     return (
       <div className="details-error">⚠️ {t(error || "المتقدم غير موجود")}</div>
     );
-  const u = app.user;
+  const u = app.user || {
+    userId: "",
+    fullName: "",
+    email: "",
+    avatarUrl: "",
+    phone: "",
+    skills: [],
+    bio: "",
+    dob: "",
+    gender: "",
+    experiences: [],
+    educations: [],
+    portfolios: [],
+    experience: 0,
+    languages: [],
+    socialLinks: {},
+    location: ""
+  };
   const avatar = u.avatarUrl
     ? u.avatarUrl.startsWith("http")
       ? u.avatarUrl
@@ -280,7 +297,9 @@ export default function ApplicantDetails() {
               </h2>
               <div className="applied-job-meta">
                 {t(app.job?.category?.name || "عام")} •{" "}
-                {t(app.job?.jobType || "دوام كامل")}
+                {Array.isArray(app.job?.jobType)
+                  ? t(app.job.jobType[0] || "دوام كامل")
+                  : t(app.job?.jobType || "دوام كامل")}
               </div>
             </div>
 
@@ -310,7 +329,7 @@ export default function ApplicantDetails() {
                   <div className="cv-details-text">
                     <span className="cv-filename">
                       {app.resumeUrl.split("/").pop() ||
-                        `${u.fullName.split(" ")[0]}_CV.pdf`}
+                        `${(u?.fullName || "Applicant").split(" ")[0]}_CV.pdf`}
                     </span>
                     <span className="cv-filesize">{t("سيرة ذاتية احترافية")}</span>
                   </div>

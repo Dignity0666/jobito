@@ -1,4 +1,3 @@
-ة
 :root {
   --navy:        #0B1020;
   --cobalt:      #4A6ED1;
@@ -23,7 +22,7 @@
   background-color: var(--off-white);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: var(--text-main);
-  direction: rtl;
+  overflow-x: hidden;
 }
 
 /* ─── Hero Section ─── */
@@ -33,6 +32,12 @@
   padding: 100px 24px 80px;
   text-align: center;
   overflow: hidden;
+}
+
+@media (max-width: 480px) {
+  .heroSection {
+    padding: 70px 16px 50px;
+  }
 }
 
 .heroOverlay {
@@ -113,6 +118,18 @@
   padding: 48px 24px 80px;
 }
 
+@media (max-width: 768px) {
+  .mainLayout {
+    padding: 24px 12px 60px;
+  }
+}
+
+@media (max-width: 380px) {
+  .mainLayout {
+    padding: 16px 8px 40px;
+  }
+}
+
 /* ─── Stats Grid ─── */
 .statsGrid {
   display: grid;
@@ -124,6 +141,15 @@
 @media (max-width: 768px) {
   .statsGrid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+}
+
+@media (max-width: 380px) {
+  .statsGrid {
+    gap: 8px;
+    margin-bottom: 24px;
   }
 }
 
@@ -135,6 +161,13 @@
   box-shadow: var(--shadow-sm);
   border: 1px solid rgba(74,110,209,0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+@media (max-width: 480px) {
+  .statCard {
+    padding: 20px 12px;
+    border-radius: var(--radius-sm);
+  }
 }
 
 .statCard:hover {
@@ -190,11 +223,39 @@
   border: 1px solid rgba(74,110,209,0.1);
 }
 
+@media (max-width: 768px) {
+  .formCard {
+    padding: 24px 20px;
+    border-radius: var(--radius-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .formCard {
+    padding: 20px 14px;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+@media (max-width: 320px) {
+  .formCard {
+    padding: 16px 10px;
+    border-radius: 6px;
+  }
+}
+
 .formCard h3 {
   font-size: 1.7rem;
   font-weight: 900;
   color: var(--navy);
   margin: 0 0 8px 0;
+}
+
+@media (max-width: 480px) {
+  .formCard h3 {
+    font-size: 1.4rem;
+  }
 }
 
 .formHeaderDesc {
@@ -261,7 +322,14 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   box-sizing: border-box;
   outline: none;
-  direction: rtl;
+}
+
+@media (max-width: 480px) {
+  .inputField {
+    padding: 11px 12px;
+    font-size: 0.9rem;
+    border-radius: 8px;
+  }
 }
 
 .inputField:focus {
@@ -287,8 +355,16 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   box-sizing: border-box;
   outline: none;
-  direction: rtl;
   font-family: inherit;
+}
+
+@media (max-width: 480px) {
+  .textareaField {
+    padding: 11px 12px;
+    font-size: 0.9rem;
+    min-height: 120px;
+    border-radius: 8px;
+  }
 }
 
 .textareaField:focus {
@@ -305,6 +381,7 @@
 .submitBtn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   background: linear-gradient(135deg, var(--tangerine) 0%, #e86010 100%);
   color: var(--white);
@@ -317,6 +394,30 @@
   transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
   box-shadow: 0 4px 16px rgba(255,122,42,0.4);
   letter-spacing: 0.3px;
+}
+
+.submitGroup {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.requiredText {
+  font-size: 12px;
+  color: #8892a4;
+}
+
+@media (max-width: 600px) {
+  .submitGroup {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .requiredText {
+    text-align: center;
+  }
 }
 
 .submitBtn:hover:not(:disabled) {
@@ -346,6 +447,20 @@
   padding: 32px;
   box-shadow: var(--shadow-md);
   border: 1px solid rgba(74,110,209,0.1);
+}
+
+@media (max-width: 768px) {
+  .infoCard {
+    padding: 24px 20px;
+    border-radius: var(--radius-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .infoCard {
+    padding: 20px 14px;
+    border-radius: 8px;
+  }
 }
 
 .infoCard h4 {
@@ -429,6 +544,13 @@
   max-width: 1200px;
   margin: 0 auto 64px;
   padding: 0 24px;
+}
+
+@media (max-width: 480px) {
+  .MapComponent {
+    padding: 0 12px;
+    margin-bottom: 40px;
+  }
 }
 
 .MapComponent a {

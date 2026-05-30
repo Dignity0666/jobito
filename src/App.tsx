@@ -29,7 +29,7 @@ import CVViewer from "./Basic/Company/All Applicants/CVViewer";
 import PostJobStep3 from "./Basic/Company/Perks & Benefits/Perks&Benefits";
 import PostJob from "./Basic/Company/post job/PostJobForm";
 import { AuthProvider, useJobitoAuth } from "./context/LinkContxt";
-import { TranslationProvider } from "./context/TranslationContext";
+import { TranslationProvider } from "./context/translation-context";
 import { ThemeProvider } from "./context/ThemeContext";
 import ProfilepageCompany from "./Basic/Company/ProfilepageCompany/ProfilepageCompany";
 import JobListing from "./Basic/Company/Job Listing/Job Listing";
@@ -180,6 +180,14 @@ function AppContent() {
 
   if (isInitialLoading) {
     return <SplashScreen />;
+  }
+
+  // Redirect logged-in users with no classification (who are not company/admin) to complete profile
+  const isCompleteProfilePath = location.pathname.toLowerCase() === "/complete-profile";
+  const isUserWithoutClassification = isAuthenticated && role === "user" && !classification;
+
+  if (isUserWithoutClassification && !isCompleteProfilePath) {
+    return <Navigate to="/complete-profile" replace />;
   }
 
   if (isBackendOffline) {
@@ -402,12 +410,16 @@ function AppContent() {
                   <Route
                     path="/"
                     element={
-                      <PageWrapper>
-                        <Home />
-                      </PageWrapper>
+                      role === "admin" ? (
+                        <Navigate to="/admin" replace />
+                      ) : (
+                        <PageWrapper>
+                          <Home />
+                        </PageWrapper>
+                      )
                     }
                   />
-                  <Route path="/home" element={<Navigate to="/" replace />} />
+                  <Route path="/home" element={role === "admin" ? <Navigate to="/admin" replace /> : <Navigate to="/" replace />} />
                   <Route
                     path="/Find Jobs"
                     element={

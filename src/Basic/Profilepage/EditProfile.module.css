@@ -762,3 +762,45 @@
   font-weight: 600;
   cursor: pointer;
 }
+
+@media (max-width: 600px) {
+  .photoSection {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+  }
+  .uploadZone {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 16px;
+    margin: 20px auto;
+  }
+  .tabs {
+    gap: 16px;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 8px;
+  }
+  .tabBtn {
+    padding: 8px 0;
+  }
+  .servicesRow {
+    max-width: 100%;
+    width: 100%;
+  }
+  .serviceSlot {
+    width: 50%;
+    box-sizing: border-box;
+  }
+  .footer {
+    justify-content: center;
+  }
+  .saveBtn {
+    width: 100%;
+  }
+}

@@ -123,7 +123,73 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
           'Remote': 'عن بعد',
           'Tradesman': 'صنايعي',
           'Technical': 'تقني',
-          'Non-Technical': 'غير تقني'
+          'Non-Technical': 'غير تقني',
+          'Activity Breakdown': 'تحليل النشاط',
+          'Hourly Activity (Last 24h)': 'معدل النشاط (آخر 24 ساعة)',
+          'No chart data available yet': 'لا توجد بيانات للرسم البياني بعد',
+          'Login Activity': 'نشاط تسجيل الدخول',
+          'User Actions': 'إجراءات المستخدمين',
+          'Company Actions': 'إجراءات الشركات',
+          'Admin Actions': 'إجراءات المشرفين',
+          'Content Actions': 'إجراءات المحتوى',
+          'System Events': 'أحداث النظام',
+          'Live': 'مباشر',
+          'Login Sessions': 'جلسات الدخول',
+          'From current activity log': 'من سجل النشاط الحالي',
+          'User Events': 'أحداث المستخدمين',
+          'Warn, suspend, ban actions': 'عمليات التحذير، الإيقاف، والحظر',
+          'Company Events': 'أحداث الشركات',
+          'Review & approval actions': 'عمليات المراجعة والموافقات',
+          'Registration, verification, resets': 'التسجيل، التفعيل، وإعادة التعيين',
+          'Security Alerts': 'التنبيهات الأمنية',
+          'Bans, suspensions, failed logins': 'الحظر، الإيقاف، والدخول الفاشل',
+          'System Activity Log': 'سجل نشاط النظام',
+          'All Entities': 'جميع الكيانات',
+          'Users': 'المستخدمين',
+          'Companies': 'الشركات',
+          'Admins': 'المشرفين',
+          'Content': 'المحتوى',
+          'System': 'النظام',
+          'Search activity...': 'بحث في الأنشطة...',
+          'Admin': 'المشرف',
+          'Description': 'الوصف',
+          'Target': 'الهدف',
+          'Action': 'الإجراء',
+          'Time': 'الوقت',
+          'Loading activity data...': 'جاري تحميل سجل النشاط...',
+          'No activity records found': 'لم يتم العثور على سجلات نشاط',
+          'Page': 'صفحة',
+          'total': 'إجمالي',
+          'Just now': 'الآن',
+          'm ago': ' دقيقة',
+          'h ago': ' ساعة',
+          'd ago': ' يوم',
+          'Company Registration Requests': 'طلبات تسجيل الشركات',
+          'Criminal Record Reviews': 'مراجعات السجل الجنائي',
+          'Tradesmen': 'الحرفيين',
+          'Applicant': 'المتقدم',
+          'Submission Date': 'تاريخ التقديم',
+          'Commercial Registration Review': 'مراجعة السجل التجاري',
+          'Commercial Register': 'السجل التجاري',
+          'Tax Register': 'البطاقة الضريبية',
+          'Criminal Record Document': 'مستند الفيش والتشبيه',
+          'View Document': 'عرض المستند',
+          'No document uploaded': 'لم يتم رفع مستند',
+          'Tax ID': 'الرقم الضريبي',
+          'License Number': 'رقم الترخيص',
+          'National ID': 'الرقم القومي',
+          'Address': 'العنوان',
+          'Classification': 'التصنيف',
+          'Pending review': 'قيد الانتظار',
+          'Reviewed by Super Admin': 'تمت المراجعة بواسطة المسؤول',
+          'System Requests': 'طلبات النظام',
+          'Review and manage assistant addition requests from Operations Managers': 'مراجعة وإدارة طلبات إضافة المساعدين من مدراء العمليات',
+          'Requested by': 'مقدم الطلب',
+          'No requests yet': 'لا توجد طلبات بعد',
+          'No system requests have been submitted by Operations Managers': 'لم يتم تقديم أي طلبات نظام بواسطة مدراء العمليات بعد',
+          'Request approved successfully': 'تمت الموافقة على الطلب بنجاح',
+          'Request rejected': 'تم رفض الطلب',
+          'Add Assistant': 'إضافة مساعد'
         };
 
         if (language === 'ar') {
@@ -214,6 +280,15 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
       fallbackOrOptions?: string | Record<string, string | number>,
       options?: Record<string, string | number>
     ): string => {
+      if (typeof key !== 'string') {
+        if (Array.isArray(key)) {
+          key = key[0] || '';
+        } else if (key && typeof key === 'object') {
+          key = (key as any).name || (key as any).title || String(key);
+        } else {
+          key = String(key || '');
+        }
+      }
       if (!key) return '';
 
       // Hardcoded high-priority overrides for stubborn strings in both Arabic and English
@@ -225,15 +300,64 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
           'الإسكندرية، مصر': 'Alexandria, Egypt',
           'مسمى الوظيفة أو الكلمة الرئيسية...': 'Job title or keyword...',
           'ما هي الخدمة التي تستطيع تقديمها؟ (سباكة، نجارة...)': 'What service can you provide? (Plumbing, carpentry...)',
-          'طلبات التقديم': 'My Applications'
+          'المؤسسة التعليمية': 'Educational Institution',
+          'طلبات التقديم': 'My Applications',
+          'USER_REGISTERED': 'User Registered',
+          'USER_VERIFIED': 'User Verified',
+          'FAILED_LOGIN': 'Failed Login',
+          'LOGIN': 'Successful Login',
+          'USER_LOGIN': 'User Login',
+          'PASSWORD_RESET': 'Password Reset',
+          'GOOGLE_LOGIN': 'Google Login',
+          'MAINTENANCE_ENABLED': 'Maintenance Mode Enabled',
+          'MAINTENANCE_DISABLED': 'Maintenance Mode Disabled',
+          'MAINTENANCE_ENABLED_SYSTEM': 'Maintenance Mode Enabled',
+          'MAINTENANCE_DISABLED_SYSTEM': 'Maintenance Mode Disabled',
+          'WARN_USER': 'User Warned',
+          'SUSPEND_USER': 'User Suspended',
+          'BAN_USER': 'User Banned',
+          'UNBAN_USER': 'User Unbanned',
+          'UNSUSPEND_USER': 'User Unsuspended',
+          'APPROVE_COMPANY': 'Company Approved',
+          'REJECT_COMPANY': 'Company Rejected',
+          'INVITE_ADMIN': 'Admin Invited',
+          'MAINTENANCE': 'System Maintenance',
+          'SYSTEM': 'System Event',
+          'actions': 'actions'
         };
         if (englishOverrides[key]) return englishOverrides[key];
+        const normalizedKey = key.toUpperCase().replace(/\s+/g, '_');
+        if (englishOverrides[normalizedKey]) return englishOverrides[normalizedKey];
       } else if (language === 'ar') {
         const arabicOverrides: Record<string, string> = {
           'Search': 'بحث',
           'Anywhere': 'أي مكان',
+          'USER_REGISTERED': 'تسجيل مستخدم جديد',
+          'USER_VERIFIED': 'تفعيل حساب مستخدم',
+          'FAILED_LOGIN': 'محاولة دخول فاشلة',
+          'LOGIN': 'تسجيل دخول ناجح',
+          'USER_LOGIN': 'تسجيل دخول مستخدم',
+          'PASSWORD_RESET': 'إعادة تعيين كلمة المرور',
+          'GOOGLE_LOGIN': 'دخول بواسطة جوجل',
+          'MAINTENANCE_ENABLED': 'تفعيل وضع الصيانة',
+          'MAINTENANCE_DISABLED': 'إيقاف وضع الصيانة',
+          'MAINTENANCE_ENABLED_SYSTEM': 'تفعيل وضع الصيانة',
+          'MAINTENANCE_DISABLED_SYSTEM': 'إيقاف وضع الصيانة',
+          'WARN_USER': 'إرسال تحذير لمستخدم',
+          'SUSPEND_USER': 'إيقاف حساب مستخدم',
+          'BAN_USER': 'حظر مستخدم نهائياً',
+          'UNBAN_USER': 'إلغاء حظر مستخدم',
+          'UNSUSPEND_USER': 'إلغاء إيقاف مستخدم',
+          'APPROVE_COMPANY': 'الموافقة على شركة',
+          'REJECT_COMPANY': 'رفض تسجيل شركة',
+          'INVITE_ADMIN': 'دعوة مشرف جديد',
+          'MAINTENANCE': 'صيانة النظام',
+          'SYSTEM': 'حدث نظام',
+          'actions': 'إجراءات'
         };
         if (arabicOverrides[key]) return arabicOverrides[key];
+        const normalizedKey = key.toUpperCase().replace(/\s+/g, '_');
+        if (arabicOverrides[normalizedKey]) return arabicOverrides[normalizedKey];
       }
 
       // Determine fallback and options

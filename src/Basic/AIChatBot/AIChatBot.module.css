@@ -25,67 +25,58 @@
   scrollbar-width: none; /* Firefox */
 }
 
-/* ─── Floating Controls ─── */
-.floatingControls {
-  position: absolute;
-  top: 30px;
-  right: 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  z-index: 100000;
-  pointer-events: all;
-}
-
-.floatBtn {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1) !important;
-  backdrop-filter: blur(25px);
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
-  color: var(--color-text);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-}
-
-.floatBtn:hover {
-  background: var(--color-primary) !important;
-  color: white;
-  transform: translateY(-5px) scale(1.1);
-  box-shadow: 0 15px 45px rgba(var(--color-primary-rgb), 0.5);
-}
-
-/* ─── Top Bar ─── */
-.topBar {
+/* ─── Sleek Sticky Header ─── */
+.headerBar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 5%;
-  border-bottom: 1px solid var(--color-border-light);
-  background: var(--color-bg);
+  padding: 14px 24px;
+  background: rgba(15, 23, 42, 0.4) !important;
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 10000;
+  position: relative;
 }
 
-.topBarTitle {
+.headerLeft, .headerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.headerCenter {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.headerAvatar {
+  background: var(--color-primary);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
+}
+
+.headerTitle {
   font-weight: 700;
   font-size: 16px;
   color: var(--color-text);
+  letter-spacing: -0.3px;
 }
 
-.themeToggle {
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border-light);
-  color: var(--color-text);
-  width: 36px;
-  height: 36px;
+.headerBtn {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: var(--color-text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -93,10 +84,11 @@
   transition: all 0.2s ease;
 }
 
-.themeToggle:hover {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
+.headerBtn:hover {
+  background: var(--color-primary) !important;
   color: white;
+  border-color: var(--color-primary) !important;
+  transform: scale(1.05);
 }
 
 /* ─── Welcome Screen ─── */
@@ -404,39 +396,43 @@
 
 /* ─── Responsive ─── */
 @media (max-width: 768px) {
-  .topBar {
-    padding: 10px 15px;
+  .headerBar {
+    padding: 10px 16px;
+  }
+
+  .headerTitle {
+    font-size: 14px;
   }
 
   .chatArea {
-    padding: 15px;
+    padding: 16px 16px 90px;
   }
 
   .welcomeTitle {
-    font-size: 22px;
+    font-size: 20px;
   }
 
   .welcomeSubtitle {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .bubble {
     max-width: 85%;
     font-size: 14px;
-    padding: 12px 16px;
+    padding: 10px 14px;
   }
 
   .msgRow {
     gap: 8px;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
   }
 
   .inputSection {
-    padding: 12px 15px;
+    padding: 0 16px 16px !important;
   }
 
   .inputWrapper {
-    padding: 6px 12px;
+    padding: 4px 16px;
     gap: 8px;
   }
 
@@ -445,8 +441,8 @@
   }
 
   .sendBtn {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
   }
 
   .sugBtn {
@@ -456,6 +452,14 @@
 }
 
 @media (max-width: 480px) {
+  .headerTitle {
+    display: none; /* Hide title on tiny screens to save horizontal space for buttons */
+  }
+
+  .headerBar {
+    padding: 8px 12px;
+  }
+
   .bubble {
     max-width: 90%;
   }

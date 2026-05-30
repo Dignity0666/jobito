@@ -19,7 +19,8 @@ import {
   Sun, 
   Moon, 
   LogOut, 
-  Plus 
+  Plus,
+  ChevronDown
 } from 'lucide-react';
 
 /**
@@ -38,6 +39,7 @@ const Admin: React.FC = () => {
   const userAdminRole = user?.adminRole?.toLowerCase() || 'super_admin';
 
   const [adminRole, setAdminRole] = useState<'SUPER_ADMIN' | 'OPS_MANAGER' | 'USER_MANAGEMENT' | 'SUPPORT' | 'CONTENT' | 'COMPANY_REVIEW' | 'SYSTEM_REQUESTS'>('SUPER_ADMIN');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   const [isAssistantModalOpen, setIsAssistantModalOpen] = useState(false);
   const [candidateName, setCandidateName] = useState("");
@@ -125,19 +127,44 @@ const Admin: React.FC = () => {
           {/* Right Branding & Tabs */}
           <div className={styles.headerRight}>
             <div className={styles.greetingRow}>
-              <h1 className={styles.greetingTitle}>{t("Hello,")} {user?.name || t('Admin')}</h1>
+              <div className={styles.greetingTitle}>{t("Hello,")} {user?.name || t('Admin')}</div>
             </div>
             
             <div className={styles.tabsRow}>
-              {navItems.map((item) => (
+              {/* Module Dropdown Selector */}
+              <div className={styles.menuContainer}>
                 <button 
-                  key={item.id}
-                  onClick={() => setAdminRole(item.id as any)}
-                  className={`${styles.headerTab} ${adminRole === item.id ? styles.headerTabActive : ''}`}
+                  className={styles.menuTrigger} 
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
                 >
-                  {item.label}
+                  <span className={styles.menuTriggerLabel}>
+                    {navItems.find(item => item.id === adminRole)?.label || t("Dashboard")}
+                  </span>
+                  <span className={`${styles.menuArrow} ${isMenuOpen ? styles.menuArrowOpen : ''}`}>
+                    <ChevronDown size={14} />
+                  </span>
                 </button>
-              ))}
+                
+                {isMenuOpen && (
+                  <>
+                    <div className={styles.menuOverlay} onClick={() => setIsMenuOpen(false)} />
+                    <div className={styles.dropdownMenu}>
+                      {navItems.map((item) => (
+                        <button
+                          key={item.id}
+                          onClick={() => {
+                            setAdminRole(item.id as any);
+                            setIsMenuOpen(false);
+                          }}
+                          className={`${styles.dropdownItem} ${adminRole === item.id ? styles.dropdownItemActive : ''}`}
+                        >
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
               
               {userAdminRole === 'operation_manager' && (
                 <button 

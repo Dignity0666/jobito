@@ -6,6 +6,7 @@ import JobsSection from "../../Subject to/Home/JobsSection/JobsSection";
 import HiringBanner from "../../Subject to/Home/HiringBanner/HiringBanner";
 import Categories from "../../Subject to/Home/Categories/Categories";
 import JobsDashboard from "../../Subject to/Home/JobCard/JobCard";
+import TradesmanWorkflow from "../../Subject to/Home/TradesmanWorkflow/TradesmanWorkflow";
 import { motion } from "framer-motion";
 import { useJobitoAuth } from "../../context/LinkContxt";
 import { useTranslation } from "../../context/translation-context";
@@ -154,10 +155,7 @@ export const Home = () => {
             {!isAuthenticated && (
               <motion.div
                 variants={itemVariants}
-                style={{
-                  zoom: 0.7,
-                  marginTop: "20px",
-                }}
+                className={styles.hiringBannerContainer}
               >
                 <HiringBanner />
               </motion.div>
@@ -166,28 +164,29 @@ export const Home = () => {
             {/* Popular searches section removed as requested */}
           </motion.div>
         </div>
-        <motion.img
-          src={isDark ? herodarktionImage : heroSectionImage}
-          alt="Hero Section"
+        <motion.div
           className={styles.heroImage}
-          initial={{ opacity: 0, x: isRTL ? -100 : 100, y: "-50%" }}
+          initial={{ opacity: 0, x: isRTL ? -100 : 100 }}
           animate={{ 
             opacity: 1, 
-            x: 0,
-            y: ["-50%", "-52%", "-50%"]
+            x: 0
           }}
           transition={{
             opacity: { duration: 1 },
-            x: { duration: 1, ease: "easeOut" },
-            y: { duration: 4, repeat: Infinity, ease: "easeInOut" },
+            x: { duration: 1, ease: "easeOut" }
           }}
-        />
+        >
+          <img
+            src={isDark ? herodarktionImage : heroSectionImage}
+            alt="Hero Section"
+          />
+        </motion.div>
       </motion.section>
       <JobsDashboard />
       <section className={styles.companiesSection}>
         <Testimonial />
       </section>
-      <Categories />
+      {isTradesman ? <TradesmanWorkflow /> : <Categories />}
       <JobsSection />
     </>
   );

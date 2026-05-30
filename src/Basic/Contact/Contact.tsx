@@ -277,9 +277,7 @@ export default function ContactPage() {
                   ></textarea>
                 </div>
 
-                <div
-                  style={{ display: "flex", alignItems: "center", gap: "16px" }}
-                >
+                <div className={styles.submitGroup}>
                   <button
                     type="submit"
                     className={styles.submitBtn}
@@ -301,7 +299,7 @@ export default function ContactPage() {
                     </svg>
                     {loading ? t("جاري الإرسال...") : t("إرسال الرسالة")}
                   </button>
-                  <span style={{ fontSize: "12px", color: "#8892a4" }}>
+                  <span className={styles.requiredText}>
                     * {t("جميع الحقول مطلوبة")}
                   </span>
                 </div>

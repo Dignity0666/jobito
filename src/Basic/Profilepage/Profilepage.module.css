@@ -599,6 +599,14 @@
   text-decoration: underline;
 }
 
+.socialLink {
+  word-break: break-all;
+}
+
+.detailVal {
+  word-break: break-all;
+}
+
 /* ============================================================
    Responsive
    ============================================================ */
@@ -609,22 +617,49 @@
     padding: 16px 12px 40px;
   }
 
-  .right {
-    order: -1;
-  }
-
   .portfolioGrid {
     grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .heroBody {
+    padding: 0 16px 16px;
+  }
+
+  .avatarWrap {
+    margin-top: -30px;
+  }
+
+  .avatar {
+    width: 70px;
+    height: 70px;
+  }
+
+  .heroActions {
+    width: 100%;
+  }
+
+  .editProfileBtn {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+  }
+
+  .openBadge {
+    width: 100%;
+    justify-content: center;
   }
 }
 
 @media (max-width: 480px) {
   .heroActions {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 8px;
   }
 
   .portfolioGrid {
     grid-template-columns: repeat(2, 1fr);
   }
-}
+}

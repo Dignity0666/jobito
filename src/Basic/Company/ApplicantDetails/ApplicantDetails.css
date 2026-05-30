@@ -472,3 +472,72 @@
   font-size: 20px;
   color: var(--color-text);
 }
+
+@media (max-width: 768px) {
+  .applicant-details-view {
+    padding: 16px;
+  }
+
+  .details-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .profile-top {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .profile-info-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .large-avatar {
+    order: -1;
+    width: 90px;
+    height: 90px;
+  }
+
+  .sidebar-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .accept-btn, .reject-btn, .waitlist-btn {
+    width: 100%;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .info-cell.full-width {
+    grid-column: span 1;
+  }
+
+  .main-card {
+    padding: 20px 16px;
+  }
+
+  .main-tabs {
+    padding: 0 16px;
+  }
+
+  .back-btn {
+    font-size: 16px;
+  }
+
+  .cv-details-text {
+    min-width: 0;
+  }
+
+  .cv-filename {
+    word-break: break-all;
+    font-size: 14px;
+  }
+}

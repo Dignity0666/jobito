@@ -14,7 +14,11 @@ import {
   TrendingUp,
   BarChart3,
   FileText,
-  AlertTriangle
+  AlertTriangle,
+  Server,
+  Wrench,
+  UserCheck,
+  KeyRound
 } from 'lucide-react';
 import styles from './OpsManager.module.css';
 
@@ -56,11 +60,21 @@ function getActionClass(action: string): string {
   if (a.includes('CREATE') || a.includes('APPROVE') || a.includes('INVITE') || a.includes('UNSUSPEND') || a.includes('UNBAN')) return 'create';
   if (a.includes('WARN') || a.includes('SUSPEND')) return 'warning';
   if (a.includes('BAN') || a.includes('DELETE') || a.includes('REJECT')) return 'danger';
+  if (a.includes('REGISTERED') || a.includes('VERIFIED') || a.includes('PASSWORD_RESET') || a.includes('MAINTENANCE') || a.includes('SYSTEM')) return 'system';
   return 'info';
 }
 
+function getActionIcon(action: string): React.ReactNode {
+  const a = action?.toUpperCase() || '';
+  if (a.includes('REGISTERED')) return <UserCheck size={14} />;
+  if (a.includes('PASSWORD_RESET')) return <KeyRound size={14} />;
+  if (a.includes('MAINTENANCE')) return <Wrench size={14} />;
+  if (a.includes('VERIFIED')) return <UserCheck size={14} />;
+  return null;
+}
+
 function getAvatarInitials(name: string): string {
-  if (!name) return '?';
+  if (!name) return 'SY';
   const parts = name.split(' ');
   return parts.length > 1 
     ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() 
@@ -154,10 +168,12 @@ const OpsManagerDashboard: React.FC = () => {
   const loginCount = activities.filter(a => a.actionType?.toUpperCase().includes('LOGIN')).length;
   const userActionCount = activities.filter(a => getEntityClass(a.targetEntity) === 'user').length;
   const companyActionCount = activities.filter(a => getEntityClass(a.targetEntity) === 'company').length;
+  const systemCount = activities.filter(a => getEntityClass(a.targetEntity) === 'system').length;
   const alertCount = activities.filter(a => 
     a.actionType?.toUpperCase().includes('BAN') || 
     a.actionType?.toUpperCase().includes('SUSPEND') ||
-    a.actionType?.toUpperCase().includes('DELETE')
+    a.actionType?.toUpperCase().includes('DELETE') ||
+    a.actionType?.toUpperCase().includes('FAILED_LOGIN')
   ).length;
 
   // Build chart SVG path
@@ -165,13 +181,54 @@ const OpsManagerDashboard: React.FC = () => {
   const chartHeight = 180;
   const chartPadding = 20;
 
-  const buildChartPath = () => {
-    if (chartData.length < 2) return { linePath: '', fillPath: '', dots: [] as {x: number, y: number, count: number}[] };
-
-    const maxCount = Math.max(...chartData.map(d => Number(d.count)), 1);
-    const stepX = (chartWidth - chartPadding * 2) / (chartData.length - 1);
+  // Pad chart data to always have the last 24 hours
+  const getPaddedChartData = () => {
+    const padded: ChartPoint[] = [];
+    const now = new Date();
     
-    const points = chartData.map((d, i) => ({
+    // Create map of existing data
+    const dataMap = new Map<string, number>();
+    chartData.forEach(d => {
+      try {
+        const hourDate = new Date(d.hour);
+        if (!isNaN(hourDate.getTime())) {
+          const key = `${hourDate.getFullYear()}-${hourDate.getMonth()}-${hourDate.getDate()} ${hourDate.getHours()}`;
+          dataMap.set(key, Number(d.count));
+        }
+      } catch (e) {}
+    });
+
+    // Generate last 24 hours
+    for (let i = 23; i >= 0; i--) {
+      const hourDate = new Date(now.getTime() - i * 60 * 60 * 1000);
+      const key = `${hourDate.getFullYear()}-${hourDate.getMonth()}-${hourDate.getDate()} ${hourDate.getHours()}`;
+      
+      const count = dataMap.get(key) || 0;
+      
+      // Format hour for display
+      const formattedHour = hourDate.toLocaleTimeString(language === 'ar' ? 'ar-EG' : 'en-US', {
+        hour: 'numeric',
+        hour12: true
+      });
+
+      padded.push({
+        hour: formattedHour,
+        count
+      });
+    }
+
+    return padded;
+  };
+
+  const paddedChartData = getPaddedChartData();
+
+  const buildChartPath = (data: ChartPoint[]) => {
+    if (data.length < 2) return { linePath: '', fillPath: '', dots: [] as {x: number, y: number, count: number}[] };
+
+    const maxCount = Math.max(...data.map(d => Number(d.count)), 1);
+    const stepX = (chartWidth - chartPadding * 2) / (data.length - 1);
+    
+    const points = data.map((d, i) => ({
       x: chartPadding + i * stepX,
       y: chartHeight - chartPadding - ((Number(d.count) / maxCount) * (chartHeight - chartPadding * 2)),
       count: Number(d.count),
@@ -183,7 +240,7 @@ const OpsManagerDashboard: React.FC = () => {
     return { linePath, fillPath, dots: points };
   };
 
-  const { linePath, fillPath, dots } = buildChartPath();
+  const { linePath, fillPath, dots } = buildChartPath(paddedChartData);
 
   // Breakdown categories
   const breakdownCategories = [
@@ -192,7 +249,7 @@ const OpsManagerDashboard: React.FC = () => {
     { key: 'company', label: t('Company Actions'), icon: <Building2 size={16} />, count: companyActionCount },
     { key: 'admin', label: t('Admin Actions'), icon: <ShieldCheck size={16} />, count: actionBreakdown.filter(a => a.action_type?.includes('INVITE') || a.action_type?.includes('ADMIN')).reduce((s, a) => s + Number(a.count), 0) },
     { key: 'content', label: t('Content Actions'), icon: <FileText size={16} />, count: actionBreakdown.filter(a => a.action_type?.includes('CONTENT') || a.action_type?.includes('REPORT')).reduce((s, a) => s + Number(a.count), 0) },
-    { key: 'system', label: t('System Events'), icon: <Activity size={16} />, count: totalChartActions - loginCount - userActionCount - companyActionCount },
+    { key: 'system', label: t('System Events'), icon: <Server size={16} />, count: systemCount },
   ];
 
   const maxBreakdown = Math.max(...breakdownCategories.map(b => b.count), 1);
@@ -240,16 +297,97 @@ const OpsManagerDashboard: React.FC = () => {
         </div>
         <div className={styles.kpiCard}>
           <div className={styles.kpiHeader}>
+            <span className={styles.kpiLabel}>{t("System Events")}</span>
+            <div className={`${styles.kpiIcon} ${styles.purple}`}><Server size={18} /></div>
+          </div>
+          <div className={styles.kpiValue}>{systemCount}</div>
+          <div className={styles.kpiSub}>{t("Registration, verification, resets")}</div>
+        </div>
+        <div className={styles.kpiCard}>
+          <div className={styles.kpiHeader}>
             <span className={styles.kpiLabel}>{t("Security Alerts")}</span>
             <div className={`${styles.kpiIcon} ${styles.red}`}><AlertTriangle size={18} /></div>
           </div>
           <div className={styles.kpiValue}>{alertCount}</div>
-          <div className={styles.kpiSub}>{t("Bans, suspensions, deletions")}</div>
+          <div className={styles.kpiSub}>{t("Bans, suspensions, failed logins")}</div>
         </div>
       </div>
 
       {/* ── Charts Row ── */}
       <div className={styles.mainGrid}>
+
+        {/* Hourly Activity Chart */}
+        <div className={styles.chartCard}>
+          <div className={styles.chartTitle}>
+            <TrendingUp size={18} className={styles.chartTitleIcon} />
+            {t("Hourly Activity (Last 24h)")}
+          </div>
+          <div className={styles.chartArea}>
+            {paddedChartData.length < 2 ? (
+              <div className={styles.emptyState} style={{ padding: '40px 0' }}>
+                <div className={styles.emptyIcon}>📊</div>
+                <div className={styles.emptyText}>{t("No chart data available yet")}</div>
+              </div>
+            ) : (
+              <>
+                <svg className={styles.chartSvg} viewBox={`0 0 ${chartWidth} ${chartHeight}`}>
+                  <defs>
+                    <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.25"/>
+                      <stop offset="100%" stopColor="var(--primary)" stopOpacity="0.00"/>
+                    </linearGradient>
+                  </defs>
+                  
+                  {/* Grid Lines */}
+                  {[0, 1, 2, 3, 4].map((grid, idx) => {
+                    const y = chartPadding + (idx * (chartHeight - chartPadding * 2)) / 4;
+                    return (
+                      <line 
+                        key={idx} 
+                        x1={chartPadding} 
+                        y1={y} 
+                        x2={chartWidth - chartPadding} 
+                        y2={y} 
+                        className={styles.chartGrid} 
+                      />
+                    );
+                  })}
+
+                  {/* Area Fill */}
+                  <path d={fillPath} className={styles.chartFill} />
+
+                  {/* Line */}
+                  <path d={linePath} className={styles.chartLine} />
+
+                  {/* Dots */}
+                  {dots.map((dot, idx) => (
+                    <circle 
+                      key={idx} 
+                      cx={dot.x} 
+                      cy={dot.y} 
+                      r={4} 
+                      className={styles.chartDot} 
+                    >
+                      <title>{`${dot.count} ${t('actions')} at ${paddedChartData[idx]?.hour}`}</title>
+                    </circle>
+                  ))}
+                </svg>
+
+                {/* X Axis Labels */}
+                <div className={styles.chartLabels}>
+                  {paddedChartData.map((d, idx) => {
+                    const shouldShow = idx === 0 || idx === paddedChartData.length - 1 || idx % 4 === 0;
+                    return (
+                      <span key={idx} className={styles.chartLabel} style={{ opacity: shouldShow ? 1 : 0 }}>
+                        {d.hour}
+                      </span>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
 
         {/* Action Breakdown */}
         <div className={styles.breakdownCard}>
@@ -337,35 +475,40 @@ const OpsManagerDashboard: React.FC = () => {
               <div className={styles.emptyText}>{t("No activity records found")}</div>
             </div>
           ) : (
-            filteredActivities.map((log) => (
-              <div key={log.logId} className={styles.tableRow}>
-                {/* Admin */}
-                <div className={styles.cellUser}>
-                  <div className={`${styles.cellAvatar} ${styles[getEntityClass('admin') as keyof typeof styles] || ''}`}>
-                    {getAvatarInitials(log.adminName)}
+            filteredActivities.map((log) => {
+              const isSystemEvent = !log.adminName;
+              const entityClass = getEntityClass(log.targetEntity);
+              const avatarClass = isSystemEvent ? 'system' : 'admin';
+              return (
+                <div key={log.logId} className={styles.tableRow}>
+                  {/* Admin */}
+                  <div className={styles.cellUser}>
+                    <div className={`${styles.cellAvatar} ${styles[avatarClass as keyof typeof styles] || ''}`}>
+                      {isSystemEvent ? <Server size={14} /> : getAvatarInitials(log.adminName)}
+                    </div>
+                    <span className={styles.cellName}>{log.adminName || t('System')}</span>
                   </div>
-                  <span className={styles.cellName}>{log.adminName}</span>
-                </div>
-                {/* Description */}
-                <span className={styles.cellDesc} title={log.description}>
-                  {log.description || log.actionType}
-                </span>
-                {/* Target Entity */}
-                <div className={styles.cellEntity}>
-                  <span className={`${styles.entityBadge} ${styles[getEntityClass(log.targetEntity) as keyof typeof styles] || ''}`}>
-                    {t(log.targetEntity || 'System')}
+                  {/* Description */}
+                  <span className={styles.cellDesc} title={log.description}>
+                    {log.description || log.actionType}
+                  </span>
+                  {/* Target Entity */}
+                  <div className={styles.cellEntity}>
+                    <span className={`${styles.entityBadge} ${styles[entityClass as keyof typeof styles] || ''}`}>
+                      {t(log.targetEntity || 'System')}
+                    </span>
+                  </div>
+                  {/* Action */}
+                  <span className={`${styles.actionBadge} ${styles[getActionClass(log.actionType) as keyof typeof styles] || ''}`}>
+                    {getActionIcon(log.actionType)} {t(log.actionType)}
+                  </span>
+                  {/* Time */}
+                  <span className={styles.cellTime} title={new Date(log.createdAt).toLocaleString(language === 'ar' ? 'ar-EG' : 'en-GB')}>
+                    {timeAgo(log.createdAt, t)}
                   </span>
                 </div>
-                {/* Action */}
-                <span className={`${styles.actionBadge} ${styles[getActionClass(log.actionType) as keyof typeof styles] || ''}`}>
-                  {t(log.actionType)}
-                </span>
-                {/* Time */}
-                <span className={styles.cellTime} title={new Date(log.createdAt).toLocaleString(language === 'ar' ? 'ar-EG' : 'en-GB')}>
-                  {timeAgo(log.createdAt, t)}
-                </span>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
 

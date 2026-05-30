@@ -1,4 +1,4 @@
-.container {
+.wrapper {
   padding: 24px;
   background: var(--color-bg);
   min-height: 100vh;
@@ -313,3 +313,91 @@
   margin-top: 4px;
   direction: rtl; /* Ensure Arabic text is right-to-left */
 }
+
+@media (max-width: 768px) {
+  .wrapper {
+    padding: 16px 12px;
+  }
+
+  .tabs {
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .tabBtn {
+    flex: 1;
+    padding: 10px 8px;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  .horizontalRatingRow {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .userSection {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .detailsSection {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+  }
+
+  .ratingInputSection {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 12px;
+    width: 100%;
+  }
+
+  .starsRow {
+    justify-content: center;
+  }
+
+  .commentInput {
+    width: 100%;
+    min-width: 100%;
+    font-size: 14px;
+    text-align: inherit;
+    padding: 6px 0;
+  }
+
+  .actionSection {
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
+  }
+
+  .compactSubmitBtn {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .finalizedLabel {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .statusWait {
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .lockedMessage {
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    text-align: center;
+  }
+}
+

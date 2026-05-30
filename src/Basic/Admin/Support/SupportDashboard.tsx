@@ -91,6 +91,11 @@ const SupportDashboard: React.FC = () => {
     }
   };
 
+  const handleBackToList = () => {
+    setSelectedAdmin(null);
+    setSelectedTicket(null);
+  };
+
   const handleCloseTicket = async () => {
     if (!selectedId) return;
     if (!window.confirm(t("Are you sure you want to close this ticket?"))) return;
@@ -122,7 +127,7 @@ const SupportDashboard: React.FC = () => {
       </nav>
 
       {/* Body */}
-      <div className={styles.body}>
+      <div className={`${styles.body} ${selectedTicket ? styles.hasActiveChat : ''}`}>
         {/* Sidebar */}
         <div className={styles.leftPanel}>
 
@@ -158,6 +163,9 @@ const SupportDashboard: React.FC = () => {
           ) : (
             <>
               <div className={styles.chatHeader}>
+                <button className={styles.backBtn} onClick={handleBackToList} title={t("Back")}>
+                  {language === 'ar' ? '→' : '←'}
+                </button>
                 <div className={styles.chatAvatar}>{selectedTicket.ticket.userName?.split(" ")?.map((n: string) => n[0])?.join("") || 'U'}</div>
                 <div>
                   <div className={styles.chatTitle}>{selectedTicket.ticket.userName}</div>

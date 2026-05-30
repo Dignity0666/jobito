@@ -338,18 +338,18 @@ export default function JobListing() {
                   }
                 >
                   <td className="jl-col-role">{job.title}</td>
-                  <td>
+                  <td data-label={t("Status")}>
                     <span
                       className={`jl-status-badge ${job.isActive ? "status-open" : "status-closed"}`}
                     >
                       {job.isActive ? t("Live") : t("Closed")}
                     </span>
                   </td>
-                  <td className="jl-col-date">{formatDate(job.createdAt)}</td>
-                  <td className="jl-col-date">
+                  <td className="jl-col-date" data-label={t("Date Posted")}>{formatDate(job.createdAt)}</td>
+                  <td className="jl-col-date" data-label={t("Due Date")}>
                     {job.updatedAt ? formatDate(job.updatedAt) : "24 May 2020"}
                   </td>
-                  <td>
+                  <td data-label={t("Job Type")}>
                     <span
                       className={`jl-type-badge ${getTypeClass(Array.isArray(job.jobType) ? job.jobType[0] : String(job.jobType || ""))}`}
                     >
@@ -358,7 +358,7 @@ export default function JobListing() {
                         : (t(String(job.jobType || "")) || t("Fulltime"))}
                     </span>
                   </td>
-                  <td className="jl-col-appl">
+                  <td className="jl-col-appl" data-label={t("Applicants")}>
                     <button
                       className="jl-applicants-link"
                       onClick={(e) => {
@@ -371,10 +371,10 @@ export default function JobListing() {
                       {job.appliedCount || 0}
                     </button>
                   </td>
-                  <td className="jl-col-needs">
+                  <td className="jl-col-needs" data-label={t("Needs")}>
                     {job.appliedCount || 0} / {job.slotsAvailable}
                   </td>
-                  <td>
+                  <td data-label={t("Procedures")}>
                     <div className="jl-actions">
                       <button
                         className="jl-action-btn"

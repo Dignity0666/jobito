@@ -25,11 +25,7 @@ const ModeSwitcherBar: React.FC = () => {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Only show for users/students, not companies
   const isIndividual = role === "user" || role === "student" || (user?.role as string) === "student";
-  if (!isAuthenticated || !isIndividual) {
-    return null;
-  }
 
   const classification = user?.classification || "job_seeker";
 
@@ -194,11 +190,25 @@ const ModeSwitcherBar: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    const handleTrigger = () => {
+      handleToggleMode();
+    };
+    window.addEventListener("trigger-mode-switch", handleTrigger);
+    return () => {
+      window.removeEventListener("trigger-mode-switch", handleTrigger);
+    };
+  }, [handleToggleMode]);
+
   const toggleService = (service: string) => {
     setSelectedServices(prev => 
       prev.includes(service) ? prev.filter(s => s !== service) : [...prev, service]
     );
   };
+
+  if (!isAuthenticated || !isIndividual) {
+    return null;
+  }
 
   return (
     <>

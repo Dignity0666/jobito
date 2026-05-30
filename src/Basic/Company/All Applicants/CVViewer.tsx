@@ -20,10 +20,12 @@ export default function CVViewer() {
   
   const fileUrlParam = searchParams.get("fileUrl") || "";
   const applicantName = searchParams.get("name") || "Applicant";
+  const customTitle = searchParams.get("title") || "";
 
   const [pdfText, setPdfText] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [fileType, setFileType] = useState<"pdf" | "image" | null>(null);
 
   // Reconstruct complete URL
   const fileUrl = fileUrlParam.startsWith("http")
@@ -37,47 +39,44 @@ export default function CVViewer() {
       return;
     }
 
-    const extractTextFromPDF = async () => {
+    const detectAndProcess = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Fetch PDF file as arrayBuffer
         const response = await fetch(fileUrl);
-        if (!response.ok) throw new Error(t("فشل تحميل ملف الـ PDF من السيرفر"));
+        if (!response.ok) throw new Error(t("فشل تحميل الملف"));
         
-        const arrayBuffer = await response.arrayBuffer();
-        
-        // Load PDF using PDF.js
-        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-        const pdf = await loadingTask.promise;
-        
-        let fullText = "";
-        
-        // Extract text page by page
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const textContent = await page.getTextContent();
-          const pageText = textContent.items
-            .map((item: any) => item.str)
-            .join(" ");
-          fullText += `--- Page ${i} ---\n${pageText}\n\n`;
-        }
-
-        if (!fullText.trim()) {
-          setPdfText(t("الملف فارغ أو عبارة عن صور ممسوحة ضوئياً لا يمكن قراءة نصوصها."));
+        const contentType = response.headers.get("content-type") || "";
+        if (contentType.includes("pdf")) {
+          setFileType("pdf");
+          const arrayBuffer = await response.arrayBuffer();
+          const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+          const pdf = await loadingTask.promise;
+          let fullText = "";
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items
+              .map((item: any) => item.str)
+              .join(" ");
+            fullText += `--- Page ${i} ---\n${pageText}\n\n`;
+          }
+          setPdfText(fullText.trim() ? fullText : t("الملف فارغ أو عبارة عن صور ممسوحة ضوئياً لا يمكن قراءة نصوصها."));
+        } else if (contentType.startsWith("image/")) {
+          setFileType("image");
         } else {
-          setPdfText(fullText);
+          throw new Error(t("نوع ملف غير مدعوم"));
         }
       } catch (err: any) {
-        console.error("Error parsing PDF:", err);
-        setError(err.message || t("حدث خطأ أثناء قراءة محتوى ملف الـ PDF"));
+        console.error("Error processing file:", err);
+        setError(err.message || t("حدث خطأ أثناء عرض الملف"));
       } finally {
         setLoading(false);
       }
     };
 
-    extractTextFromPDF();
+    detectAndProcess();
   }, [fileUrl, fileUrlParam, t]);
 
   const handleDownloadTxt = () => {
@@ -103,8 +102,8 @@ export default function CVViewer() {
         <button className={styles.backBtn} onClick={() => navigate(-1)}>
           ← {t("Back")}
         </button>
-        <h2>{t("محتوى السيرة الذاتية لـ")} {applicantName}</h2>
-        {!loading && !error && (
+        <h2>{customTitle ? `${customTitle} ${applicantName}` : `${t("محتوى السيرة الذاتية لـ")} ${applicantName}`}</h2>
+        {!loading && !error && fileType === "pdf" && (
           <button className={styles.downloadBtn} onClick={handleDownloadTxt}>
             📥 {t("تحميل النص")}
           </button>
@@ -115,7 +114,7 @@ export default function CVViewer() {
         {loading && (
           <div className={styles.statusBox}>
             <div className={styles.spinner}></div>
-            <p>{t("جاري استخراج وقراءة نصوص ملف الـ PDF...")}</p>
+            <p>{t("جاري معالجة الملف...")}</p>
           </div>
         )}
 
@@ -130,7 +129,11 @@ export default function CVViewer() {
 
         {!loading && !error && (
           <div className={styles.textContentArea}>
-            <pre className={styles.preContent}>{pdfText}</pre>
+            {fileType === "pdf" ? (
+              <pre className={styles.preContent}>{pdfText}</pre>
+            ) : fileType === "image" ? (
+              <img src={fileUrl} alt="Applicant CV" className={styles.imageContent} style={{ maxWidth: '100%' }} />
+            ) : null}
           </div>
         )}
       </div>

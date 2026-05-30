@@ -488,3 +488,86 @@
   font-size: 12px !important;
   margin-left: 10px;
 }
+
+.backBtn {
+  display: none;
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: var(--color-text);
+  padding: 4px 10px;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.backBtn:hover {
+  background-color: var(--color-border-light);
+  transform: scale(1.05);
+}
+
+/* ─── Mobile Responsiveness ─── */
+@media (max-width: 768px) {
+  .backBtn {
+    display: inline-flex;
+    margin-inline-end: 8px;
+  }
+
+  .nav {
+    padding: 0 16px;
+  }
+
+  .body {
+    padding: 12px;
+    gap: 0;
+  }
+
+  /* Chat list view (Default / No Active Chat) */
+  .body:not(.hasActiveChat) .leftPanel {
+    display: flex;
+    width: 100% !important;
+  }
+
+  .body:not(.hasActiveChat) .rightPanel {
+    display: none !important;
+  }
+
+  /* Active Chat view */
+  .body.hasActiveChat .leftPanel {
+    display: none !important;
+  }
+
+  .body.hasActiveChat .rightPanel {
+    display: flex;
+    width: 100% !important;
+  }
+
+  .root {
+    height: 82vh; /* Make sure it doesn't overflow mobile viewport */
+  }
+
+  .chatHeader {
+    padding: 14px 16px;
+  }
+
+  .messages {
+    padding: 16px;
+  }
+
+  .bubble {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  .inputArea {
+    padding: 12px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .root {
+    height: 80vh;
+  }
+}

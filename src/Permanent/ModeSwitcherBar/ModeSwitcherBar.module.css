@@ -82,20 +82,7 @@
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .switcherBar {
-    min-height: 60px; /* More compact for mobile */
-    padding: 10px 15px;
-    top: 70px;
-  }
-
-  .statusText {
-    display: none;
-  }
-
-  .switchBtn, .postJobBtn {
-    padding: 8px 15px;
-    font-size: 12px;
-    border-radius: 10px;
-    gap: 8px;
+    display: none !important;
   }
 }
 

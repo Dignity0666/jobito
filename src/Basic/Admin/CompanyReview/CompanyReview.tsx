@@ -37,6 +37,68 @@ interface CriminalRecordUser {
   registrationDate: string;
 }
 
+// Helper to construct complete backend URL for documents
+const getAbsoluteDocUrl = (url?: string): string => {
+  if (!url) return '';
+  if (url.startsWith('http')) return url;
+  return `${API_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
+// Detect file type from URL
+const getFileType = (url: string): 'image' | 'pdf' | 'unknown' => {
+  const lower = url.toLowerCase();
+  if (lower.match(/\.(png|jpg|jpeg|gif|webp|bmp|svg)$/)) return 'image';
+  if (lower.match(/\.pdf$/)) return 'pdf';
+  return 'unknown';
+};
+
+// Inline Document Preview component
+function InlineDocumentPreview({ url, title, t }: { url: string; title: string; t: any }) {
+  const [lightbox, setLightbox] = useState(false);
+  const fileType = getFileType(url);
+
+  return (
+    <div className={styles.inlinePreview}>
+      {fileType === 'image' ? (
+        <>
+          <img
+            src={url}
+            alt={title}
+            className={styles.previewImage}
+            onClick={() => setLightbox(true)}
+            title={t("Click to enlarge")}
+          />
+          {lightbox && (
+            <div className={styles.lightboxOverlay} onClick={() => setLightbox(false)}>
+              <img src={url} alt={title} className={styles.lightboxImage} />
+            </div>
+          )}
+        </>
+      ) : fileType === 'pdf' ? (
+        <iframe
+          src={url}
+          title={title}
+          className={styles.previewIframe}
+        />
+      ) : (
+        <div style={{ padding: '16px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+          📄 {t("Preview not available")}
+        </div>
+      )}
+      <div className={styles.previewActions}>
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.openNewTabLink}
+        >
+          🔗 {t("Open in new tab")}
+        </a>
+      </div>
+    </div>
+  );
+}
+
 // ── Review Modals ──────────────────────────────────────────────────
 function CompanyModal({ company, onClose, onReject, onApprove, loading, t }: {
   company: Company;
@@ -52,16 +114,16 @@ function CompanyModal({ company, onClose, onReject, onApprove, loading, t }: {
         {/* Header */}
         <div className={styles.modalHeader}>
           <div>
-            <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text)', marginBottom: '4px' }}>
+            <div className={styles.modalTitle}>
               {t("Commercial Registration Review")}
             </div>
-            <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-primary)' }}>{company.companyName}</div>
+            <div className={styles.modalSubtitle}>{company.companyName}</div>
           </div>
           <button onClick={onClose} className={styles.btnClose}>✕</button>
         </div>
 
         {/* Company Details */}
-        <div style={{ padding: '24px' }}>
+        <div className={styles.modalBody}>
           <div className={styles.modalDetailsGrid}>
             <DetailItem icon="📧" label={t("Email")} value={company.contactEmail} />
             <DetailItem icon="📞" label={t("Phone")} value={company.phone || '—'} />
@@ -72,58 +134,42 @@ function CompanyModal({ company, onClose, onReject, onApprove, loading, t }: {
           </div>
 
           {/* Document Previews */}
-          <div style={{ marginTop: '20px', display: 'flex', gap: '16px' }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          <div className={styles.modalDocsGrid}>
+            <div className={styles.modalDocItem}>
+              <div className={styles.modalDocTitle}>
                 {t("Commercial Register")}
               </div>
-              <div style={{
-                border: '2px dashed var(--color-border)',
-                borderRadius: '16px',
-                background: 'var(--color-bg-tertiary)',
-                height: '140px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-              }}>
+              <div className={styles.documentCard}>
                 {company.crDocumentUrl ? (
-                  <a href={company.crDocumentUrl.startsWith('http') ? company.crDocumentUrl : `${API_BASE_URL}${company.crDocumentUrl}`} target="_blank" rel="noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: '14px', textDecoration: 'none' }}>
-                    📄 {t("View Document")}
-                  </a>
+                  <InlineDocumentPreview
+                    url={getAbsoluteDocUrl(company.crDocumentUrl)}
+                    title={t("Commercial Register")}
+                    t={t}
+                  />
                 ) : (
                   <>
-                    <div style={{ fontSize: '32px', opacity: 0.4 }}>📄</div>
-                    <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>{t("No document uploaded")}</span>
+                    <div className={styles.noDocIcon}>📄</div>
+                    <span className={styles.noDocText}>{t("No document uploaded")}</span>
                   </>
                 )}
               </div>
             </div>
 
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <div className={styles.modalDocItem}>
+              <div className={styles.modalDocTitle}>
                 {t("Tax Register")}
               </div>
-              <div style={{
-                border: '2px dashed var(--color-border)',
-                borderRadius: '16px',
-                background: 'var(--color-bg-tertiary)',
-                height: '140px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-              }}>
+              <div className={styles.documentCard}>
                 {company.taxDocumentUrl ? (
-                  <a href={company.taxDocumentUrl.startsWith('http') ? company.taxDocumentUrl : `${API_BASE_URL}${company.taxDocumentUrl}`} target="_blank" rel="noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: '14px', textDecoration: 'none' }}>
-                    📄 {t("View Document")}
-                  </a>
+                  <InlineDocumentPreview
+                    url={getAbsoluteDocUrl(company.taxDocumentUrl)}
+                    title={t("Tax Register")}
+                    t={t}
+                  />
                 ) : (
                   <>
-                    <div style={{ fontSize: '32px', opacity: 0.4 }}>📄</div>
-                    <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>{t("No document uploaded")}</span>
+                    <div className={styles.noDocIcon}>📄</div>
+                    <span className={styles.noDocText}>{t("No document uploaded")}</span>
                   </>
                 )}
               </div>
@@ -169,16 +215,16 @@ function CriminalRecordModal({ user, onClose, onReject, onApprove, loading, t }:
         {/* Header */}
         <div className={styles.modalHeader}>
           <div>
-            <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text)', marginBottom: '4px' }}>
+            <div className={styles.modalTitle}>
               {t("Criminal Record Review")}
             </div>
-            <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-primary)' }}>{user.fullName}</div>
+            <div className={styles.modalSubtitle}>{user.fullName}</div>
           </div>
           <button onClick={onClose} className={styles.btnClose}>✕</button>
         </div>
 
         {/* User Details */}
-        <div style={{ padding: '24px' }}>
+        <div className={styles.modalBody}>
           <div className={styles.modalDetailsGrid}>
             <DetailItem icon="📧" label={t("Email")} value={user.email} />
             <DetailItem icon="📞" label={t("Phone")} value={user.phone || '—'} />
@@ -187,28 +233,20 @@ function CriminalRecordModal({ user, onClose, onReject, onApprove, loading, t }:
 
           {/* Document Previews */}
           <div style={{ marginTop: '20px' }}>
-            <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <div className={styles.modalDocTitle}>
               {t("Criminal Record Document")}
             </div>
-            <div style={{
-              border: '2px dashed var(--color-border)',
-              borderRadius: '16px',
-              background: 'var(--color-bg-tertiary)',
-              height: '140px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-            }}>
+            <div className={styles.documentCard}>
               {user.criminalRecordUrl ? (
-                <a href={user.criminalRecordUrl.startsWith('http') ? user.criminalRecordUrl : `${API_BASE_URL}${user.criminalRecordUrl}`} target="_blank" rel="noreferrer" style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: '14px', textDecoration: 'none' }}>
-                  📄 {t("View Document")}
-                </a>
+                <InlineDocumentPreview
+                  url={getAbsoluteDocUrl(user.criminalRecordUrl)}
+                  title={t("Criminal Record Document")}
+                  t={t}
+                />
               ) : (
                 <>
-                  <div style={{ fontSize: '32px', opacity: 0.4 }}>📄</div>
-                  <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>{t("No document uploaded")}</span>
+                  <div className={styles.noDocIcon}>📄</div>
+                  <span className={styles.noDocText}>{t("No document uploaded")}</span>
                 </>
               )}
             </div>
@@ -242,10 +280,10 @@ function CriminalRecordModal({ user, onClose, onReject, onApprove, loading, t }:
 function DetailItem({ icon, label, value }: { icon: string; label: string; value: string }) {
   return (
     <div className={styles.modalDetailItem}>
-      <span style={{ fontSize: '16px' }}>{icon}</span>
+      <span className={styles.detailIcon}>{icon}</span>
       <div>
-        <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600, marginBottom: '2px' }}>{label}</div>
-        <div style={{ fontSize: '13px', color: 'var(--color-text)', fontWeight: 700 }}>{value}</div>
+        <div className={styles.detailLabel}>{label}</div>
+        <div className={styles.detailValue}>{value}</div>
       </div>
     </div>
   );
@@ -414,31 +452,21 @@ const CompanyReview: React.FC = () => {
       <div className={styles.body}>
         
         {/* Top Header & Switcher */}
-        <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-          <h1 style={{ fontSize: '24px', fontWeight: 800, margin: 0, color: 'var(--color-text)' }}>
+        <div className={styles.pageHeader}>
+          <h1 className={styles.pageTitle}>
             {viewMode === "COMPANIES" ? t("Company Registration Requests") : t("Criminal Record Reviews")}
           </h1>
 
-          <div style={{ display: 'flex', background: 'var(--color-bg-tertiary)', borderRadius: '12px', padding: '4px' }}>
+          <div className={styles.modeSwitcher}>
             <button
               onClick={() => { setViewMode("COMPANIES"); setActiveTab("PENDING"); }}
-              style={{
-                padding: '8px 16px', border: 'none', borderRadius: '8px', cursor: 'pointer',
-                fontWeight: 700, fontSize: '14px', transition: 'all 0.2s',
-                background: viewMode === "COMPANIES" ? 'var(--color-primary)' : 'transparent',
-                color: viewMode === "COMPANIES" ? '#fff' : 'var(--color-text-secondary)'
-              }}
+              className={`${styles.modeBtn} ${viewMode === "COMPANIES" ? styles.modeBtnActive : ''}`}
             >
               🏢 {t("Companies")}
             </button>
             <button
               onClick={() => { setViewMode("CRIMINAL_RECORDS"); setActiveTab("PENDING"); }}
-              style={{
-                padding: '8px 16px', border: 'none', borderRadius: '8px', cursor: 'pointer',
-                fontWeight: 700, fontSize: '14px', transition: 'all 0.2s',
-                background: viewMode === "CRIMINAL_RECORDS" ? 'var(--color-primary)' : 'transparent',
-                color: viewMode === "CRIMINAL_RECORDS" ? '#fff' : 'var(--color-text-secondary)'
-              }}
+              className={`${styles.modeBtn} ${viewMode === "CRIMINAL_RECORDS" ? styles.modeBtnActive : ''}`}
             >
               👷 {t("Tradesmen")}
             </button>
@@ -446,11 +474,11 @@ const CompanyReview: React.FC = () => {
         </div>
 
         {/* Filter Tabs */}
-        <div className={styles.tabsContainer} style={{ marginBottom: '24px' }}>
+        <div className={styles.tabsContainer}>
           {tabs.map(tab => (
             <button
               key={tab.key}
-              className={`${styles.tab} ${activeTab === tab.key ? styles.tabActive : ''}`}
+              className={`${styles.tab} ${styles[`tab_${tab.key.toLowerCase()}`]} ${activeTab === tab.key ? styles.tabActive : ''}`}
               onClick={() => setActiveTab(tab.key)}
             >
               {tab.label}
@@ -462,47 +490,37 @@ const CompanyReview: React.FC = () => {
         </div>
 
         {/* Data Table */}
-        <div style={{
-          background: 'var(--color-card-bg)',
-          borderRadius: '20px',
-          border: '1px solid var(--color-border)',
-          overflow: 'hidden',
-          boxShadow: 'var(--shadow-md)',
-        }}>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--color-border-light)', background: 'var(--color-bg-tertiary)' }}>
-                  <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--color-text-muted)', textTransform: 'uppercase', textAlign: 'left', fontWeight: 700, letterSpacing: '0.5px' }}>
-                    {viewMode === "COMPANIES" ? t("Company") : t("Applicant")}
-                  </th>
-                  <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--color-text-muted)', textTransform: 'uppercase', textAlign: 'left', fontWeight: 700, letterSpacing: '0.5px' }}>{t("Email")}</th>
-                  <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--color-text-muted)', textTransform: 'uppercase', textAlign: 'left', fontWeight: 700, letterSpacing: '0.5px' }}>{t("Submission Date")}</th>
-                  <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--color-text-muted)', textTransform: 'uppercase', textAlign: 'left', fontWeight: 700, letterSpacing: '0.5px' }}>{t("Status")}</th>
-                  <th style={{ padding: '16px 24px', fontSize: '12px', color: 'var(--color-text-muted)', textTransform: 'uppercase', textAlign: 'left', fontWeight: 700, letterSpacing: '0.5px' }}>{t("Actions")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan={5} style={{ padding: '48px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-                      <div className={styles.spinner} />
-                      <div style={{ marginTop: '12px' }}>{t("Loading")}...</div>
-                    </td>
+        <div className={styles.tableCard}>
+          <div className={styles.tableScroll}>
+            {loading ? (
+              <div className={styles.spinnerCell}>
+                <div className={styles.spinner} />
+                <div style={{ marginTop: '12px' }}>{t("Loading")}...</div>
+              </div>
+            ) : filteredList.length === 0 ? (
+              <div className={styles.emptyCell}>
+                <div className={styles.emptyIcon}>
+                  {viewMode === "COMPANIES" ? '🏢' : '📋'}
+                </div>
+                <div className={styles.emptyText}>
+                  {activeTab === "PENDING" ? t("No pending requests") : t("No records found")}
+                </div>
+              </div>
+            ) : (
+              <table className={styles.table}>
+                <thead className={styles.thead}>
+                  <tr className={styles.tableHeader}>
+                    <th className={styles.th}>
+                      {viewMode === "COMPANIES" ? t("Company") : t("Applicant")}
+                    </th>
+                    <th className={styles.th}>{t("Email")}</th>
+                    <th className={styles.th}>{t("Submission Date")}</th>
+                    <th className={styles.th}>{t("Status")}</th>
+                    <th className={styles.th}>{t("Actions")}</th>
                   </tr>
-                ) : filteredList.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} style={{ padding: '60px', textAlign: 'center' }}>
-                      <div style={{ fontSize: '48px', marginBottom: '12px', opacity: 0.3 }}>
-                        {viewMode === "COMPANIES" ? '🏢' : '📋'}
-                      </div>
-                      <div style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>
-                        {activeTab === "PENDING" ? t("No pending requests") : t("No records found")}
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  filteredList.map((item: any) => {
+                </thead>
+                <tbody>
+                  {filteredList.map((item: any) => {
                     const isCompany = viewMode === "COMPANIES";
                     const itemId = isCompany ? item.companyId : item.userId;
                     const itemName = isCompany ? item.companyName : item.fullName;
@@ -514,42 +532,37 @@ const CompanyReview: React.FC = () => {
                     return (
                       <tr key={itemId} className={styles.tableRow}>
                         {/* Name + Avatar */}
-                        <td style={{ padding: '16px 24px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <td className={styles.td} data-label={isCompany ? t("Company") : t("Applicant")}>
+                          <div className={styles.nameAvatarWrapper}>
                             <div className={styles.companyAvatar}>
                               {itemName?.charAt(0)?.toUpperCase() || '?'}
                             </div>
-                            <span style={{ fontWeight: 700, fontSize: '14px' }}>{itemName}</span>
+                            <span className={styles.itemNameText}>{itemName}</span>
                           </div>
                         </td>
                         {/* Email */}
-                        <td style={{ padding: '16px 24px', color: 'var(--color-text-secondary)', fontSize: '13px' }}>
-                          {itemEmail || '—'}
+                        <td className={styles.td} data-label={t("Email")}>
+                          <span className={styles.cellText}>{itemEmail || '—'}</span>
                         </td>
                         {/* Date */}
-                        <td style={{ padding: '16px 24px', color: 'var(--color-text-secondary)', fontSize: '13px' }}>
-                          {item.registrationDate ? new Date(item.registrationDate).toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-GB') : '—'}
+                        <td className={styles.td} data-label={t("Submission Date")}>
+                          <span className={styles.cellText}>
+                            {item.registrationDate ? new Date(item.registrationDate).toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-GB') : '—'}
+                          </span>
                         </td>
                         {/* Status Badge */}
-                        <td style={{ padding: '16px 24px' }}>
+                        <td className={styles.td} data-label={t("Status")}>
                           <span style={{
                             background: badge.bg,
                             color: badge.color,
-                            padding: '5px 14px',
-                            borderRadius: '20px',
-                            fontSize: '12px',
-                            fontWeight: 700,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                          }}>
+                          }} className={styles.statusBadge}>
                             {badge.icon} {badge.text}
                           </span>
                         </td>
                         {/* Actions */}
-                        <td style={{ padding: '16px 24px' }}>
+                        <td className={styles.td} data-label={t("Actions")}>
                           {isPending ? (
-                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                            <div className={styles.actionsWrapper}>
                               {/* View Details */}
                               <button
                                 onClick={() => isCompany ? setReviewCompanyId(itemId) : setReviewUserId(itemId)}
@@ -576,22 +589,22 @@ const CompanyReview: React.FC = () => {
                               </button>
                             </div>
                           ) : (
-                            <span style={{ fontSize: '13px', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
+                            <span className={styles.reviewedText}>
                               {t("Reviewed")}
                             </span>
                           )}
                         </td>
                       </tr>
                     );
-                  })
-                )}
-              </tbody>
-            </table>
+                  })}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
 
         {/* Summary Footer */}
-        <div style={{ marginTop: '16px', fontSize: '13px', color: 'var(--color-text-muted)', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+        <div className={styles.summaryFooter}>
           <span>⏳ {pendingCount} {t("Pending review")}</span>
           <span>✓ {approvedCount} {t("Approved")}</span>
           <span>✕ {rejectedCount} {t("Rejected")}</span>
@@ -625,3 +638,4 @@ const CompanyReview: React.FC = () => {
 };
 
 export default CompanyReview;
+

@@ -31,6 +31,7 @@ interface Rating {
 interface Application {
   applicationId: number;
   status: string;
+  appliedAt: string;
   job: {
     jobId: number;
     title: string;
@@ -40,6 +41,7 @@ interface Application {
     fullName: string;
     email: string;
     avatarUrl?: string;
+    phone?: string;
   };
 }
 
@@ -298,6 +300,8 @@ const CompanyRatings: React.FC = () => {
               
               const timeLeftToUnlock = (() => {
                 if (!isLocked) return null;
+                const hiringDate = new Date(app.appliedAt).getTime();
+                const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
                 const unlockDate = hiringDate + sevenDaysInMs;
                 const diff = unlockDate - now;
                 const days = Math.floor(diff / (1000 * 60 * 60 * 24));

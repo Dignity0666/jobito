@@ -16,7 +16,7 @@ import {
   Moon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "../../context/TranslationContext";
+import { useTranslation } from "../../context/translation-context";
 import { useJobitoAuth } from "../../context/LinkContxt";
 import { useTheme } from "../../context/ThemeContext";
 import styles from "./AIChatBot.module.css";
@@ -294,32 +294,43 @@ const AIChatBot: React.FC = () => {
 
   return (
     <div className={s.container}>
-      {/* ─── Floating Controls ─── */}
-      <div className={s.floatingControls}>
-        <button 
-          className={s.floatBtn} 
-          onClick={() => navigate(-1)} 
-          title={t("Back", "رجوع")}
-        >
-          <ArrowLeft size={20} />
-        </button>
+      {/* ─── Sleek Sticky Header ─── */}
+      <header className={s.headerBar}>
+        <div className={s.headerLeft}>
+          <button 
+            className={s.headerBtn} 
+            onClick={() => navigate(-1)} 
+            title={t("Back", "رجوع")}
+          >
+            <ArrowLeft size={18} />
+          </button>
+        </div>
         
-        <button 
-          className={s.floatBtn} 
-          onClick={toggleTheme} 
-          title={isDark ? t("Light Mode", "الوضع الفاتح") : t("Dark Mode", "الوضع المظلم")}
-        >
-          {isDark ? <Sun size={20} /> : <Moon size={20} />}
-        </button>
+        <div className={s.headerCenter}>
+          <div className={s.headerAvatar}>
+            <Bot size={18} />
+          </div>
+          <span className={s.headerTitle}>{t("Jobito AI Assistant", "مساعد جوبيتو الذكي")}</span>
+        </div>
+        
+        <div className={s.headerRight}>
+          <button 
+            className={s.headerBtn} 
+            onClick={toggleTheme} 
+            title={isDark ? t("Light Mode", "الوضع الفاتح") : t("Dark Mode", "الوضع المظلم")}
+          >
+            {isDark ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
 
-        <button 
-          className={s.floatBtn} 
-          onClick={toggleLanguage} 
-          title={t("Switch Language", "تغيير اللغة")}
-        >
-          <Languages size={20} />
-        </button>
-      </div>
+          <button 
+            className={s.headerBtn} 
+            onClick={toggleLanguage} 
+            title={t("Switch Language", "تغيير اللغة")}
+          >
+            <Languages size={18} />
+          </button>
+        </div>
+      </header>
 
       {/* ─── Chat Area ─── */}
       <div className={s.chatArea} onScroll={handleScroll}>

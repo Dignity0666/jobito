@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useTranslation } from "../../context/TranslationContext";
+import { useTranslation } from "../../context/translation-context";
 import styles from "./ChatBotWidget.module.css";
 
 const s = styles as Record<string, string>;

@@ -61,11 +61,18 @@
 .filter label {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
   font-size: 14px;
   color: var(--color-text-secondary);
   cursor: pointer;
   transition: all 0.2s;
+  width: 100%;
+}
+
+.filterLabelGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .filter label:hover {
@@ -840,11 +847,69 @@
 @media (max-width: 1024px) {
   .jobsPage {
     flex-direction: column;
+    gap: 24px;
   }
 
   .sidebar {
     width: 100%;
     position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .jobsHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .headerRight {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .jobRowContent {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+  }
+
+  .jobRowLeft {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .jobInfoColumn {
+    align-items: center;
+    text-align: center;
+  }
+
+  .jobRowRight {
+    width: 100%;
+    align-items: center;
+    min-width: 0;
+    gap: 16px;
+  }
+
+  .premiumApplyBtn {
+    width: 100%;
+  }
+
+  .capacityWrapper {
+    align-items: center;
+  }
+
+  .jobRowTags {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .tags {
+    justify-content: center;
+    flex-wrap: wrap;
   }
 }
 
@@ -856,6 +921,7 @@
   .jobRow {
     flex-direction: column;
     align-items: flex-start;
+    padding: 20px;
     gap: 24px;
   }
 

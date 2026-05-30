@@ -35,11 +35,8 @@
   width: 100%;
 }
 
-@media (max-width: 600px) {
-  .heroSection {
-    padding: 40px 12px 20px;
-    min-height: 200px;
-  }
+.mobileBanner {
+  display: none;
 }
 
 /* Shapes removed as requested */
@@ -520,4 +517,76 @@
   color: var(--white) !important;
   border-color: var(--cobalt) !important;
   box-shadow: 0 4px 12px rgba(74,110,209,0.35);
+}
+
+@media (max-width: 768px) {
+  .heroSection {
+    background-image: none !important;
+    padding: 20px 16px !important;
+    min-height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .mobileBanner {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 320px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-md);
+  }
+  .searchBar {
+    flex-direction: column !important;
+    border-radius: 24px !important;
+    padding: 24px 16px !important;
+    gap: 16px !important;
+    box-shadow: var(--shadow-lg) !important;
+    background: white !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .inputGroup {
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    background-color: rgba(0, 0, 0, 0.02) !important;
+    border-radius: 14px !important;
+    padding: 6px 16px !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    box-sizing: border-box !important;
+  }
+  .inputGroup input,
+  .inputGroup select {
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    padding: 8px 0 !important;
+    margin: 0 !important;
+    font-size: 14px !important;
+    color: #0b1020 !important;
+    width: 100% !important;
+  }
+  .divider {
+    display: none !important;
+  }
+  .searchBtn {
+    width: 100% !important;
+    border-radius: 14px !important;
+    padding: 14px !important;
+    font-size: 16px !important;
+    margin-top: 4px !important;
+  }
+  .CompaniesHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .Companiespage {
+    padding: 0 16px;
+    margin: 24px auto 40px;
+  }
 }

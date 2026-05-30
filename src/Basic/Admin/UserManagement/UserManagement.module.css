@@ -459,3 +459,111 @@
   cursor: pointer;
 }
 .demoBtn.active { background: var(--orange); }
+
+/* ─── Mobile Responsiveness ─── */
+@media (max-width: 768px) {
+  .toolbar {
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .searchBox {
+    width: 100%;
+  }
+
+  .tableCard {
+    margin: 0 16px 24px;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  /* Hide Desktop Table Headers */
+  .thead {
+    display: none;
+  }
+
+  /* Transform table tags to blocks */
+  .table, 
+  .table tbody, 
+  .table tr, 
+  .table td {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Transform row to card */
+  .table tr {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .table tr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+  }
+
+  :global(.dark) .table tr {
+    background: var(--color-card-bg, #141b2d);
+    border-color: var(--color-border, #1e2a45);
+  }
+
+  .td {
+    padding: 8px 0;
+    border-bottom: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+  }
+
+  /* Display data-label attribute for fields on the left */
+  .td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: var(--text-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* First cell (Name) styling as Card Header */
+  .td:first-child {
+    border-bottom: 1px dashed var(--border);
+    padding-bottom: 12px;
+    margin-bottom: 10px;
+  }
+
+  .td:first-child::before {
+    display: none;
+  }
+
+  .userName {
+    font-size: 15px;
+    font-weight: 800;
+  }
+
+  /* Message and Actions layouts */
+  .msgBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .table tr {
+    padding: 12px;
+  }
+
+  .td {
+    font-size: 12px;
+  }
+}

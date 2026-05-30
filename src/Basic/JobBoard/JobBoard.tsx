@@ -47,6 +47,11 @@ export default function JobBoard() {
           backgroundPosition: "center",
         }}
       >
+        <img
+          src={!isDark ? darkBg : lightBg}
+          alt="Banner"
+          className={Styles.mobileBanner}
+        />
         <div className={Styles.container}>
           <div className={Styles.content}>
             {/* Search Bar */}

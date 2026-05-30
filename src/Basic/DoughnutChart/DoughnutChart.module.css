@@ -427,3 +427,37 @@
     width: 100%;
   }
 }
+
+@media (max-width: 600px) {
+  .statsCol {
+    flex-direction: column;
+  }
+  .appItem {
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  .appLogo {
+    order: 1;
+  }
+  .appInfo {
+    order: 2;
+    flex: 1 1 calc(100% - 70px);
+  }
+  .badge {
+    order: 3;
+  }
+  .appDateCol {
+    order: 4;
+    text-align: right;
+    flex-grow: 1;
+  }
+  .moreBtn {
+    order: 5;
+  }
+  .header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+}

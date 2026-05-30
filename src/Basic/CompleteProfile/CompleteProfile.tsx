@@ -158,6 +158,13 @@ export default function CompleteProfile() {
       const reader = new FileReader();
       reader.onloadend = () => setCriminalRecordPreview(reader.result as string);
       reader.readAsDataURL(file);
+      if (formErrors.criminalRecord) {
+        setFormErrors((prev) => {
+          const newErrs = { ...prev };
+          delete newErrs.criminalRecord;
+          return newErrs;
+        });
+      }
     }
   };
 
@@ -206,13 +213,29 @@ export default function CompleteProfile() {
       isValid = false;
     }
 
+    // Tradesman-specific validations
+    if (role === "tradesman") {
+      if (selectedServices.length === 0) {
+        errors.services = true;
+        isValid = false;
+      }
+      if (!selectedCriminalRecord && !criminalRecordPreview) {
+        errors.criminalRecord = true;
+        isValid = false;
+      }
+    }
+
     setFormErrors(errors);
     return isValid;
   };
 
   const handleSave = async () => {
     if (!validateForm()) {
-      showToast(t("يرجى إكمال جميع الحقول المطلوبة (المشار إليها بنجمة *) قبل الحفظ."), "error");
+      if (role === "tradesman" && (formErrors.services || formErrors.criminalRecord)) {
+        showToast(t("يجب رفع الفيش الجنائي واختيار خدمة واحدة على الأقل للتسجيل كصنايعي."), "error");
+      } else {
+        showToast(t("يرجى إكمال جميع الحقول المطلوبة (المشار إليها بنجمة *) قبل الحفظ."), "error");
+      }
       return;
     }
 
@@ -254,6 +277,8 @@ export default function CompleteProfile() {
       if (selectedCriminalRecord) {
         const fd = new FormData();
         fd.append("file", selectedCriminalRecord);
+        fd.append("entity_type", "user");
+        fd.append("entity_id", user?.id || "anonymous");
         const uploadRes = await apiFetch(`${API_BASE_URL}/images/upload`, {
           method: "POST",
           body: fd,
@@ -299,15 +324,18 @@ export default function CompleteProfile() {
       }
 
       const result = await res.json();
-      if (role === "tradesman" && criminalRecordUrl) {
+
+      // Tradesman flow: must logout and wait for admin approval
+      if (role === "tradesman") {
         showToast(t("تم تقديم طلبك بنجاح! حسابك قيد المراجعة الآن، وسيتم تسجيل خروجك لحين موافقة الإدارة."), "success");
         setTimeout(() => {
           logout();
-          navigate("/login");
+          navigate("/");
         }, 3000);
         return;
       }
 
+      // Job seeker flow: save token and proceed
       if (result.access_token) {
         localStorage.setItem("token", result.access_token);
         window.dispatchEvent(new Event("auth-changed"));
@@ -666,7 +694,7 @@ export default function CompleteProfile() {
           >
             <div className={styles.sectionRow}>
               <div className={styles.sectionLabel}>
-                <h3>{t("الخدمة")}</h3>
+                <h3>{t("الخدمة")} <span>*</span></h3>
                 <p>{t("اختر الخدمات التي تقدمها لعملائك.")}</p>
               </div>
               <div className={styles.sectionContent}>
@@ -684,6 +712,13 @@ export default function CompleteProfile() {
                             setSelectedServices(selectedServices.filter((item) => item !== s));
                           } else {
                             setSelectedServices([...selectedServices, s]);
+                            if (formErrors.services) {
+                              setFormErrors((prev) => {
+                                const newErrs = { ...prev };
+                                delete newErrs.services;
+                                return newErrs;
+                              });
+                            }
                           }
                         }}
                       >
@@ -726,6 +761,9 @@ export default function CompleteProfile() {
                     </button>
                   )}
                 </div>
+                {formErrors.services && (
+                  <div className={styles.errorMessage}>{t("يجب اختيار خدمة واحدة على الأقل")}</div>
+                )}
               </div>
             </div>
           </motion.div>
@@ -1081,7 +1119,7 @@ export default function CompleteProfile() {
           >
             <div className={styles.sectionRow}>
               <div className={styles.sectionLabel}>
-                <h3>{t("Criminal Record Check")}</h3>
+                <h3>{t("Criminal Record Check")} <span>*</span></h3>
                 <p>
                   {t(
                     "Is An Official Document That Shows A Person's Criminal History."
@@ -1090,7 +1128,7 @@ export default function CompleteProfile() {
               </div>
               <div className={styles.sectionContent}>
                 <div
-                  className={styles.criminalRecordZone}
+                  className={`${styles.criminalRecordZone} ${formErrors.criminalRecord ? styles.inputError : ''}`}
                   onClick={() => criminalRecordInputRef.current?.click()}
                 >
                   {criminalRecordPreview ? (
@@ -1126,6 +1164,9 @@ export default function CompleteProfile() {
                     onChange={handleCriminalRecordUpload}
                   />
                 </div>
+                {formErrors.criminalRecord && (
+                  <div className={styles.errorMessage}>{t("يجب رفع صورة الفيش الجنائي")}</div>
+                )}
               </div>
             </div>
           </motion.div>

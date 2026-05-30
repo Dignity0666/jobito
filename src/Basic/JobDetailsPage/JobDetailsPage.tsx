@@ -313,7 +313,7 @@ export const JobDetailsPage = () => {
 
   return (
     <div className={styles.pageContainer}>
-      <div className={styles.contentWrapper}>
+      <div className={`${styles.contentWrapper} ${activeTab === "applicants" ? styles.wideWrapper : ""}`}>
         <div className={styles.breadcrumb}>
           <div />
           {job.titleEn && (
@@ -338,7 +338,7 @@ export const JobDetailsPage = () => {
         {role === "company" && (
           <div
             className={styles.tabsContainer}
-            style={{ padding: "0 40px", marginBottom: "0" }}
+            style={{ padding: "0 40px" }}
           >
             <button
               className={`${styles.tab} ${activeTab === "details" ? styles.activeTab : ""}`}
@@ -462,18 +462,23 @@ export const JobDetailsPage = () => {
                       <div className={styles.dotSeparator}></div>
                     </>
                   )}
-                  <span>
-                    {Array.isArray(job.fieldOfWork) &&
-                    job.fieldOfWork.length > 0
-                      ? job.fieldOfWork.map((f: any) => t(typeof f === "string" ? f : (f?.name || ""))).join(" · ")
-                      : t(
+                  {Array.isArray(job.fieldOfWork) && job.fieldOfWork.length > 0 ? (
+                    job.fieldOfWork.map((f: any, idx: number) => {
+                      const name = typeof f === "string" ? f : (f?.name || "");
+                      return name ? <span key={idx}>{t(name)}</span> : null;
+                    })
+                  ) : (
+                    (job.category?.name || (typeof job.fieldOfWork === "string" && job.fieldOfWork)) ? (
+                      <span>
+                        {t(
                           job.category?.name ||
                             (typeof job.fieldOfWork === "string"
                               ? job.fieldOfWork
-                              : "") ||
-                            "",
+                              : "")
                         )}
-                  </span>
+                      </span>
+                    ) : null
+                  )}
                   <div className={styles.dotSeparator}></div>
                   <span>
                     {Array.isArray(job.jobType)

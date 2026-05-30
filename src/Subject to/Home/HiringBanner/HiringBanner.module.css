@@ -1,12 +1,13 @@
 .bannerWrapper {
-  width: fit-content;
+  width: 100%;
   max-width: 100%;
   margin-bottom: 48px;
   font-family: "Plus Jakarta Sans", sans-serif;
+  box-sizing: border-box;
 }
 
 [dir="ltr"] .bannerWrapper {
-  width: fit-content;
+  width: 100%;
 }
 
 .bannerContainer {
@@ -23,6 +24,8 @@
   justify-content: space-between;
   gap: 24px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 @media (min-width: 768px) {
@@ -199,4 +202,31 @@
   height: 4px;
   background-color: #9ca3af;
   border-radius: 50%;
+}
+
+@media (max-width: 480px) {
+  .bannerContainer {
+    padding: 24px 16px;
+  }
+  .leftContent {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+    width: 100%;
+  }
+  .textStack {
+    align-items: center;
+    text-align: center;
+  }
+  .hiringTitle {
+    font-size: 26px;
+  }
+  .rightContent {
+    width: 100%;
+  }
+  .applyBtn {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 24px;
+  }
 }

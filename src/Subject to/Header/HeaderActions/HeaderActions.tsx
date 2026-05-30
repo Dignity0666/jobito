@@ -47,10 +47,10 @@ export function HeaderActions({
       <div className={styles.right}>
         {isAuthenticated ? (
           <div className={styles.avatarWrap}>
-            <Link
-              to="/ProfileSettings"
+            <div
               className={styles.avatar}
               title={user?.name || t("nav.profile")}
+              style={{ cursor: "default" }}
             >
               { (user?.avatarUrl || user?.avatar) && !avatarError ? (
                 <img
@@ -61,7 +61,7 @@ export function HeaderActions({
               ) : (
                 <span>{initials}</span>
               )}
-            </Link>
+            </div>
             <button
               className={styles.logoutBtn}
               onClick={handleLogoutClick}

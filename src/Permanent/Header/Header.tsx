@@ -90,6 +90,37 @@ export function Header() {
     : guestNavLinks;
   const navLinks = role === "company" ? navLinkscompany : navLinksuser;
 
+  const desktopNavLinks = useMemo(() => {
+    return navLinks.filter(link => link.path !== "/MyApplications");
+  }, [navLinks]);
+
+  const desktopMenuLinks = useMemo(() => {
+    const links = [
+      { label: t("عن المنصة"), path: "/about", icon: <Info size={16} /> },
+      { label: t("اتصل بنا"), path: "/contact", icon: <Mail size={16} /> },
+    ];
+    if (isAuthenticated && role !== "company" && role !== "admin" && user?.classification !== "tradesman") {
+      links.push({ label: t("طلبات التقديم"), path: "/MyApplications", icon: <FileText size={16} /> });
+    }
+    return links;
+  }, [t, isAuthenticated, role, user]);
+
+  const mobileMenuLinks = useMemo(() => {
+    const links = [...navLinks];
+    if (isAuthenticated) {
+      const hasAbout = links.some(l => l.path === "/about");
+      const hasContact = links.some(l => l.path === "/contact");
+      
+      if (!hasAbout) {
+        links.push({ label: t("عن المنصة"), path: "/about", icon: <Info size={16} /> });
+      }
+      if (!hasContact) {
+        links.push({ label: t("اتصل بنا"), path: "/contact", icon: <Mail size={16} /> });
+      }
+    }
+    return links;
+  }, [navLinks, isAuthenticated, t]);
+
   const isDarkHeader = role === "company";
   const LogoComponent = role === "company" ? Logocompany : Logo;
   const HeaderActionsComponent = role === "company" ? HeaderActionscompany : HeaderActions;
@@ -106,7 +137,11 @@ export function Header() {
 
         <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
           <div className={styles.mobileMenuOnly}>
-            <SidebarMenu navLinks={navLinks} />
+            <SidebarMenu navLinks={mobileMenuLinks} />
+          </div>
+
+          <div className={styles.desktopMenuOnly}>
+            <SidebarMenu navLinks={desktopMenuLinks} />
           </div>
           
           <LogoComponent />
@@ -115,7 +150,7 @@ export function Header() {
             <NavBar
               mobileOpen={mobileOpen}
               setMobileOpen={setMobileOpen}
-              navLinks={navLinks}
+              navLinks={desktopNavLinks}
             />
           </div>
         </div>

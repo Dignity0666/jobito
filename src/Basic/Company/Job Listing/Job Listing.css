@@ -16,6 +16,35 @@
   align-items: flex-start;
 }
 
+.jl-date-range-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background-color: var(--color-bg-secondary, #13192B);
+  border: 1px solid var(--color-border, #1E2A45);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.jl-date-range-picker:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-input-bg);
+}
+
+.jl-date-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.jl-date-icon {
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
 .jl-title {
   font-size: 32px;
   font-weight: 700;
@@ -257,3 +286,148 @@
 /* RTL Support */
 [dir="rtl"] .jl-table th { text-align: right; }
 [dir="rtl"] .jl-table { direction: rtl; }
+
+/* Responsive styles for mobile */
+@media (max-width: 768px) {
+  .job-listing-page {
+    padding: 20px 16px;
+  }
+
+  .jl-header-area {
+    margin-bottom: 24px;
+  }
+
+  .jl-title-row {
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    text-align: center;
+  }
+
+  .jl-title {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .jl-subtitle {
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .jl-date-range-picker {
+    justify-content: center;
+    width: auto;
+  }
+
+  /* Card Toolbar (filters & duplicate title) */
+  .jl-card-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 16px 0;
+  }
+
+  .jl-card-title {
+    display: none;
+  }
+
+  .filter-checkboxes {
+    gap: 10px;
+    margin: 0;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .filter-checkboxes span {
+    display: none !important;
+  }
+
+  .filter-chip {
+    flex: 1;
+    min-width: calc(50% - 10px);
+    justify-content: center;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  /* Table to Cards Conversion */
+  .jl-table, 
+  .jl-table tbody, 
+  .jl-table tr, 
+  .jl-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .jl-table thead {
+    display: none;
+  }
+
+  .jl-table tr {
+    background: var(--color-bg-secondary, #13192B);
+    border: 1px solid var(--color-border, #1E2A45);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  }
+
+  .jl-table td {
+    border-bottom: none;
+    padding: 8px 0;
+    white-space: normal;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    text-align: inherit;
+  }
+
+  /* Role column styled as card header */
+  .jl-table tr td:first-child {
+    border-bottom: 1px solid var(--color-border, #1E2A45);
+    padding-bottom: 12px;
+    margin-bottom: 10px;
+    display: block;
+    font-size: 18px;
+    font-weight: 800;
+    text-align: inherit;
+  }
+
+  /* Dynamic labels from data-label */
+  .jl-table td[data-label]::before {
+    content: attr(data-label) ": ";
+    font-weight: 700;
+    color: var(--color-text-muted, #64748b);
+    margin-left: 8px;
+  }
+
+  :global([dir="ltr"]) .jl-table td[data-label]::before {
+    margin-left: 0;
+    margin-right: 8px;
+  }
+
+  /* Center actions with a dividing line inside the card */
+  .jl-actions {
+    justify-content: center;
+    width: 100%;
+    gap: 16px;
+    margin-top: 12px;
+    border-top: 1px solid var(--color-border, #1E2A45);
+    padding-top: 12px;
+  }
+
+  .jl-action-btn {
+    flex: 1;
+    height: 40px;
+    border-radius: 8px;
+  }
+
+  .jl-pagination {
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    padding: 20px 0;
+  }
+}

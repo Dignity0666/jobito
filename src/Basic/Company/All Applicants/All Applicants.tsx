@@ -250,7 +250,7 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
   }
 
   return (
-    <div className={styles['applicant-page']}>
+    <div className={`${styles['applicant-page']} ${jobIdProp ? styles.isEmbedded : ""}`}>
       <div className={styles['top-p-header']}>
         <h2 className={styles['top-p-title']}>
           {t("إجمالي المتقدمين")} : {applicants.length}
@@ -358,15 +358,15 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
                       <span>{t(app.user?.fullName || "مستخدم")}</span>
                     </div>
                   </td>
-                  <td className={styles.appRole}>{t(app.user?.email || "—")}</td>
-                  <td>
+                  <td className={styles.appRole} data-label={t("البريد الإلكتروني")}>{t(app.user?.email || "—")}</td>
+                  <td data-label={t("مرحلة التوظيف")}>
                     <span className={`${styles.appBadge} ${getBadgeClass(app.status)}`}>
                       {getTranslatedStage(app.status)}
                     </span>
                   </td>
-                  <td className={styles.appDate}>{formatDate(app.appliedAt)}</td>
-                  <td className={styles.appRole}>{t(app.user?.phone || "—")}</td>
-                  <td>
+                  <td className={styles.appDate} data-label={t("تاريخ التقديم")}>{formatDate(app.appliedAt)}</td>
+                  <td className={styles.appRole} data-label={t("الهاتف")}>{t(app.user?.phone || "—")}</td>
+                  <td data-label={t("العداد/الإجراء")}>
                     <div className={styles.appActions}>
                       {app.resumeUrl && (
                         <button
@@ -417,7 +417,7 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
                         {t("View Application")}
                       </button>
 
-                      {app.status.toLowerCase() === "hired" && app.updatedAt && (
+                      {(app.status || "").toLowerCase() === "hired" && app.updatedAt && (
                         <div className={styles.timerContainer} style={{ 
                           marginLeft: '12px',
                           display: 'flex',

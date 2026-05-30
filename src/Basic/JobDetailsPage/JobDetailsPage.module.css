@@ -14,6 +14,10 @@
   padding: 40px;
 }
 
+.wideWrapper {
+  max-width: 1600px;
+}
+
 .breadcrumb {
   display: flex;
   justify-content: space-between;
@@ -716,5 +720,126 @@
   }
   .contentWrapper {
     padding: 24px 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .headerCard {
+    border-radius: 24px;
+    padding: 28px 20px;
+    gap: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  }
+
+  .headerLeft {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+    width: 100%;
+  }
+
+  .companyLogo {
+    width: 80px;
+    height: 80px;
+    border-radius: 22px;
+    box-shadow: 0 10px 25px rgba(70, 64, 222, 0.08);
+  }
+
+  .headerTitles {
+    width: 100%;
+  }
+
+  .headerTitles h1 {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.35;
+    text-align: center;
+    margin-bottom: 12px;
+    color: var(--color-text);
+  }
+
+  .subHeaderInfo {
+    justify-content: center;
+    font-size: 13px;
+    gap: 8px;
+  }
+
+  .dotSeparator {
+    display: none;
+  }
+
+  .subHeaderInfo > span {
+    background: rgba(70, 64, 222, 0.06);
+    color: var(--color-primary, #4640de);
+    padding: 6px 14px;
+    border-radius: 100px;
+    border: 1px solid rgba(70, 64, 222, 0.12);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .headerRight {
+    justify-content: center;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  .applyBtn, .closedBtn {
+    width: 100%;
+    text-align: center;
+    order: -1;
+  }
+
+  .appliedStatusContainer {
+    width: 100%;
+    align-items: center;
+  }
+
+  .appliedBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .statusBadge {
+    width: 100%;
+    text-align: center;
+  }
+
+  .section, .widget {
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .section h2, .widget h2 {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  .perksGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .similarGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .similarJobCard {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .simLogo {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+  }
+
+  .simTitleGroup h3 {
+    font-size: 15px;
   }
 }

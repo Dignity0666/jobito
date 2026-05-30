@@ -109,9 +109,9 @@ const ContentManagement: React.FC = () => {
                 ) : (
                   rows.map((row) => (
                     <tr key={row.reportId} className={styles.tr}>
-                      <td className={styles.td} style={{ fontWeight: 700 }}>{row.postOwner}</td>
-                      <td className={styles.td}>{row.content}</td>
-                      <td className={styles.td}>
+                      <td className={styles.td} data-label={t("Post Owner")} style={{ fontWeight: 700 }}>{row.postOwner}</td>
+                      <td className={styles.td} data-label={t("Content")}>{row.content}</td>
+                      <td className={styles.td} data-label={t("Reason")}>
                         <span 
                           className={styles.badge} 
                           style={{ 
@@ -123,7 +123,7 @@ const ContentManagement: React.FC = () => {
                           {t(row.reason)}
                         </span>
                       </td>
-                      <td className={styles.td}>
+                      <td className={styles.td} data-label={t("Actions")}>
                         <div style={{ display: 'flex', gap: '8px' }}>
                           <button 
                             className={`${styles.btn} ${styles.btnDanger}`}

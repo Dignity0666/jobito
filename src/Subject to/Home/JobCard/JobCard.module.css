@@ -186,5 +186,147 @@
     flex-direction: column;
     gap: 16px;
   }
+
+  .dashboard {
+    padding: 24px 16px;
+  }
+
+  .header {
+    margin-bottom: 20px;
+  }
+
+  .todayGrid {
+    gap: 16px;
+  }
+
+  .todayCard {
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .cardHeader {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .mainLogo {
+    width: 44px;
+    height: 44px;
+  }
+
+  .mainTitle {
+    font-size: 17px;
+  }
+
+  .topMeta {
+    font-size: 13px;
+  }
+
+  .cardBody {
+    margin-bottom: 20px;
+  }
+
+  .jobDesc {
+    font-size: 13px;
+  }
+
+  .salaryText {
+    font-size: 15px;
+  }
+
+  .applyBtn {
+    padding: 8px 18px;
+    font-size: 13px;
+  }
+
+  .showAllLink {
+    font-size: 14px;
+  }
 }
 
+@media (max-width: 380px) {
+  .dashboard {
+    padding: 20px 10px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .todayGrid {
+    gap: 12px;
+  }
+
+  .todayCard {
+    padding: 14px;
+    border-radius: 10px;
+  }
+
+  .cardHeader {
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .mainLogo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .mainTitle {
+    font-size: 15px;
+  }
+
+  .topMeta {
+    font-size: 12px;
+  }
+
+  .cardBody {
+    margin-bottom: 16px;
+  }
+
+  .jobDesc {
+    font-size: 12px;
+    -webkit-line-clamp: 2;
+  }
+
+  .salaryText {
+    font-size: 14px;
+  }
+
+  .applyBtn {
+    padding: 7px 14px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+
+  .cardFooter {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 320px) {
+  .dashboard {
+    padding: 16px 8px;
+  }
+
+  .todayCard {
+    padding: 12px;
+  }
+
+  .mainLogo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .mainTitle {
+    font-size: 14px;
+  }
+
+  .applyBtn {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+}

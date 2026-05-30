@@ -173,6 +173,26 @@ export const ApplicationsHistory = () => {
           ))}
         </div>
 
+        {/* Mobile dropdown select menu */}
+        <div className="ah-mobile-select-container">
+          <select
+            value={activeTab}
+            onChange={(e) => setActiveTab(e.target.value)}
+            className="ah-mobile-select"
+          >
+            {tabs.map((tab) => (
+              <option key={tab.id} value={tab.id}>
+                {tab.label}
+              </option>
+            ))}
+          </select>
+          <div className="ah-mobile-select-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
         {/* Table Area */}
         <div className="ah-table-container">
           <div className="ah-table-header">
@@ -297,8 +317,8 @@ export const ApplicationsHistory = () => {
                   
                   return (
                     <tr key={app.applicationId}>
-                      <td>{index + 1}</td>
-                      <td>
+                      <td data-label="#">{index + 1}</td>
+                      <td data-label={t("مقدم الخدمة / الشركة")}>
                         <div className="ah-company-cell">
                           <img
                             src={getFullImageUrl(displayLogo)}
@@ -311,13 +331,13 @@ export const ApplicationsHistory = () => {
                           </span>
                         </div>
                       </td>
-                      <td className="ah-role">
+                      <td className="ah-role" data-label={t("المسمى الوظيفي")}>
                         {app.job?.title || t("عنوان غير معروف")}
                       </td>
-                      <td>
+                      <td data-label={t("تاريخ التقديم")}>
                         {new Date(app.appliedAt).toLocaleDateString()}
                       </td>
-                      <td>
+                      <td data-label={t("الحالة")}>
                         <span
                           className={`ah-status-badge ${app.status.toLowerCase()}`}
                         >

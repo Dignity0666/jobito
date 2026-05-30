@@ -829,6 +829,7 @@
   .richFieldStep2 {
     grid-template-columns: 1fr;
     gap: 24px;
+    margin-bottom: 40px;
   }
   .daySelector {
     width: 100%;
@@ -837,7 +838,7 @@
   }
   .dayBtn {
     flex: 1;
-    min-width: 120px;
+    min-width: 100px;
     text-align: center;
   }
   .nextBtn {
@@ -849,5 +850,120 @@
   }
   .skillActionBtns button {
     flex: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .pageHeader h1 {
+    font-size: 26px;
+    margin-bottom: 8px;
+  }
+  
+  .pageHeader p {
+    font-size: 14px;
+  }
+  
+  .stepBar {
+    padding: 16px 20px;
+    margin-bottom: 40px;
+    justify-content: center;
+    gap: 12px;
+  }
+  
+  .stepItem {
+    flex: none;
+  }
+  
+  .stepItem:not(:last-child) {
+    margin-right: 0;
+  }
+  
+  .stepText, .stepLine {
+    display: none !important;
+  }
+  
+  .stepCircle {
+    width: 38px;
+    height: 38px;
+    font-size: 14px;
+  }
+  
+  .sectionTitle {
+    font-size: 22px;
+    text-align: center;
+  }
+  
+  .sectionSubtitle {
+    font-size: 14px;
+    text-align: center;
+  }
+  
+  .rowLabel {
+    gap: 8px;
+    text-align: center;
+  }
+  
+  .rowLabel strong {
+    font-size: 17px;
+  }
+  
+  .rowLabel span {
+    font-size: 13.5px;
+  }
+  
+  .radioGrid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+  }
+  
+  .checkRow {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  
+  .checkRow span {
+    font-size: 13px;
+  }
+  
+  .salaryBox {
+    max-width: 100%;
+  }
+  
+  .dropzone {
+    padding: 40px 20px;
+  }
+  
+  .dropzone i {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+  
+  .dropzone p {
+    font-size: 13px;
+  }
+  
+  .footerNav {
+    flex-direction: column-reverse;
+    gap: 12px;
+    align-items: stretch;
+    margin-top: 32px;
+    padding-top: 20px;
+  }
+  
+  .backBtnInline, .nextBtn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    padding: 14px;
+    font-size: 16px;
+  }
+  
+  .completionRow {
+    margin: 0 auto 30px auto;
+  }
+  
+  .benefitsGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 }

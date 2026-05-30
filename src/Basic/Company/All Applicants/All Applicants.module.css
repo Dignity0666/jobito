@@ -284,6 +284,166 @@
   color: white;
 }
 
+/* Embedded State override */
+.applicant-page.isEmbedded {
+  padding: 0;
+  background-color: transparent;
+  min-height: auto;
+}
+
+.applicant-page.isEmbedded .top-p-header {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 24px;
+}
+
+/* Optimize table padding for better spacing */
+.applicantTable th {
+  padding: 16px 12px;
+}
+
+.applicantTable td {
+  padding: 16px 12px;
+}
+
+/* Responsive design for mobile screens */
+@media (max-width: 768px) {
+  .applicant-page {
+    padding: 20px 16px;
+  }
+
+  .top-p-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+  }
+
+  .top-p-title {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .search-box input {
+    width: 100%;
+  }
+
+  .filterCheckboxes {
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .filterChip {
+    flex: 1;
+    min-width: calc(50% - 10px);
+    justify-content: center;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  /* Table to Cards Transformation */
+  .tableContainer {
+    margin-top: 12px;
+    overflow-x: visible;
+  }
+
+  .applicantTable, 
+  .applicantTable tbody, 
+  .applicantTable tr, 
+  .applicantTable td {
+    display: block;
+    width: 100%;
+  }
+
+  .applicantTable thead {
+    display: none;
+  }
+
+  .applicantTable tr {
+    background: var(--color-bg-secondary, #13192B);
+    border: 1px solid var(--color-border, #1E2A45);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  }
+
+  .applicantTable td {
+    border-bottom: none;
+    padding: 8px 0;
+    white-space: normal;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    text-align: right;
+  }
+
+  /* Hide Checkbox Column on Mobile */
+  .applicantTable td:first-child {
+    display: none;
+  }
+
+  /* User profile cell styled as card header */
+  .applicantTable tr td:nth-child(2) {
+    border-bottom: 1px solid var(--color-border, #1E2A45);
+    padding-bottom: 12px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: flex-start;
+    text-align: right;
+  }
+
+  .appUser {
+    gap: 12px;
+  }
+
+  .appUser img {
+    width: 44px;
+    height: 44px;
+  }
+
+  .appUser span {
+    font-size: 16px;
+    max-width: none;
+  }
+
+  /* Labels generated dynamically from HTML attributes */
+  .applicantTable td[data-label]::before {
+    content: attr(data-label) ": ";
+    font-weight: 700;
+    color: var(--color-text-muted, #64748b);
+    margin-left: 8px;
+  }
+
+  :global([dir="ltr"]) .applicantTable td[data-label]::before {
+    margin-left: 0;
+    margin-right: 8px;
+  }
+
+  .appActions {
+    justify-content: flex-end;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .seeAppBtn {
+    flex: 1;
+    justify-content: center;
+    padding: 10px 16px;
+  }
+
+  .paginationFooter {
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    padding-top: 20px;
+  }
+}
+
 /* RTL */
 [dir="rtl"] .applicant-table { text-align: right; }
 [dir="rtl"] .delete-app-btn { margin-left: 0; margin-right: 8px; }

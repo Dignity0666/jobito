@@ -43,6 +43,10 @@
   background-position: center;
 }
 
+.mobileBanner {
+  display: none;
+}
+
 .container {
   width: 100%;
   max-width: 1200px;
@@ -100,19 +104,57 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .searchBar {
-    flex-direction: column;
-    border-radius: var(--radius);
-    padding: 16px;
-    gap: 12px;
+    flex-direction: column !important;
+    border-radius: 24px !important;
+    padding: 24px 16px !important;
+    gap: 16px !important;
+    box-shadow: var(--shadow-lg) !important;
+    background: var(--color-card-bg, #ffffff) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
+
+  .inputGroup {
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    background-color: rgba(0, 0, 0, 0.02) !important;
+    border-radius: 14px !important;
+    padding: 6px 16px !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  .darkSearchBar .inputGroup {
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+  }
+
+  .inputGroup input,
+  .inputGroup select {
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    padding: 8px 0 !important;
+    margin: 0 !important;
+    font-size: 14px !important;
+    color: inherit !important;
+    width: 100% !important;
+  }
+
   .divider {
     display: none !important;
   }
+
   .searchBtn {
-    width: 100%;
-    border-radius: var(--radius-sm) !important;
+    width: 100% !important;
+    border-radius: 14px !important;
+    padding: 14px !important;
+    font-size: 16px !important;
+    margin-top: 4px !important;
   }
 }
 
@@ -227,4 +269,39 @@
   margin: 48px auto 80px;
   padding: 0 24px;
   background: transparent;
+}
+
+@media (max-width: 768px) {
+  .heroSection {
+    background-image: none !important;
+    padding: 20px 16px !important;
+    min-height: auto;
+    text-align: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+  }
+  .mobileBanner {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 320px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-md);
+  }
+  .container {
+    padding: 0 !important;
+    width: 100%;
+  }
+  .content {
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+  .cardJobBoard {
+    margin: 24px auto 40px;
+    padding: 0 16px;
+  }
 }

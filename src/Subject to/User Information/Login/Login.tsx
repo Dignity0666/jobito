@@ -48,7 +48,7 @@ interface LoginPageProps {
 export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { googleClientId } = useJobitoAuth();
+  const { googleClientId, login: contextLogin } = useJobitoAuth();
   const { showToast } = useToast();
 
   const [email, setEmail] = useState("");
@@ -87,8 +87,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Google login failed");
-      localStorage.setItem("token", data.access_token);
-      window.dispatchEvent(new Event("auth-changed"));
+      contextLogin(data.access_token);
       setShowLogin(false);
       navigate("/");
     } catch (err: unknown) {
@@ -163,8 +162,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Login failed");
-      localStorage.setItem("token", data.access_token);
-      window.dispatchEvent(new Event("auth-changed"));
+      contextLogin(data.access_token);
       setShowLogin(false);
       navigate("/");
     } catch (err: unknown) {
@@ -245,10 +243,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
                 <span>{t("Or Sign in with")}</span>
               </div>
 
-              <div className={Style.socialButtons}>
-                <button type="button" className={Style.socialBtn}>
-                  <GoogleIcon /> <span>{t("Google")}</span>
-                </button>
+              <div className={Style.googleWrapper}>
+                <GoogleOAuthProvider clientId={googleClientId}>
+                  <MyLoginPage
+                    onGoogleLogin={handleGoogleLogin}
+                  />
+                </GoogleOAuthProvider>
               </div>
 
             </motion.form>

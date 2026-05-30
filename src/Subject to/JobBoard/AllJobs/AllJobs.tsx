@@ -100,7 +100,18 @@ const AllJobs: React.FC<AllJobsProps> = ({
   const [jobs, setJobs] = useState<Job[]>([]);
   const { t } = useTranslation();
 
-  // Mock Maintenance Orders removed - linking to backend real data
+  const cleanDescription = (text: string) => {
+    if (!text) return "";
+    return t(text)
+      .replace(/\*\*(Job Description|الوصف الوظيفي|المتطلبات|Requirements|Responsibilities|وصف الوظيفة|المؤهلات المطلوبة|مزايا إضافية)s?:?\s*\*\*/gi, "")
+      .replace(/^(Job Description|الوصف الوظيفي|وصف الوظيفة|المؤهلات المطلوبة|مزايا إضافية):\s*/gi, "")
+      .replace(/\*\*/g, "")
+      .replace(/#/g, "")
+      .replace(/\s*\n\s*[-•*]?\s*/g, " • ")
+      .replace(/[\s•:\-]{2,}/g, " • ")
+      .replace(/^[\s•:\-]+|[\s•:\-]+$/g, "")
+      .trim();
+  };
 
   const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -947,11 +958,11 @@ const AllJobs: React.FC<AllJobsProps> = ({
                           {t(job.company?.name || "جوبيتو")}
                         </p>
                         <p className={styles.cardDesc}>
-                          {job.description
-                            ? job.description.length > 80
-                              ? t(job.description).substring(0, 80) + "..."
-                              : t(job.description)
-                            : t("لا يوجد وصف لهذه الوظيفة حالياً.")}
+                          {(() => {
+                            if (!job.description) return t("لا يوجد وصف لهذه الوظيفة حالياً.");
+                            const clean = cleanDescription(job.description);
+                            return clean.length > 80 ? clean.substring(0, 80) + "..." : clean;
+                          })()}
                         </p>
                       </div>
                       <div className={styles.cardFooter}>
@@ -1107,12 +1118,14 @@ const Filter: React.FC<FilterProps> = ({
             const itemValue = item.value || item.name;
             return (
               <label key={item.name}>
-                <input
-                  type="checkbox"
-                  checked={selected.includes(itemValue)}
-                  onChange={() => toggleItem(itemValue)}
-                />
-                {t(item.name)}
+                <span className={styles.filterLabelGroup}>
+                  <input
+                    type="checkbox"
+                    checked={selected.includes(itemValue)}
+                    onChange={() => toggleItem(itemValue)}
+                  />
+                  <span>{t(item.name)}</span>
+                </span>
                 <span className={styles.itemCount}>({item.count})</span>
               </label>
             );

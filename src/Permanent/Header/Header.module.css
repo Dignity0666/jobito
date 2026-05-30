@@ -84,6 +84,11 @@
   display: none;
 }
 
+.desktopMenuOnly {
+  display: flex;
+  align-items: center;
+}
+
 .desktopNavOnly {
   display: flex;
   align-items: center;
@@ -93,6 +98,10 @@
   .mobileMenuOnly {
     display: flex;
     align-items: center;
+  }
+
+  .desktopMenuOnly {
+    display: none;
   }
   
   .desktopNavOnly {

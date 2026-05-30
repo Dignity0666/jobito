@@ -105,10 +105,13 @@ const CompanyJobCard: React.FC<{ job: Job; variants: Variants }> = ({
           {job.description && (
             <p className={styles.jobDesc}>
               {t(job.description)
-                .replace(/\*\*(Job Description|الوصف الوظيفي|المتطلبات|Requirements|Responsibilities)s?:\*\*/gi, "")
-                .replace(/^(Job Description|الوصف الوظيفي):\s*/gi, "")
+                .replace(/\*\*(Job Description|الوصف الوظيفي|المتطلبات|Requirements|Responsibilities|وصف الوظيفة|المؤهلات المطلوبة|مزايا إضافية)s?:?\s*\*\*/gi, "")
+                .replace(/^(Job Description|الوصف الوظيفي|وصف الوظيفة|المؤهلات المطلوبة|مزايا إضافية):\s*/gi, "")
                 .replace(/\*\*/g, "")
                 .replace(/#/g, "")
+                .replace(/\s*\n\s*[-•*]?\s*/g, " • ")
+                .replace(/[\s•:\-]{2,}/g, " • ")
+                .replace(/^[\s•:\-]+|[\s•:\-]+$/g, "")
                 .trim()}
             </p>
           )}

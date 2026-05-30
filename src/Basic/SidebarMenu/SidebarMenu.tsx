@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../../context/translation-context";
 import { useJobitoAuth } from "../../context/LinkContxt";
 import { useTheme } from "../../context/ThemeContext";
-import { LogOut } from "lucide-react";  
+import { LogOut, ArrowLeftRight } from "lucide-react";  
 import styles from "./SidebarMenu.module.css";
 
 interface SidebarMenuProps {
@@ -15,7 +15,7 @@ interface SidebarMenuProps {
 }
 
 const SidebarMenu: React.FC<SidebarMenuProps> = ({ navLinks }) => {
-  const { isAuthenticated, logout } = useJobitoAuth();
+  const { isAuthenticated, logout, user, role } = useJobitoAuth();
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const { t, language, setLanguage } = useTranslation();
@@ -63,6 +63,23 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ navLinks }) => {
               <span>{link.label}</span>
             </button>
           ))}
+
+          {isAuthenticated && (role === "user" || role === "student" || user?.role === "student") && (
+            <button
+              className={`${styles.menuItem} ${styles.switchModeBtn}`}
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent("trigger-mode-switch"));
+                setIsOpen(false);
+              }}
+            >
+              <ArrowLeftRight size={16} />
+              <span>
+                {user?.classification === "tradesman"
+                  ? t("العودة إلى باحث عن عمل")
+                  : t("التبديل إلى الوضع الحرفي")}
+              </span>
+            </button>
+          )}
         </div>
 
         <div className={styles.divider} />

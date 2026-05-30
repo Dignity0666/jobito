@@ -204,12 +204,12 @@ const UserManagement: React.FC<UserManagementProps> = ({ onGoToSupport }) => {
           <tbody>
             {filtered.map(u => (
               <tr key={u.userId}>
-                <td className={styles.td}><span className={styles.userName}>{u.name}</span></td>
-                <td className={styles.td}><span className={styles.userInfo}>{u.contactInfo}</span></td>
-                <td className={styles.td}><ActionBadge action={u.lastActionType || 'Active'} /></td>
-                <td className={styles.td}><AccountChip type={u.accountType} /></td>
-                <td className={styles.td}><RatingDisplay r={u.rating?.average || 0} /></td>
-                <td className={styles.td}>
+                <td className={styles.td} data-label={t("Name")}><span className={styles.userName}>{u.name}</span></td>
+                <td className={styles.td} data-label={t("Info")}><span className={styles.userInfo}>{u.contactInfo}</span></td>
+                <td className={styles.td} data-label={t("Action Type")}><ActionBadge action={u.lastActionType || 'Active'} /></td>
+                <td className={styles.td} data-label={t("Account Type")}><AccountChip type={u.accountType} /></td>
+                <td className={styles.td} data-label={t("Status & Rating")}><RatingDisplay r={u.rating?.average || 0} /></td>
+                <td className={styles.td} data-label={t("Quick Actions")}>
                   <div className={styles.quickActions}>
                     <button className={`${styles.qaBtn} ${styles.qaBlock}`} title={t("Block")} onClick={() => setModal({type: "block", user: u})}>
                       <Ban size={14} />
@@ -234,7 +234,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ onGoToSupport }) => {
                     </button>
                   </div>
                 </td>
-                <td className={styles.td}>
+                <td className={styles.td} data-label={t("Contact")}>
                   <button className={styles.msgBtn} onClick={onGoToSupport}>
                     <MessageSquare size={14} />
                     {t("Messages")}
