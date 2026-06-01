@@ -848,69 +848,14 @@ export default function EditProfile() {
                 </div>
               </div>
 
-              {/* Project Links */}
-              <div className={styles.section}>
-                <div className={styles.row}>
-                  <div className={styles.labelGroup}>
-                    <p className={styles.label}>{t("روابط الأعمال")}</p>
-                    <p className={styles.sectionSub}>
-                      {t("أضف روابط لمشاريعك أو أعمالك السابقة (مثل Behance, GitHub, إلخ).")}
-                    </p>
-                  </div>
-                  <div className={styles.fieldFull}>
-                    <div className={styles.skillInputWrapper}>
-                      <input
-                        type="url"
-                        className={styles.input}
-                        style={{ flex: 1 }}
-                        placeholder={t("https://...")}
-                        value={projectLinkInput}
-                        onChange={(e) => setProjectLinkInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && projectLinkInput.trim()) {
-                            e.preventDefault();
-                            setProjectLinks([...projectLinks, projectLinkInput.trim()]);
-                            setProjectLinkInput("");
-                          }
-                        }}
-                      />
-                      <button
-                        type="button"
-                        className={styles.addSkillBtn}
-                        onClick={() => {
-                          if (projectLinkInput.trim()) {
-                            setProjectLinks([...projectLinks, projectLinkInput.trim()]);
-                            setProjectLinkInput("");
-                          }
-                        }}
-                      >
-                        +
-                      </button>
-                    </div>
-                    <div className={styles.tagContainer}>
-                      {projectLinks.map((link, i) => (
-                        <span key={i} className={styles.tag} style={{ maxWidth: "100%", wordBreak: "break-all" }}>
-                          <a href={link} target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>{link}</a>
-                          <span
-                            className={styles.tagRemove}
-                            onClick={() =>
-                              setProjectLinks(projectLinks.filter((_, idx) => idx !== i))
-                            }
-                          >
-                            ×
-                          </span>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               {/* Social Links */}
               <div className={styles.section}>
                 <div className={styles.row}>
                   <div className={styles.labelGroup}>
                     <p className={styles.label}>{t("روابط التواصل الاجتماعي")}</p>
+                    <p className={styles.sectionSub}>
+                      {t("أضف روابط حساباتك على منصات التواصل الاجتماعي.")}
+                    </p>
                   </div>
                   <div className={styles.formGrid}>
                     <div className={styles.field}>
@@ -960,6 +905,8 @@ export default function EditProfile() {
                   </div>
                 </div>
               </div>
+
+
 
 
               {/* Services Section - Only for Tradesmen */}

@@ -511,7 +511,7 @@
   flex: 1;
   background: transparent !important;
   border: none !important;
-  color: #fff !important;
+  color: var(--chat-text) !important;
   padding: 8px 12px;
   font-size: 14px;
   outline: none;

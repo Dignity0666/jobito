@@ -33,6 +33,17 @@ interface ChatMessage {
   imageUrl?: string;
 }
 
+const renderMessageText = (text: string) => {
+  if (!text) return "";
+  const parts = text.split(/\*\*([^*]+)\*\*/g);
+  return parts.map((part, i) => {
+    if (i % 2 === 1) {
+      return <strong key={i}>{part}</strong>;
+    }
+    return part;
+  });
+};
+
 const AIChatBot: React.FC = () => {
   const { t, language, setLanguage } = useTranslation();
   const { user, apiFetch } = useJobitoAuth();
@@ -194,7 +205,7 @@ const AIChatBot: React.FC = () => {
                 // Clean leaked tokens from the entire buffer
                 const cleanDisplay = botText
                   .replace(/<\|.*?\|>/g, "")
-                  .replace(/\[THEME:.*?\]/g, "");
+                  .replace(/(?:\[)?theme:\s*\w+[\?\!\.\s]*(?:\])?/gi, "");
 
                 setMessages((prev) =>
                   prev.map((m) =>
@@ -386,7 +397,8 @@ const AIChatBot: React.FC = () => {
                   </div>
                 )}
                 <div
-                  className={`${s.bubble} ${msg.role === "user" ? s.bubbleUser : s.bubbleBot} ${s.glassy}`}
+                  className={`${s.bubble} ${msg.role === "user" ? s.bubbleUser : `${s.bubbleBot} ${s.glassy}`}`}
+                  dir="auto"
                 >
                   {msg.type === "image" ? (
                     <img
@@ -395,7 +407,7 @@ const AIChatBot: React.FC = () => {
                       style={{ maxWidth: "200px", borderRadius: "10px" }}
                     />
                   ) : (
-                    msg.text
+                    renderMessageText(msg.text)
                   )}
                   {msg.role === "bot" && msg.text && (
                     <div className={s.bubbleActionsInside}>
@@ -430,6 +442,7 @@ const AIChatBot: React.FC = () => {
             placeholder={t("Write your message...", "اكتب رسالتك...")}
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            dir="auto"
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
@@ -438,15 +451,6 @@ const AIChatBot: React.FC = () => {
             }}
           />
           <div className={s.actions}>
-            <button
-              className={s.actionBtn}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <Paperclip size={20} />
-            </button>
-            <button className={s.actionBtn} onClick={handleVoiceSearch}>
-              <Mic size={20} />
-            </button>
             <button
               className={`${s.sendBtn} ${isTyping ? s.stopBtn : ""}`}
               onClick={() => (isTyping ? stopGeneration() : sendMessage())}

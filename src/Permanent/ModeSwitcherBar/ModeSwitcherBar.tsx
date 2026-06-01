@@ -219,7 +219,7 @@ const ModeSwitcherBar: React.FC = () => {
             {classification === "tradesman" ? t("العودة إلى باحث عن عمل") : t("التبديل إلى الوضع الحرفي")}
           </button>
           <span className={styles.statusText}>
-            {t("الوضع الحالي:")} {classification === "tradesman" ? t("الحرفي") : t("باحث عن عمل")}
+            {t("الوضع الحالي:")} {classification === "tradesman" ? t("الحرفي", "Tradesman") : t("باحث عن عمل")}
           </span>
         </div>
 

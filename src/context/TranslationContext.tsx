@@ -294,6 +294,9 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
       // Hardcoded high-priority overrides for stubborn strings in both Arabic and English
       if (language === 'en') {
         const englishOverrides: Record<string, string> = {
+          'الحرفي': 'Tradesman',
+          'التبديل إلى الوضع الحرفي': 'Switch to tradesman mode',
+          'تم تفعيل الوضع الحرفي بنجاح!': 'Tradesman mode activated successfully!',
           'بحث': 'Search',
           'أي مكان': 'Anywhere',
           'القاهرة، مصر': 'Cairo, Egypt',

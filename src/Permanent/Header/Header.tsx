@@ -95,10 +95,11 @@ export function Header() {
   }, [navLinks]);
 
   const desktopMenuLinks = useMemo(() => {
-    const links = [
-      { label: t("عن المنصة"), path: "/about", icon: <Info size={16} /> },
-      { label: t("اتصل بنا"), path: "/contact", icon: <Mail size={16} /> },
-    ];
+    const links: Array<{label: string; path: string; icon: JSX.Element}> = [];
+    if (role !== "company") {
+      links.push({ label: t("عن المنصة"), path: "/about", icon: <Info size={16} /> });
+      links.push({ label: t("اتصل بنا"), path: "/contact", icon: <Mail size={16} /> });
+    }
     if (isAuthenticated && role !== "company" && role !== "admin" && user?.classification !== "tradesman") {
       links.push({ label: t("طلبات التقديم"), path: "/MyApplications", icon: <FileText size={16} /> });
     }
@@ -107,7 +108,7 @@ export function Header() {
 
   const mobileMenuLinks = useMemo(() => {
     const links = [...navLinks];
-    if (isAuthenticated) {
+    if (isAuthenticated && role !== "company") {
       const hasAbout = links.some(l => l.path === "/about");
       const hasContact = links.some(l => l.path === "/contact");
       
@@ -141,7 +142,9 @@ export function Header() {
           </div>
 
           <div className={styles.desktopMenuOnly}>
-            <SidebarMenu navLinks={desktopMenuLinks} />
+            {role !== "company" && (
+              <SidebarMenu navLinks={desktopMenuLinks} />
+            )}
           </div>
           
           <div className={styles.logoWrapper}>
@@ -165,7 +168,6 @@ export function Header() {
           transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 20 }}
         >
 
-          {role !== "company" && (
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <button
               className={styles.themeToggleBtn}
@@ -199,7 +201,6 @@ export function Header() {
               </AnimatePresence>
             </button>
           </div>
-          )}
 
           <AnimatePresence mode="wait">
             {role === "company" ? (

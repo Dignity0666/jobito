@@ -292,6 +292,17 @@ interface UserSearchResult {
 }
 
 // ─── Main Component ─────────────────────────────────────────────────────────
+const renderMessageText = (text: string) => {
+  if (!text) return "";
+  const parts = text.split(/\*\*([^*]+)\*\*/g);
+  return parts.map((part, i) => {
+    if (i % 2 === 1) {
+      return <strong key={i}>{part}</strong>;
+    }
+    return part;
+  });
+};
+
 interface ChatAppProps {
   setShowHeader?: (value: boolean) => void;
 }
@@ -1228,82 +1239,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                     <p>{activeChat?.email || t("Online", "متصل")}</p>
                   </div>
                 </div>
-                <div className={s.headerActions}>
-                  <MoreVertical
-                    size={18}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowHeaderMenu(!showHeaderMenu);
-                    }}
-                    style={{ cursor: "pointer" }}
-                  />
-                </div>
 
-                <AnimatePresence>
-                  {showHeaderMenu && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      className={`${s.dropdownMenu} ${s.headerDropdown}`}
-                    >
-                      <div className={s.menuItem}>
-                        <div className={s.menuIcon}>
-                          <UserPlus size={18} />
-                        </div>
-                        {t("Add member", "إضافة عضو")}
-                      </div>
-                      <div className={s.menuItem}>
-                        <div className={s.menuIcon}>
-                          <Info size={18} />
-                        </div>
-                        {t("Contact info", "معلومات الاتصال")}
-                      </div>
-                      <div className={s.menuItem}>
-                        <div className={s.menuIcon}>
-                          <CheckSquare size={18} />
-                        </div>
-                        {t("Select messages", "تحديد الرسائل")}
-                      </div>
-                      <div className={s.menuItem}>
-                        <div className={s.menuIcon}>
-                          <BellOff size={18} />
-                        </div>
-                        {t("Mute notifications", "كتم التنبيهات")}
-                      </div>
-                      <div className={s.menuItem}>
-                        <div className={s.menuIcon}>
-                          <History size={18} />
-                        </div>
-                        {t("Disappearing messages", "رسائل تختفي")}
-                      </div>
-                      <div className={s.menuItem}>
-                        <div className={s.menuIcon}>
-                          <Heart size={18} />
-                        </div>
-                        {t("Add to favourites", "إضافة للمفضلة")}
-                      </div>
-                      <div className={s.menuItem}>
-                        <div className={s.menuIcon}>
-                          <List size={18} />
-                        </div>
-                        {t("Add to list", "إضافة للقائمة")}
-                      </div>
-                      <div className={s.menuItem}>
-                        <div className={s.menuIcon}>
-                          <LogOut size={18} />
-                        </div>
-                        {t("Close chat", "إغلاق الدردشة")}
-                      </div>
-                      <div className={s.menuItem}>
-                        <div className={s.menuIcon}>
-                          <Trash2 size={18} />
-                        </div>
-                        {t("Clear chat", "مسح الدردشة")}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
               </header>
 
               <div className={s.messagesArea} ref={areaRef} onScroll={closeContextMenu}>
@@ -1501,7 +1437,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                                   </div>
                                 ) : (
                                   <div className={s.bubbleContent}>
-                                    {msg.message}
+                                    {renderMessageText(msg.message || "")}
                                   </div>
                                 )}
                                 {msg.type !== "voice" && (
@@ -1707,6 +1643,7 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
                       <input
                         type="text"
                         className="transparent"
+                        style={{ color: "white" }}
                         placeholder={
                           uploadingFile ? t("Uploading...", "جاري الرفع...") : t("Reply message", "اكتب رداً...")
                         }

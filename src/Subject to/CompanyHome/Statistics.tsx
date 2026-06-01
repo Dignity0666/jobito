@@ -340,23 +340,6 @@ export default function Statistics({
                     <h3 className={styles.miniStatValue}>
                       {t(summary.views.total)}
                     </h3>
-                    <div className={styles.miniStatTrend}>
-                      <span className={styles.trendLabel}>
-                        {t("هذا الـ")} {periodLabels[activePeriod]}
-                      </span>
-                      <span
-                        className={
-                          summary.views.isUp ? styles.trendUp : styles.trendDown
-                        }
-                      >
-                        {t(summary.views.trend)}{" "}
-                        {summary.views.isUp ? (
-                          <ChevronUp size={12} />
-                        ) : (
-                          <ChevronDown size={12} />
-                        )}
-                      </span>
-                    </div>
                   </div>
                   <div
                     className={`${styles.miniStatIcon} ${styles.iconBgOrange}`}
@@ -373,25 +356,6 @@ export default function Statistics({
                     <h3 className={styles.miniStatValue}>
                       {t(summary.applied.total)}
                     </h3>
-                    <div className={styles.miniStatTrend}>
-                      <span className={styles.trendLabel}>
-                        {t("هذا الـ")} {periodLabels[activePeriod]}
-                      </span>
-                      <span
-                        className={
-                          summary.applied.isUp
-                            ? styles.trendUp
-                            : styles.trendDown
-                        }
-                      >
-                        {t(summary.applied.trend)}{" "}
-                        {summary.applied.isUp ? (
-                          <ChevronUp size={12} />
-                        ) : (
-                          <ChevronDown size={12} />
-                        )}
-                      </span>
-                    </div>
                   </div>
                   <div
                     className={`${styles.miniStatIcon} ${styles.iconBgBlue}`}
