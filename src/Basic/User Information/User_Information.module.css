@@ -341,8 +341,8 @@
 
 @media (max-width: 480px) {
   .leftPanel {
-    min-height: 260px;
-    padding: 60px 20px 40px;
+    min-height: 400px;
+    padding: 80px 20px 60px;
   }
 
   .sphere {
