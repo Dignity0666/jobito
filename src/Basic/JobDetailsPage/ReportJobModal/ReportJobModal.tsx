@@ -34,11 +34,14 @@ export const ReportJobModal: React.FC<ReportJobModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
     }
     return () => {
       document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
     };
   }, [isOpen]);
 
@@ -84,7 +87,7 @@ export const ReportJobModal: React.FC<ReportJobModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
+    <div className={styles.modalOverlay}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <button className={styles.closeButton} onClick={onClose}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
