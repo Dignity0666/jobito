@@ -839,7 +839,7 @@ tbody td {
 }
 
 .mobileMenu {
-  display: none;
+  display: none !important;
 }
 
 .headerTab {
@@ -945,10 +945,10 @@ tbody td {
     padding-bottom: 0 !important;
   }
   .desktopTabs {
-    display: none;
+    display: none !important;
   }
   .mobileMenu {
-    display: block;
+    display: block !important;
   }
   .addAssistantBtn {
     margin-right: 0;
