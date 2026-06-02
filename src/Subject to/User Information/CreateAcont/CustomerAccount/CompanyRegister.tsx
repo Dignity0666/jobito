@@ -72,8 +72,13 @@ export const CompanyRegister: React.FC = () => {
       method: "POST",
       body: formData,
     });
-    if (!res.ok) throw new Error(t("Failed to upload document"));
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch(e) {
+      data = {};
+    }
+    if (!res.ok) throw new Error(data.message || t("Failed to upload document"));
     return data.url;
   };
 
