@@ -131,8 +131,21 @@ const Admin: React.FC = () => {
             </div>
             
             <div className={styles.tabsRow}>
-              {/* Module Dropdown Selector */}
-              <div className={styles.menuContainer}>
+              {/* Desktop Tabs */}
+              <div className={styles.desktopTabs}>
+                {navItems.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setAdminRole(item.id as any)}
+                    className={`${styles.headerTab} ${adminRole === item.id ? styles.headerTabActive : ''}`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Mobile Dropdown Selector */}
+              <div className={`${styles.menuContainer} ${styles.mobileMenu}`}>
                 <button 
                   className={styles.menuTrigger} 
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
