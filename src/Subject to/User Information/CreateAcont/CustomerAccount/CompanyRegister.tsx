@@ -94,21 +94,18 @@ export const CompanyRegister: React.FC = () => {
     try {
       setIsCreating(true);
 
-      // Upload documents first
-      let crDocumentUrl = "";
-      let taxDocumentUrl = "";
-
-      if (formData.commercialRegister instanceof File) {
-        crDocumentUrl = await uploadFile(formData.commercialRegister);
-      } else {
+      // Upload documents in parallel for better speed
+      if (!(formData.commercialRegister instanceof File)) {
         throw new Error(t("Commercial register document is required"));
       }
-
-      if (formData.taxNumber instanceof File) {
-        taxDocumentUrl = await uploadFile(formData.taxNumber);
-      } else {
+      if (!(formData.taxNumber instanceof File)) {
         throw new Error(t("Tax register document is required"));
       }
+
+      const [crDocumentUrl, taxDocumentUrl] = await Promise.all([
+        uploadFile(formData.commercialRegister),
+        uploadFile(formData.taxNumber)
+      ]);
 
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: "POST",
