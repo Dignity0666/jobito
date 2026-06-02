@@ -59,12 +59,12 @@ const ContentManagement: React.FC = () => {
     setDeletingId(null);
   };
 
-  const handleDismiss = async (id: number) => {
+  const handleDismiss = async (id: number, notify: boolean = false) => {
     try {
       const res = await apiFetch(`${API_BASE_URL}/admin/ops/content/review`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reportId: id, action: 'dismiss' })
+        body: JSON.stringify({ reportId: id, action: 'dismiss', notifyViolation: notify })
       });
       if (res.ok) {
         setRows((prev) => prev.filter((r) => r.reportId !== id));
@@ -193,26 +193,19 @@ const ContentManagement: React.FC = () => {
                       </td>
                       <td className={styles.td} data-label={t("Actions")}>
                         <div style={{ display: 'flex', gap: '8px' }}>
-                          <button 
-                            className={`${styles.btn} ${styles.btnDanger}`}
-                            onClick={() => handleDelete(row.reportId, false)}
-                            title={t("Delete Content")}
-                          >
-                            {t("حذف")}
-                          </button>
                           {activeFilter === 'company' && (
                             <button 
                               className={`${styles.btn} ${styles.btnDanger}`}
-                              onClick={() => handleDelete(row.reportId, true)}
-                              title={t("حذف وإرسال إشعار بالمخالفة")}
+                              onClick={() => handleDismiss(row.reportId, true)}
+                              title={t("إرسال إنذار وحذف البلاغ")}
                               style={{ opacity: 0.85 }}
                             >
-                              {t("حذف بإنذار")}
+                              {t("إنذار")}
                             </button>
                           )}
                           <button 
                             className={`${styles.btn} ${styles.btnOutline}`}
-                            onClick={() => handleDismiss(row.reportId)}
+                            onClick={() => handleDismiss(row.reportId, false)}
                             title={t("Reject Report")}
                             style={{ color: '#E53E3E', borderColor: '#E53E3E' }}
                           >
