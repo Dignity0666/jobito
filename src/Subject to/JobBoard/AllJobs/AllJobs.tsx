@@ -464,13 +464,23 @@ const AllJobs: React.FC<AllJobsProps> = ({
       if (getJobLevel(job) !== "services") return false;
     }
 
-    const locationMatch =
-      !location ||
-      String(job.address || "")
-        .toLowerCase()
-        .includes(location.toLowerCase()) ||
-      (location.toLowerCase() === "cairo" && (String(job.address || "").includes("القاهرة") || String(job.address || "").includes("Cairo"))) ||
-      (location.toLowerCase() === "alexandria" && (String(job.address || "").includes("الإسكندرية") || String(job.address || "").includes("Alexandria")));
+    const jobAddress = String(job.address || "").toLowerCase();
+    const compAddress = String(job.company?.address || "").toLowerCase();
+    const locLower = location.toLowerCase();
+    const map: Record<string, string[]> = {
+      cairo: ["القاهرة"], alexandria: ["الإسكندرية", "الاسكندرية"], giza: ["الجيزة"], qalyubia: ["القليوبية"],
+      "port said": ["بورسعيد"], suez: ["السويس"], gharbia: ["الغربية"], dakahlia: ["الدقهلية"],
+      ismailia: ["الإسماعيلية", "الاسماعيلية"], asyut: ["أسيوط", "اسيوط"], fayoum: ["الفيوم"],
+      minya: ["المنيا"], qena: ["قنا"], sohag: ["سوهاج"], "beni suef": ["بني سويف"],
+      aswan: ["أسوان", "اسوان"], "red sea": ["البحر الأحمر", "البحر الاحمر"],
+      "new valley": ["الوادي الجديد"], matrouh: ["مطروح"], "north sinai": ["شمال سيناء"],
+      "south sinai": ["جنوب سيناء"], "kafr el sheikh": ["كفر الشيخ"], beheira: ["البحيرة"],
+      damietta: ["دمياط"], sharqia: ["الشرقية"], monufia: ["المنوفية"], luxor: ["الأقصر", "الاقصر"]
+    };
+    const arNames = map[locLower] || [];
+    const isMatch = (addr: string) => addr ? (addr.includes(locLower) || arNames.some(name => addr.includes(name))) : false;
+    
+    const locationMatch = !location || isMatch(jobAddress) || isMatch(compAddress);
 
     const keywordMatch = true;
 
@@ -782,7 +792,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
                                   {t(
                                     job.address === "Remote"
                                       ? "بعيد"
-                                      : job.address || "غير محدد",
+                                      : job.address || job.company?.address || "غير محدد",
                                   )}
                                 </span>
                               </div>
@@ -842,7 +852,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
                                 </span>
                                 <span className={styles.metaCircle}>•</span>
                                 <span className={styles.locationNameText}>
-                                  {t(job.address || "الموقع")}
+                                  {t(job.address || job.company?.address || "الموقع")}
                                 </span>
                               </div>
                               <div className={styles.jobRowTags}>
@@ -967,11 +977,11 @@ const AllJobs: React.FC<AllJobsProps> = ({
                               .join(" / ");
                           })()}
                         </span>
-                        {job.address && (
+                        {(job.address || job.company?.address) && (
                           <span
                             className={`${styles.tag} ${styles.tagBusiness}`}
                           >
-                            {t(job.address)}
+                            {t(job.address || job.company?.address || "")}
                           </span>
                         )}
                       </div>

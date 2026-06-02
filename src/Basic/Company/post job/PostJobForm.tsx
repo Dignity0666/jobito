@@ -454,6 +454,50 @@ function Step1({
       <div className={styles.divider} />
       <div className={styles.fieldRow}>
         <div className={styles.rowLabel}>
+          <strong>{t("موقع الوظيفة (المحافظة)")}</strong>
+          <span>{t("اتركه للوضع الافتراضي لاعتماد مقر الشركة")}</span>
+        </div>
+        <div className={styles.rowContent}>
+          <select
+            className={styles.textInput}
+            value={data.address}
+            onChange={(e) => updateData({ address: e.target.value })}
+          >
+            <option value="">{t("نفس مقر الشركة")}</option>
+            <option value="Cairo">{t("القاهرة")}</option>
+            <option value="Alexandria">{t("الإسكندرية")}</option>
+            <option value="Giza">{t("الجيزة")}</option>
+            <option value="Qalyubia">{t("القليوبية")}</option>
+            <option value="Port Said">{t("بورسعيد")}</option>
+            <option value="Suez">{t("السويس")}</option>
+            <option value="Gharbia">{t("الغربية")}</option>
+            <option value="Dakahlia">{t("الدقهلية")}</option>
+            <option value="Ismailia">{t("الإسماعيلية")}</option>
+            <option value="Asyut">{t("أسيوط")}</option>
+            <option value="Fayoum">{t("الفيوم")}</option>
+            <option value="Minya">{t("المنيا")}</option>
+            <option value="Qena">{t("قنا")}</option>
+            <option value="Sohag">{t("سوهاج")}</option>
+            <option value="Beni Suef">{t("بني سويف")}</option>
+            <option value="Aswan">{t("أسوان")}</option>
+            <option value="Red Sea">{t("البحر الأحمر")}</option>
+            <option value="New Valley">{t("الوادي الجديد")}</option>
+            <option value="Matrouh">{t("مطروح")}</option>
+            <option value="North Sinai">{t("شمال سيناء")}</option>
+            <option value="South Sinai">{t("جنوب سيناء")}</option>
+            <option value="Kafr El Sheikh">{t("كفر الشيخ")}</option>
+            <option value="Beheira">{t("البحيرة")}</option>
+            <option value="Damietta">{t("دمياط")}</option>
+            <option value="Sharqia">{t("الشرقية")}</option>
+            <option value="Monufia">{t("المنوفية")}</option>
+            <option value="Luxor">{t("الأقصر")}</option>
+            <option value="Remote">{t("عن بعد (Remote)")}</option>
+          </select>
+        </div>
+      </div>
+      <div className={styles.divider} />
+      <div className={styles.fieldRow}>
+        <div className={styles.rowLabel}>
           <strong>{t("تصنيف الوظيفة")} <span style={{ color: "red" }}>*</span></strong>
           <span>{t("اختر التصنيف العام للوظيفة")}</span>
         </div>
@@ -988,7 +1032,7 @@ export default function PostJob() {
     title: "",
     jobTypes: [],
     salary: 10000,
-    address: "Remote",
+    address: "",
     description: [""],
     responsibilities: [""],
     whoYouAre: [""],
