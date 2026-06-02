@@ -203,6 +203,16 @@ const ContentManagement: React.FC = () => {
                               {t("إنذار")}
                             </button>
                           )}
+                          {activeFilter === 'job' && (
+                            <button 
+                              className={`${styles.btn} ${styles.btnDanger}`}
+                              onClick={() => handleDelete(row.reportId, true)}
+                              title={t("حذف الوظيفة وإرسال إنذار للشركة")}
+                              style={{ opacity: 0.85 }}
+                            >
+                              {t("حذف بإنذار")}
+                            </button>
+                          )}
                           <button 
                             className={`${styles.btn} ${styles.btnOutline}`}
                             onClick={() => handleDismiss(row.reportId, false)}

@@ -695,13 +695,15 @@ export const JobDetailsPage = () => {
 
 
                 {/* Rating Section Moved to Left Column */}
-                <div className={styles.widget} style={{ marginTop: '24px' }}>
-                  <GeneralRatingSection 
-                    companyId={job.company?.companyId || job.company?.company_id}
-                    targetUserId={job.user?.userId || job.user?.id}
-                    targetName={job.company?.name || job.user?.fullName || job.user?.name || job.title || "المعلن"}
-                  />
-                </div>
+                {role !== "admin" && (
+                  <div className={styles.widget} style={{ marginTop: '24px' }}>
+                    <GeneralRatingSection 
+                      companyId={job.company?.companyId || job.company?.company_id}
+                      targetUserId={job.user?.userId || job.user?.id}
+                      targetName={job.company?.name || job.user?.fullName || job.user?.name || job.title || "المعلن"}
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Right Column */}
