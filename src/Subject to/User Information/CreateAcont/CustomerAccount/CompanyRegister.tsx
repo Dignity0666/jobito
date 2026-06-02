@@ -337,15 +337,23 @@ export const CompanyRegister: React.FC = () => {
                         </div>
                         <div className={styles.inputGroup}>
                           <label>{t("Company Address")}</label>
-                          <input
+                          <select
                             className={styles.inputField}
-                            type="text"
-                            placeholder={t("City, state")}
                             value={formData.companyAddress}
                             onChange={(e) => setFormData({ ...formData, companyAddress: e.target.value })}
                             dir="auto"
                             required
-                          />
+                          >
+                            <option value="" disabled>{t("Select Governorate")}</option>
+                            {[
+                              "Cairo", "Alexandria", "Giza", "Qalyubia", "Port Said", "Suez", "Gharbia",
+                              "Dakahlia", "Ismailia", "Asyut", "Fayoum", "Minya", "Qena", "Sohag",
+                              "Beni Suef", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai",
+                              "South Sinai", "Kafr El Sheikh", "Beheira", "Damietta", "Sharqia", "Monufia", "Luxor"
+                            ].map(gov => (
+                              <option key={gov} value={gov}>{t(gov)}</option>
+                            ))}
+                          </select>
                         </div>
                       </div>
                       

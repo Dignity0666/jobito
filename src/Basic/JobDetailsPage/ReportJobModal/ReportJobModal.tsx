@@ -15,6 +15,14 @@ interface ReportJobModalProps {
   postOwnerName: string;
 }
 
+const REPORT_REASONS = [
+  { id: "fake_job", label: "وظيفة وهمية أو احتيال (Fake Job/Scam)" },
+  { id: "spam", label: "محتوى غير مرغوب فيه (Spam)" },
+  { id: "inappropriate", label: "محتوى غير لائق (Inappropriate Content)" },
+  { id: "incorrect_info", label: "معلومات غير صحيحة (Incorrect Info)" },
+  { id: "other", label: "أسباب أخرى (Other reasons)" }
+];
+
 export const ReportJobModal: React.FC<ReportJobModalProps> = ({
   isOpen,
   onClose,
@@ -27,6 +35,7 @@ export const ReportJobModal: React.FC<ReportJobModalProps> = ({
   const { apiFetch, user } = useJobitoAuth();
   const { showToast } = useToast();
 
+  const [selectedReason, setSelectedReason] = useState("fake_job");
   const [reasonText, setReasonText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -47,8 +56,9 @@ export const ReportJobModal: React.FC<ReportJobModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!reasonText.trim()) {
-      showToast(t("يرجى كتابة سبب الإبلاغ"), "error");
+
+    if (selectedReason === "other" && !reasonText.trim()) {
+      showToast(t("يرجى كتابة سبب الإبلاغ بالتفصيل"), "error");
       return;
     }
 
@@ -63,7 +73,7 @@ export const ReportJobModal: React.FC<ReportJobModalProps> = ({
           postOwnerName: postOwnerName,
           contentType: "job",
           contentId: String(jobId),
-          reason: "other",
+          reason: selectedReason,
           customReason: reasonText,
           contentText: jobTitle
         }),
@@ -71,6 +81,7 @@ export const ReportJobModal: React.FC<ReportJobModalProps> = ({
 
       if (res.ok) {
         showToast(t("تم إرسال بلاغك بنجاح. سنقوم بمراجعته."), "success");
+        setSelectedReason("fake_job");
         setReasonText("");
         onClose();
       } else {
@@ -105,17 +116,34 @@ export const ReportJobModal: React.FC<ReportJobModalProps> = ({
             </svg>
           </div>
           <h2>{t("إبلاغ عن")} {jobTitle}</h2>
-          <p>{t("يرجى توضيح سبب الإبلاغ لمساعدتنا في تحسين جودة المحتوى.")}</p>
+          <p>{t("يرجى اختيار سبب الإبلاغ لمساعدتنا في تحسين جودة المحتوى.")}</p>
         </div>
 
         <form onSubmit={handleSubmit} className={styles.reportForm}>
+          
+          <div className={styles.radioGroup}>
+            <label className={styles.radioGroupLabel}>{t("سبب الإبلاغ")}</label>
+            {REPORT_REASONS.map(reason => (
+              <label key={reason.id} className={styles.radioOption}>
+                <input
+                  type="radio"
+                  name="reportReason"
+                  value={reason.id}
+                  checked={selectedReason === reason.id}
+                  onChange={(e) => setSelectedReason(e.target.value)}
+                />
+                {t(reason.label)}
+              </label>
+            ))}
+          </div>
+
           <div className={styles.formGroup}>
-            <label>{t("تفاصيل الشكوى")}</label>
+            <label>{t("تفاصيل إضافية للشكوى (اختياري)")}</label>
             <textarea
               value={reasonText}
               onChange={(e) => setReasonText(e.target.value)}
-              placeholder={t("اكتب تفاصيل الشكوى هنا...")}
-              required
+              placeholder={t("اكتب تفاصيل الشكوى هنا (اختياري، أو إجباري إذا اخترت 'أسباب أخرى')...")}
+              required={selectedReason === 'other'}
             />
           </div>
 

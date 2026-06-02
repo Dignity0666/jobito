@@ -170,3 +170,46 @@
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Radio Group Styles */
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.radioGroupLabel {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--color-text);
+}
+
+.radioOption {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-size: 15px;
+  color: var(--color-text);
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.radioOption:hover {
+  background-color: var(--color-bg-body, #F8FAFC);
+}
+
+[data-theme="dark"] .radioOption:hover {
+  background-color: #334155;
+}
+
+.radioOption input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #ff4d4f;
+  cursor: pointer;
+}

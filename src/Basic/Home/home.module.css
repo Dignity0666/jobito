@@ -108,11 +108,13 @@
 .inputGroup input,
 .inputGroup select {
   border: none !important;
-  outline: none;
+  outline: none !important;
   width: 100%;
   font-size: 16px;
-  color: var(--color-text-secondary) !important;
-  background-color: transparent !important;
+  color: #0b1020 !important;
+  background-color: white !important;
+  background: white !important;
+  box-shadow: none !important;
   padding: 10px 0;
 }
 

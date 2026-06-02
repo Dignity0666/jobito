@@ -7,6 +7,7 @@ import HiringBanner from "../../Subject to/Home/HiringBanner/HiringBanner";
 import Categories from "../../Subject to/Home/Categories/Categories";
 import JobsDashboard from "../../Subject to/Home/JobCard/JobCard";
 import TradesmanWorkflow from "../../Subject to/Home/TradesmanWorkflow/TradesmanWorkflow";
+import UserWorkflow from "../../Subject to/Home/UserWorkflow/UserWorkflow";
 import { motion } from "framer-motion";
 import { useJobitoAuth } from "../../context/LinkContxt";
 import { useTranslation } from "../../context/translation-context";
@@ -186,6 +187,7 @@ export const Home = () => {
       <section className={styles.companiesSection}>
         <Testimonial />
       </section>
+      {!isTradesman && <UserWorkflow />}
       {isTradesman ? <TradesmanWorkflow /> : <Categories />}
       <JobsSection />
     </>

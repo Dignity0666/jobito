@@ -108,67 +108,172 @@
 .searchBar {
   display: flex;
   align-items: center;
-  background: white !important;
+  background: var(--color-card-bg, #ffffff);
+  color: var(--color-text, #0b1020);
   border-radius: 100px;
   padding: 8px 8px 8px 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15); /* Stronger shadow */
   width: 100%;
-  max-width: 900px;
+  max-width: 780px; /* Increased to fit full placeholder text beautifully */
   gap: 0;
+  margin-top: 20px;
+  position: relative;
+  z-index: 10;
   transition: all 0.3s ease;
-  z-index: 100;
+}
+
+@keyframes floating {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 .darkSearchBar {
-  background: white !important;
+  background: #1e253a !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Force transparent background for all elements inside search bar to fix theme overrides */
-.searchBar * {
-  background-color: transparent !important;
+@media (max-width: 768px) {
+  .searchBar {
+    flex-direction: column !important;
+    border-radius: 24px !important;
+    padding: 24px 16px !important;
+    gap: 16px !important;
+    box-shadow: var(--shadow-lg) !important;
+    background: var(--color-card-bg, #ffffff) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .inputGroup {
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    background-color: rgba(0, 0, 0, 0.02) !important;
+    border-radius: 14px !important;
+    padding: 6px 16px !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  .darkSearchBar .inputGroup {
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+  }
+
+  .inputGroup input,
+  .inputGroup select {
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    padding: 8px 0 !important;
+    margin: 0 !important;
+    font-size: 14px !important;
+    color: inherit !important;
+    width: 100% !important;
+  }
+
+  .divider {
+    display: none !important;
+  }
+
+  .searchBtn {
+    width: 100% !important;
+    border-radius: 14px !important;
+    padding: 14px !important;
+    font-size: 16px !important;
+    margin-top: 4px !important;
+  }
 }
 
+/* ─── Input Group ─── */
 .inputGroup {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex: 1;
   padding: 0 12px;
-  background: transparent !important;
 }
 
 .inputGroup input,
-.inputGroup select,
-.inputGroup option {
-  border: none !important;
-  outline: none !important;
-  background: transparent !important;
+.inputGroup select {
+  border: none;
+  outline: none;
+  background: transparent; /* Blend with parent */
   font-size: 0.95rem;
-  color: #0b1020 !important;
+  color: inherit; /* Inherit from searchBar or darkSearchBar */
   width: 100%;
   font-family: inherit;
-  padding: 8px 0;
+  padding: 10px 15px;
+  border-radius: 12px;
+  direction: ltr;
+  transition: all 0.3s ease;
 }
 
-/* Ensure placeholder is visible */
+:global([dir="rtl"]) .inputGroup input,
+:global([dir="rtl"]) .inputGroup select {
+  direction: rtl;
+  text-align: right;
+}
+
+.darkSearchBar .inputGroup input,
+.darkSearchBar .inputGroup select,
+.darkSearchBar .inputGroup option {
+  background: #0b1020 !important;
+  background-color: #0b1020 !important;
+  color: #ffffff !important;
+}
+
 .inputGroup input::placeholder {
-  color: #6b6070 !important;
-  opacity: 1 !important;
+  color: #a0aec0;
 }
 
+.darkSearchBar .inputGroup input::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.inputGroup select {
+  cursor: pointer;
+}
+
+.inputGroup option {
+  color: var(--color-text);
+  background: var(--color-card-bg);
+}
+
+.darkSearchBar .inputGroup option {
+  color: var(--white);
+  background: #1e253a;
+}
+
+/* ─── Search Icon ─── */
 .icon {
-  color: #4A6ED1 !important;
+  color: var(--tangerine, #ff7a2a); /* Match the orange in the image */
   flex-shrink: 0;
-  background: transparent !important;
 }
 
+.darkSearchBar .icon {
+  color: var(--tangerine, #ff7a2a) !important;
+}
+
+/* ─── Divider ─── */
 .divider {
   width: 1px;
-  height: 24px;
-  background: rgba(0,0,0,0.1) !important;
-  margin: 0 12px;
+  height: 28px;
+  background: var(--taupe-light);
+  flex-shrink: 0;
 }
 
+/* ─── Search Button ─── */
 .searchBtn {
   background: linear-gradient(135deg, var(--tangerine) 0%, #e86010 100%);
   color: var(--white);
@@ -179,20 +284,16 @@
   font-weight: 800;
   cursor: pointer;
   white-space: nowrap;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  box-shadow: 0 4px 16px rgba(255,122,42,0.45);
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(255, 122, 42, 0.3);
   font-family: inherit;
   flex-shrink: 0;
+  text-transform: lowercase; /* Matching the image "discussion" style */
 }
 
 .searchBtn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(255,122,42,0.55);
-}
-
-.searchBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(255,122,42,0.55);
+  box-shadow: 0 8px 24px rgba(255, 122, 42, 0.55);
 }
 
 .searchBtn:active {

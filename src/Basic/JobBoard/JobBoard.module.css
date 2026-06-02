@@ -189,9 +189,11 @@
 }
 
 .darkSearchBar .inputGroup input,
-.darkSearchBar .inputGroup select {
-  background: transparent !important;
-  color: var(--white) !important;
+.darkSearchBar .inputGroup select,
+.darkSearchBar .inputGroup option {
+  background: #0b1020 !important;
+  background-color: #0b1020 !important;
+  color: #ffffff !important;
 }
 
 .inputGroup input::placeholder {

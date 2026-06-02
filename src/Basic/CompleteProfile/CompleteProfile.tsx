@@ -96,12 +96,10 @@ export default function CompleteProfile() {
 
 
   // Social Links
-  const [socialLinks, setSocialLinks] = useState({
-    instagram: user?.socialLinks?.instagram || "",
-    twitter: user?.socialLinks?.twitter || "",
-    website: user?.socialLinks?.website || "",
-    linkedin: user?.socialLinks?.linkedin || "",
-  });
+  const [socialLinks, setSocialLinks] = useState<string[]>(
+    Array.isArray(user?.socialLinks) ? user.socialLinks : []
+  );
+  const [socialLinkInput, setSocialLinkInput] = useState("");
 
   // Work Images
   const [workImages, setWorkImages] = useState<string[]>([]);
@@ -189,9 +187,7 @@ export default function CompleteProfile() {
     }
   };
 
-  const handleSocialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSocialLinks({ ...socialLinks, [e.target.name]: e.target.value });
-  };
+
 
   const addExperience = () => {
     setExperiences([...experiences, { role: "", period: "" }]);
@@ -637,6 +633,7 @@ export default function CompleteProfile() {
                     className={`${styles.input} ${formErrors.dob ? styles.inputError : ''}`}
                     value={formData.dob}
                     onChange={handleChange}
+                    max="2026-12-31"
                   />
                   {formErrors.dob && (
                     <div className={styles.errorMessage}>{t("هذا الحقل مطلوب")}</div>
@@ -1097,52 +1094,56 @@ export default function CompleteProfile() {
           <div className={styles.sectionRow}>
             <div className={styles.sectionLabel}>
               <h3>{t("روابط التواصل الاجتماعي")}</h3>
+              <p>{t("أضف روابط أعمالك أو حساباتك المهنية.")}</p>
             </div>
             <div className={styles.sectionContent}>
               <div className={styles.formGrid}>
-                <div className={styles.field}>
-                  <label className={styles.label}>{t("إنستجرام")}</label>
-                  <input
-                    type="text"
-                    name="instagram"
-                    className={styles.input}
-                    placeholder="instagram.com/username"
-                    value={socialLinks.instagram}
-                    onChange={handleSocialChange}
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.label}>{t("تويتر")}</label>
-                  <input
-                    type="text"
-                    name="twitter"
-                    className={styles.input}
-                    placeholder="twitter.com/username"
-                    value={socialLinks.twitter}
-                    onChange={handleSocialChange}
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.label}>{t("الموقع الإلكتروني / معرض الأعمال")}</label>
-                  <input
-                    type="text"
-                    name="website"
-                    className={styles.input}
-                    placeholder="https://myportfolio.com"
-                    value={socialLinks.website}
-                    onChange={handleSocialChange}
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.label}>{t("لينكد إن")}</label>
-                  <input
-                    type="text"
-                    name="linkedin"
-                    className={styles.input}
-                    placeholder="linkedin.com/in/username"
-                    value={socialLinks.linkedin}
-                    onChange={handleSocialChange}
-                  />
+                <div className={styles.fieldFull}>
+                  <label className={styles.label}>{t("الروابط")}</label>
+                  <div className={styles.skillInputWrapper}>
+                    <input
+                      type="url"
+                      className={styles.input}
+                      style={{ flex: 1 }}
+                      placeholder={t("أضف رابط واضغط Enter أو زر الـ +")}
+                      value={socialLinkInput}
+                      onChange={(e) => setSocialLinkInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && socialLinkInput.trim()) {
+                          e.preventDefault();
+                          setSocialLinks([...socialLinks, socialLinkInput.trim()]);
+                          setSocialLinkInput("");
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className={styles.addSkillBtn}
+                      onClick={() => {
+                        if (socialLinkInput.trim()) {
+                          setSocialLinks([...socialLinks, socialLinkInput.trim()]);
+                          setSocialLinkInput("");
+                        }
+                      }}
+                    >
+                      +
+                    </button>
+                  </div>
+                  <div className={styles.tagContainer}>
+                    {socialLinks.map((link, i) => (
+                      <span key={i} className={styles.tag}>
+                        {link}
+                        <span
+                          className={styles.tagRemove}
+                          onClick={() =>
+                            setSocialLinks(socialLinks.filter((_, idx) => idx !== i))
+                          }
+                        >
+                          ×
+                        </span>
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

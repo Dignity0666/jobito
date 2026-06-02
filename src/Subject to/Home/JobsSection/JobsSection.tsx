@@ -195,9 +195,6 @@ const TradesmanJobCard: React.FC<{ job: Job; variants: Variants }> = ({ job, var
    ═══════════════════════════════════════ */
 const JobsSection = () => {
   const { t } = useTranslation();
-  const { user } = useJobitoAuth();
-  const classification = user?.classification;
-  const isTradesman = classification === "tradesman";
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -206,10 +203,8 @@ const JobsSection = () => {
     const fetchJobs = async () => {
       try {
         setIsLoading(true);
-        const query = isTradesman
-          ? "classification=خدمات" 
-          : "excludeClassification=خدمات";
-        const response = await fetch(`${API_BASE_URL}/jobs?${query}&_t=${Date.now()}`);
+        // Fetch top/exceptional jobs for everyone without filtering by tradesman
+        const response = await fetch(`${API_BASE_URL}/jobs?_t=${Date.now()}`);
         if (!response.ok) throw new Error("Failed to fetch jobs");
         
         const result = await response.json();
@@ -225,7 +220,7 @@ const JobsSection = () => {
     };
 
     fetchJobs();
-  }, [isTradesman]);
+  }, []);
 
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
@@ -269,13 +264,9 @@ const JobsSection = () => {
         <div className={styles.error}>{t(error)}</div>
       ) : (
         <motion.div className={styles.featuredGrid} variants={containerVariants}>
-          {jobs.map((job) =>
-            isTradesman ? (
-              <TradesmanJobCard key={job.jobId} job={job} variants={cardVariants} />
-            ) : (
-              <CompanyJobCard key={job.jobId} job={job} variants={cardVariants} />
-            )
-          )}
+          {jobs.map((job) => (
+            <CompanyJobCard key={job.jobId} job={job} variants={cardVariants} />
+          ))}
         </motion.div>
       )}
     </motion.div>

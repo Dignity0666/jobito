@@ -152,10 +152,8 @@ export default function JobsDashboard() {
     const fetchJobs = async () => {
       try {
         setLoading(true);
-        const query = isTradesman
-          ? "classification=خدمات" 
-          : "excludeClassification=خدمات";
-        const response = await fetch(`${API_BASE_URL}/jobs?${query}`);
+        // Fetch jobs for everyone without filtering by tradesman classification
+        const response = await fetch(`${API_BASE_URL}/jobs`);
         if (!response.ok) throw new Error("Failed to fetch jobs");
         const result = await response.json();
         const jobsData = result.data || (Array.isArray(result) ? result : []);
@@ -186,7 +184,7 @@ export default function JobsDashboard() {
       }
     };
     fetchJobs();
-  }, [isTradesman]);
+  }, []);
 
   const containerVariants: Variants = {
     hidden: { opacity: 0 },

@@ -165,6 +165,46 @@ const EMP_RANGES = [
   "1000+",
 ];
 
+const GOVERNORATES = [
+  "Cairo", "Alexandria", "Giza", "Qalyubia", "Port Said", "Suez", "Gharbia",
+  "Dakahlia", "Ismailia", "Asyut", "Fayoum", "Minya", "Qena", "Sohag",
+  "Beni Suef", "Aswan", "Red Sea", "New Valley", "Matrouh", "North Sinai",
+  "South Sinai", "Kafr El Sheikh", "Beheira", "Damietta", "Sharqia", "Monufia", "Luxor"
+];
+
+function LocationTagInput({ tags, onAdd, onRemove }) {
+  const handleChange = (e: any) => {
+    const val = e.target.value;
+    if (val && !tags.includes(val)) {
+      onAdd(val);
+    }
+    e.target.value = "";
+  };
+  return (
+    <div className="tag-input-wrap">
+      {tags.map((t: string) => (
+        <span key={t} className="tag">
+          {t}
+          <button type="button" className="tag-remove" onClick={() => onRemove(t)}>
+            ×
+          </button>
+        </span>
+      ))}
+      <select 
+        className="tag-input" 
+        style={{ border: 'none', outline: 'none', background: 'transparent', flex: 1, minWidth: '150px' }} 
+        onChange={handleChange}
+        defaultValue=""
+      >
+        <option value="" disabled>Select a governorate...</option>
+        {GOVERNORATES.map(gov => (
+          <option key={gov} value={gov}>{gov}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 export default function CompanySettings() {
   const { user, apiFetch } = useJobitoAuth();
   const { showToast } = useToast();
@@ -683,16 +723,15 @@ export default function CompanySettings() {
                     </div>
                     <div className="input-group">
                       <label className="input-group-label">Location</label>
-                      <TagInput
+                      <LocationTagInput
                         tags={form.locations}
-                        onAdd={(v) => set("locations", [...form.locations, v])}
-                        onRemove={(v) =>
+                        onAdd={(v: string) => set("locations", [...form.locations, v])}
+                        onRemove={(v: string) =>
                           set(
                             "locations",
                             form.locations.filter((x) => x !== v),
                           )
                         }
-                        placeholder="Add country / city..."
                       />
                     </div>
                     <div className="input-group">

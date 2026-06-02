@@ -574,70 +574,58 @@ export const JobDetailsPage = () => {
               </div>
             ) : (
               <div className={styles.headerRight}>
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                <button className={styles.shareBtn}>
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <circle cx="18" cy="5" r="3"></circle>
-                    <circle cx="6" cy="12" r="3"></circle>
-                    <circle cx="18" cy="19" r="3"></circle>
-                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-                  </svg>
-                </button>
+
                 {/* Report Button */}
-                <button className={styles.reportBtn} title={t("إبلاغ عن هذا المحتوى")} onClick={handleReport}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                    <line x1="12" y1="9" x2="12" y2="13" />
-                    <line x1="12" y1="17" x2="12.01" y2="17" />
-                  </svg>
-                </button>
-                {userApplication ? (
-                  <div className={(styles as any).appliedStatusContainer}>
-                    <button className={(styles as any).appliedBtn} disabled>
-                      <i
-                        className="fa-solid fa-check-circle"
-                        style={{ marginLeft: "8px" }}
-                      ></i>
-                      {t("تم التقديم مسبقاً")}
-                    </button>
-                    <div
-                      className={`${(styles as any).statusBadge} ${(styles as any)["status-" + (userApplication.status || "applied")]}`}
-                    >
-                      <span style={{ fontSize: "13px", opacity: 0.8 }}>
-                        {t("حالة الطلب")}:
-                      </span>
-                      <strong style={{ marginLeft: "4px" }}>
-                        {userApplication.status === "applied" ||
-                        userApplication.status === "reviewing"
-                          ? t("تحت المراجعة") + "⏳"
-                          : userApplication.status === "shortlisted" ||
-                              userApplication.status === "interviewed" ||
-                              userApplication.status === "hired"
-                            ? t("تم القبول (تواصل معنا)") + " ✅"
-                            : userApplication.status === "declined"
-                              ? t("نأسف، تم الرفض") + " ❌"
-                              : t("تحت المراجعة") + " ⏳"}
-                      </strong>
-                    </div>
-                  </div>
-                ) : (
-                  <button
-                    className={
-                      job.isActive ? styles.applyBtn : styles.closedBtn
-                    }
-                    onClick={handleApplyClick}
-                    disabled={!job.isActive}
-                  >
-                    {job.isActive ? t("تقدم الآن") : t("مغلق")}
+                {role !== "admin" && (
+                  <button className={styles.reportBtn} title={t("إبلاغ عن هذا المحتوى")} onClick={handleReport}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                      <line x1="12" y1="9" x2="12" y2="13" />
+                      <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
                   </button>
+                )}
+                {role !== "admin" && (
+                  userApplication ? (
+                    <div className={(styles as any).appliedStatusContainer}>
+                      <button className={(styles as any).appliedBtn} disabled>
+                        <i
+                          className="fa-solid fa-check-circle"
+                          style={{ marginLeft: "8px" }}
+                        ></i>
+                        {t("تم التقديم مسبقاً")}
+                      </button>
+                      <div
+                        className={`${(styles as any).statusBadge} ${(styles as any)["status-" + (userApplication.status || "applied")]}`}
+                      >
+                        <span style={{ fontSize: "13px", opacity: 0.8 }}>
+                          {t("حالة الطلب")}:
+                        </span>
+                        <strong style={{ marginLeft: "4px" }}>
+                          {userApplication.status === "applied" ||
+                          userApplication.status === "reviewing"
+                            ? t("تحت المراجعة") + "⏳"
+                            : userApplication.status === "shortlisted" ||
+                                userApplication.status === "interviewed" ||
+                                userApplication.status === "hired"
+                              ? t("تم القبول (تواصل معنا)") + " ✅"
+                              : userApplication.status === "declined"
+                                ? t("نأسف، تم الرفض") + " ❌"
+                                : t("تحت المراجعة") + " ⏳"}
+                        </strong>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      className={
+                        job.isActive ? styles.applyBtn : styles.closedBtn
+                      }
+                      onClick={handleApplyClick}
+                      disabled={!job.isActive}
+                    >
+                      {job.isActive ? t("تقدم الآن") : t("مغلق")}
+                    </button>
+                  )
                 )}
               </div>
             )}
