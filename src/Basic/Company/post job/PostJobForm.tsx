@@ -1037,7 +1037,7 @@ export default function PostJob() {
     responsibilities: [""],
     whoYouAre: [""],
     niceToHaves: [""],
-    skills: [t("التصميم الجرافيكي"), t("التواصل"), t("اللغة الإنجليزية")],
+    skills: [],
     benefits: getDefaultBenefits(t),
     slotsAvailable: 1,
     expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
