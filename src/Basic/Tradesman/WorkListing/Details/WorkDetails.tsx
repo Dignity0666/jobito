@@ -107,6 +107,23 @@ const WorkDetails = () => {
     }
   };
 
+  const handleDeleteWork = async () => {
+    if (!window.confirm(t("هل أنت متأكد من رغبتك في حذف هذا العمل؟"))) return;
+    try {
+      const response = await apiFetch(`${API_BASE_URL}/jobs/${id}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        navigate("/JobListing");
+      } else {
+        alert(t("حدث خطأ أثناء الحذف"));
+      }
+    } catch (error) {
+      console.error("Error deleting work:", error);
+    }
+  };
+
+
   if (isLoading) {
     return (
       <div className={`${styles.container} ${isDark ? styles.dark : styles.light}`}>
@@ -152,6 +169,14 @@ const WorkDetails = () => {
             title={t("تعديل")}
           >
             <Pencil size={18} />
+          </button>
+          <button 
+            className={styles.backBtn} 
+            style={{ marginLeft: '10px', color: '#ef4444' }}
+            onClick={handleDeleteWork}
+            title={t("حذف")}
+          >
+            <Trash2 size={18} />
           </button>
           <div className={styles.headerTitleArea}>
             <motion.h1 

@@ -121,9 +121,7 @@ const SupportDashboard: React.FC = () => {
         <div className={styles.tabsRow}>
           {/* Tabs removed to use global Admin navigation */}
         </div>
-        {authUser?.adminRole === 'super_admin' && (
-          <button className={styles.sysBtn}>{t("System request")}</button>
-        )}
+
       </nav>
 
       {/* Body */}
