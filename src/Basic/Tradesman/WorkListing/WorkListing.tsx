@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Star, Eye, Users, ChevronLeft, ChevronRight, Pencil } from "lucide-react";
+import { Star, Eye, Users, ChevronLeft, ChevronRight, Pencil, Trash2 } from "lucide-react";
 import styles from "./WorkListing.module.css";
 import { useTranslation } from "../../../context/translation-context";
 import { useJobitoAuth } from "../../../context/LinkContxt";
@@ -51,6 +51,20 @@ const WorkListing = () => {
       }
     } catch (error) {
       console.error("Error fetching work for edit:", error);
+    }
+  };
+
+  const handleDelete = async (jobId: string) => {
+    if (!window.confirm(t("هل أنت متأكد من حذف هذا العمل؟"))) return;
+    try {
+      const response = await apiFetch(`${API_BASE_URL}/jobs/${jobId}`, {
+        method: "DELETE"
+      });
+      if (response.ok) {
+        setWorks(works.filter(w => w.jobId !== jobId));
+      }
+    } catch (error) {
+      console.error("Error deleting work:", error);
     }
   };
 
@@ -128,6 +142,13 @@ const WorkListing = () => {
                       title={t("عرض")}
                     >
                       <Eye size={16} />
+                    </button>
+                    <button 
+                      className={`${styles.actionBtn} ${styles.actionDelete}`}
+                      onClick={() => handleDelete(work.jobId)}
+                      title={t("حذف")}
+                    >
+                      <Trash2 size={16} color="var(--red-600)" />
                     </button>
                   </div>
                 </td>
