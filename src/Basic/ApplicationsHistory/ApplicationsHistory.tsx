@@ -287,14 +287,13 @@ export const ApplicationsHistory = () => {
                 <th style={{ width: "25%" }}>{t("المسمى الوظيفي")}</th>
                 <th style={{ width: "20%" }}>{t("تاريخ التقديم")}</th>
                 <th style={{ width: "15%" }}>{t("الحالة")}</th>
-                <th style={{ width: "10%", textAlign: "left" }}></th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={5}
                     style={{ textAlign: "center", padding: "20px" }}
                   >
                     {t("جاري التحميل...")}
@@ -303,7 +302,7 @@ export const ApplicationsHistory = () => {
               ) : filteredApplications.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={5}
                     style={{ textAlign: "center", padding: "20px" }}
                   >
                     {t("لم يتم العثور على طلبات.")}
@@ -343,20 +342,6 @@ export const ApplicationsHistory = () => {
                         >
                           {getStatusLabel(app.status)}
                         </span>
-                      </td>
-                      <td style={{ textAlign: "left" }}>
-                        <button className="ah-more-btn">
-                          <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                          >
-                            <circle cx="12" cy="7" r="1.5" />
-                            <circle cx="12" cy="12" r="1.5" />
-                            <circle cx="12" cy="17" r="1.5" />
-                          </svg>
-                        </button>
                       </td>
                     </tr>
                   );
