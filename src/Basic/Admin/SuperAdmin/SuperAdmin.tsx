@@ -67,7 +67,7 @@ const SuperAdminDashboard: React.FC = () => {
   const { t, language } = useTranslation();
   const { showToast } = useToast();
   const { apiFetch, user } = useJobitoAuth();
-  const isSuperAdmin = user?.adminRole === 'super_admin';
+  const isSuperAdmin = user?.adminRole === 'super_admin' || user?.adminRole === 'operation_manager';
 
   const [isLoading, setIsLoading] = useState(true);
   const [maintenanceOn, setMaintenanceOn] = useState(false);

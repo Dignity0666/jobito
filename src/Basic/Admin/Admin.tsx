@@ -14,8 +14,6 @@ import { useToast } from '../../context/ToastContext';
 import { useTheme } from '../../context/ThemeContext';
 import { API_BASE_URL } from '../../services/api';
 import styles from './Admin.module.css';
-import { 
-  Bell, 
   Sun, 
   Moon, 
   LogOut, 
@@ -117,7 +115,6 @@ const Admin: React.FC = () => {
               <button className={styles.iconBtn} onClick={toggleLanguage} style={{ fontSize: '13px', fontWeight: 'bold' }}>
                 {language === 'ar' ? 'EN' : 'عربي'}
               </button>
-              <button className={styles.iconBtn}><Bell size={18} /></button>
               <button className={styles.iconBtn} onClick={toggleTheme}>
                 {isDark ? <Sun size={18} /> : <Moon size={18} />}
               </button>
