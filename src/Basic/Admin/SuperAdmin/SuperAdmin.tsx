@@ -301,35 +301,6 @@ const SuperAdminDashboard: React.FC = () => {
             )}
           </div>
 
-          {/* Card 2: Operations Revenue */}
-          <div className={styles.kpiCard}>
-            {isLoading ? (
-              <div className={styles.kpiHeader} style={{ width: '100%' }}>
-                <div className={styles.kpiLabelBox} style={{ width: '60%' }}>
-                  <span className={styles.kpiLabel}>{t("Operations Revenue")}</span>
-                  <div className={`${styles.skeleton} ${styles.skeletonText}`} />
-                </div>
-                <div className={`${styles.skeleton} ${styles.skeletonBadge}`} />
-              </div>
-            ) : (
-              <div className={styles.kpiHeader}>
-                <div className={styles.kpiLabelBox}>
-                  <span className={styles.kpiLabel}>{t("Operations Revenue")}</span>
-                  <h2 className={styles.kpiValue}>
-                    {revenueValue !== undefined && revenueValue !== null 
-                      ? Number(revenueValue).toLocaleString() 
-                      : '0'}
-                  </h2>
-                </div>
-                <span className={`${styles.kpiBadge} ${styles.badgeInfo}`}>20% ↗</span>
-              </div>
-            )}
-            {isLoading ? (
-              <div className={`${styles.skeleton} ${styles.skeletonSparkline}`} />
-            ) : (
-              <SparkLine data={[12, 18, 15, 22, 19, 28, 25]} color="info" />
-            )}
-          </div>
 
           {/* Card 3: System Uptime */}
           <div className={styles.kpiCard}>
