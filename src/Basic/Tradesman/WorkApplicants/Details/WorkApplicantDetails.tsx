@@ -38,7 +38,7 @@ const WorkApplicantDetails = () => {
 
   const handleUpdateStatus = async (newStatus: string) => {
     try {
-      const response = await apiFetch(`${API_BASE_URL}/applications/${id}/status`, {
+      const response = await apiFetch(`${API_BASE_URL}/applications/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),

@@ -142,23 +142,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     const initializeApp = async () => {
+      const startTime = Date.now();
       try {
-        // 1. First, try to restore auth session
-        await checkAuth();
+        // Run auth restore + config fetch in PARALLEL for faster startup
+        const configController = new AbortController();
+        const configTimeout = setTimeout(() => configController.abort(), 8000);
 
-        // 2. Then, fetch global config
-        const res = await fetch(`${API_BASE_URL}/config`, {
-          headers: {
-            "ngrok-skip-browser-warning": "69420",
-          },
-        });
-        if (res.ok) {
-          const data = await res.json();
+        const [, configRes] = await Promise.allSettled([
+          checkAuth(),
+          fetch(`${API_BASE_URL}/config`, {
+            headers: {
+              "ngrok-skip-browser-warning": "69420",
+            },
+            signal: configController.signal,
+          }),
+        ]);
+
+        clearTimeout(configTimeout);
+
+        // Process config result
+        if (configRes.status === "fulfilled" && configRes.value.ok) {
+          const data = await configRes.value.json();
           if (data.GOOGLE_CLIENT_ID) {
             setGoogleClientId(data.GOOGLE_CLIENT_ID);
           }
         } else {
-          // Failure here doesn't mean offline, but it's a sign
           console.warn(
             "API returned error for config, investigating health...",
           );
@@ -167,10 +175,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setIsBackendOffline(true);
         console.warn("Failed to initialize app correctly", err);
       } finally {
-        // Guarantee at least 3 seconds of splash screen for a smoother experience
+        // Show splash for at least 800ms (smooth but fast)
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(0, 800 - elapsed);
         setTimeout(() => {
           setIsInitialLoading(false);
-        }, 3000);
+        }, remaining);
       }
     };
     initializeApp();
@@ -386,13 +396,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
-      } else {
       }
 
       console.log(`📡 [apiFetch] Requesting: ${url}`, {
         hasToken: !!token,
         method: options.method || "GET",
       });
+
+      // Timeout: 45s for uploads (FormData body), 15s for regular requests
+      const isUpload = options.body instanceof FormData;
+      const timeoutMs = isUpload ? 45000 : 15000;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+      // If caller already passed a signal, chain it
+      if (options.signal) {
+        options.signal.addEventListener("abort", () => controller.abort());
+      }
 
       try {
         headers.set("ngrok-skip-browser-warning", "69420");
@@ -402,7 +422,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           ...options,
           headers,
           mode: "cors",
+          signal: controller.signal,
         });
+
+        clearTimeout(timeoutId);
 
         console.log(
           `✅ [apiFetch] Response: ${response.status} ${response.statusText} for ${url}`,
@@ -434,6 +457,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         return response;
       } catch (error) {
+        clearTimeout(timeoutId);
+        if (error instanceof DOMException && error.name === "AbortError") {
+          console.error(`⏰ [apiFetch] Request TIMED OUT after ${timeoutMs / 1000}s for ${url}`);
+          throw new Error(
+            isUpload
+              ? "انتهت مهلة رفع الملف. تأكد من اتصالك بالإنترنت وحاول مرة أخرى."
+              : "انتهت مهلة الاتصال بالخادم. حاول مرة أخرى."
+          );
+        }
         console.error(`❌ [apiFetch] Fetch FAILED for ${url}:`, error);
         throw error;
       }

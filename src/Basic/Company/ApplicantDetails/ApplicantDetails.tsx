@@ -99,7 +99,7 @@ export default function ApplicantDetails() {
       const updateToReviewing = async () => {
         try {
           const res = await apiFetch(
-            `${API_BASE_URL}/applications/${id}/status`,
+            `${API_BASE_URL}/applications/${id}`,
             {
               method: "PATCH",
               headers: { "Content-Type": "application/json" },
@@ -121,7 +121,7 @@ export default function ApplicantDetails() {
 
   const handleStatusUpdate = async (newStatus: string) => {
     try {
-      const res = await apiFetch(`${API_BASE_URL}/applications/${id}/status`, {
+      const res = await apiFetch(`${API_BASE_URL}/applications/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

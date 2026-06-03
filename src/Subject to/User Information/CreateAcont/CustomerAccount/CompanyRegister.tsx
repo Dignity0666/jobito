@@ -141,7 +141,7 @@ export const CompanyRegister: React.FC = () => {
     setFormError("");
     try {
       setIsVerifying(true);
-      const res = await fetch(`${API_BASE_URL}/auth/verify-email`, {
+      const res = await fetch(`${API_BASE_URL}/auth/verify-otp`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",

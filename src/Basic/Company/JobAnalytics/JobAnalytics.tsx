@@ -243,7 +243,7 @@ export default function JobAnalytics() {
   /* ── Status Change (Drag & Drop Equivalent) ── */
   const changeStatus = async (appId: number, newStatus: string) => {
     try {
-      const res = await apiFetch(`${API_BASE_URL}/applications/${appId}/status`, {
+      const res = await apiFetch(`${API_BASE_URL}/applications/${appId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),

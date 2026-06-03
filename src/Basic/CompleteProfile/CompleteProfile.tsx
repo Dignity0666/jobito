@@ -119,6 +119,31 @@ export default function CompleteProfile() {
 
   // Saving
   const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState("");
+
+  // ─── Upload helper with retry ─────────────────
+  const uploadWithRetry = async (
+    url: string,
+    formData: FormData,
+    method: "PUT" | "POST" = "PUT",
+    maxRetries = 2,
+  ): Promise<Response> => {
+    let lastError: Error | null = null;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const res = await apiFetch(url, { method, body: formData });
+        return res;
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err));
+        console.warn(`Upload attempt ${attempt}/${maxRetries} failed for ${url}:`, lastError.message);
+        if (attempt < maxRetries) {
+          // Wait 1.5s before retrying
+          await new Promise((r) => setTimeout(r, 1500));
+        }
+      }
+    }
+    throw lastError!;
+  };
 
   // ─── Handlers ─────────────────────────────────
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -242,55 +267,84 @@ export default function CompleteProfile() {
 
     try {
       setIsSaving(true);
+      setSaveStatus(t("جاري رفع الصور..."));
 
-      // Upload avatar
+      // ─── Upload all images in PARALLEL with retry ───
       let avatarUrl = user?.avatar || "";
+      let bannerUrl = "";
+      let criminalRecordUrl = "";
+
+      const uploadTasks: Array<{
+        key: "avatar" | "banner" | "criminal";
+        promise: Promise<Response>;
+      }> = [];
+
       if (selectedFile) {
         const fd = new FormData();
         fd.append("file", selectedFile);
-        const uploadRes = await apiFetch(`${API_BASE_URL}/images/profile`, {
-          method: "PUT",
-          body: fd,
+        uploadTasks.push({
+          key: "avatar",
+          promise: uploadWithRetry(`${API_BASE_URL}/images/profile`, fd, "PUT"),
         });
-        if (uploadRes.ok) {
-          const imgData = await uploadRes.json();
-          avatarUrl = imgData.imageUrl || imgData.image_url;
-        }
       }
 
-      // Upload banner
-      let bannerUrl = "";
       if (selectedWallpaper) {
         const fd = new FormData();
         fd.append("file", selectedWallpaper);
-        const uploadRes = await apiFetch(`${API_BASE_URL}/images/banner`, {
-          method: "PUT",
-          body: fd,
+        uploadTasks.push({
+          key: "banner",
+          promise: uploadWithRetry(`${API_BASE_URL}/images/banner`, fd, "PUT"),
         });
-        if (uploadRes.ok) {
-          const imgData = await uploadRes.json();
-          bannerUrl = imgData.imageUrl || imgData.image_url;
-        }
       }
 
-      // Upload Criminal Record
-      let criminalRecordUrl = "";
       if (selectedCriminalRecord) {
         const fd = new FormData();
         fd.append("file", selectedCriminalRecord);
         fd.append("entity_type", "user");
         fd.append("entity_id", user?.id || "anonymous");
-        const uploadRes = await apiFetch(`${API_BASE_URL}/images/upload`, {
-          method: "POST",
-          body: fd,
+        uploadTasks.push({
+          key: "criminal",
+          promise: uploadWithRetry(`${API_BASE_URL}/images/upload`, fd, "POST"),
         });
-        if (uploadRes.ok) {
-          const imgData = await uploadRes.json();
-          criminalRecordUrl = imgData.imageUrl || imgData.image_url;
+      }
+
+      // Run all uploads simultaneously
+      if (uploadTasks.length > 0) {
+        const uploadResults = await Promise.allSettled(
+          uploadTasks.map((t) => t.promise)
+        );
+
+        const failedUploads: string[] = [];
+
+        for (let i = 0; i < uploadResults.length; i++) {
+          const result = uploadResults[i];
+          const task = uploadTasks[i];
+
+          if (result.status === "fulfilled" && result.value.ok) {
+            const imgData = await result.value.json();
+            const url = imgData.imageUrl || imgData.image_url;
+            if (task.key === "avatar") avatarUrl = url;
+            else if (task.key === "banner") bannerUrl = url;
+            else if (task.key === "criminal") criminalRecordUrl = url;
+          } else if (result.status === "rejected") {
+            const label =
+              task.key === "avatar" ? t("الصورة الشخصية") :
+              task.key === "banner" ? t("صورة الغلاف") :
+              t("الفيش الجنائي");
+            failedUploads.push(label);
+          }
+        }
+
+        if (failedUploads.length > 0) {
+          throw new Error(
+            `${t("فشل رفع:")} ${failedUploads.join("، ")}. ${t("تأكد من اتصالك بالإنترنت وحاول مرة أخرى.")}`
+          );
         }
       }
 
-      // Build update payload
+      // ─── Build update payload ───
+      setSaveStatus(t("جاري حفظ البيانات..."));
+
       const updateData: Record<string, unknown> = {
         fullName: formData.fullName,
         phone: formData.phone,
@@ -345,10 +399,11 @@ export default function CompleteProfile() {
 
       navigate("/");
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : "Unknown error occurred";
+      const message = error instanceof Error ? error.message : t("حدث خطأ غير متوقع");
       showToast(`${t("فشل الحفظ:")} ${message}`, "error");
     } finally {
       setIsSaving(false);
+      setSaveStatus("");
     }
   };
 
@@ -1300,11 +1355,14 @@ export default function CompleteProfile() {
             className={styles.submitBtn}
             onClick={handleSave}
             disabled={isSaving}
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
+            whileHover={{ scale: isSaving ? 1 : 1.03 }}
+            whileTap={{ scale: isSaving ? 1 : 0.97 }}
           >
             {isSaving ? (
-              <span className={styles.loader} />
+              <span style={{ display: "flex", alignItems: "center", gap: "8px", justifyContent: "center" }}>
+                <span className={styles.loader} />
+                {saveStatus && <span>{saveStatus}</span>}
+              </span>
             ) : (
               t("حفظ وإكمال الملف الشخصي")
             )}
