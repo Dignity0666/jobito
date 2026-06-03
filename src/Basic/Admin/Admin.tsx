@@ -94,7 +94,6 @@ const Admin: React.FC = () => {
 
   const allNavItems = [
     { id: 'SUPER_ADMIN', label: userAdminRole === 'super_admin' ? t("Super Admin") : t("Dashboard"), role: 'both' },
-    { id: 'OPS_MANAGER', label: t("Operations Monitor"), role: 'operation_manager' },
     { id: 'USER_MANAGEMENT', label: t("User Management"), role: 'operation_manager' },
     { id: 'SUPPORT', label: t("Technical Support"), role: 'operation_manager' },
     { id: 'CONTENT', label: t("Content Moderation"), role: 'operation_manager' },
