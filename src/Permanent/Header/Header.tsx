@@ -68,6 +68,7 @@ export function Header() {
     { label: t("الرئيسية"), path: "/", icon: <Home size={16} /> },
     { label: t("البحث عن عمل"), path: "/Find Jobs", icon: <Search size={16} /> },
     { label: t("الوظائف"), path: "/JobListing", icon: <List size={16} /> },
+    { label: t("طلبات التقديم"), path: "/MyApplications", icon: <FileText size={16} /> },
     { label: t("التقييمات"), path: "/CompanyRatings", icon: <Star size={16} /> },
     { label: t("تصفح الشركات"), path: "/Browse Companies", icon: <Building2 size={16} /> },
     { label: t("الملف الشخصي"), path: "/Profile", icon: <UserCircle size={16} /> },
@@ -100,7 +101,7 @@ export function Header() {
       links.push({ label: t("عن المنصة"), path: "/about", icon: <Info size={16} /> });
       links.push({ label: t("اتصل بنا"), path: "/contact", icon: <Mail size={16} /> });
     }
-    if (isAuthenticated && role !== "company" && role !== "admin" && user?.classification !== "tradesman") {
+    if (isAuthenticated && role !== "company" && role !== "admin") {
       links.push({ label: t("طلبات التقديم"), path: "/MyApplications", icon: <FileText size={16} /> });
     }
     return links;

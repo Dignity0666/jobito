@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Star, Eye, Users, ChevronLeft, ChevronRight, Pencil } from "lucide-react";
+import { Star, Trash2, Users, ChevronLeft, ChevronRight, Pencil } from "lucide-react";
 import styles from "./WorkListing.module.css";
 import { useTranslation } from "../../../context/translation-context";
 import { useJobitoAuth } from "../../../context/LinkContxt";
@@ -51,6 +51,22 @@ const WorkListing = () => {
       }
     } catch (error) {
       console.error("Error fetching work for edit:", error);
+    }
+  };
+
+  const handleDelete = async (jobId: string) => {
+    if (!window.confirm(t("هل أنت متأكد من رغبتك في حذف هذه الخدمة؟"))) return;
+    try {
+      const response = await apiFetch(`${API_BASE_URL}/jobs/${jobId}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        setWorks((prev) => prev.filter((w) => w.jobId !== jobId));
+      } else {
+        alert(t("حدث خطأ أثناء الحذف"));
+      }
+    } catch (error) {
+      console.error("Error deleting work:", error);
     }
   };
 
@@ -124,10 +140,10 @@ const WorkListing = () => {
                     </button>
                     <button 
                       className={styles.actionBtn}
-                      onClick={() => navigate(`/WorkManagement/${work.jobId}`, { state: { tab: "details" } })}
-                      title={t("عرض")}
+                      onClick={() => handleDelete(work.jobId)}
+                      title={t("حذف")}
                     >
-                      <Eye size={16} />
+                      <Trash2 size={16} color="red" />
                     </button>
                   </div>
                 </td>

@@ -21,8 +21,8 @@ const ModeSwitcherBar: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [criminalRecordFile, setCriminalRecordFile] = useState<File | null>(null);
-  const [fileError, setFileError] = useState<string>("");
   const [uploading, setUploading] = useState(false);
+  const [isSwitching, setIsSwitching] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isIndividual = role === "user" || role === "student" || (user?.role as string) === "student";
@@ -43,17 +43,22 @@ const ModeSwitcherBar: React.FC = () => {
     
     // Switching back to job_seeker → always allow immediately
     if (newType === "job_seeker") {
+      setIsSwitching(true);
       await performSwitch(newType);
+      setIsSwitching(false);
       showToast(t("تم العودة إلى وضع باحث عن عمل بنجاح!"));
+      navigate("/");
       return;
     }
-
 
     // Switching to tradesman → check if profile is already complete
     if (isProfileComplete) {
       // All data exists → switch immediately, no modal needed
+      setIsSwitching(true);
       await performSwitch(newType);
+      setIsSwitching(false);
       showToast(t("تم تفعيل الوضع الحرفي بنجاح!"));
+      navigate("/");
       return;
     }
 
@@ -181,6 +186,7 @@ const ModeSwitcherBar: React.FC = () => {
 
       await performSwitch("tradesman", extraPayload);
       showToast(t("تم تفعيل الوضع الحرفي بنجاح!"));
+      navigate("/");
 
     } catch (err) {
       console.error(err);
@@ -214,9 +220,9 @@ const ModeSwitcherBar: React.FC = () => {
     <>
       <div className={styles.switcherBar}>
         <div className={styles.leftSide}>
-          <button className={styles.switchBtn} onClick={handleToggleMode}>
+          <button className={styles.switchBtn} onClick={handleToggleMode} disabled={isSwitching}>
             <ArrowLeftRight size={16} />
-            {classification === "tradesman" ? t("العودة إلى باحث عن عمل") : t("التبديل إلى الوضع الحرفي")}
+            {isSwitching ? t("جاري التبديل...") : (classification === "tradesman" ? t("العودة إلى باحث عن عمل") : t("التبديل إلى الوضع الحرفي"))}
           </button>
           <span className={styles.statusText}>
             {t("الوضع الحالي:")} {classification === "tradesman" ? t("الحرفي", "Tradesman") : t("باحث عن عمل")}

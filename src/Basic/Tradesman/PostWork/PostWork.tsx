@@ -86,9 +86,7 @@ const PostWork = () => {
   };
 
   const uploadImagesToServer = async (): Promise<string[]> => {
-    const uploadedUrls: string[] = [];
-
-    for (const file of selectedFiles) {
+    const uploadPromises = selectedFiles.map(async (file) => {
       const formDataUpload = new FormData();
       formDataUpload.append("file", file);
       formDataUpload.append("entity_type", "job");
@@ -107,16 +105,19 @@ const PostWork = () => {
 
         if (response.ok) {
           const data = await response.json();
-          uploadedUrls.push(data.imageUrl);
+          return data.imageUrl;
         } else {
           console.error("Failed to upload image:", file.name);
+          return null;
         }
       } catch (err) {
         console.error("Error uploading image:", err);
+        return null;
       }
-    }
+    });
 
-    return uploadedUrls;
+    const results = await Promise.all(uploadPromises);
+    return results.filter((url): url is string => url !== null);
   };
 
   const handleSubmit = async () => {
