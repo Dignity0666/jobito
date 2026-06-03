@@ -164,17 +164,23 @@ const OpsManagerDashboard: React.FC = () => {
     return matchEntity && matchSearch;
   });
 
-  // Count KPIs from current data
-  const loginCount = activities.filter(a => a.actionType?.toUpperCase().includes('LOGIN')).length;
-  const userActionCount = activities.filter(a => getEntityClass(a.targetEntity) === 'user').length;
-  const companyActionCount = activities.filter(a => getEntityClass(a.targetEntity) === 'company').length;
-  const systemCount = activities.filter(a => getEntityClass(a.targetEntity) === 'system').length;
-  const alertCount = activities.filter(a => 
-    a.actionType?.toUpperCase().includes('BAN') || 
-    a.actionType?.toUpperCase().includes('SUSPEND') ||
-    a.actionType?.toUpperCase().includes('DELETE') ||
-    a.actionType?.toUpperCase().includes('FAILED_LOGIN')
-  ).length;
+  // Count KPIs comprehensively from actionBreakdown
+  const getActionSum = (condition: (action_type: string) => boolean) => {
+    return actionBreakdown
+      .filter(a => condition(a.action_type?.toUpperCase() || ''))
+      .reduce((sum, a) => sum + Number(a.count), 0);
+  };
+
+  const loginCount = getActionSum(a => a.includes('LOGIN'));
+  const userActionCount = getActionSum(a => a.includes('USER'));
+  const companyActionCount = getActionSum(a => a.includes('COMPANY') || a.includes('COMPAN'));
+  const systemCount = getActionSum(a => a.includes('SYSTEM') || a.includes('REGISTERED') || a.includes('VERIFIED') || a.includes('PASSWORD_RESET') || a.includes('MAINTENANCE'));
+  const alertCount = getActionSum(a => 
+    a.includes('BAN') || 
+    a.includes('SUSPEND') ||
+    a.includes('DELETE') ||
+    a.includes('FAILED_LOGIN')
+  );
 
   // Build chart SVG path
   const chartWidth = 500;
@@ -277,7 +283,7 @@ const OpsManagerDashboard: React.FC = () => {
             <div className={`${styles.kpiIcon} ${styles.blue}`}><LogIn size={18} /></div>
           </div>
           <div className={styles.kpiValue}>{loginCount}</div>
-          <div className={styles.kpiSub}>{t("From current activity log")}</div>
+          <div className={styles.kpiSub}>{t("Total overall")}</div>
         </div>
         <div className={styles.kpiCard}>
           <div className={styles.kpiHeader}>
