@@ -95,8 +95,8 @@ export default function AccountSecurity() {
       });
       if (!res.ok) throw new Error("فشل في طلب حذف الحساب");
       const data = await res.json();
-      showToast(data.message || "تم جدولة حذف الحساب خلال 7 أيام", "success");
-      setDeletionStatus({ scheduled: true, daysLeft: 7 });
+      showToast(data.message || "تم جدولة حذف الحساب خلال 15 يوما", "success");
+      setDeletionStatus({ scheduled: true, daysLeft: 15 });
       setShowDeleteConfirm(false);
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : "Error", "error");
@@ -233,7 +233,7 @@ export default function AccountSecurity() {
             <p>
               {deletionStatus.scheduled
                 ? `Your account is scheduled for permanent deletion in ${deletionStatus.daysLeft ?? "?"} days. You can cancel this anytime before then.`
-                : "Once you request deletion, your account will be permanently deleted after 7 days. This action can be cancelled within that period."}
+                : "Once you request deletion, your account will be permanently deleted after 15 days. This action can be cancelled within that period."}
             </p>
           </div>
           <div className={styles.form}>
@@ -268,7 +268,7 @@ export default function AccountSecurity() {
             ) : (
               <div className={styles.confirmDeleteBox}>
                 <p className={styles.confirmText}>
-                  Are you sure? Your account will be permanently deleted after 7 days.
+                  Are you sure? Your account will be permanently deleted after 15 days.
                 </p>
                 <div className={styles.confirmActions}>
                   <motion.button
