@@ -947,109 +947,111 @@ export const JobDetailsPage = () => {
 
 
             {/* Similar Jobs */}
-            <div className={styles.similarJobsSection}>
-              <div className={styles.similarHeader}>
-                <h2>{t("وظائف مشابهة")}</h2>
-                <Link to="/JobListing" className={styles.companyLink}>
-                  {t("عرض كل الوظائف")}{" "}
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    style={{ transform: "rotate(180deg)" }}
-                  >
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                    <polyline points="12 5 19 12 12 19"></polyline>
-                  </svg>
-                </Link>
-              </div>
-
-              <div className={styles.similarGrid}>
-                {similarJobs.length > 0 ? (
-                  similarJobs.map((simJob: Job) => (
-                    <div
-                      key={simJob.jobId}
-                      className={styles.similarJobCard}
-                      onClick={() => {
-                        navigate("/Job details", {
-                          state: { jobId: simJob.jobId },
-                        });
-                        window.scrollTo(0, 0);
-                      }}
-                      style={{ cursor: "pointer" }}
+            {role !== "company" && (
+              <div className={styles.similarJobsSection}>
+                <div className={styles.similarHeader}>
+                  <h2>{t("وظائف مشابهة")}</h2>
+                  <Link to="/JobListing" className={styles.companyLink}>
+                    {t("عرض كل الوظائف")}{" "}
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      style={{ transform: "rotate(180deg)" }}
                     >
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                      <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                  </Link>
+                </div>
+
+                <div className={styles.similarGrid}>
+                  {similarJobs.length > 0 ? (
+                    similarJobs.map((simJob: Job) => (
                       <div
-                        className={styles.simLogo}
-                        style={{
-                          backgroundColor: simJob.company?.logoUrl
-                            ? "transparent"
-                            : "#4640de",
+                        key={simJob.jobId}
+                        className={styles.similarJobCard}
+                        onClick={() => {
+                          navigate("/Job details", {
+                            state: { jobId: simJob.jobId },
+                          });
+                          window.scrollTo(0, 0);
                         }}
+                        style={{ cursor: "pointer" }}
                       >
-                        <img
-                          src={
-                            simJob.user?.avatarUrl
-                              ? simJob.user.avatarUrl.startsWith("http")
-                                ? simJob.user.avatarUrl
-                                : `${API_BASE_URL}${simJob.user.avatarUrl.startsWith("/") ? "" : "/"}${simJob.user.avatarUrl}`
-                              : simJob.company?.logoUrl
-                                ? simJob.company.logoUrl.startsWith("http")
-                                  ? simJob.company.logoUrl
-                                  : `${API_BASE_URL}${simJob.company.logoUrl.startsWith("/") ? "" : "/"}${simJob.company.logoUrl}`
-                                : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(simJob.company?.name || simJob.user?.fullName || "Company")}`
-                          }
-                          alt={simJob.company?.name || simJob.user?.fullName}
+                        <div
+                          className={styles.simLogo}
                           style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                            borderRadius: "inherit",
+                            backgroundColor: simJob.company?.logoUrl
+                              ? "transparent"
+                              : "#4640de",
                           }}
-                        />
-                      </div>
-                      <div className={styles.simDetails}>
-                        <div className={styles.simTitleGroup}>
-                          <h3>{t(simJob.title || "")}</h3>
-                          <p>
-                            {simJob.company?.name
-                              ? t(simJob.company.name)
-                              : "Jobito"}{" "}
-                            • {simJob.address ? t(simJob.address) : t("عالمي")}
-                          </p>
+                        >
+                          <img
+                            src={
+                              simJob.user?.avatarUrl
+                                ? simJob.user.avatarUrl.startsWith("http")
+                                  ? simJob.user.avatarUrl
+                                  : `${API_BASE_URL}${simJob.user.avatarUrl.startsWith("/") ? "" : "/"}${simJob.user.avatarUrl}`
+                                : simJob.company?.logoUrl
+                                  ? simJob.company.logoUrl.startsWith("http")
+                                    ? simJob.company.logoUrl
+                                    : `${API_BASE_URL}${simJob.company.logoUrl.startsWith("/") ? "" : "/"}${simJob.company.logoUrl}`
+                                  : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(simJob.company?.name || simJob.user?.fullName || "Company")}`
+                            }
+                            alt={simJob.company?.name || simJob.user?.fullName}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              borderRadius: "inherit",
+                            }}
+                          />
                         </div>
-                        <div className={styles.simTags}>
-                          <span className={styles.tagGreen}>
-                            {Array.isArray(simJob.jobType)
-                              ? simJob.jobType
-                                  .map((type) =>
-                                    type === "full-time"
-                                      ? t("دوام كامل")
-                                      : type === "part-time"
-                                        ? t("دوام جزئي")
-                                        : t(type),
-                                  )
-                                  .join(" / ")
-                              : simJob.jobType === "full-time"
-                                ? t("دوام كامل")
-                                : t("دوام جزئي")}
-                          </span>
-                          {simJob.category && (
-                            <span className={styles.tagYellowOutline}>
-                              {t(simJob.category.name)}
+                        <div className={styles.simDetails}>
+                          <div className={styles.simTitleGroup}>
+                            <h3>{t(simJob.title || "")}</h3>
+                            <p>
+                              {simJob.company?.name
+                                ? t(simJob.company.name)
+                                : "Jobito"}{" "}
+                              • {simJob.address ? t(simJob.address) : t("عالمي")}
+                            </p>
+                          </div>
+                          <div className={styles.simTags}>
+                            <span className={styles.tagGreen}>
+                              {Array.isArray(simJob.jobType)
+                                ? simJob.jobType
+                                    .map((type) =>
+                                      type === "full-time"
+                                        ? t("دوام كامل")
+                                        : type === "part-time"
+                                          ? t("دوام جزئي")
+                                          : t(type),
+                                    )
+                                    .join(" / ")
+                                : simJob.jobType === "full-time"
+                                  ? t("دوام كامل")
+                                  : t("دوام جزئي")}
                             </span>
-                          )}
+                            {simJob.category && (
+                              <span className={styles.tagYellowOutline}>
+                                {t(simJob.category.name)}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))
-                ) : (
-                  <p>{t("لا توجد وظائف مشابهة متاحة.")}</p>
-                )}
+                    ))
+                  ) : (
+                    <p>{t("لا توجد وظائف مشابهة متاحة.")}</p>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </>
         ) : (
           <div className={styles.applicantsContainer}>

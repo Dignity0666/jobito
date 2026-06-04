@@ -101,6 +101,7 @@ export default function EditProfile() {
   );
   const [skills, setSkills] = useState<string[]>(user?.skills || []);
   const [gallery, setGallery] = useState<string[]>(user?.portfolios || []);
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
 
   const [projectLinks, setProjectLinks] = useState<string[]>(user?.projectLinks || []);
   const [projectLinkInput, setProjectLinkInput] = useState("");
@@ -168,6 +169,7 @@ export default function EditProfile() {
     const files = e.target.files;
     if (files) {
       Array.from(files).forEach((file) => {
+        setGalleryFiles((prev) => [...prev, file]);
         const reader = new FileReader();
         reader.onloadend = () =>
           setGallery((prev) => [...prev, reader.result as string]);
@@ -269,6 +271,36 @@ export default function EditProfile() {
         }
       }
 
+      // Upload new gallery images to server and collect their URLs
+      const uploadedGalleryUrls: string[] = [];
+      if (galleryFiles.length > 0) {
+        for (const file of galleryFiles) {
+          try {
+            const fd = new FormData();
+            fd.append("file", file);
+            fd.append("entity_type", "user");
+            fd.append("entity_id", user?.id || "anonymous");
+            fd.append("image_type", "portfolio");
+            const uploadRes = await apiFetch(`${API_BASE_URL}/images/upload`, {
+              method: "POST",
+              body: fd,
+            });
+            if (uploadRes.ok) {
+              const imgData = await uploadRes.json();
+              uploadedGalleryUrls.push(imgData.imageUrl || imgData.image_url);
+            }
+          } catch (err) {
+            console.error("Failed to upload gallery image:", err);
+          }
+        }
+      }
+
+      // Combine existing server URLs (non-base64) with newly uploaded URLs
+      const existingServerUrls = gallery.filter(
+        (img) => !img.startsWith("data:")
+      );
+      const finalPortfolios = [...existingServerUrls, ...uploadedGalleryUrls];
+
       if (activeTab === "login") {
         if (passwords.new) {
           const passRes = await apiFetch(`${API_BASE_URL}/users/me/password`, {
@@ -297,7 +329,7 @@ export default function EditProfile() {
           educations: education,
           skills: skills,
           projectLinks: projectLinks,
-          portfolios: gallery,
+          portfolios: finalPortfolios,
           avatarUrl: finalAvatarUrl,
           avatar: finalAvatarUrl,
           banner_url: finalBannerUrl,
@@ -329,6 +361,7 @@ export default function EditProfile() {
       setPhotoPreview(null);
       setSelectedBannerFile(null);
       setBannerPreview(null);
+      setGalleryFiles([]);
       if (activeTab === "login") {
         setPasswords({ current: "", new: "", confirm: "" });
       }
@@ -1027,8 +1060,16 @@ export default function EditProfile() {
                           />
                           <button
                             className={styles.galleryRemoveBtn}
-                            onClick={() =>
-                              setGallery(gallery.filter((_, i) => i !== idx))
+                            onClick={() => {
+                              // If removing a newly added image (base64), also remove corresponding file
+                              const removedImg = gallery[idx];
+                              if (removedImg.startsWith("data:")) {
+                                // Count how many base64 images come before this index
+                                const base64IndexBefore = gallery.slice(0, idx).filter(g => g.startsWith("data:")).length;
+                                setGalleryFiles(prev => prev.filter((_, fi) => fi !== base64IndexBefore));
+                              }
+                              setGallery(gallery.filter((_, i) => i !== idx));
+                            }
                             }
                             title={t("حذف")}
                           >

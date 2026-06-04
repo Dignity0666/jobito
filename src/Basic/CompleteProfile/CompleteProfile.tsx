@@ -342,6 +342,33 @@ export default function CompleteProfile() {
         }
       }
 
+      // ─── Upload gallery/work images ───
+      const uploadedWorkImageUrls: string[] = [];
+      if (workImageFiles.length > 0) {
+        for (const file of workImageFiles) {
+          try {
+            const fd = new FormData();
+            fd.append("file", file);
+            fd.append("entity_type", "user");
+            fd.append("entity_id", user?.id || "anonymous");
+            fd.append("image_type", "portfolio");
+            const uploadRes = await uploadWithRetry(`${API_BASE_URL}/images/upload`, fd, "POST");
+            if (uploadRes.ok) {
+              const imgData = await uploadRes.json();
+              uploadedWorkImageUrls.push(imgData.imageUrl || imgData.image_url);
+            }
+          } catch (err) {
+            console.error("Failed to upload work image:", err);
+          }
+        }
+      }
+
+      // Combine existing server URLs (non-base64) with newly uploaded URLs
+      const existingServerUrls = workImages.filter(
+        (img) => !img.startsWith("data:")
+      );
+      const finalPortfolios = [...existingServerUrls, ...uploadedWorkImageUrls];
+
       // ─── Build update payload ───
       setSaveStatus(t("جاري حفظ البيانات..."));
 
@@ -358,7 +385,7 @@ export default function CompleteProfile() {
         educations: educations,
         skills,
         projectLinks,
-        portfolios: workImages,
+        portfolios: finalPortfolios,
         avatarUrl: avatarUrl,
         avatar: avatarUrl,
         banner_url: bannerUrl,
