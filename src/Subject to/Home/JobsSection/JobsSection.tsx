@@ -195,6 +195,8 @@ const TradesmanJobCard: React.FC<{ job: Job; variants: Variants }> = ({ job, var
    ═══════════════════════════════════════ */
 const JobsSection = () => {
   const { t } = useTranslation();
+  const { user } = useJobitoAuth();
+  const classification = user?.classification;
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -209,7 +211,17 @@ const JobsSection = () => {
         
         const result = await response.json();
         const jobsData = result.data || (Array.isArray(result) ? result : []);
-        setJobs(jobsData.slice(0, 8)); 
+
+        let filteredJobs = jobsData;
+        const isTradesmanUser = classification === "tradesman" || classification === "industrial";
+        if (isTradesmanUser) {
+          filteredJobs = filteredJobs.filter((job: any) => {
+            if (!job.company) return false;
+            return job.classification === "services" || job.classification === "خدمات" || job.classification === "Services";
+          });
+        }
+
+        setJobs(filteredJobs.slice(0, 8)); 
         setError(null);
       } catch (err) {
         console.error("Error loading jobs:", err);
@@ -220,7 +232,7 @@ const JobsSection = () => {
     };
 
     fetchJobs();
-  }, []);
+  }, [classification]);
 
   const containerVariants: Variants = {
     hidden: { opacity: 0 },

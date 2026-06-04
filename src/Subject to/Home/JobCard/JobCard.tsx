@@ -161,10 +161,18 @@ export default function JobsDashboard() {
         const todayStr = new Date().toDateString();
 
         // Only include jobs created on the exact same day
-        const todaysJobs = jobsData.filter((job: Job) => {
+        let todaysJobs = jobsData.filter((job: Job) => {
           if (!job.createdAt) return false;
           return new Date(job.createdAt).toDateString() === todayStr;
         });
+
+        const isTradesmanUser = classification === "tradesman" || classification === "industrial";
+        if (isTradesmanUser) {
+          todaysJobs = todaysJobs.filter((job: any) => {
+            if (!job.company) return false;
+            return job.classification === "services" || job.classification === "خدمات" || job.classification === "Services";
+          });
+        }
 
         // Sort jobs to show newest first
         const sortedJobs = todaysJobs.sort((a: Job, b: Job) => {
@@ -184,7 +192,7 @@ export default function JobsDashboard() {
       }
     };
     fetchJobs();
-  }, []);
+  }, [classification]);
 
   const containerVariants: Variants = {
     hidden: { opacity: 0 },

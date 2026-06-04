@@ -243,38 +243,44 @@ export default function EditProfile() {
     try {
       setIsSaving(true);
 
+      const uploadPromises: Promise<void>[] = [];
+
       let finalAvatarUrl = user?.avatar || "";
       if (selectedFile) {
-        const fd = new FormData();
-        fd.append("file", selectedFile);
-        const uploadRes = await apiFetch(`${API_BASE_URL}/images/profile`, {
-          method: "PUT",
-          body: fd,
-        });
-        if (uploadRes.ok) {
-          const imgData = await uploadRes.json();
-          finalAvatarUrl = imgData.imageUrl || imgData.image_url;
-        }
+        uploadPromises.push((async () => {
+          const fd = new FormData();
+          fd.append("file", selectedFile);
+          const uploadRes = await apiFetch(`${API_BASE_URL}/images/profile`, {
+            method: "PUT",
+            body: fd,
+          });
+          if (uploadRes.ok) {
+            const imgData = await uploadRes.json();
+            finalAvatarUrl = imgData.imageUrl || imgData.image_url;
+          }
+        })());
       }
 
       let finalBannerUrl = user?.banner_url || "";
       if (selectedBannerFile) {
-        const fd = new FormData();
-        fd.append("file", selectedBannerFile);
-        const uploadRes = await apiFetch(`${API_BASE_URL}/images/banner`, {
-          method: "PUT",
-          body: fd,
-        });
-        if (uploadRes.ok) {
-          const imgData = await uploadRes.json();
-          finalBannerUrl = imgData.imageUrl || imgData.image_url;
-        }
+        uploadPromises.push((async () => {
+          const fd = new FormData();
+          fd.append("file", selectedBannerFile);
+          const uploadRes = await apiFetch(`${API_BASE_URL}/images/banner`, {
+            method: "PUT",
+            body: fd,
+          });
+          if (uploadRes.ok) {
+            const imgData = await uploadRes.json();
+            finalBannerUrl = imgData.imageUrl || imgData.image_url;
+          }
+        })());
       }
 
-      // Upload new gallery images to server and collect their URLs
+      // Upload new gallery images to server concurrently
       const uploadedGalleryUrls: string[] = [];
       if (galleryFiles.length > 0) {
-        for (const file of galleryFiles) {
+        const galleryPromises = galleryFiles.map(async (file) => {
           try {
             const fd = new FormData();
             fd.append("file", file);
@@ -292,8 +298,11 @@ export default function EditProfile() {
           } catch (err) {
             console.error("Failed to upload gallery image:", err);
           }
-        }
+        });
+        uploadPromises.push(...galleryPromises);
       }
+
+      await Promise.all(uploadPromises);
 
       // Combine existing server URLs (non-base64) with newly uploaded URLs
       const existingServerUrls = gallery.filter(

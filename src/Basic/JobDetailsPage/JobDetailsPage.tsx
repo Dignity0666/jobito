@@ -804,10 +804,10 @@ export const JobDetailsPage = () => {
                         dir={t("ar-EG") === "ar-EG" ? "rtl" : "ltr"}
                         style={{ display: "inline-block" }}
                       >
-                        {(job.classification === "tradesman_work" || job.classification === "خدمات" || !!job.user) && (!job.salaryMin || job.salaryMin === 0)
+                        {!job.salaryMin || job.salaryMin === 0
                           ? t("قابل للتفاوض")
                           : job.salaryMin === job.salaryMax || !job.salaryMax
-                            ? `${job.salaryMin || 0} ${t("جنيه مصري")}`
+                            ? `${job.salaryMin} ${t("جنيه مصري")}`
                             : `${job.salaryMin} - ${job.salaryMax} ${t("جنيه مصري")}`}
                       </span>
                     </div>
@@ -1064,12 +1064,7 @@ export const JobDetailsPage = () => {
         isOpen={isApplyModalOpen}
         onClose={() => setIsApplyModalOpen(false)}
         jobId={jobId}
-        isTradesman={
-          !!job?.user ||
-          job?.classification === "خدمات" ||
-          job?.classification === "services" ||
-          job?.classification === "Services"
-        }
+        isTradesman={!!job?.user}
         jobTitle={t(job?.title || "")}
         companyName={t(job?.company?.name || "شركة")}
         location={t(job?.address || "الموقع")}

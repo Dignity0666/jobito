@@ -415,7 +415,7 @@ function Step1({
       <div className={styles.fieldRow}>
         <div className={styles.rowLabel}>
           <strong>{t("الراتب (بالجنيه)")}</strong>
-          <span>{t("يرجى تحديد الراتب المتوقع.")}</span>
+          <span>{t("يرجى تحديد الراتب المتوقع. (اكتب 0 إذا كان قابل للتفاوض)")}</span>
         </div>
         <div className={styles.rowContent}>
           <div className={styles.salaryBox}>
