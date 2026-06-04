@@ -352,6 +352,11 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
           'الدردشة': 'Chat',
           'الوظائف': 'Jobs',
           'لوحة الإدارة': 'Admin Panel',
+          // Gender additions
+          'الجنس': 'Gender',
+          'ذكر': 'Male',
+          'أنثى': 'Female',
+          'اختر...': 'Select...',
           // Company Ratings additions
           'التقييمات المستلمة': 'Received Ratings',
           'تقييم المقبولين': 'Rate Hired Applicants',
