@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Facebook, Linkedin } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import { useTranslation } from "../../context/translation-context";
 import ImgMapComponent from "../../assets/WhatsApp Image 2026-03-22 at 8.08.17 PM.jpeg";
 import styles from "./Contact.module.css";
@@ -97,10 +99,9 @@ export default function ContactPage() {
   };
 
   const socialLinks = [
-    { name: "Facebook", icon: "F", url: "#", background: "#1877F2" },
-    { name: "Twitter", icon: "T", url: "#", background: "#1DA1F2" },
-    { name: "Instagram", icon: "I", url: "#", background: "#E4405F" },
-    { name: "LinkedIn", icon: "L", url: "#", background: "#0A66C2" },
+    { name: "Facebook", icon: <Facebook size={20} />, url: "https://www.facebook.com/share/1EuiUefJYa/", background: "#1877F2" },
+    { name: "WhatsApp", icon: <FaWhatsapp size={20} />, url: "https://wa.me/201009913865", background: "#25D366" },
+    { name: "LinkedIn", icon: <Linkedin size={20} />, url: "https://www.linkedin.com/in/saif-mhfuz4u?utm_source=share_via&utm_content=profile&utm_medium=member_android", background: "#0A66C2" },
   ];
 
   const quickLinks = [
@@ -322,7 +323,7 @@ export default function ContactPage() {
                     <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                   </svg>
                 </div>
-                <div>
+                <div style={{ flex: 1, textAlign: "start" }}>
                   <h5
                     style={{
                       margin: "0 0 4px 0",
@@ -332,8 +333,8 @@ export default function ContactPage() {
                   >
                     {t("اتصل بنا")}
                   </h5>
-                  <p style={{ color: "#3b5bdb", fontWeight: 700, margin: 0 }}>
-                    +20 1015466210
+                  <p dir="ltr" style={{ color: "#3b5bdb", fontWeight: 700, margin: 0, textAlign: "start", display: "inline-block" }}>
+                    +20 1009913865
                   </p>
                   <p
                     style={{
@@ -360,7 +361,7 @@ export default function ContactPage() {
                     <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                   </svg>
                 </div>
-                <div>
+                <div style={{ flex: 1, textAlign: "start" }}>
                   <h5
                     style={{
                       margin: "0 0 4px 0",
@@ -370,7 +371,7 @@ export default function ContactPage() {
                   >
                     {t("راسلنا")}
                   </h5>
-                  <p style={{ color: "#3b5bdb", fontWeight: 700, margin: 0 }}>
+                  <p style={{ color: "#3b5bdb", fontWeight: 700, margin: 0, wordBreak: "break-all" }}>
                     mohamednasseremam380@gmail.com
                   </p>
                   <p
@@ -391,6 +392,8 @@ export default function ContactPage() {
                   <a
                     key={idx}
                     href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className={styles.socialIcon}
                     style={{ backgroundColor: social.background }}
                   >

@@ -221,7 +221,14 @@ const JobsSection = () => {
           });
         }
 
-        setJobs(filteredJobs.slice(0, 8)); 
+        // Sort by highest salary
+        filteredJobs.sort((a: any, b: any) => {
+          const salA = Math.max(Number(a.salary) || 0, Number(a.salaryMax) || 0, Number(a.salaryMin) || 0);
+          const salB = Math.max(Number(b.salary) || 0, Number(b.salaryMax) || 0, Number(b.salaryMin) || 0);
+          return salB - salA;
+        });
+
+        setJobs(filteredJobs.slice(0, 4)); 
         setError(null);
       } catch (err) {
         console.error("Error loading jobs:", err);

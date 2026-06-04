@@ -16,6 +16,25 @@
   --radius-sm:   10px;
 }
 
+:global([data-theme="dark"]) .pageContainer {
+  --navy:        var(--color-text);
+  --cobalt:      var(--color-primary);
+  --cobalt-dark: var(--color-primary-hover);
+  --white:       #ffffff;
+  --card-bg:     var(--color-card-bg);
+  --off-white:   var(--color-bg);
+  --text-main:   var(--color-text);
+  --text-muted:  var(--color-text-muted);
+  --taupe-light: var(--color-border);
+  --shadow-sm:   0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md:   0 6px 24px rgba(0,0,0,0.4);
+  --shadow-lg:   0 16px 48px rgba(0,0,0,0.5);
+}
+
+:global([data-theme="dark"]) .heroSection {
+  background: linear-gradient(135deg, #0b1020 0%, #162035 60%, var(--color-primary-hover) 100%);
+}
+
 /* ─── Page Container ─── */
 .pageContainer {
   min-height: 100vh;
@@ -154,7 +173,7 @@
 }
 
 .statCard {
-  background: var(--white);
+  background: var(--card-bg, var(--white));
   border-radius: var(--radius);
   padding: 28px 20px;
   text-align: center;
@@ -216,7 +235,7 @@
 }
 
 .formCard {
-  background: var(--white);
+  background: var(--card-bg, var(--white));
   border-radius: var(--radius);
   padding: 40px;
   box-shadow: var(--shadow-md);
@@ -314,7 +333,7 @@
 .inputField {
   width: 100%;
   padding: 12px 16px;
-  border: 2px solid #e2dedd;
+  border: 2px solid var(--taupe-light);
   border-radius: var(--radius-sm);
   font-size: 0.95rem;
   color: var(--text-main);
@@ -345,7 +364,7 @@
 .textareaField {
   width: 100%;
   padding: 14px 16px;
-  border: 2px solid #e2dedd;
+  border: 2px solid var(--taupe-light);
   border-radius: var(--radius-sm);
   font-size: 0.95rem;
   color: var(--text-main);
@@ -442,7 +461,7 @@
 }
 
 .infoCard {
-  background: var(--white);
+  background: var(--card-bg, var(--white));
   border-radius: var(--radius);
   padding: 32px;
   box-shadow: var(--shadow-md);
@@ -502,6 +521,7 @@
 /* ─── Social Grid ─── */
 .socialGrid {
   display: flex;
+  justify-content: center;
   gap: 12px;
   margin-top: 28px;
   padding-top: 24px;

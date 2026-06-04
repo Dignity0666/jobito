@@ -15,6 +15,35 @@
   margin-bottom: 8px;
 }
 
+.raterName {
+  font-weight: 600;
+  color: var(--text-primary, #fff);
+  margin-bottom: 4px;
+}
+
+.jobTitleRating {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #94a3b8);
+  margin-bottom: 4px;
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.jobLink {
+  color: var(--primary-color, #3b82f6);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.jobLink:hover {
+  text-decoration: underline;
+}
+
+.ratingDate {
+}
+
 .header p {
   color: var(--color-text-muted);
   font-size: 14px;

@@ -4,6 +4,7 @@ import { useJobitoAuth } from "../../../context/LinkContxt";
 import styles from "./CompanyRatings.module.css";
 import { Star, CheckCircle } from "lucide-react";
 import { useToast } from "../../../context/ToastContext";
+import { Link } from "react-router-dom";
 
 import { API_BASE_URL } from "../../../services/api";
 
@@ -25,6 +26,12 @@ interface Rating {
     fullName?: string;
     name?: string;
     avatarUrl?: string;
+  };
+  jobId?: number;
+  job?: {
+    jobId: number;
+    title?: string;
+    titleEn?: string;
   };
 }
 
@@ -182,7 +189,9 @@ const CompanyRatings: React.FC = () => {
         const givenRes = await apiFetch(endpoint);
         if (givenRes.ok) setGivenRatings(await givenRes.json());
       } else {
-        throw new Error("Failed to submit rating");
+        const errData = await res.json().catch(() => null);
+        const errMsg = errData?.message || t("حدث خطأ أثناء إرسال التقييم", "Failed to submit rating");
+        showToast(errMsg, "error");
       }
     } catch (error) {
       console.error(error);
@@ -252,15 +261,18 @@ const CompanyRatings: React.FC = () => {
       {loading ? (
         <div className={styles.loading}>{t("جاري التحميل...", "Loading...")}</div>
       ) : activeTab === "received" ? (
-        receivedRatings.length === 0 ? (
-          <div className={styles.noData}>
-            {user?.classification === "tradesman"
-              ? t("لم يقم أحد بتقييمك حتى الآن.", "No one has rated you yet.")
-              : t("لم يقم أحد بتقييم شركتك حتى الآن.", "No one has rated your company yet.")}
-          </div>
-        ) : (
-          <div className={styles.receivedGrid}>
-            {receivedRatings.map((rating) => (
+        (() => {
+          const displayedRatings = receivedRatings;
+            
+          return displayedRatings.length === 0 ? (
+            <div className={styles.noData}>
+              {user?.classification === "tradesman"
+                ? t("لم يقم أحد بتقييمك حتى الآن.", "No one has rated you yet.")
+                : t("لم يقم أحد بتقييم شركتك حتى الآن.", "No one has rated your company yet.")}
+            </div>
+          ) : (
+            <div className={styles.receivedGrid}>
+              {displayedRatings.map((rating) => (
               <div key={rating.ratingId} className={styles.receivedCard}>
                 <div className={styles.raterInfo}>
                   {rating.raterUser?.avatarUrl || rating.raterCompany?.logoUrl || rating.user?.avatarUrl || rating.company?.logoUrl ? (
@@ -277,6 +289,14 @@ const CompanyRatings: React.FC = () => {
                   <div className={styles.raterName}>
                     {rating.raterUser?.name || rating.raterUser?.fullName || rating.raterCompany?.name || rating.user?.name || rating.user?.fullName || rating.company?.name || t("مستخدم غير معروف", "Unknown User")}
                   </div>
+                  {rating.job && (
+                    <div className={styles.jobTitleRating}>
+                      {t("وظيفة:", "Job:")}{" "}
+                      <Link to={`/Job details/${rating.job.jobId}`} className={styles.jobLink}>
+                        {rating.job.title || rating.job.titleEn}
+                      </Link>
+                    </div>
+                  )}
                   <div className={styles.ratingDate}>
                     {new Date(rating.createdAt).toLocaleDateString()}
                   </div>
@@ -286,7 +306,8 @@ const CompanyRatings: React.FC = () => {
               </div>
             ))}
           </div>
-        )
+          );
+        })()
       ) : (
         <div className={styles.ratingsList}>
           {hiredApplicants.length === 0 ? (
@@ -296,13 +317,15 @@ const CompanyRatings: React.FC = () => {
           ) : (
             hiredApplicants.map((app) => {
               const existingRating = givenRatings.find(r => r.targetUser?.userId === app.user.userId);
-              const isLocked = false;
+              const unlockDurationInMs = user?.classification === "tradesman" 
+                ? 1 * 24 * 60 * 60 * 1000 // 1 day for tradesman
+                : 7 * 24 * 60 * 60 * 1000; // 7 days for company
+              const hiringDate = new Date(app.appliedAt).getTime();
+              const unlockDate = hiringDate + unlockDurationInMs;
+              const isLocked = now < unlockDate;
               
               const timeLeftToUnlock = (() => {
                 if (!isLocked) return null;
-                const hiringDate = new Date(app.appliedAt).getTime();
-                const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
-                const unlockDate = hiringDate + sevenDaysInMs;
                 const diff = unlockDate - now;
                 const days = Math.floor(diff / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));

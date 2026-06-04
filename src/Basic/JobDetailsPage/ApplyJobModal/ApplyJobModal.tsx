@@ -85,11 +85,7 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
     e.preventDefault();
     if (!jobId) return;
 
-    // Enforce CV upload for standard jobs
-    if (!isTradesman && !resumeFile) {
-      showToast(t("الرجاء اختيار ملف السيرة الذاتية (PDF) أولاً"), "error");
-      return;
-    }
+    // CV upload is now optional, so we removed the enforcement block.
 
     // Validate Portfolio URL if filled
     if (!isTradesman && portfolioUrl.trim()) {
@@ -243,7 +239,7 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
                   </div>
 
                   <div className={styles.formGroup} style={{ marginBottom: '24px' }}>
-                    <label>{t("رسالة التغطية")}</label>
+                    <label>{t("رسالة التغطية")} <span className={styles.optionalText}>({t("اختياري")})</span></label>
                     <div className={styles.textareaWrapper}>
                       <textarea 
                         value={coverLetter} 
@@ -255,7 +251,7 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
 
                   <div className={styles.formGroupResume} style={{ marginBottom: '32px' }}>
                     <div className={styles.resumeTop}>
-                      <span className={styles.resumeLabel}>{t("السيرة الذاتية (PDF)")}</span>
+                      <span className={styles.resumeLabel}>{t("السيرة الذاتية (PDF)")} <span className={styles.optionalText}>({t("اختياري")})</span></span>
                       <label className={styles.uploadButton}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>

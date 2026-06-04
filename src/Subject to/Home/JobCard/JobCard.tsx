@@ -118,15 +118,13 @@ const CompanyJobCard: React.FC<{ job: Job; variants: Variants }> = ({
         </div>
 
         <div className={styles.cardFooter}>
-           {isServiceJob ? (
-             <span className={styles.salaryText}>
-               {t("قابل للتفاوض")}
-             </span>
-           ) : (
-             <span className={styles.salaryText}>
-               {job.salary ? `${t(job.salary.toString())}` : "$1.00/Hour"}
-             </span>
-           )}
+           <span className={styles.salaryText}>
+             {(!job.salaryMin && !job.salary) || job.salaryMin === 0 || job.salary === 0
+               ? t("قابل للتفاوض")
+               : job.salaryMin === job.salaryMax || !job.salaryMax
+                 ? `${job.salaryMin || job.salary} ${t("جنيه مصري")}`
+                 : `${job.salaryMin} - ${job.salaryMax} ${t("جنيه مصري")}`}
+           </span>
            <span className={styles.applyBtn}>
              {t("Apply")}
            </span>
@@ -158,26 +156,19 @@ export default function JobsDashboard() {
         const result = await response.json();
         const jobsData = result.data || (Array.isArray(result) ? result : []);
 
-        const todayStr = new Date().toDateString();
-
-        // Only include jobs created on the exact same day
-        let todaysJobs = jobsData.filter((job: Job) => {
-          if (!job.createdAt) return false;
-          return new Date(job.createdAt).toDateString() === todayStr;
-        });
-
+        let allJobs = jobsData;
         const isTradesmanUser = classification === "tradesman" || classification === "industrial";
         if (isTradesmanUser) {
-          todaysJobs = todaysJobs.filter((job: any) => {
+          allJobs = allJobs.filter((job: any) => {
             if (!job.company) return false;
             return job.classification === "services" || job.classification === "خدمات" || job.classification === "Services";
           });
         }
 
         // Sort jobs to show newest first
-        const sortedJobs = todaysJobs.sort((a: Job, b: Job) => {
+        const sortedJobs = allJobs.sort((a: Job, b: Job) => {
           return (
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
           );
         });
 
@@ -241,7 +232,7 @@ export default function JobsDashboard() {
           <div className={styles.error}>{t(error)}</div>
         ) : jobs.length === 0 ? (
           <div className={styles.emptyState}>
-            {t("لا توجد وظائف جديدة تم نشرها في هذا اليوم بعد.")}
+            {t("لا توجد وظائف متاحة حالياً.")}
           </div>
         ) : (
           <motion.div className={styles.todayGrid} variants={containerVariants}>

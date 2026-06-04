@@ -698,6 +698,7 @@ export const JobDetailsPage = () => {
                 {role !== "admin" && (
                   <div className={styles.widget} style={{ marginTop: '24px' }}>
                     <GeneralRatingSection 
+                      jobId={job.jobId}
                       companyId={job.company?.companyId || job.company?.company_id}
                       targetUserId={job.user?.userId || job.user?.id}
                       targetName={job.company?.name || job.user?.fullName || job.user?.name || job.title || "المعلن"}

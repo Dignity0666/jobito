@@ -258,7 +258,7 @@ export default function CompleteProfile() {
   const handleSave = async () => {
     if (!validateForm()) {
       if (role === "tradesman" && (formErrors.services || formErrors.criminalRecord)) {
-        showToast(t("يجب رفع الفيش الجنائي واختيار خدمة واحدة على الأقل للتسجيل كصنايعي."), "error");
+        showToast(t("يجب رفع الفيش الجنائي واختيار خدمة واحدة على الأقل للتسجيل كحرفي."), "error");
       } else {
         showToast(t("يرجى إكمال جميع الحقول المطلوبة (المشار إليها بنجمة *) قبل الحفظ."), "error");
       }
@@ -465,7 +465,7 @@ export default function CompleteProfile() {
         transition={{ duration: 0.6 }}
       >
         <h1 className={styles.heroTitle}>
-          {t("يمكنك التسجيل")} <span className={styles.highlight}>{t("كصنايعي")}</span>
+          {t("يمكنك التسجيل")} <span className={styles.highlight}>{t("كحرفي")}</span>
           <br />
           {t("أو")} <span className={styles.accentText}>{t("باحث عن عمل")}</span>{" "}
           {t("مع")} <span className={styles.brandText}>Jobito</span>
@@ -514,7 +514,7 @@ export default function CompleteProfile() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          {t("صنايعي")}
+          {t("حرفي")}
         </motion.button>
       </motion.div>
 

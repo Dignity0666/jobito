@@ -813,6 +813,47 @@ export default function ApplicantDetails() {
               </>
             )}
 
+            {(() => {
+              const portfolios = app.user?.portfolios;
+              console.log("🖼️ [ApplicantDetails] Raw portfolios data:", JSON.stringify(portfolios));
+              if (!portfolios || !Array.isArray(portfolios) || portfolios.length === 0) return null;
+              return (
+                <>
+                  <div className="main-divider" />
+                  <div className="main-section">
+                    <h3 className="section-title">{t("معرض أعمال المتقدم")}</h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '16px', marginTop: '16px' }}>
+                      {portfolios.map((item: any, idx: number) => {
+                        let urlStr = '';
+                        if (typeof item === 'string') {
+                          urlStr = item;
+                        } else if (item && typeof item === 'object') {
+                          urlStr = item.imageUrl || item.image_url || item.url || item.path || '';
+                        }
+                        console.log(`🖼️ [ApplicantDetails] Portfolio[${idx}] raw:`, item, "=> urlStr:", urlStr);
+                        if (!urlStr) return null;
+                        // Normalize backslashes to forward slashes
+                        urlStr = urlStr.replace(/\\/g, '/');
+                        const finalUrl = urlStr.startsWith("http") || urlStr.startsWith("data:") 
+                          ? urlStr 
+                          : `${API_BASE_URL}${urlStr.startsWith("/") ? "" : "/"}${urlStr}`;
+                        return (
+                          <div key={idx} style={{ width: '100%', paddingTop: '100%', position: 'relative', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border, #eee)' }}>
+                            <img 
+                              src={finalUrl} 
+                              alt={`Portfolio ${idx}`}
+                              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; console.error(`🖼️ Failed to load: ${finalUrl}`); }}
+                              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              );
+            })()}
+
             {app.status === "hired" && !hasRated && (
               <>
                 <div className="main-divider" />

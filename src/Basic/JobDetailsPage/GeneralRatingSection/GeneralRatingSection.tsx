@@ -11,12 +11,14 @@ interface GeneralRatingSectionProps {
   companyId?: string | number;
   targetUserId?: string | number;
   targetName: string;
+  jobId?: string | number;
 }
 
 export const GeneralRatingSection: React.FC<GeneralRatingSectionProps> = ({
   companyId,
   targetUserId,
   targetName,
+  jobId,
 }) => {
   const { t } = useTranslation();
   const { apiFetch, user } = useJobitoAuth();
@@ -31,13 +33,19 @@ export const GeneralRatingSection: React.FC<GeneralRatingSectionProps> = ({
 
   const fetchReviews = async () => {
     try {
-      const endpoint = companyId 
-        ? `${API_BASE_URL}/ratings/company/${companyId}`
-        : `${API_BASE_URL}/ratings/user/${targetUserId}`;
+      let endpoint = "";
+      if (jobId) {
+        endpoint = `${API_BASE_URL}/ratings/job/${jobId}`;
+      } else if (companyId) {
+        endpoint = `${API_BASE_URL}/ratings/company/${companyId}`;
+      } else {
+        endpoint = `${API_BASE_URL}/ratings/user/${targetUserId}`;
+      }
       
       const res = await apiFetch(endpoint);
       if (res.ok) {
-        setReviews(await res.json());
+        let data = await res.json();
+        setReviews(data);
       }
     } catch (err) {
       console.error("Failed to fetch reviews", err);
@@ -48,7 +56,7 @@ export const GeneralRatingSection: React.FC<GeneralRatingSectionProps> = ({
 
   useEffect(() => {
     fetchReviews();
-  }, [companyId, targetUserId]);
+  }, [companyId, targetUserId, jobId]);
 
   const hasRated = reviews.some(r => {
     const raterId = String(r.raterUserId || r.rater_user_id || r.user?.userId || r.user?.id || r.userId || r.raterId || "");
@@ -72,8 +80,15 @@ export const GeneralRatingSection: React.FC<GeneralRatingSectionProps> = ({
         comment,
         raterType: user?.role === "company" ? "COMPANY" : "USER"
       };
-      if (companyId) body.companyId = companyId;
-      if (targetUserId) body.targetUserId = targetUserId;
+      if (jobId) {
+        body.jobId = jobId;
+        // Optionally pass target if backend needs it, but jobId is main
+        if (companyId) body.companyId = companyId;
+        if (targetUserId) body.targetUserId = targetUserId;
+      } else {
+        if (companyId) body.companyId = companyId;
+        if (targetUserId) body.targetUserId = targetUserId;
+      }
 
       const res = await apiFetch(`${API_BASE_URL}/ratings`, {
         method: "POST",
@@ -128,7 +143,9 @@ export const GeneralRatingSection: React.FC<GeneralRatingSectionProps> = ({
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.titleGroup}>
-          <h2 className={styles.title}>{t("التقييمات والآراء")}</h2>
+          <h2 className={styles.title}>
+            {jobId ? t("تقييمات الوظيفة") : companyId ? t("تقييمات الشركة") : t("تقييمات مقدم الخدمة")}
+          </h2>
           {avgRating && (
             <div className={styles.avgBadge}>
               <Star size={16} fill="#FFB020" color="#FFB020" />

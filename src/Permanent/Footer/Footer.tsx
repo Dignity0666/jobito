@@ -1,6 +1,5 @@
 import {
   FaFacebookF,
-  FaInstagram,
   FaLinkedinIn,
   FaWhatsapp,
 } from "react-icons/fa";
@@ -35,11 +34,6 @@ const Footer: FC = () => {
                 { 
                   label: "Facebook", 
                   icon: <FaFacebookF size={18} />, 
-                  href: "#" 
-                },
-                { 
-                  label: "Instagram", 
-                  icon: <FaInstagram size={18} />, 
                   href: "#" 
                 },
               ].map((link, index) => (
