@@ -19,7 +19,7 @@
 }
 
 /* Dark Mode support */
-:global(.dark) .container {
+:global([data-theme="dark"]) .container {
   --bg-page: #0b1020;
   --card-bg: #141b2d;
   --border: #1e2a45;
@@ -40,7 +40,7 @@
 /* ─── KPI Cards ─── */
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 24px;
 }
 
@@ -63,12 +63,22 @@
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
 }
 
-:global(.dark) .kpiCard:hover {
+:global([data-theme="dark"]) .kpiCard:hover {
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
 }
 
 .kpiCardGreen { background: #ffffff; border-color: #e2e8f0; }
 /* Based on image, the cards are white but with colored sparklines and icons/badges */
+
+.kpiCardAlert {
+  background: #fff1f2;
+  border-color: #ffe4e6;
+}
+
+:global([data-theme="dark"]) .kpiCardAlert {
+  background: rgba(244, 63, 94, 0.1);
+  border-color: rgba(244, 63, 94, 0.2);
+}
 
 .kpiHeader {
   display: flex;
@@ -154,7 +164,7 @@
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
 }
 
-:global(.dark) .barChartCard:hover {
+:global([data-theme="dark"]) .barChartCard:hover {
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
 }
 
@@ -177,7 +187,7 @@
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
 }
 
-:global(.dark) .lineChartCard:hover {
+:global([data-theme="dark"]) .lineChartCard:hover {
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
 }
 
@@ -228,7 +238,7 @@
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
 }
 
-:global(.dark) .donutCard:hover {
+:global([data-theme="dark"]) .donutCard:hover {
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
 }
 
@@ -319,7 +329,7 @@
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
 }
 
-:global(.dark) .controlsCard:hover {
+:global([data-theme="dark"]) .controlsCard:hover {
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
 }
 
@@ -376,7 +386,7 @@
   transition: 0.3s;
 }
 
-:global(.dark) .toggle {
+:global([data-theme="dark"]) .toggle {
   background: #334155;
 }
 
@@ -408,7 +418,7 @@
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
 }
 
-:global(.dark) .adminFormCard:hover {
+:global([data-theme="dark"]) .adminFormCard:hover {
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
 }
 
@@ -524,7 +534,7 @@
   display: inline-block;
 }
 
-:global(.dark) .skeleton {
+:global([data-theme="dark"]) .skeleton {
   background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
   background-size: 200% 100%;
 }

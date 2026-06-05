@@ -78,7 +78,7 @@ const SuperAdminDashboard: React.FC = () => {
   const [newAdminName, setNewAdminName] = useState('');
   const [newAdminEmail, setNewAdminEmail] = useState('');
   const [newAdminPassword, setNewAdminPassword] = useState('');
-  const [newAdminRole, setNewAdminRole] = useState('Operation Manager');
+  const [newAdminRole, setNewAdminRole] = useState('operation_manager');
 
   useEffect(() => {
     const loadData = async () => {
@@ -129,7 +129,7 @@ const SuperAdminDashboard: React.FC = () => {
           fullName: newAdminName, 
           email: newAdminEmail, 
           password: newAdminPassword, 
-          role: 'operation_manager'
+          role: newAdminRole
         })
       });
       if (res.ok) {
@@ -301,6 +301,35 @@ const SuperAdminDashboard: React.FC = () => {
             )}
           </div>
 
+          {/* Card 2: Companies */}
+          <div className={styles.kpiCard}>
+            {isLoading ? (
+              <div className={styles.kpiHeader} style={{ width: '100%' }}>
+                <div className={styles.kpiLabelBox} style={{ width: '60%' }}>
+                  <span className={styles.kpiLabel}>{t("Companies")}</span>
+                  <div className={`${styles.skeleton} ${styles.skeletonText}`} />
+                </div>
+                <div className={`${styles.skeleton} ${styles.skeletonBadge}`} />
+              </div>
+            ) : (
+              <div className={styles.kpiHeader}>
+                <div className={styles.kpiLabelBox}>
+                  <span className={styles.kpiLabel}>{t("Companies")}</span>
+                  <h2 className={styles.kpiValue}>
+                    {statsData?.userDistribution?.companies !== undefined && statsData?.userDistribution?.companies !== null 
+                      ? Number(statsData.userDistribution.companies).toLocaleString() 
+                      : '0'}
+                  </h2>
+                </div>
+                <span className={`${styles.kpiBadge} ${styles.badgeInfo}`}>12% ↗</span>
+              </div>
+            )}
+            {isLoading ? (
+              <div className={`${styles.skeleton} ${styles.skeletonSparkline}`} />
+            ) : (
+              <SparkLine data={[5, 10, 8, 12, 15, 20, 18]} color="info" />
+            )}
+          </div>
 
           {/* Card 3: System Uptime */}
           <div className={styles.kpiCard}>
@@ -329,7 +358,7 @@ const SuperAdminDashboard: React.FC = () => {
           </div>
 
           {/* Card 4: Active Security Alerts */}
-          <div className={styles.kpiCard} style={{ background: '#fff1f2', borderColor: '#ffe4e6' }}>
+          <div className={`${styles.kpiCard} ${styles.kpiCardAlert}`}>
             {isLoading ? (
               <div className={styles.kpiHeader} style={{ width: '100%' }}>
                 <div className={styles.kpiLabelBox} style={{ width: '80%' }}>
@@ -486,6 +515,16 @@ const SuperAdminDashboard: React.FC = () => {
                 value={newAdminPassword}
                 onChange={e => setNewAdminPassword(e.target.value)}
               />
+            </div>
+            <div className={styles.inputGroup}>
+              <label>{t("Role")}</label>
+              <select 
+                value={newAdminRole}
+                onChange={e => setNewAdminRole(e.target.value)}
+              >
+                <option value="operation_manager">{t("Operation Manager")}</option>
+                <option value="super_admin">{t("Super Admin")}</option>
+              </select>
             </div>
             <button className={styles.inviteBtn} onClick={handleInviteAdmin}>
               {t("Send invitation")}

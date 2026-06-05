@@ -41,9 +41,10 @@ const Admin: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   const [isAssistantModalOpen, setIsAssistantModalOpen] = useState(false);
-  const [candidateName, setCandidateName] = useState("");
-  const [candidateEmail, setCandidateEmail] = useState("");
-  const [requestReason, setRequestReason] = useState("");
+  const [candidateName, setCandidateName] = useState('');
+  const [candidateEmail, setCandidateEmail] = useState('');
+  const [requestReason, setRequestReason] = useState('');
+  const [supportUser, setSupportUser] = useState<any>(null);
 
   const toggleLanguage = () => {
     console.log('[Admin.tsx] Language toggle button clicked. Current language:', language);
@@ -95,6 +96,7 @@ const Admin: React.FC = () => {
 
   const allNavItems = [
     { id: 'SUPER_ADMIN', label: userAdminRole === 'super_admin' ? t("Super Admin") : t("Dashboard"), role: 'both' },
+    { id: 'OPS_MANAGER', label: t("Operations Monitor"), role: 'super_admin' },
     { id: 'USER_MANAGEMENT', label: t("User Management"), role: 'operation_manager' },
     { id: 'SUPPORT', label: t("Technical Support"), role: 'operation_manager' },
     { id: 'CONTENT', label: t("Content Moderation"), role: 'operation_manager' },
@@ -293,8 +295,8 @@ const Admin: React.FC = () => {
       <div style={{ flex: 1, overflow: 'auto' }}>
         {adminRole === 'SUPER_ADMIN' && <SuperAdminDashboard />}
         {adminRole === 'OPS_MANAGER' && <OpsManagerDashboard />}
-        {adminRole === 'USER_MANAGEMENT' && <UserManagement onGoToSupport={() => setAdminRole('SUPPORT')} />}
-        {adminRole === 'SUPPORT' && <SupportDashboard />}
+        {adminRole === 'USER_MANAGEMENT' && <UserManagement onGoToSupport={(user) => { setSupportUser(user); setAdminRole('SUPPORT'); }} />}
+        {adminRole === 'SUPPORT' && <SupportDashboard preselectedUser={supportUser} />}
         {adminRole === 'CONTENT' && <ContentManagement />}
         {adminRole === 'COMPANY_REVIEW' && <CompanyReview />}
         {adminRole === 'SYSTEM_REQUESTS' && <SystemRequests />}

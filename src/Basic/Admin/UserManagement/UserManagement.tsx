@@ -126,7 +126,7 @@ const BlockModal = ({ user, onClose, onConfirm }: { user: any; onClose: () => vo
 // ── Main Component ────────────────────────────────────────────────
 
 interface UserManagementProps {
-  onGoToSupport?: () => void;
+  onGoToSupport?: (user?: any) => void;
 }
 
 const UserManagement: React.FC<UserManagementProps> = ({ onGoToSupport }) => {
@@ -235,7 +235,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ onGoToSupport }) => {
                   </div>
                 </td>
                 <td className={styles.td} data-label={t("Contact")}>
-                  <button className={styles.msgBtn} onClick={onGoToSupport}>
+                  <button className={styles.msgBtn} onClick={() => onGoToSupport?.(u)}>
                     <MessageSquare size={14} />
                     {t("Messages")}
                   </button>

@@ -24,23 +24,23 @@ const Icon = ({ d, children, size = 24, className = "", stroke = "currentColor",
 
 const FEATURES = [
   {
-    title: "مطابقة ذكية للوظائف",
-    desc: "يحلل محركنا المدعوم بالذكاء الاصطناعي ملفك الشخصي لمطابقتك مع الفرص المثالية بناءً على مهاراتك وخبراتك.",
+    title: "البحث والفلترة عن الوظائف",
+    desc: "اكتشف دورك القادم باستخدام فلاتر قوية للموقع ونطاقات الرواتب والتقنيات المحددة.",
     icon: <Icon d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />,
     color: "var(--color-accent)",
     bg: "var(--color-accent-light)",
     highlight: true,
   },
   {
-    title: "شركات موثوقة",
-    desc: "نتحقق يدوياً من كل صاحب عمل على منصتنا لضمان تجربة بحث عن عمل آمنة وقانونية ومهنية.",
+    title: "الاستشارات المهنية",
+    desc: "توجيهات خبيرة حول مفاوضات الرواتب، وتخطيط المسار المهني، والنجاح في الانتقالات الوظيفية.",
     icon: <Icon d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />,
     color: "var(--color-primary)",
     bg: "var(--color-primary-light)",
   },
   {
-    title: "تحليلات متقدمة",
-    desc: "تتبع حالة طلبك، وشاهد ترتيبك بين المتقدمين الآخرين، واحصل على رؤى حول اتجاهات السوق.",
+    title: "رؤى سوق الشركات",
+    desc: "وصول إلى بيانات حول ثقافة الشركات، ومعايير الرواتب، واتجاهات التوظيف في قطاعك المستهدف.",
     icon: (
       <Icon>
         <line x1="18" y1="20" x2="18" y2="10" />
@@ -52,8 +52,8 @@ const FEATURES = [
     bg: "var(--color-accent-light)",
   },
   {
-    title: "أدوات تطوير المسار المهني",
-    desc: "من بناء السيرة الذاتية بالذكاء الاصطناعي إلى التحضير للمقابلات، يوفر Jobito الأدوات التي تحتاجها للتميز في مسيرتك المهنية.",
+    title: "شارات مهارات معتمدة",
+    desc: "قم بإجراء تقييمات للتحقق من مهاراتك التقنية والتميز أمام مسؤولي التوظيف بشارات معتمدة.",
     icon: <Icon d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />,
     color: "var(--color-primary)",
     bg: "var(--color-primary-light)",
@@ -169,9 +169,9 @@ export function About() {
               <div ref={r("hero")} className={rv(vis, "hero", "l")}>
                 <div className={styles["hero-tag"]}>✦ {t("مرحباً بك في Jobito")}</div>
                 <h1 className={styles["hero-h1"]}>
-                  <span style={{ display: "block" }}>{t("جد وظيفة أحلامك")}</span>
+                  <span style={{ display: "block" }}>{t("جد وظيفة أحلامك في")}</span>
                   <span className={styles["co-t"]}>
-                    {t("في Jobito")}
+                    {t("Jobito")}
                     <svg viewBox="0 0 280 12" fill="none" height="12">
                       <path
                         d="M4 9 Q70 2 140 9 T276 9"
@@ -313,7 +313,6 @@ export function About() {
                   </div>
                   <div className={styles["svc-ttl"]}>{t(s.title)}</div>
                   <div className={styles["svc-dsc"]}>{t(s.desc)}</div>
-                  <button className={styles["svc-link"]}>{t("Read more")} →</button>
                 </div>
               ))}
             </div>
@@ -333,15 +332,11 @@ export function About() {
                   <span className={styles.acc}>{t("المستقبل")}</span>
                 </h2>
                 <p className={styles["ban-p"]}>
-                  {t("في جوبيتو، نؤمن بأن العثور على وظيفة يجب أن يكون ممتعاً بقدر البدء فيها. لقد بنينا منصة تزيل العقبات من عملية التوظيف، مما يسهل على المرشحين التألق وعلى الشركات العثور على نجومهم القادمين.")}
+                  {t("في Jobito، نؤمن بأن العثور على وظيفة يجب أن يكون ممتعاً بقدر البدء فيها. لقد بنينا منصة تزيل العقبات من عملية التوظيف، مما يسهل على المرشحين التألق وعلى الشركات العثور على نجومهم القادمين.")}
                 </p>
                 <div className={styles["ban-author"]}>
                   <div className={styles["ban-av"]}>
                     <img src={projectLogo} alt="Jobito" style={{ height: "100%", objectFit: "contain" }} />
-                  </div>
-                  <div>
-                    <div className={styles["ban-avname"]}>{t("فريق جوبيتو")}</div>
-                    <div className={styles["ban-avrole"]}>{t("خبراء الابتكار")}</div>
                   </div>
                 </div>
               </div>
@@ -414,7 +409,7 @@ export function About() {
                   <span className={styles.ita}>{t("عندما تحتاجه")}</span>
                 </h2>
                 <p className={styles.lead}>
-                  {t("سواء كنت تبحث عن وظيفتك الأولى أو منصب تنفيذي رفيع، يوفر جوبيتو التوجيه والدعم اللازمين للتنقل في سوق العمل التنافسي بنجاح.")}
+                  {t("سواء كنت تبحث عن وظيفتك الأولى أو منصب تنفيذي رفيع، يوفر Jobito التوجيه والدعم اللازمين للتنقل في سوق العمل التنافسي بنجاح.")}
                 </p>
 
               </div>
@@ -456,7 +451,7 @@ export function About() {
                 {t("جاهز للانطلاق في مسيرتك المهنية؟")}
               </h2>
               <p className={styles["fcta-sub"]}>
-                {t("انضم لآلاف المحترفين الذين يجدون وظائف أحلامهم يومياً على جوبيتو.")}
+                {t("انضم لآلاف المحترفين الذين يجدون وظائف أحلامهم يومياً على Jobito.")}
               </p>
               <div className={styles["fcta-btns"]}>
                 <button className={styles["btn-wh"]} onClick={() => navigate("/Find Jobs")}>{t("ابحث عن وظائف الآن")}</button>

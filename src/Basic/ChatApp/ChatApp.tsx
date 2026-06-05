@@ -661,6 +661,50 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
     }
   };
 
+  // ─── Contact Random Admin ──────────────────────────────────────────────
+  const handleContactSupport = async () => {
+    try {
+      showToast(t("Connecting to a support agent...", "جاري الاتصال بمندوب الدعم الفني..."));
+      const res = await apiFetch(`${API}/chat/support-staff`);
+      if (res.ok) {
+        const staffList = await res.json();
+        const validAdmins = staffList.filter((a: any) => a.adminId !== myUserId);
+        
+        if (validAdmins.length > 0) {
+          const randomAdmin = validAdmins[Math.floor(Math.random() * validAdmins.length)];
+          
+          // Construct ChatContact format
+          const adminContact: ChatContact = {
+            oderId: randomAdmin.adminId,
+            name: randomAdmin.fullName,
+            avatar: null, // Default avatar
+            email: randomAdmin.email,
+            lastMessage: t("System Admin", "مدير النظام"),
+            lastTime: new Date().toISOString(),
+            senderId: myUserId,
+            unreadCount: 0
+          };
+          
+          // Add to chats if not exists
+          setChats(prev => {
+            const exists = prev.find(c => c.oderId === adminContact.oderId);
+            if (exists) return prev;
+            return [adminContact, ...prev];
+          });
+          
+          selectChat(adminContact);
+        } else {
+          showToast(t("No support agents available right now.", "عذراً، لا يوجد مندوبين دعم متاحين حالياً."));
+        }
+      } else {
+        showToast(t("Failed to connect to support.", "فشل الاتصال بالدعم الفني."));
+      }
+    } catch (err) {
+      console.error("Support connection error:", err);
+      showToast(t("An error occurred.", "حدث خطأ ما."));
+    }
+  };
+
   // ─── File Uploads (Images/Documents) ──────────────────────────────────
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -1123,8 +1167,16 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
         <aside
           className={`${s.sidebar} ${mobileChatOpen ? s.sidebarHiddenMobile : ""}`}
         >
-          <header className={s.sidebarHeader}>
+          <header className={s.sidebarHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2>{t("Messages", "الرسائل")}</h2>
+            <button 
+              onClick={handleContactSupport}
+              style={{ background: 'var(--color-primary)', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '12px' }}
+              title={t("Contact Support", "تواصل مع الدعم")}
+            >
+              <Headphones size={14} />
+              <span style={{ fontWeight: 'bold' }}>{t("Support", "الدعم")}</span>
+            </button>
           </header>
 
           <div className={s.searchSection}>

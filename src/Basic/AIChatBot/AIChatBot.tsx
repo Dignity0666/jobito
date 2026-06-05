@@ -321,7 +321,7 @@ const AIChatBot: React.FC = () => {
           <div className={s.headerAvatar}>
             <Bot size={18} />
           </div>
-          <span className={s.headerTitle}>{t("Jobito AI Assistant", "مساعد جوبيتو الذكي")}</span>
+          <span className={s.headerTitle}>{t("Jobito AI Assistant", "مساعد Jobito الذكي")}</span>
         </div>
         
         <div className={s.headerRight}>
@@ -351,7 +351,7 @@ const AIChatBot: React.FC = () => {
               <Bot size={40} color="var(--color-primary)" />
             </div>
             <h1 className={s.welcomeTitle}>
-              {t("Jobito AI Assistant", "مساعد جوبيتو الذكي")}
+              {t("Jobito AI Assistant", "مساعد Jobito الذكي")}
             </h1>
             <p className={s.welcomeSubtitle}>
               {t(

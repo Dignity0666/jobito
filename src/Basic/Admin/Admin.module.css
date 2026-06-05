@@ -729,7 +729,6 @@ tbody td {
 }
 
 .dark .adminHeader {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
