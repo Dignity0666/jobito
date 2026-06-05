@@ -42,6 +42,7 @@ interface Benefit {
 interface Application {
   applicationId: number;
   status: string;
+  createdAt?: string;
 }
 
 interface Job {
@@ -82,7 +83,7 @@ export const JobDetailsPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const location = useLocation();
-  const { apiFetch, isAuthenticated, role } = useJobitoAuth();
+  const { apiFetch, isAuthenticated, role, user } = useJobitoAuth();
   const { showToast } = useToast();
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"details" | "applicants">(
@@ -162,7 +163,7 @@ export const JobDetailsPage = () => {
     fetchJobData();
 
     const fetchApplicationStatus = async () => {
-      if (isAuthenticated && role === "student") {
+      if (isAuthenticated && (role === "user" || role === "student")) {
         try {
           const res = await apiFetch(
             `${API_BASE_URL}/applications/status/${jobId}`,
@@ -310,6 +311,10 @@ export const JobDetailsPage = () => {
     });
     parsedSections[currentTitle] = currentLines.join("\n").trim();
   }
+
+  const currentUserId = user?.userId || user?.id || (user as any)?.userId;
+  const jobOwnerId = job?.user?.userId || job?.user?.id;
+  const isOwner = currentUserId && jobOwnerId && String(currentUserId) === String(jobOwnerId);
 
   return (
     <div className={styles.pageContainer}>
@@ -575,8 +580,18 @@ export const JobDetailsPage = () => {
             ) : (
               <div className={styles.headerRight}>
 
+                {user?.classification === "tradesman" && isOwner && (
+                  <button
+                    className={styles.applyBtn}
+                    style={{ backgroundColor: "var(--color-primary)", color: "white" }}
+                    onClick={() => navigate(`/WorkManagement/${job.jobId}`, { state: { tab: "applicants" } })}
+                  >
+                    {t("المتقدمين")}
+                  </button>
+                )}
+
                 {/* Report Button */}
-                {role !== "admin" && (
+                {role !== "admin" && !(user?.classification === "tradesman" && isOwner) && (
                   <button className={styles.reportBtn} title={t("إبلاغ عن هذا المحتوى")} onClick={handleReport}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
@@ -585,7 +600,7 @@ export const JobDetailsPage = () => {
                     </svg>
                   </button>
                 )}
-                {role !== "admin" && (
+                {role !== "admin" && !(user?.classification === "tradesman" && isOwner) && (
                   userApplication ? (
                     <div className={(styles as any).appliedStatusContainer}>
                       <button className={(styles as any).appliedBtn} disabled>
@@ -702,6 +717,9 @@ export const JobDetailsPage = () => {
                       companyId={job.company?.companyId || job.company?.company_id}
                       targetUserId={job.user?.userId || job.user?.id}
                       targetName={job.company?.name || job.user?.fullName || job.user?.name || job.title || "المعلن"}
+                      hasApplied={!!userApplication}
+                      applicationDate={userApplication?.createdAt}
+                      isTradesmanJob={!job.company}
                     />
                   </div>
                 )}
@@ -945,10 +963,8 @@ export const JobDetailsPage = () => {
               </div>
             )}
 
-
-
             {/* Similar Jobs */}
-            {role !== "company" && (
+            {role !== "company" && !(user?.classification === "tradesman" && isOwner) && (
               <div className={styles.similarJobsSection}>
                 <div className={styles.similarHeader}>
                   <h2>{t("وظائف مشابهة")}</h2>

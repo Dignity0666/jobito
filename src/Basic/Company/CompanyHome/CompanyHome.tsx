@@ -44,7 +44,11 @@ const JobCard: React.FC<JobCardProps> = ({
   const rawType = Array.isArray(type) ? type.join(" / ") : type;
   const displayType = String(rawType || t("دوام كامل"));
   return (
-    <div className={Style.jobCard}>
+    <div 
+      className={Style.jobCard} 
+      onClick={() => navigate("/Job details", { state: { jobId } })}
+      style={{ cursor: "pointer" }}
+    >
       <div className={Style.cardTop}>
         <div className={Style.logoBox}>
           {logo ? (
@@ -128,6 +132,7 @@ function getCurrentWeekRange(t: any): string {
 const CompanyHome = () => {
   const { user, apiFetch } = useJobitoAuth();
   const { t, language } = useTranslation();
+  const navigate = useNavigate();
   const userName = user?.name || t("عضو");
 
   const [dashboardData, setDashboardData] = useState({
@@ -324,7 +329,7 @@ const CompanyHome = () => {
           <div className={Style.updatesSection}>
             <div className={Style.updatesHeader}>
               <h3 className={Style.updatesTitle}>{t("آخر تحديثات الوظائف")}</h3>
-              <button className={Style.viewAllBtn}>{t("عرض الكل ←")}</button>
+              <button className={Style.viewAllBtn} onClick={() => navigate('/JobListing')}>{t("عرض الكل ←")}</button>
             </div>
 
             <div className={Style.jobGrid}>

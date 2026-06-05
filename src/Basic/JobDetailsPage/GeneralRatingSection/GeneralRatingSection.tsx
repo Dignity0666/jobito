@@ -12,6 +12,8 @@ interface GeneralRatingSectionProps {
   targetUserId?: string | number;
   targetName: string;
   jobId?: string | number;
+  hasApplied?: boolean;
+  isTradesmanJob?: boolean;
 }
 
 export const GeneralRatingSection: React.FC<GeneralRatingSectionProps> = ({
@@ -19,6 +21,8 @@ export const GeneralRatingSection: React.FC<GeneralRatingSectionProps> = ({
   targetUserId,
   targetName,
   jobId,
+  hasApplied,
+  isTradesmanJob,
 }) => {
   const { t } = useTranslation();
   const { apiFetch, user } = useJobitoAuth();
@@ -166,7 +170,15 @@ export const GeneralRatingSection: React.FC<GeneralRatingSectionProps> = ({
         </div>
       ) : !isOwner && (
         <div className={styles.card}>
-          {hasRated ? (
+          {isTradesmanJob && (!hasApplied || !applicationDate || (new Date().getTime() - new Date(applicationDate).getTime()) / (1000 * 60 * 60 * 24) < 1) ? (
+            <div className={styles.loginPrompt} style={{ padding: '20px 0' }}>
+              <p style={{ color: 'var(--color-text)' }}>
+                {!hasApplied 
+                  ? t("لا يمكنك تقييم هذا العمل إلا بعد التقديم عليه.")
+                  : t("لا يمكنك التقييم إلا بعد مرور يوم واحد على الأقل من تاريخ التقديم.")}
+              </p>
+            </div>
+          ) : hasRated ? (
             <div className={styles.alreadyRatedBox}>
               <div className={styles.checkCircle}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3">

@@ -149,7 +149,7 @@ const SplashScreen = () => (
 );
 
 function AppContent() {
-  const { role, user, isAuthenticated, isBackendOffline, isInitialLoading } =
+  const { role, user, isAuthenticated, isBackendOffline, isMaintenance, isInitialLoading } =
     useJobitoAuth();
   const classification = user?.classification;
   const location = useLocation();
@@ -201,9 +201,21 @@ function AppContent() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              flexDirection: "column",
+              padding: "50px 20px",
+              textAlign: "center"
             }}
           >
-            <NotFound />
+            {isMaintenance ? (
+               <div style={{ maxWidth: '600px', margin: '0 auto', background: '#fff', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                 <h2 style={{ fontSize: '28px', color: '#102A43', marginBottom: '20px' }}>الموقع تحت الصيانة حالياً 🛠️</h2>
+                 <p style={{ fontSize: '18px', color: '#486581', lineHeight: '1.6' }}>
+                   نعتذر عن الإزعاج، نقوم حالياً ببعض التحديثات والتحسينات الهامة على النظام لتقديم تجربة أفضل لكم. يرجى المحاولة مرة أخرى لاحقاً.
+                 </p>
+               </div>
+            ) : (
+               <NotFound />
+            )}
           </div>
           <Footer />
         </div>

@@ -28,8 +28,28 @@ const WorkListing = () => {
         const response = await apiFetch(`${API_BASE_URL}/jobs?userId=${userId}&classification=tradesman_work&_t=${Date.now()}`);
         if (response.ok) {
           const result = await response.json();
-          const freshWorks = result.data || [];
-          console.log("🔥 [WorkListing] Fresh Works:", freshWorks);
+          let freshWorks = result.data || [];
+          
+          // Fetch ratings for each job to calculate the average rating
+          freshWorks = await Promise.all(freshWorks.map(async (work: any) => {
+            try {
+              const ratingRes = await apiFetch(`${API_BASE_URL}/ratings/job/${work.jobId}`);
+              if (ratingRes.ok) {
+                const ratingsData = await ratingRes.json();
+                if (Array.isArray(ratingsData) && ratingsData.length > 0) {
+                  const avgRating = ratingsData.reduce((sum: number, r: any) => sum + r.ratingValue, 0) / ratingsData.length;
+                  work.rating = avgRating;
+                } else {
+                  work.rating = 0;
+                }
+              }
+            } catch (err) {
+              console.error(`Failed to fetch rating for job ${work.jobId}`, err);
+            }
+            return work;
+          }));
+
+          console.log("🔥 [WorkListing] Fresh Works with Ratings:", freshWorks);
           setWorks(freshWorks);
         }
       } catch (error) {
@@ -138,7 +158,7 @@ const WorkListing = () => {
                     </button>
                     <button 
                       className={styles.actionBtn}
-                      onClick={() => navigate(`/WorkManagement/${work.jobId}`, { state: { tab: "details" } })}
+                      onClick={() => navigate(`/Job details`, { state: { jobId: work.jobId } })}
                       title={t("عرض")}
                     >
                       <Eye size={16} />
@@ -148,7 +168,7 @@ const WorkListing = () => {
                       onClick={() => handleDelete(work.jobId)}
                       title={t("حذف")}
                     >
-                      <Trash2 size={16} color="var(--red-600)" />
+                      <Trash2 size={16} color="#ef4444" />
                     </button>
                   </div>
                 </td>

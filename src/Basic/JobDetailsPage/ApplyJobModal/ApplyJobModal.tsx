@@ -228,15 +228,17 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
                 </>
               ) : (
                 <>
-                  <div className={styles.formGroup} style={{ marginBottom: '20px' }}>
-                    <label>{t("رابط الأعمال (Portfolio)")} <span className={styles.optionalText}>({t("اختياري")})</span></label>
-                    <input 
-                      type="text" 
-                      value={portfolioUrl} 
-                      onChange={(e) => setPortfolioUrl(e.target.value)} 
-                      placeholder="https://..."
-                    />
-                  </div>
+                  {user?.classification !== "tradesman" && (
+                    <div className={styles.formGroup} style={{ marginBottom: '20px' }}>
+                      <label>{t("رابط الأعمال (Portfolio)")} <span className={styles.optionalText}>({t("اختياري")})</span></label>
+                      <input 
+                        type="text" 
+                        value={portfolioUrl} 
+                        onChange={(e) => setPortfolioUrl(e.target.value)} 
+                        placeholder="https://..."
+                      />
+                    </div>
+                  )}
 
                   <div className={styles.formGroup} style={{ marginBottom: '24px' }}>
                     <label>{t("رسالة التغطية")} <span className={styles.optionalText}>({t("اختياري")})</span></label>
@@ -249,25 +251,27 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
                     </div>
                   </div>
 
-                  <div className={styles.formGroupResume} style={{ marginBottom: '32px' }}>
-                    <div className={styles.resumeTop}>
-                      <span className={styles.resumeLabel}>{t("السيرة الذاتية (PDF)")} <span className={styles.optionalText}>({t("اختياري")})</span></span>
-                      <label className={styles.uploadButton}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                          <polyline points="17 8 12 3 7 8"></polyline>
-                          <line x1="12" y1="3" x2="12" y2="15"></line>
-                        </svg>
-                        {resumeFile ? resumeFile.name : t("اختر ملف")}
-                        <input 
-                          type="file" 
-                          accept=".pdf" 
-                          onChange={(e) => setResumeFile(e.target.files?.[0] || null)} 
-                          style={{ display: 'none' }}
-                        />
-                      </label>
+                  {user?.classification !== "tradesman" && (
+                    <div className={styles.formGroupResume} style={{ marginBottom: '32px' }}>
+                      <div className={styles.resumeTop}>
+                        <span className={styles.resumeLabel}>{t("السيرة الذاتية (PDF)")} <span className={styles.optionalText}>({t("اختياري")})</span></span>
+                        <label className={styles.uploadButton}>
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                          </svg>
+                          {resumeFile ? resumeFile.name : t("اختر ملف")}
+                          <input 
+                            type="file" 
+                            accept=".pdf" 
+                            onChange={(e) => setResumeFile(e.target.files?.[0] || null)} 
+                            style={{ display: 'none' }}
+                          />
+                        </label>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </>
               )}
 

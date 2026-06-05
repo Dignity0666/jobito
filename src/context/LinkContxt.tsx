@@ -72,6 +72,7 @@ export type AuthContextType = {
   apiFetch: (url: string, options?: RequestInit) => Promise<Response>;
   updateUser: (newData: Partial<AuthUser>) => void;
   isBackendOffline: boolean;
+  isMaintenance: boolean;
   isInitialLoading: boolean;
 };
 
@@ -88,6 +89,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [googleClientId, setGoogleClientId] = useState<string>("");
   const [isBackendOffline, setIsBackendOffline] = useState(false);
+  const [isMaintenance, setIsMaintenance] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const isRefreshing = useRef(false);
   const failCountRef = useRef(0);
@@ -121,8 +123,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         if (res.ok) {
            try {
              const data = await res.clone().json();
-             const localRole = localStorage.getItem("jobito_role");
-             if (data.maintenanceMode && localRole !== 'admin') {
+             const token = localStorage.getItem("token");
+             let localRole = null;
+             if (token) {
+               try {
+                 // Import is already at the top, but we use it here
+                 const decoded: any = jwtDecode(token);
+                 if (decoded.adminRole) {
+                   localRole = 'admin';
+                 } else {
+                   localRole = decoded.role || 'user';
+                 }
+               } catch (e) {}
+             }
+             // Only apply maintenance block if the user is LOGGED IN and NOT an admin.
+             if (data.maintenanceMode && localRole && localRole !== 'admin') {
                isMaintenanceMode = true;
              }
            } catch (e) {}
@@ -130,11 +145,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         
         if (isMaintenanceMode) {
           setIsBackendOffline(true);
+          setIsMaintenance(true);
         } else if (isOfflineResponse || latency > 5000) {
           failCountRef.current++;
         } else {
           failCountRef.current = 0;
           setIsBackendOffline(false);
+          setIsMaintenance(false);
         }
 
         // Only mark offline if it fails 5 times in a row (for network glitches)
@@ -183,9 +200,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           }
           
           // Check Maintenance Mode (Admins bypass the maintenance screen)
-          const localRole = localStorage.getItem("jobito_role");
-          if (configData.maintenanceMode && localRole !== 'admin') {
+          const token = localStorage.getItem("token");
+          let localRole = null;
+          if (token) {
+            try {
+              const decoded: any = jwtDecode(token);
+              if (decoded.adminRole) {
+                localRole = 'admin';
+              } else {
+                localRole = decoded.role || 'user';
+              }
+            } catch (e) {}
+          }
+          if (configData.maintenanceMode && localRole && localRole !== 'admin') {
             setIsBackendOffline(true);
+            setIsMaintenance(true);
           }
         } else {
           console.warn(
@@ -505,6 +534,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       apiFetch,
       updateUser,
       isBackendOffline,
+      isMaintenance,
       isInitialLoading,
     }),
     [
@@ -517,6 +547,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       apiFetch,
       updateUser,
       isBackendOffline,
+      isMaintenance,
       isInitialLoading,
     ],
   );

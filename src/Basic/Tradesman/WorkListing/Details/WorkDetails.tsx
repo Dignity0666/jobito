@@ -150,6 +150,7 @@ const WorkDetails = () => {
   return (
     <div className={`${styles.container} ${isDark ? styles.dark : styles.light}`} data-theme={theme}>
       <header className={styles.header}>
+        {activeTab === 'details' && (
         <div className={styles.headerTop}>
           <button className={styles.backBtn} onClick={() => navigate(-1)}>
             <ArrowLeft size={20} />
@@ -194,21 +195,8 @@ const WorkDetails = () => {
             </div>
           </div>
         </div>
+        )}
         
-        <div className={styles.tabs}>
-          <button 
-            className={`${styles.tab} ${activeTab === 'details' ? styles.activeTab : ''}`}
-            onClick={() => setActiveTab('details')}
-          >
-            {t("تفاصيل العمل")}
-          </button>
-          <button 
-            className={`${styles.tab} ${activeTab === 'applicants' ? styles.activeTab : ''}`}
-            onClick={() => setActiveTab('applicants')}
-          >
-            {t("المتقدمين")}
-          </button>
-        </div>
       </header>
 
       <main className={styles.content}>
@@ -331,7 +319,7 @@ const WorkDetails = () => {
                         </td>
                         <td>
                           <span className={`${styles.skillTag} ${app.status === 'accepted' ? styles.approvedBtn : app.status === 'rejected' ? styles.rejectedBtn : ''}`}>
-                            {t(app.status || "قيد الانتظار")}
+                            {app.status === 'applied' ? t("تم التقديم") : t(app.status || "قيد الانتظار")}
                           </span>
                         </td>
                         <td>

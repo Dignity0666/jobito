@@ -49,7 +49,7 @@ export default function ApplicantDetails() {
   const { t, language } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
-  const { apiFetch } = useJobitoAuth();
+  const { apiFetch, user } = useJobitoAuth();
   const { showToast } = useToast();
   const [app, setApp] = useState<Applicant | null>(null);
   const [loading, setLoading] = useState(true);
@@ -137,6 +137,32 @@ export default function ApplicantDetails() {
             ? t("مرفوض")
             : t("في الانتظار");
       showToast(`${t("تم تحديث الحالة إلى:")} ${statusText}`, "success");
+
+      // Auto-send message to chat if accepted
+      if (newStatus === "hired" && app?.user?.userId) {
+        const myUserId = user?.id || (user as any)?.userId;
+        if (myUserId) {
+          try {
+            const clientId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            const content = `${t("مرحباً")} ${(app.user.fullName || "Applicant").split(" ")[0]}، ${t("تهانينا! لقد تم قبول طلبك لوظيفة")} ${t(app?.job?.title || "")}. ${t("سنتواصل معك قريباً لتحديد موعد المقابلة.")}`;
+            
+            await apiFetch(`${API_BASE_URL}/chat/p2p`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                senderId: myUserId,
+                recipientId: app.user.userId,
+                content,
+                type: "text",
+                clientId,
+              }),
+            });
+          } catch (msgErr) {
+            console.error("Failed to send auto-message", msgErr);
+          }
+        }
+      }
+
     } catch (err) {
       showToast(err instanceof Error ? t(err.message) : t("خطأ"), "error");
     }
