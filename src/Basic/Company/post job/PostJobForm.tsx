@@ -437,7 +437,7 @@ function Step1({
       <div className={styles.fieldRow}>
         <div className={styles.rowLabel}>
           <strong>{t("العدد المطلوب")}</strong>
-          <span>{t("حدد عدد المقاعد المتاحة لهذا المتصب")}</span>
+          <span>{t("حدد عدد المقاعد المتاحة لهذا المنصب")}</span>
         </div>
         <div className={styles.rowContent}>
           <input
