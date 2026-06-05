@@ -595,7 +595,7 @@ export const SignUpPage: React.FC = () => {
               {t("حسابك مجدول للحذف")}
             </h2>
             <p style={{ color: '#334155', fontSize: '16px', lineHeight: 1.7, marginBottom: '32px' }}>
-              {t("عذراً، لا يمكنك تسجيل الدخول لأن حسابك مجدول للحذف. يجب عليك إلغاء طلب الحذف لتتمكن من الدخول.")}
+              {t("حسابك مجدول للحذف. اضغط على 'استكمال الدخول' لإلغاء طلب الحذف والدخول لحسابك.")}
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <button
@@ -625,7 +625,7 @@ export const SignUpPage: React.FC = () => {
                   fontSize: '16px', fontWeight: 700, cursor: 'pointer', width: '100%'
                 }}
               >
-                {t("إلغاء الحذف وتسجيل الدخول")}
+                {t("استكمال الدخول")}
               </button>
               <button
                 onClick={() => {

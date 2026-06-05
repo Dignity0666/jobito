@@ -400,7 +400,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
               <span className={Style.modalIcon}>⚠️</span>
               <h2 className={Style.modalTitle}>{t("حسابك مجدول للحذف")}</h2>
               <p className={Style.modalText}>
-                {t("عذراً، لا يمكنك تسجيل الدخول لأن حسابك مجدول للحذف خلال {{days}} أيام. يجب عليك إلغاء طلب الحذف لتتمكن من الدخول.", { days: deletionStatus.daysLeft })}
+                {t("حسابك مجدول للحذف خلال {{days}} أيام. اضغط على 'استكمال الدخول' لإلغاء طلب الحذف والدخول لحسابك.", { days: deletionStatus.daysLeft })}
               </p>
               
               <div className={Style.modalActions}>
@@ -427,7 +427,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
                   }}
                   className={Style.cancelDeleteBtn}
                 >
-                  {t("إلغاء الحذف وتسجيل الدخول")}
+                  {t("استكمال الدخول")}
                 </button>
                 <button
                   onClick={() => {
