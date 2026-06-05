@@ -3,6 +3,8 @@ import {
   LockIcon,
   LoaderIcon,
   ArrowLeftIcon,
+  EyeIcon,
+  EyeOffIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -53,6 +55,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const [isResetMode, setIsResetMode] = useState(false);
@@ -216,13 +219,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
               <div className={Style.inputGroup}>
                 <div className={Style.relativeInput}>
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder={t("Passcode")}
                     required
                   />
-                  <button type="button" className={Style.hideBtn}>{t("Hide")}</button>
+                  <button type="button" className={Style.hideBtn} onClick={() => setShowPassword(!showPassword)}>
+                    {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+                  </button>
                 </div>
                 <div className={Style.troubleLink}>
                   <button type="button" onClick={() => setIsResetMode(true)}>
