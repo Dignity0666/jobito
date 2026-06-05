@@ -194,6 +194,9 @@ const SupportDashboard: React.FC<SupportDashboardProps> = ({ preselectedUser }) 
     const recipient = isUserChat ? selectedUser : selectedAdmin;
     if (!reply.trim() || !recipient) return;
 
+    const content = reply.trim();
+    setReply("");
+
     // Stop typing indicator
     const recipientId = isUserChat ? recipient.userId : recipient.adminId;
     if (socketRef.current && recipientId && authUser?.id) {
@@ -203,27 +206,39 @@ const SupportDashboard: React.FC<SupportDashboardProps> = ({ preselectedUser }) 
         isTyping: false,
       });
     }
+
+    // Optimistic update - add message to UI immediately
+    const tempMessage = {
+      id: `temp_${Date.now()}`,
+      senderId: authUser?.id,
+      recipientId: recipientId,
+      message: content,
+      createdAt: new Date().toISOString(),
+    };
+    setSelectedTicket((prev: any) => {
+      if (!prev) return prev;
+      return { ...prev, messages: [...prev.messages, tempMessage] };
+    });
     
     try {
-      const res = await apiFetch(`${API_BASE_URL}/chat/p2p`, {
+      await apiFetch(`${API_BASE_URL}/chat/p2p`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           senderId: authUser?.id,
           recipientId: recipientId,
-          content: reply 
+          content: content 
         })
       });
-      if (res.ok) {
-        setReply("");
-        if (isUserChat) {
-          fetchUserChatHistory(recipientId, recipient);
-        } else {
-          fetchChatHistory(recipientId);
-        }
-      }
+      // WebSocket will handle the real message update
+      fetchRecentChats();
     } catch (err) {
       console.error(err);
+      // Remove optimistic message on error
+      setSelectedTicket((prev: any) => {
+        if (!prev) return prev;
+        return { ...prev, messages: prev.messages.filter((m: any) => m.id !== tempMessage.id) };
+      });
     }
   };
 
