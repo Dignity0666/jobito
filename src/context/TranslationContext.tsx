@@ -108,6 +108,7 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
         // Add hardcoded fallbacks for stubborn strings
         const fallbacks: Record<string, string> = {
           'Company Review': 'مراجعة الشركة',
+          'Verification & Approvals': 'طلبات التوثيق والاعتماد',
           'Operations Revenue': 'إيرادات العمليات',
           'Operations Monitor': 'مراقب العمليات',
           'Technical Support': 'الدعم الفني',

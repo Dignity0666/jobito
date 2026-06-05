@@ -100,7 +100,7 @@ const Admin: React.FC = () => {
     { id: 'USER_MANAGEMENT', label: t("User Management"), role: 'operation_manager' },
     { id: 'SUPPORT', label: t("Technical Support"), role: 'operation_manager' },
     { id: 'CONTENT', label: t("Content Moderation"), role: 'operation_manager' },
-    { id: 'COMPANY_REVIEW', label: t("Company Review"), role: 'operation_manager' },
+    { id: 'COMPANY_REVIEW', label: t("Verification & Approvals"), role: 'operation_manager' },
     { id: 'SYSTEM_REQUESTS', label: t("System Requests"), role: 'super_admin' },
   ];
 
