@@ -294,10 +294,42 @@ const SupportDashboard: React.FC<SupportDashboardProps> = ({ preselectedUser }) 
                   {language === 'ar' ? '→' : '←'}
                 </button>
                 <div className={styles.chatAvatar}>{selectedTicket.ticket.userName?.split(" ")?.map((n: string) => n[0])?.join("") || 'U'}</div>
-                <div>
+                <div style={{ flex: 1 }}>
                   <div className={styles.chatTitle}>{selectedTicket.ticket.userName}</div>
                   <div className={styles.chatSub}>{selectedTicket.ticket.userEmail}</div>
                 </div>
+                
+                {/* Average Response Time Display */}
+                {(() => {
+                  const msgs = selectedTicket.messages || [];
+                  let totalMs = 0;
+                  let count = 0;
+                  let lastUserTime: number | null = null;
+                  
+                  const sorted = [...msgs].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+                  for (const m of sorted) {
+                    const isMe = m.senderId === authUser?.id;
+                    if (!isMe) {
+                      if (lastUserTime === null) lastUserTime = new Date(m.createdAt).getTime();
+                    } else if (isMe && lastUserTime !== null) {
+                      totalMs += (new Date(m.createdAt).getTime() - lastUserTime);
+                      count++;
+                      lastUserTime = null;
+                    }
+                  }
+                  
+                  if (count > 0) {
+                    const avgMins = Math.round((totalMs / count) / 60000);
+                    const avgText = avgMins < 1 ? t("Under 1 min") : `${avgMins} ${t("mins")}`;
+                    return (
+                      <div style={{ textAlign: language === 'ar' ? 'left' : 'right', fontSize: '12px', color: 'var(--color-text-muted)', background: 'var(--color-bg-tertiary)', padding: '4px 8px', borderRadius: '12px' }}>
+                        <strong style={{ display: 'block', color: 'var(--color-primary)' }}>{t("Avg Response Time")}</strong>
+                        {avgText}
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
 
               </div>
               <div className={styles.messages}>
