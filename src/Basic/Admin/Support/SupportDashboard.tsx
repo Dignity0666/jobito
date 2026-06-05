@@ -145,6 +145,20 @@ const SupportDashboard: React.FC<SupportDashboardProps> = ({ preselectedUser }) 
     };
   }, [authUser?.id]);
 
+  const markChatAsRead = async (otherId: string) => {
+    if (!authUser?.id) return;
+    try {
+      await apiFetch(`${API_BASE_URL}/chat/p2p/read`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: authUser.id, otherId })
+      });
+      fetchRecentChats(); // Refresh unread counts in sidebar
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const fetchChatHistory = async (otherId: string) => {
     setSelectedId(otherId as any);
     try {
@@ -155,6 +169,7 @@ const SupportDashboard: React.FC<SupportDashboardProps> = ({ preselectedUser }) 
           ticket: { userName: selectedAdmin?.fullName, userEmail: selectedAdmin?.email },
           messages: data || []
         });
+        markChatAsRead(otherId);
       }
     } catch (err) {
       console.error(err);
@@ -172,6 +187,7 @@ const SupportDashboard: React.FC<SupportDashboardProps> = ({ preselectedUser }) 
           messages: data || [],
           isUserChat: true
         });
+        markChatAsRead(otherId);
       }
     } catch (err) {
       console.error(err);
