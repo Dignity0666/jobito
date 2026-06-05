@@ -336,14 +336,12 @@ export default function ProfileSettings() {
         method: "DELETE",
       });
       if (!res.ok) throw new Error(t("فشل في طلب حذف الحساب"));
-      const data = await res.json();
-      alert(data.message || t("تم جدولة حذف الحساب خلال يومين"));
       setShowDeleteConfirm(false);
-      logout(); // Logout immediately so they get the fresh flow next time
-      window.location.href = "/"; // Force redirect to home
+      // Logout IMMEDIATELY — no blocking alert
+      logout();
+      window.location.href = "/";
     } catch (err: any) {
-      alert(err.message || t("خطأ"));
-    } finally {
+      showToast(err.message || t("خطأ"), "error");
       setIsDeleting(false);
     }
   };
