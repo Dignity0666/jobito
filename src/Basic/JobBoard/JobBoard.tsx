@@ -60,7 +60,7 @@ export default function JobBoard() {
               initial={{ opacity: 1, y: 0 }}
               dir="ltr"
             >
-              <div className={Styles.inputGroup} style={{ flex: 2 }}>
+              <div className={Styles.inputGroup}>
                 <Search className={Styles.icon} size={20} />
                 <input
                   type="text"

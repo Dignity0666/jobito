@@ -221,7 +221,7 @@ const CompaniesJobs = () => {
               variants={searchBarVariant}
               dir="ltr"
             >
-              <div className={styles.inputGroup} style={{ flex: 2 }}>
+              <div className={styles.inputGroup}>
                 <Search className={styles.icon} size={20} />
                 <input
                   type="text"

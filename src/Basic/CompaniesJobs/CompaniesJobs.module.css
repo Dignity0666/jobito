@@ -27,9 +27,9 @@
 .heroSection {
   position: relative;
   background: transparent;
-  padding: 60px 20px 30px; /* Smaller padding for a compact hero */
+  padding: 150px 40px 80px; 
   overflow: hidden;
-  min-height: 300px; /* Reduced height */
+  min-height: 500px;
   display: flex;
   align-items: flex-end;
   width: 100%;
