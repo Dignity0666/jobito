@@ -17,7 +17,7 @@ import { useTranslation } from '../../../context/translation-context';
 import { useToast } from '../../../context/ToastContext';
 import { useJobitoAuth } from '../../../context/LinkContxt';
 import { API_BASE_URL } from '../../../services/api';
-import { Settings, PieChart, TrendingUp, Clock } from 'lucide-react';
+import { Settings, PieChart, TrendingUp, Clock, EyeIcon, EyeOffIcon } from 'lucide-react';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Filler, Tooltip, Legend);
 
@@ -78,6 +78,7 @@ const SuperAdminDashboard: React.FC = () => {
   const [newAdminName, setNewAdminName] = useState('');
   const [newAdminEmail, setNewAdminEmail] = useState('');
   const [newAdminPassword, setNewAdminPassword] = useState('');
+  const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [newAdminRole, setNewAdminRole] = useState('operation_manager');
 
   useEffect(() => {
@@ -509,12 +510,21 @@ const SuperAdminDashboard: React.FC = () => {
             </div>
             <div className={styles.inputGroup}>
               <label>{t("Password")}</label>
-              <input 
-                type="password" 
-                placeholder="••••••••"
-                value={newAdminPassword}
-                onChange={e => setNewAdminPassword(e.target.value)}
-              />
+              <div className={styles.passwordWrapper}>
+                <input 
+                  type={showAdminPassword ? "text" : "password"} 
+                  placeholder="••••••••"
+                  value={newAdminPassword}
+                  onChange={e => setNewAdminPassword(e.target.value)}
+                />
+                <button 
+                  type="button" 
+                  className={styles.eyeButton} 
+                  onClick={() => setShowAdminPassword(!showAdminPassword)}
+                >
+                  {showAdminPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+                </button>
+              </div>
             </div>
             <div className={styles.inputGroup}>
               <label>{t("Role")}</label>
