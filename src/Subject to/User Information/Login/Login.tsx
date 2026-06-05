@@ -385,49 +385,49 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
                   </button>
                 </>
               )}
-                {/* Deletion Modal */}
-                {showDeletionModal && deletionStatus && (
-                  <div className={Style.modalOverlay}>
-                    <div className={Style.modalContent}>
-                      <h2 style={{ color: "#ef4444" }}>{t("حذف حسابك مجدول")}</h2>
-                      <p>{t("حسابك مجدول للحذف خلال {{days}} أيام. هل تريد إلغاء الحذف؟", { days: deletionStatus.daysLeft })}</p>
-                      <button
-                        onClick={async () => {
-                          try {
-                            const cancelRes = await fetch(`${API_BASE_URL}/users/me/cancel-deletion`, {
-                              method: "PATCH",
-                              headers: { Authorization: `Bearer ${loginToken}` },
-                            });
-                            if (!cancelRes.ok) throw new Error("Cancel failed");
-                            alert(t("تم إلغاء حذف الحساب"));
-                            setShowDeletionModal(false);
-                            setShowLogin(false);
-                            navigate("/");
-                          } catch (e) {
-                            console.error(e);
-                            alert(t("فشل إلغاء الحذف"));
-                          }
-                        }}
-                        style={{ padding: "8px 16px", background: "#ef4444", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", marginRight: "8px" }}
-                      >
-                        {t("إلغاء الحذف")}
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowDeletionModal(false);
-                          setShowLogin(false);
-                          navigate("/");
-                        }}
-                        style={{ padding: "8px 16px", background: "#475569", color: "white", border: "none", borderRadius: "6px", cursor: "pointer" }}
-                      >
-                        {t("متابعة الدخول")}
-                      </button>
-                    </div>
-                  </div>
-                )}
-
             </motion.div>
           </AnimatePresence>
+        )}
+
+        {/* Deletion Modal */}
+        {showDeletionModal && deletionStatus && (
+          <div className={Style.modalOverlay}>
+            <div className={Style.modalContent}>
+              <h2 style={{ color: "#ef4444" }}>{t("حذف حسابك مجدول")}</h2>
+              <p>{t("حسابك مجدول للحذف خلال {{days}} أيام. هل تريد إلغاء الحذف؟", { days: deletionStatus.daysLeft })}</p>
+              <button
+                onClick={async () => {
+                  try {
+                    const cancelRes = await fetch(`${API_BASE_URL}/users/me/cancel-deletion`, {
+                      method: "PATCH",
+                      headers: { Authorization: `Bearer ${loginToken}` },
+                    });
+                    if (!cancelRes.ok) throw new Error("Cancel failed");
+                    alert(t("تم إلغاء حذف الحساب"));
+                    setShowDeletionModal(false);
+                    setShowLogin(false);
+                    navigate("/");
+                  } catch (e) {
+                    console.error(e);
+                    alert(t("فشل إلغاء الحذف"));
+                  }
+                }}
+                style={{ padding: "8px 16px", background: "#ef4444", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", marginRight: "8px" }}
+              >
+                {t("إلغاء الحذف")}
+              </button>
+              <button
+                onClick={() => {
+                  setShowDeletionModal(false);
+                  setShowLogin(false);
+                  navigate("/");
+                }}
+                style={{ padding: "8px 16px", background: "#475569", color: "white", border: "none", borderRadius: "6px", cursor: "pointer" }}
+              >
+                {t("متابعة الدخول")}
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>
