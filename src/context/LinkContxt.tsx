@@ -102,7 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-        const res = await fetch(`${API_BASE_URL}/`, {
+        const res = await fetch(`${API_BASE_URL}/config`, {
           method: "GET",
           cache: "no-store",
           headers: {
@@ -116,14 +116,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         const isOfflineResponse =
           !res.ok && ![404, 401, 403].includes(res.status);
-        if (isOfflineResponse || latency > 5000) {
+          
+        let isMaintenanceMode = false;
+        if (res.ok) {
+           try {
+             const data = await res.clone().json();
+             const localRole = localStorage.getItem("jobito_role");
+             if (data.maintenanceMode && localRole !== 'admin') {
+               isMaintenanceMode = true;
+             }
+           } catch (e) {}
+        }
+        
+        if (isMaintenanceMode) {
+          setIsBackendOffline(true);
+        } else if (isOfflineResponse || latency > 5000) {
           failCountRef.current++;
         } else {
           failCountRef.current = 0;
           setIsBackendOffline(false);
         }
 
-        // Only mark offline if it fails 5 times in a row (Softer threshold)
+        // Only mark offline if it fails 5 times in a row (for network glitches)
         if (failCountRef.current >= 5) {
           setIsBackendOffline(true);
         }
@@ -162,9 +176,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         // Process config result
         if (configRes.status === "fulfilled" && configRes.value.ok) {
-          const data = await configRes.value.json();
-          if (data.GOOGLE_CLIENT_ID) {
-            setGoogleClientId(data.GOOGLE_CLIENT_ID);
+          const configData = await configRes.value.json();
+          // Read Google Client ID
+          if (configData.GOOGLE_CLIENT_ID) {
+            setGoogleClientId(configData.GOOGLE_CLIENT_ID);
+          }
+          
+          // Check Maintenance Mode (Admins bypass the maintenance screen)
+          const localRole = localStorage.getItem("jobito_role");
+          if (configData.maintenanceMode && localRole !== 'admin') {
+            setIsBackendOffline(true);
           }
         } else {
           console.warn(
