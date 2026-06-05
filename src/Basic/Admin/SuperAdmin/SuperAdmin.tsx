@@ -516,6 +516,7 @@ const SuperAdminDashboard: React.FC = () => {
                   placeholder="••••••••"
                   value={newAdminPassword}
                   onChange={e => setNewAdminPassword(e.target.value)}
+                  dir="ltr"
                 />
                 <button 
                   type="button" 

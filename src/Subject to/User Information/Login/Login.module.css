@@ -62,7 +62,7 @@
 .relativeInput input {
   width: 100%;
   padding: 16px 22px;
-  padding-inline-start: 45px;
+  padding-right: 45px;
   border-radius: 14px;
   border: 1.5px solid var(--color-border, #e2e8f0);
   font-size: 15px;
@@ -86,7 +86,7 @@
 
 .hideBtn {
   position: absolute;
-  inset-inline-start: 18px;
+  right: 18px;
   background: none;
   border: none;
   color: var(--color-primary, #4A6ED1);

@@ -459,7 +459,7 @@ export const SignUpPage: React.FC = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, password: e.target.value })
                       }
-                      dir="auto"
+                      dir="ltr"
                       required
                     />
                     <button
@@ -467,7 +467,7 @@ export const SignUpPage: React.FC = () => {
                       onClick={() => setShowPassword(!showPassword)}
                       style={{
                         position: "absolute",
-                        insetInlineStart: "14px",
+                        right: "14px",
                         background: "none",
                         border: "none",
                         cursor: "pointer",
@@ -498,7 +498,7 @@ export const SignUpPage: React.FC = () => {
                           confirmPassword: e.target.value,
                         })
                       }
-                      dir="auto"
+                      dir="ltr"
                       required
                     />
                     <button
@@ -508,7 +508,7 @@ export const SignUpPage: React.FC = () => {
                       }
                       style={{
                         position: "absolute",
-                        insetInlineStart: "14px",
+                        right: "14px",
                         background: "none",
                         border: "none",
                         cursor: "pointer",

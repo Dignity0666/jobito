@@ -432,7 +432,7 @@ export const CompanyRegister: React.FC = () => {
                               placeholder="••••••••"
                               value={formData.password}
                               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                              dir="auto"
+                              dir="ltr"
                               required
                             />
                             <button type="button" className={styles.eyeButton} onClick={() => setShowPassword(!showPassword)}>
@@ -449,7 +449,7 @@ export const CompanyRegister: React.FC = () => {
                               placeholder="••••••••"
                               value={formData.confirmPassword}
                               onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                              dir="auto"
+                              dir="ltr"
                               required
                             />
                             <button type="button" className={styles.eyeButton} onClick={() => setShowConfirmPassword(!showConfirmPassword)}>

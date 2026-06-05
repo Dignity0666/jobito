@@ -246,6 +246,9 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
           'إدارة المتقدمين': 'Manage Applicants',
           'تواصل معنا': 'Contact Us',
           'جميع الحقوق محفوظة.': 'All rights reserved.',
+          'إنشاء حساب جديد': 'Create a new account',
+          'ابدأ رحلتك المهنية مع Jobito': 'Start your professional journey with Jobito',
+          'إنشاء حساب': 'Create Account',
         };
 
         if (language === 'ar') {

@@ -223,6 +223,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder={t("Passcode")}
+                    dir="ltr"
                     required
                   />
                   <button type="button" className={Style.hideBtn} onClick={() => setShowPassword(!showPassword)}>
