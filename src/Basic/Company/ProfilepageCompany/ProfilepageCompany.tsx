@@ -545,39 +545,51 @@ export default function ProfilepageCompany() {
           </div>
           <div className={styles.contactChips}>
             {(() => {
-              let links: any = company?.socialLinks || {};
-              if (typeof links === "string")
+              let linksArray: string[] = [];
+              if (Array.isArray(company?.socialLinks)) {
+                linksArray = company.socialLinks;
+              } else if (company?.socialLinks && typeof company.socialLinks === "object") {
+                linksArray = Object.values(company.socialLinks).filter(Boolean) as string[];
+              } else if (typeof company?.socialLinks === "string") {
                 try {
-                  links = JSON.parse(links);
+                  const parsed = JSON.parse(company.socialLinks);
+                  if (Array.isArray(parsed)) {
+                    linksArray = parsed;
+                  } else if (typeof parsed === "object") {
+                    linksArray = Object.values(parsed).filter(Boolean) as string[];
+                  }
                 } catch (e) {
-                  links = {};
+                  // ignore
                 }
+              }
+
               return (
                 <>
-                  <a href={links.twitter || "#"} className={styles.contactChip}>
-                    <TwitterIcon />{" "}
-                    {t(links.twitter?.split("/").pop() || "twitter.com/nomad")}
-                  </a>
-                  <a
-                    href={links.facebook || "#"}
-                    className={styles.contactChip}
-                  >
-                    <FacebookIcon />{" "}
-                    {t(links.facebook?.split("/").pop() || "facebook.com/NomadHQ")}
-                  </a>
-                  <a
-                    href={links.linkedin || "#"}
-                    className={styles.contactChip}
-                  >
-                    <LinkedInIcon />{" "}
-                    {t(links.linkedin?.split("/").pop() || "linkedin.com/company/nomad")}
-                  </a>
-                  <a
-                    href={`mailto:${companyEmail}`}
-                    className={styles.contactChip}
-                  >
-                    <MailIcon /> {companyEmail || "nomad@gmail.com"}
-                  </a>
+                  {linksArray.map((link, idx) => {
+                    const isEmail = link.includes("@");
+                    const href = isEmail && !link.startsWith("mailto:") ? `mailto:${link}` : (link.startsWith("http") ? link : `https://${link}`);
+                    const display = link.replace(/^https?:\/\//, "").replace(/\/$/, "");
+                    
+                    let Icon = GlobeAltIcon;
+                    if (link.toLowerCase().includes("twitter") || link.toLowerCase().includes("x.com")) Icon = TwitterIcon;
+                    else if (link.toLowerCase().includes("facebook")) Icon = FacebookIcon;
+                    else if (link.toLowerCase().includes("linkedin")) Icon = LinkedInIcon;
+                    else if (isEmail) Icon = MailIcon;
+
+                    return (
+                      <a key={idx} href={href} target="_blank" rel="noreferrer" className={styles.contactChip}>
+                        <Icon /> {t(display)}
+                      </a>
+                    );
+                  })}
+                  {!linksArray.some(link => link.includes(companyEmail)) && companyEmail && (
+                    <a
+                      href={`mailto:${companyEmail}`}
+                      className={styles.contactChip}
+                    >
+                      <MailIcon /> {companyEmail || "nomad@gmail.com"}
+                    </a>
+                  )}
                 </>
               );
             })()}

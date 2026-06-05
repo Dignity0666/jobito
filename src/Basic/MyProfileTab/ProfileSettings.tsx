@@ -100,6 +100,7 @@ export default function ProfileSettings() {
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [socialLinkInput, setSocialLinkInput] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -116,13 +117,11 @@ export default function ProfileSettings() {
             fullName: data.fullName || data.name || "",
             logo: data.logoUrl || data.avatarUrl || "",
             avatar: data.avatarUrl || data.logoUrl || "",
-            socialLinks: data.socialLinks || {
-              instagram: "",
-              twitter: "",
-              facebook: "",
-              linkedin: "",
-              youtube: "",
-            },
+            socialLinks: Array.isArray(data.socialLinks)
+              ? data.socialLinks
+              : (data.socialLinks && typeof data.socialLinks === "object"
+                  ? Object.values(data.socialLinks).filter(Boolean)
+                  : []),
             locationTags: Array.isArray(data.locationTags)
               ? data.locationTags
               : [],
@@ -623,54 +622,68 @@ export default function ProfileSettings() {
               </div>
               <div className={styles.rowContent}>
                 <div className={styles.fieldFull}>
-                  <label>LinkedIn</label>
-                  <input
-                    name="linkedin"
-                    type="text"
-                    value={formData.socialLinks?.linkedin || ""}
-                    onChange={handleSocialChange}
-                    placeholder="https://linkedin.com/company/..."
-                  />
-                </div>
-                <div className={styles.fieldFull}>
-                  <label>Twitter / X</label>
-                  <input
-                    name="twitter"
-                    type="text"
-                    value={formData.socialLinks?.twitter || ""}
-                    onChange={handleSocialChange}
-                    placeholder="https://twitter.com/..."
-                  />
-                </div>
-                <div className={styles.fieldFull}>
-                  <label>Facebook</label>
-                  <input
-                    name="facebook"
-                    type="text"
-                    value={formData.socialLinks?.facebook || ""}
-                    onChange={handleSocialChange}
-                    placeholder="https://facebook.com/..."
-                  />
-                </div>
-                <div className={styles.fieldFull}>
-                  <label>Instagram</label>
-                  <input
-                    name="instagram"
-                    type="text"
-                    value={formData.socialLinks?.instagram || ""}
-                    onChange={handleSocialChange}
-                    placeholder="https://instagram.com/..."
-                  />
-                </div>
-                <div className={styles.fieldFull}>
-                  <label>YouTube</label>
-                  <input
-                    name="youtube"
-                    type="text"
-                    value={formData.socialLinks?.youtube || ""}
-                    onChange={handleSocialChange}
-                    placeholder="https://youtube.com/..."
-                  />
+                  <div className={styles.skillInputWrapper}>
+                    <input
+                      type="text"
+                      className={styles.input}
+                      style={{ flex: 1 }}
+                      placeholder={t("أضف رابط واضغط Enter أو زر الـ +")}
+                      value={socialLinkInput}
+                      onChange={(e) => setSocialLinkInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && socialLinkInput.trim()) {
+                          e.preventDefault();
+                          const currentLinks = Array.isArray(formData.socialLinks) ? formData.socialLinks : [];
+                          if (!currentLinks.includes(socialLinkInput.trim())) {
+                            setFormData({
+                              ...formData,
+                              socialLinks: [...currentLinks, socialLinkInput.trim()],
+                            });
+                          }
+                          setSocialLinkInput("");
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className={styles.addSkillBtn}
+                      onClick={() => {
+                        if (socialLinkInput.trim()) {
+                          const currentLinks = Array.isArray(formData.socialLinks) ? formData.socialLinks : [];
+                          if (!currentLinks.includes(socialLinkInput.trim())) {
+                            setFormData({
+                              ...formData,
+                              socialLinks: [...currentLinks, socialLinkInput.trim()],
+                            });
+                          }
+                          setSocialLinkInput("");
+                        }
+                      }}
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  <div className={styles.tagContainer}>
+                    {Array.isArray(formData.socialLinks) && formData.socialLinks.map((link: string, i: number) => (
+                      <span key={i} className={styles.tag}>
+                        {link}
+                        <span
+                          className={styles.tagRemove}
+                          onClick={() => {
+                            const newLinks = [...formData.socialLinks];
+                            newLinks.splice(i, 1);
+                            setFormData({
+                              ...formData,
+                              socialLinks: newLinks,
+                            });
+                          }}
+                        >
+                          ×
+                        </span>
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
