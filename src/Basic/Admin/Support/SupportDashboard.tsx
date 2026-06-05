@@ -28,6 +28,9 @@ const SupportDashboard: React.FC<SupportDashboardProps> = ({ preselectedUser }) 
 
   const socketRef = useRef<Socket | null>(null);
   const selectedIdRef = useRef<any>(null);
+  const [isOtherTyping, setIsOtherTyping] = useState(false);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const emitTypingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     selectedIdRef.current = selectedId;
@@ -90,12 +93,24 @@ const SupportDashboard: React.FC<SupportDashboardProps> = ({ preselectedUser }) 
       
       const currentSelectedId = selectedIdRef.current;
       if (currentSelectedId && (msg.senderId === currentSelectedId || msg.recipientId === currentSelectedId)) {
+        setIsOtherTyping(false);
         setSelectedTicket((prev: any) => {
           if (!prev) return prev;
           // Avoid duplicate messages
           if (prev.messages.find((m: any) => m.id === msg.id)) return prev;
           return { ...prev, messages: [...prev.messages, msg] };
         });
+      }
+    });
+
+    socket.on("user_typing", (payload: { senderId: string; isTyping: boolean }) => {
+      const currentSelectedId = selectedIdRef.current;
+      if (currentSelectedId && payload.senderId === currentSelectedId) {
+        setIsOtherTyping(payload.isTyping);
+        if (payload.isTyping) {
+          if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+          typingTimeoutRef.current = setTimeout(() => setIsOtherTyping(false), 3000);
+        }
       }
     });
 
@@ -150,13 +165,46 @@ const SupportDashboard: React.FC<SupportDashboardProps> = ({ preselectedUser }) 
     }
   }, [selectedAdmin, selectedUser]);
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setReply(e.target.value);
+    const isUserChat = selectedTicket?.isUserChat;
+    const recipient = isUserChat ? selectedUser : selectedAdmin;
+    const recipientId = isUserChat ? recipient?.userId : recipient?.adminId;
+    if (socketRef.current && recipientId && authUser?.id) {
+      socketRef.current.emit("typing", {
+        senderId: authUser.id,
+        recipientId: recipientId,
+        isTyping: true,
+      });
+      if (emitTypingTimeoutRef.current) clearTimeout(emitTypingTimeoutRef.current);
+      emitTypingTimeoutRef.current = setTimeout(() => {
+        if (socketRef.current && recipientId) {
+          socketRef.current.emit("typing", {
+            senderId: authUser?.id,
+            recipientId: recipientId,
+            isTyping: false,
+          });
+        }
+      }, 2000);
+    }
+  };
+
   const handleSendReply = async () => {
     const isUserChat = selectedTicket?.isUserChat;
     const recipient = isUserChat ? selectedUser : selectedAdmin;
     if (!reply.trim() || !recipient) return;
+
+    // Stop typing indicator
+    const recipientId = isUserChat ? recipient.userId : recipient.adminId;
+    if (socketRef.current && recipientId && authUser?.id) {
+      socketRef.current.emit("typing", {
+        senderId: authUser.id,
+        recipientId: recipientId,
+        isTyping: false,
+      });
+    }
     
     try {
-      const recipientId = isUserChat ? recipient.userId : recipient.adminId;
       const res = await apiFetch(`${API_BASE_URL}/chat/p2p`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -346,12 +394,26 @@ const SupportDashboard: React.FC<SupportDashboardProps> = ({ preselectedUser }) 
                     </div>
                   );
                 })}
+
+                {/* Typing Indicator */}
+                {isOtherTyping && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px' }}>
+                    <div className={styles.adminAvatarSmall} style={{ width: 28, height: 28, fontSize: 12 }}>
+                      {selectedTicket.ticket.userName?.[0] || 'U'}
+                    </div>
+                    <div className={styles.typingBubble}>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                  </div>
+                )}
               </div>
 
 
               <div className={styles.inputArea}>
                 <div className={styles.inputWrap}>
-                  <input className={styles.inputEl} placeholder={t("Reply message")} value={reply} onChange={(e) => setReply(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSendReply()} />
+                  <input className={styles.inputEl} placeholder={t("Reply message")} value={reply} onChange={handleInputChange} onKeyDown={(e) => e.key === 'Enter' && handleSendReply()} />
                 </div>
                 <button className={styles.sendBtn} onClick={handleSendReply}>➤</button>
               </div>
