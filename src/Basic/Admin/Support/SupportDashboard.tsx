@@ -31,10 +31,18 @@ const SupportDashboard: React.FC<SupportDashboardProps> = ({ preselectedUser }) 
   const [isOtherTyping, setIsOtherTyping] = useState(false);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const emitTypingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     selectedIdRef.current = selectedId;
   }, [selectedId]);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [selectedTicket?.messages, isOtherTyping]);
 
   const fetchTickets = async () => {
     try {
@@ -92,13 +100,31 @@ const SupportDashboard: React.FC<SupportDashboardProps> = ({ preselectedUser }) 
       fetchRecentChats();
       
       const currentSelectedId = selectedIdRef.current;
-      if (currentSelectedId && (msg.senderId === currentSelectedId || msg.recipientId === currentSelectedId)) {
+      const isRelevant = currentSelectedId && 
+        (msg.senderId === currentSelectedId || msg.recipientId === currentSelectedId);
+
+      if (isRelevant) {
         setIsOtherTyping(false);
         setSelectedTicket((prev: any) => {
           if (!prev) return prev;
-          // Avoid duplicate messages
-          if (prev.messages.find((m: any) => m.id === msg.id)) return prev;
-          return { ...prev, messages: [...prev.messages, msg] };
+          const messages = prev.messages || [];
+
+          // 1. Already exists by real ID - skip
+          if (msg.id && messages.find((m: any) => m.id === msg.id)) return prev;
+
+          // 2. Replace temp message with real one (sent by me)
+          if (msg.senderId === authUser?.id) {
+            const tempMatch = messages.find((m: any) => 
+              m.id?.startsWith('temp_') && 
+              m.message?.trim() === msg.message?.trim()
+            );
+            if (tempMatch) {
+              return { ...prev, messages: messages.map((m: any) => m.id === tempMatch.id ? msg : m) };
+            }
+          }
+
+          // 3. Append new message
+          return { ...prev, messages: [...messages, msg] };
         });
       }
     });
@@ -423,6 +449,7 @@ const SupportDashboard: React.FC<SupportDashboardProps> = ({ preselectedUser }) 
                     </div>
                   </div>
                 )}
+                <div ref={messagesEndRef} />
               </div>
 
 
