@@ -68,6 +68,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
   const [otpCode, setOtpCode] = useState("");
   const [googleToken, setGoogleToken] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  // Deletion status handling
+  const [deletionStatus, setDeletionStatus] = useState<{ scheduled: boolean; daysLeft?: number } | null>(null);
+  const [showDeletionModal, setShowDeletionModal] = useState(false);
+  const [loginToken, setLoginToken] = useState<string | null>(null);
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isResetting, setIsResetting] = useState(false);
   const [isSendingCode, setIsSendingCode] = useState(false);
@@ -166,6 +170,24 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Login failed");
       contextLogin(data.access_token);
+        setLoginToken(data.access_token);
+      // After login, check if account is scheduled for deletion
+      try {
+        const statusRes = await fetch(`${API_BASE_URL}/users/me/deletion-status`, {
+          headers: { Authorization: `Bearer ${data.access_token}` },
+        });
+        if (statusRes.ok) {
+          const statusData = await statusRes.json();
+          if (statusData.scheduled) {
+            setDeletionStatus(statusData);
+            setShowDeletionModal(true);
+            // Do not navigate yet; wait for user decision
+            return;
+          }
+        }
+      } catch (e) {
+        console.error("Failed to fetch deletion status", e);
+      }
       setShowLogin(false);
       navigate("/");
     } catch (err: unknown) {
@@ -363,6 +385,47 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
                   </button>
                 </>
               )}
+                {/* Deletion Modal */}
+                {showDeletionModal && deletionStatus && (
+                  <div className={Style.modalOverlay}>
+                    <div className={Style.modalContent}>
+                      <h2 style={{ color: "#ef4444" }}>{t("حذف حسابك مجدول")}</h2>
+                      <p>{t("حسابك مجدول للحذف خلال {{days}} أيام. هل تريد إلغاء الحذف؟", { days: deletionStatus.daysLeft })}</p>
+                      <button
+                        onClick={async () => {
+                          try {
+                            const cancelRes = await fetch(`${API_BASE_URL}/users/me/cancel-deletion`, {
+                              method: "PATCH",
+                              headers: { Authorization: `Bearer ${loginToken}` },
+                            });
+                            if (!cancelRes.ok) throw new Error("Cancel failed");
+                            alert(t("تم إلغاء حذف الحساب"));
+                            setShowDeletionModal(false);
+                            setShowLogin(false);
+                            navigate("/");
+                          } catch (e) {
+                            console.error(e);
+                            alert(t("فشل إلغاء الحذف"));
+                          }
+                        }}
+                        style={{ padding: "8px 16px", background: "#ef4444", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", marginRight: "8px" }}
+                      >
+                        {t("إلغاء الحذف")}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowDeletionModal(false);
+                          setShowLogin(false);
+                          navigate("/");
+                        }}
+                        style={{ padding: "8px 16px", background: "#475569", color: "white", border: "none", borderRadius: "6px", cursor: "pointer" }}
+                      >
+                        {t("متابعة الدخول")}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
             </motion.div>
           </AnimatePresence>
         )}

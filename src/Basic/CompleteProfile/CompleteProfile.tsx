@@ -120,7 +120,10 @@ export default function CompleteProfile() {
   // Saving
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
-
+  // Deletion modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  
   // ─── Upload helper with retry ─────────────────
   const uploadWithRetry = async (
     url: string,
@@ -431,6 +434,30 @@ export default function CompleteProfile() {
     } finally {
       setIsSaving(false);
       setSaveStatus("");
+    }
+  };
+
+  // ─── Delete Account Handler ─────────────────
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      const res = await apiFetch(`${API_BASE_URL}/users/me`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || t("فشل حذف الحساب"));
+      }
+      showToast(t("تم حذف حسابك بنجاح."), "success");
+      logout();
+      navigate("/");
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : t("خطأ غير متوقع");
+      showToast(`${t("فشل الحذف:")} ${msg}`, "error");
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
     }
   };
 
@@ -1394,7 +1421,38 @@ export default function CompleteProfile() {
               t("حفظ وإكمال الملف الشخصي")
             )}
           </motion.button>
+          <motion.button
+            className={styles.deleteBtn}
+            onClick={() => setShowDeleteModal(true)}
+            disabled={isDeleting}
+            whileHover={{ scale: isDeleting ? 1 : 1.03 }}
+            whileTap={{ scale: isDeleting ? 1 : 0.97 }}
+          >
+            {t("حذف الحساب نهائيًا")}
+          </motion.button>
         </motion.div>
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && (
+          <div className={styles.modalOverlay} onClick={() => setShowDeleteModal(false)}>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+              <button className={styles.closeButton} onClick={() => setShowDeleteModal(false)}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+              <h2>{t("تأكيد حذف الحساب")}</h2>
+              <p>{t("بمجرد طلب الحذف، سيتم حذف حسابك نهائياً بعد 15 يوماً. يمكنك إلغاء الإجراء خلال هذه الفترة.")}</p>
+              <div className={styles.modalFooter}>
+                <button className={styles.cancelButton} onClick={() => setShowDeleteModal(false)}>{t("إلغاء")}</button>
+                <button className={styles.submitButton} onClick={handleDelete} disabled={isDeleting}>
+                  {isDeleting ? t("جاري الحذف...") : t("حذف الحساب")}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -103,6 +103,16 @@ export default function ProfileSettings() {
   const [socialLinkInput, setSocialLinkInput] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // Deletion state
+  const [deletionStatus, setDeletionStatus] = useState<{
+    scheduled: boolean;
+    daysLeft?: number;
+    permanentDeleteAt?: string;
+  }>({ scheduled: !!user?.deletionRequestedAt });
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); 
+
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
@@ -141,6 +151,17 @@ export default function ProfileSettings() {
       }
     };
     fetchProfileData();
+
+    const fetchDeletionStatus = async () => {
+      try {
+        const res = await apiFetch(`${API_BASE_URL}/users/me/deletion-status`);
+        if (res.ok) {
+          const data = await res.json();
+          setDeletionStatus(data);
+        }
+      } catch { /* ignore */ }
+    };
+    fetchDeletionStatus();
   }, [role, apiFetch]);
 
   const handleChange = (
@@ -305,6 +326,42 @@ export default function ProfileSettings() {
       }
     } catch (err: any) {
       alert(err.message);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      const res = await apiFetch(`${API_BASE_URL}/users/me`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error(t("فشل في طلب حذف الحساب"));
+      const data = await res.json();
+      alert(data.message || t("تم جدولة حذف الحساب خلال 15 يوما"));
+      setDeletionStatus({ scheduled: true, daysLeft: 15 });
+      setShowDeleteConfirm(false);
+      window.dispatchEvent(new Event("auth-changed"));
+    } catch (err: any) {
+      alert(err.message || t("خطأ"));
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleCancelDeletion = async () => {
+    setIsCancelling(true);
+    try {
+      const res = await apiFetch(`${API_BASE_URL}/users/me/cancel-deletion`, {
+        method: "PATCH",
+      });
+      if (!res.ok) throw new Error(t("فشل في إلغاء طلب الحذف"));
+      alert(t("تم إلغاء طلب حذف الحساب بنجاح!"));
+      setDeletionStatus({ scheduled: false });
+      window.dispatchEvent(new Event("auth-changed"));
+    } catch (err: any) {
+      alert(err.message || t("خطأ"));
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -798,6 +855,64 @@ export default function ProfileSettings() {
                   )}
                 </div>
               </div>
+
+              <div className={styles.row}>
+                <div className={styles.rowLabel}>
+                  <h2 style={{ color: "#ef4444", margin: 0, fontSize: "1.1rem" }}>{t("حذف الحساب")}</h2>
+                  <span>
+                    {deletionStatus.scheduled
+                      ? t("حسابك مجدول للحذف النهائي. يمكنك إلغاء ذلك في أي وقت قبل انتهاء المدة.")
+                      : t("بمجرد طلب الحذف، سيتم حذف حسابك نهائياً بعد 15 يوماً. يمكنك إلغاء الإجراء خلال هذه الفترة.")}
+                  </span>
+                </div>
+                <div className={styles.rowContent}>
+                  {deletionStatus.scheduled ? (
+                    <div style={{ background: "rgba(239, 68, 68, 0.1)", padding: "16px", borderRadius: "8px", border: "1px solid rgba(239, 68, 68, 0.2)" }}>
+                      <p style={{ color: "#ef4444", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
+                        <span>⚠️</span>
+                        <span>{t("جاري حذف الحساب")} — <strong>{deletionStatus.daysLeft} {t("أيام متبقية")}</strong></span>
+                      </p>
+                      <button
+                        onClick={handleCancelDeletion}
+                        disabled={isCancelling}
+                        style={{ padding: "8px 16px", background: "#ef4444", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "500" }}
+                      >
+                        {isCancelling ? t("جاري الإلغاء...") : t("إلغاء الحذف")}
+                      </button>
+                    </div>
+                  ) : !showDeleteConfirm ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowDeleteConfirm(true)}
+                      style={{ padding: "10px 20px", background: "transparent", color: "#ef4444", border: "1px solid #ef4444", borderRadius: "8px", cursor: "pointer", fontWeight: "500", transition: "all 0.2s" }}
+                    >
+                      {t("حذف حسابي")}
+                    </button>
+                  ) : (
+                    <div style={{ background: "rgba(239, 68, 68, 0.05)", padding: "16px", borderRadius: "8px", border: "1px solid rgba(239, 68, 68, 0.2)" }}>
+                      <p style={{ marginBottom: "16px", color: "#e2e8f0" }}>
+                        {t("هل أنت متأكد؟ سيتم حذف حسابك نهائياً بعد 15 يوماً.")}
+                      </p>
+                      <div style={{ display: "flex", gap: "12px" }}>
+                        <button
+                          onClick={handleDeleteAccount}
+                          disabled={isDeleting}
+                          style={{ padding: "8px 16px", background: "#ef4444", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "500" }}
+                        >
+                          {isDeleting ? t("جاري التنفيذ...") : t("نعم، احذف الحساب")}
+                        </button>
+                        <button
+                          onClick={() => setShowDeleteConfirm(false)}
+                          style={{ padding: "8px 16px", background: "transparent", color: "#94a3b8", border: "1px solid #475569", borderRadius: "6px", cursor: "pointer", fontWeight: "500" }}
+                        >
+                          {t("إلغاء")}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
             </>
           )}
         </motion.div>
