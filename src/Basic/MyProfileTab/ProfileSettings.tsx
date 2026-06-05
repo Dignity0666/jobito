@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+﻿import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./ProfileSettings.module.css";
 import { useJobitoAuth } from "../../context/LinkContxt";
@@ -337,7 +337,7 @@ export default function ProfileSettings() {
       });
       if (!res.ok) throw new Error(t("فشل في طلب حذف الحساب"));
       const data = await res.json();
-      alert(data.message || t("تم جدولة حذف الحساب خلال 15 يوما"));
+      alert(data.message || t("تم جدولة حذف الحساب خلال يومين"));
       setShowDeleteConfirm(false);
       logout(); // Logout immediately so they get the fresh flow next time
     } catch (err: any) {
@@ -861,7 +861,7 @@ export default function ProfileSettings() {
                   <span>
                     {deletionStatus.scheduled
                       ? t("حسابك مجدول للحذف النهائي. يمكنك إلغاء ذلك في أي وقت قبل انتهاء المدة.")
-                      : t("بمجرد طلب الحذف، سيتم حذف حسابك نهائياً بعد 15 يوماً. يمكنك إلغاء الإجراء خلال هذه الفترة.")}
+                      : t("بمجرد طلب الحذف، سيتم حذف حسابك نهائياً بعد يومين. يمكنك إلغاء الإجراء خلال هذه الفترة.")}
                   </span>
                 </div>
                 <div className={styles.rowContent}>
@@ -890,7 +890,7 @@ export default function ProfileSettings() {
                   ) : (
                     <div style={{ background: "rgba(239, 68, 68, 0.05)", padding: "16px", borderRadius: "8px", border: "1px solid rgba(239, 68, 68, 0.2)" }}>
                       <p style={{ marginBottom: "16px", color: "#e2e8f0" }}>
-                        {t("هل أنت متأكد؟ سيتم حذف حسابك نهائياً بعد 15 يوماً.")}
+                        {t("هل أنت متأكد؟ سيتم حذف حسابك نهائياً بعد يومين.")}
                       </p>
                       <div style={{ display: "flex", gap: "12px" }}>
                         <button

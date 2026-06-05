@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+﻿import React, { useState, useRef, useEffect } from "react";
 import styles from "./EditProfile.module.css";
 import { useJobitoAuth } from "../../context/LinkContxt";
 import { motion, AnimatePresence } from "framer-motion";
@@ -153,8 +153,8 @@ export default function EditProfile() {
       });
       if (!res.ok) throw new Error(t("فشل في طلب حذف الحساب"));
       const data = await res.json();
-      showToast(data.message || t("تم جدولة حذف الحساب خلال 15 يوما"), "success");
-      setDeletionStatus({ scheduled: true, daysLeft: 15 });
+      showToast(data.message || t("تم جدولة حذف الحساب خلال يومين"), "success");
+      setDeletionStatus({ scheduled: true, daysLeft: 2 });
       setShowDeleteConfirm(false);
       window.dispatchEvent(new Event("auth-changed"));
     } catch (err: any) {
@@ -1193,7 +1193,7 @@ export default function EditProfile() {
                   <p className={styles.sectionSub}>
                     {deletionStatus.scheduled
                       ? t("حسابك مجدول للحذف. يمكنك إلغاء هذا الإجراء قبل انتهاء المدة.")
-                      : t("بمجرد طلب الحذف، سيتم حذف حسابك نهائياً بعد 15 يوماً.")}
+                      : t("بمجرد طلب الحذف، سيتم حذف حسابك نهائياً بعد يومين.")}
                   </p>
                   
                   <div style={{ marginTop: "1rem" }}>
@@ -1225,7 +1225,7 @@ export default function EditProfile() {
                     ) : (
                       <div style={{ background: "var(--bg-card, #fff)", padding: "1.5rem", borderRadius: "12px", border: "1px solid var(--border, #eee)" }}>
                         <p style={{ marginBottom: "1.5rem", fontWeight: "600", color: "var(--text-primary, #111)" }}>
-                          {t("هل أنت متأكد؟ سيتم حذف حسابك نهائياً بعد 15 يوماً.")}
+                          {t("هل أنت متأكد؟ سيتم حذف حسابك نهائياً بعد يومين.")}
                         </p>
                         <div style={{ display: "flex", gap: "1rem" }}>
                           <button
