@@ -310,9 +310,6 @@ export default function ProfileSettings() {
 
   const subTabs = [
     { id: "overview" as ProfileSubTab, label: t("نظرة عامة") },
-    ...(role === "company"
-      ? [{ id: "social" as ProfileSubTab, label: t("روابط التواصل") }]
-      : []),
     { id: "security" as ProfileSubTab, label: t("أمان الحساب") },
   ];
 
@@ -612,10 +609,7 @@ export default function ProfileSettings() {
                   </div>
                 </div>
               )}
-            </>
-          )}
-          {activeSubTab === "social" && (
-            <div className={styles.row}>
+              <div className={styles.row}>
               <div className={styles.rowLabel}>
                 <strong>{t("روابط التواصل الاجتماعي")}</strong>
                 <span>{t("أضف روابط حسابات الشركة على منصات التواصل.")}</span>
@@ -687,6 +681,7 @@ export default function ProfileSettings() {
                 </div>
               </div>
             </div>
+            </>
           )}
 
 

@@ -249,6 +249,7 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
           'إنشاء حساب جديد': 'Create a new account',
           'ابدأ رحلتك المهنية مع Jobito': 'Start your professional journey with Jobito',
           'إنشاء حساب': 'Create Account',
+          'أضف روابط حسابات الشركة على منصات التواصل.': 'Add your company\'s social media account links.',
           'إعدادات الشركة': 'Company Settings',
           'إعدادات الملف الشخصي': 'Profile Settings',
           'نظرة عامة': 'Overview',
