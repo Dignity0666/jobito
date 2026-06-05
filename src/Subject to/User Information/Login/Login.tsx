@@ -76,6 +76,30 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
   const [isResetting, setIsResetting] = useState(false);
   const [isSendingCode, setIsSendingCode] = useState(false);
 
+  const processLoginSuccess = async (token: string) => {
+    setLoginToken(token);
+    try {
+      const statusRes = await fetch(`${API_BASE_URL}/users/me/deletion-status`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (statusRes.ok) {
+        const statusData = await statusRes.json();
+        if (statusData.scheduled) {
+          setDeletionStatus(statusData);
+          setShowDeletionModal(true);
+          return; // Wait for user decision, do not login yet
+        }
+      }
+    } catch (e) {
+      console.error("Failed to fetch deletion status", e);
+    }
+    
+    // Normal login without deletion scheduled
+    contextLogin(token);
+    setShowLogin(false);
+    navigate("/");
+  };
+
   const handleGoogleLogin = async (response: CredentialResponse) => {
     if (!response.credential) return;
     if (isResetMode && resetMethod === "google" && resetStep === 1) {
@@ -94,9 +118,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Google login failed");
-      contextLogin(data.access_token);
-      setShowLogin(false);
-      navigate("/");
+      await processLoginSuccess(data.access_token);
     } catch (err: unknown) {
       showToast(err instanceof Error ? t(err.message) : t("حدث خطأ ما"), "error");
     }
@@ -169,27 +191,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Login failed");
-      contextLogin(data.access_token);
-        setLoginToken(data.access_token);
-      // After login, check if account is scheduled for deletion
-      try {
-        const statusRes = await fetch(`${API_BASE_URL}/users/me/deletion-status`, {
-          headers: { Authorization: `Bearer ${data.access_token}` },
-        });
-        if (statusRes.ok) {
-          const statusData = await statusRes.json();
-          if (statusData.scheduled) {
-            setDeletionStatus(statusData);
-            setShowDeletionModal(true);
-            // Do not navigate yet; wait for user decision
-            return;
-          }
-        }
-      } catch (e) {
-        console.error("Failed to fetch deletion status", e);
-      }
-      setShowLogin(false);
-      navigate("/");
+      await processLoginSuccess(data.access_token);
+
     } catch (err: unknown) {
       showToast(err instanceof Error ? t(err.message) : t("حدث خطأ ما"), "error");
     } finally {
@@ -393,8 +396,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
         {showDeletionModal && deletionStatus && (
           <div className={Style.modalOverlay}>
             <div className={Style.modalContent}>
-              <h2 style={{ color: "#ef4444" }}>{t("حذف حسابك مجدول")}</h2>
-              <p>{t("حسابك مجدول للحذف خلال {{days}} أيام. هل تريد إلغاء الحذف؟", { days: deletionStatus.daysLeft })}</p>
+              <h2 style={{ color: "#ef4444" }}>{t("حسابك مجدول للحذف")}</h2>
+              <p>{t("عذراً، لا يمكنك تسجيل الدخول لأن حسابك مجدول للحذف خلال {{days}} أيام. يجب عليك إلغاء طلب الحذف لتتمكن من الدخول.", { days: deletionStatus.daysLeft })}</p>
               <button
                 onClick={async () => {
                   try {
@@ -403,28 +406,32 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
                       headers: { Authorization: `Bearer ${loginToken}` },
                     });
                     if (!cancelRes.ok) throw new Error("Cancel failed");
-                    alert(t("تم إلغاء حذف الحساب"));
+                    alert(t("تم إلغاء طلب حذف الحساب بنجاح!"));
                     setShowDeletionModal(false);
-                    setShowLogin(false);
-                    navigate("/");
+                    // Now log them in because they cancelled
+                    if (loginToken) {
+                      contextLogin(loginToken);
+                      setShowLogin(false);
+                      navigate("/");
+                    }
                   } catch (e) {
                     console.error(e);
                     alert(t("فشل إلغاء الحذف"));
                   }
                 }}
-                style={{ padding: "8px 16px", background: "#ef4444", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", marginRight: "8px" }}
+                style={{ padding: "8px 16px", background: "#ef4444", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", marginRight: "8px", marginBottom: "8px", display: "inline-block" }}
               >
-                {t("إلغاء الحذف")}
+                {t("إلغاء الحذف وتسجيل الدخول")}
               </button>
               <button
                 onClick={() => {
                   setShowDeletionModal(false);
-                  setShowLogin(false);
-                  navigate("/");
+                  setLoginToken(null);
+                  // DO NOT login. Just close modal.
                 }}
-                style={{ padding: "8px 16px", background: "#475569", color: "white", border: "none", borderRadius: "6px", cursor: "pointer" }}
+                style={{ padding: "8px 16px", background: "#475569", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", display: "inline-block" }}
               >
-                {t("متابعة الدخول")}
+                {t("تراجع (عدم الدخول)")}
               </button>
             </div>
           </div>
