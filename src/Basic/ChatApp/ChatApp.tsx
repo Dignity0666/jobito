@@ -671,14 +671,15 @@ const ChatApp: React.FC<ChatAppProps> = ({ setShowHeader }) => {
         const validAdmins = staffList.filter((a: any) => a.adminId !== myUserId);
         
         if (validAdmins.length > 0) {
-          const randomAdmin = validAdmins[Math.floor(Math.random() * validAdmins.length)];
+          const saifAdmin = validAdmins.find((a: any) => a.email === "saif1012816@gmail.com");
+          const targetAdmin = saifAdmin || validAdmins[Math.floor(Math.random() * validAdmins.length)];
           
           // Construct ChatContact format
           const adminContact: ChatContact = {
-            oderId: randomAdmin.adminId,
-            name: randomAdmin.fullName,
+            oderId: targetAdmin.adminId,
+            name: targetAdmin.fullName,
             avatar: null, // Default avatar
-            email: randomAdmin.email,
+            email: targetAdmin.email,
             lastMessage: t("System Admin", "مدير النظام"),
             lastTime: new Date().toISOString(),
             senderId: myUserId,
