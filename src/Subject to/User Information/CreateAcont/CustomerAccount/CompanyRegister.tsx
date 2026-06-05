@@ -251,6 +251,29 @@ export const CompanyRegister: React.FC = () => {
                     </button>
                   </form>
                   <button
+                    className={styles.resendBtn}
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        const res = await fetch(`${API_BASE_URL}/auth/resend-code`, {
+                          method: "POST",
+                          headers: { 
+                            "Content-Type": "application/json",
+                            "ngrok-skip-browser-warning": "69420"
+                          },
+                          body: JSON.stringify({ email: formData.companyEmail }),
+                        });
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.message || t("فشل إرسال الرمز"));
+                        showToast(t("تم إعادة إرسال الرمز بنجاح"), "success");
+                      } catch (err: any) {
+                        showToast(err.message, "error");
+                      }
+                    }}
+                  >
+                    {t("إعادة إرسال الرمز")}
+                  </button>
+                  <button
                     onClick={() => setVerifyMethod(null)}
                     style={{ background: 'none', border: 'none', color: '#64748b', marginTop: '24px', cursor: 'pointer', fontWeight: 600 }}
                   >
