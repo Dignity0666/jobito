@@ -96,8 +96,8 @@ export default function AccountSecurity() {
       if (!res.ok) throw new Error("فشل في طلب حذف الحساب");
       const data = await res.json();
       showToast(data.message || "تم جدولة حذف الحساب خلال 15 يوما", "success");
-      setDeletionStatus({ scheduled: true, daysLeft: 15 });
       setShowDeleteConfirm(false);
+      logout(); // Force logout so they go through the proper flow next time
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : "Error", "error");
     } finally {

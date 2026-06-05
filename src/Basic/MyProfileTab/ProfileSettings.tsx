@@ -55,7 +55,7 @@ type ProfileSubTab = "overview" | "social" | "security";
 
 export default function ProfileSettings() {
   const { t } = useTranslation();
-  const { user, role, googleClientId, apiFetch, login } = useJobitoAuth();
+  const { user, role, googleClientId, apiFetch, login, logout } = useJobitoAuth();
   const [activeSubTab, setActiveSubTab] = useState<ProfileSubTab>("overview");
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState<any>({
@@ -338,9 +338,8 @@ export default function ProfileSettings() {
       if (!res.ok) throw new Error(t("فشل في طلب حذف الحساب"));
       const data = await res.json();
       alert(data.message || t("تم جدولة حذف الحساب خلال 15 يوما"));
-      setDeletionStatus({ scheduled: true, daysLeft: 15 });
       setShowDeleteConfirm(false);
-      window.dispatchEvent(new Event("auth-changed"));
+      logout(); // Logout immediately so they get the fresh flow next time
     } catch (err: any) {
       alert(err.message || t("خطأ"));
     } finally {
