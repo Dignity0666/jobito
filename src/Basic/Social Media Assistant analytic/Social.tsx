@@ -469,7 +469,7 @@ export default function JobAnalytics() {
             <div className="card timeline-card">
               <div className="timeline-header">
                 <div className="timeline-title">مراحل المتقدمين</div>
-                <div style={{fontSize:12,color:"#9ca3af"}}>نظرة عامة على المراحل</div>
+                <div style={{fontSize:12,color:"#9ca3af"}}>{t("نظرة عامة على المراحل")}</div>
               </div>
               <div className="applicant-stages">
                 {STAGES.map((s,i)=>(
