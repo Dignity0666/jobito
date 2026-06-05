@@ -32,6 +32,7 @@ const PostWork = () => {
     skills: editJob?.skills || ([] as string[]),
     workTime: editJob?.workTime || ([] as string[]),
     images: editJob?.images || ([] as string[]),
+    slotsAvailable: editJob?.slotsAvailable || 1,
   });
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -139,6 +140,7 @@ const PostWork = () => {
         classification: "tradesman_work",
         jobType: ["one-time"],
         isActive: true,
+        slotsAvailable: Number(formData.slotsAvailable) || 1,
       };
 
       const url = isEditMode 
@@ -191,6 +193,26 @@ const PostWork = () => {
             value={formData.title}
             onChange={(e) =>
               setFormData({ ...formData, title: e.target.value })
+            }
+          />
+        </div>
+      </div>
+
+      <div className={styles.divider} />
+
+      <div className={styles.fieldRow}>
+        <div className={styles.rowLabel}>
+          <strong>{t("العدد المطلوب")}</strong>
+          <span>{t("حدد عدد المقاعد أو الأشخاص المطلوبين لهذا العمل.")}</span>
+        </div>
+        <div className={styles.rowContent}>
+          <input
+            type="number"
+            min="1"
+            className={styles.textInput}
+            value={formData.slotsAvailable}
+            onChange={(e) =>
+              setFormData({ ...formData, slotsAvailable: parseInt(e.target.value) || 1 })
             }
           />
         </div>
