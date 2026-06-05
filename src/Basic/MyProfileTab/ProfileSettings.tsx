@@ -337,9 +337,13 @@ export default function ProfileSettings() {
       });
       if (!res.ok) throw new Error(t("فشل في طلب حذف الحساب"));
       setShowDeleteConfirm(false);
-      // Logout IMMEDIATELY — no blocking alert
-      logout();
-      window.location.href = "/";
+      showToast(t("تم استلام طلب حذف الحساب بنجاح. جاري الخروج..."), "success");
+      
+      // Add a slight delay to show the success message before redirecting
+      setTimeout(() => {
+        logout();
+        window.location.href = "/";
+      }, 1500);
     } catch (err: any) {
       showToast(err.message || t("خطأ"), "error");
       setIsDeleting(false);
