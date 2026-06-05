@@ -329,25 +329,18 @@ export default function ProfileSettings() {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    setIsDeleting(true);
-    try {
-      const res = await apiFetch(`${API_BASE_URL}/users/me`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error(t("فشل في طلب حذف الحساب"));
-      setShowDeleteConfirm(false);
-      showToast(t("تم استلام طلب حذف الحساب بنجاح. جاري الخروج..."), "success");
-      
-      // Add a slight delay to show the success message before redirecting
-      setTimeout(() => {
-        logout();
-        window.location.href = "/";
-      }, 1500);
-    } catch (err: any) {
-      showToast(err.message || t("خطأ"), "error");
-      setIsDeleting(false);
-    }
+  const handleDeleteAccount = () => {
+    // Send the request in the background (fire and forget)
+    // keepalive: true ensures the browser doesn't cancel the request when we redirect
+    apiFetch(`${API_BASE_URL}/users/me`, {
+      method: "DELETE",
+      keepalive: true,
+    }).catch(err => console.error("Failed to schedule account deletion:", err));
+
+    // Immediately close the modal, logout, and redirect
+    setShowDeleteConfirm(false);
+    logout();
+    window.location.href = "/";
   };
 
   const handleCancelDeletion = async () => {
