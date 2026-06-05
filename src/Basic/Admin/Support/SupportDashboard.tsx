@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { io, Socket } from "socket.io-client";
 import { useJobitoAuth } from '../../../context/LinkContxt';
 import { API_BASE_URL } from '../../../services/api';
 import { useTranslation } from '../../../context/translation-context';
@@ -24,6 +25,13 @@ const SupportDashboard: React.FC<SupportDashboardProps> = ({ preselectedUser }) 
   const [recentChats, setRecentChats] = useState<any[]>([]);
   const [selectedTicket, setSelectedTicket] = useState<any>(null);
   const [selectedAdmin, setSelectedAdmin] = useState<any>(null);
+
+  const socketRef = useRef<Socket | null>(null);
+  const selectedIdRef = useRef<any>(null);
+
+  useEffect(() => {
+    selectedIdRef.current = selectedId;
+  }, [selectedId]);
 
   const fetchTickets = async () => {
     try {
@@ -66,6 +74,35 @@ const SupportDashboard: React.FC<SupportDashboardProps> = ({ preselectedUser }) 
     fetchAdmins();
     fetchRecentChats();
   }, [apiFetch, language, authUser?.id]);
+
+  useEffect(() => {
+    if (!authUser?.id) return;
+    
+    const socket = io(API_BASE_URL, { transports: ["websocket", "polling"] });
+    socketRef.current = socket;
+
+    socket.on("connect", () => {
+      socket.emit("join_user", { userId: authUser.id });
+    });
+
+    socket.on("new_p2p_message", (msg: any) => {
+      fetchRecentChats();
+      
+      const currentSelectedId = selectedIdRef.current;
+      if (currentSelectedId && (msg.senderId === currentSelectedId || msg.recipientId === currentSelectedId)) {
+        setSelectedTicket((prev: any) => {
+          if (!prev) return prev;
+          // Avoid duplicate messages
+          if (prev.messages.find((m: any) => m.id === msg.id)) return prev;
+          return { ...prev, messages: [...prev.messages, msg] };
+        });
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [authUser?.id]);
 
   const fetchChatHistory = async (otherId: string) => {
     setSelectedId(otherId as any);
