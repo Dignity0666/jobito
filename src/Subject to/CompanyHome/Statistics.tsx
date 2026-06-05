@@ -338,7 +338,7 @@ export default function Statistics({
                   <div className={styles.miniStatInfo}>
                     <p className={styles.miniStatLabel}>{t("مشاهدات الوظائف")}</p>
                     <h3 className={styles.miniStatValue}>
-                      {t(summary.views.total)}
+                      {summary.views.total === "NaN" ? "0" : summary.views.total}
                     </h3>
                   </div>
                   <div
@@ -354,7 +354,7 @@ export default function Statistics({
                   <div className={styles.miniStatInfo}>
                     <p className={styles.miniStatLabel}>{t("طلبات التقديم")}</p>
                     <h3 className={styles.miniStatValue}>
-                      {t(summary.applied.total)}
+                      {summary.applied.total === "NaN" ? "0" : summary.applied.total}
                     </h3>
                   </div>
                   <div
@@ -373,7 +373,7 @@ export default function Statistics({
           <div className={styles.sideCard}>
             <p className={styles.sideCardLabel}>{t("الوظائف المفتوحة")}</p>
             <div className={styles.sideCardValueRow}>
-              <span className={styles.sideCardValue}>{t(summary.jobOpen.toString())}</span>
+              <span className={styles.sideCardValue}>{Number.isNaN(summary.jobOpen) ? "0" : summary.jobOpen}</span>
               <span className={styles.sideCardUnit}>{t("وظيفة مفتوحة")}</span>
             </div>
           </div>
@@ -381,7 +381,7 @@ export default function Statistics({
           <div className={`${styles.sideCard} ${styles.applicantsSummaryCard}`}>
             <h3 className={styles.sideCardHeaderTitle}>{t("ملخص المتقدمين")}</h3>
             <div className={styles.sumValueArea}>
-              <span className={styles.sumHugeNumber}>{t(totalApplicants.toString())}</span>
+              <span className={styles.sumHugeNumber}>{Number.isNaN(totalApplicants) ? "0" : totalApplicants}</span>
               <span className={styles.sumLabelText}>{t("متقدم")}</span>
             </div>
 
@@ -405,7 +405,7 @@ export default function Statistics({
                   "Part-Time": t("دوام جزئي"),
                   Remote: t("عن بعد"),
                   Internship: t("تدريب"),
-                  Contract: t("عقد"),
+                  Contract: t("خدمة لمرة واحدة"),
                 };
                 return (
                   <div key={idx} className={styles.applicantLegendItem}>
@@ -415,7 +415,7 @@ export default function Statistics({
                     />
                     <span className={styles.applicantLegendLabel}>
                       {arabicLabels[tItem.label] || t(tItem.label)} :{" "}
-                      <strong>{t(tItem.count.toString())}</strong>
+                      <strong>{Number.isNaN(tItem.count) ? "0" : tItem.count}</strong>
                     </span>
                   </div>
                 );

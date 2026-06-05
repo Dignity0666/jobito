@@ -546,16 +546,20 @@ export default function ProfilePage() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {ratings.length > 0 ? (
-                ratings.map((rev, idx) => (
+                ratings.map((rev, idx) => {
+                  const raterName = rev.raterUser?.name || rev.raterUser?.fullName || rev.raterCompany?.name || rev.user?.name || rev.user?.fullName || rev.company?.name || "مستخدم غير معروف";
+                  const raterAvatar = rev.raterUser?.avatarUrl || rev.raterCompany?.logoUrl || rev.user?.avatarUrl || rev.company?.logoUrl;
+                  
+                  return (
                   <div key={idx} style={{ padding: '1rem', borderRadius: '12px', border: '1px solid var(--border, #eee)', background: 'var(--bg-card, #fff)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.8rem' }}>
                       <img
-                        src={getAvatarUrl(rev.company?.logoUrl) || `https://api.dicebear.com/7.x/identicon/svg?seed=${rev.company?.name || "Company"}`}
-                        alt={rev.company?.name}
+                        src={getAvatarUrl(raterAvatar) || `https://api.dicebear.com/7.x/identicon/svg?seed=${raterName}`}
+                        alt={raterName}
                         style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }}
                       />
                       <div>
-                        <div style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>{t(rev.company?.name || "شركة غير معروفة")}</div>
+                        <div style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>{t(raterName)}</div>
                         <div style={{ display: 'flex', gap: '2px', marginTop: '2px' }}>
                           {[1, 2, 3, 4, 5].map((star) => (
                             <svg key={star} style={{ color: rev.ratingValue >= star ? "#FFD700" : "#E0E0E0", width: 14, height: 14 }} viewBox="0 0 24 24" fill="currentColor">
@@ -570,7 +574,8 @@ export default function ProfilePage() {
                     </div>
                     {rev.comment && <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{rev.comment}</p>}
                   </div>
-                ))
+                  );
+                })
               ) : (
                 <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>{t("لا توجد تقييمات من الشركات حتى الآن.")}</p>
               )}
@@ -613,21 +618,12 @@ export default function ProfilePage() {
 
         {/* Social Links - only show if at least one link exists */}
         {(() => {
-          const allLinks = [
-            {
-              icon: <InstagramIcon />,
-              label: t("إنستجرام"),
-              link: socialLinks.instagram,
-              color: "#E1306C",
-            },
-            {
-              icon: <TwitterIcon />,
-              label: t("تويتر"),
-              link: socialLinks.twitter,
-              color: "#1DA1F2",
-            },
-          ];
-          const activeLinks = allLinks.filter((s) => s.link && s.link.trim() !== "");
+          const linksArray = Array.isArray(profileUser?.socialLinks)
+            ? profileUser.socialLinks
+            : (profileUser?.socialLinks ? Object.values(profileUser.socialLinks).filter(Boolean) : []);
+            
+          const activeLinks = linksArray.filter((link: any) => typeof link === 'string' && link.trim() !== "");
+          
           if (activeLinks.length === 0) return null;
 
           return (
@@ -636,20 +632,17 @@ export default function ProfilePage() {
                 <div className={styles.cardHeader}>
                   <span className={styles.cardTitle}>{t("روابط التواصل الاجتماعي")}</span>
                 </div>
-                {activeLinks.map((s) => (
-                  <div className={styles.socialRow} key={s.label}>
-                    <div className={styles.socialIcon} style={{ color: s.color }}>{s.icon}</div>
-                    <div>
-                      <div className={styles.socialLabel}>{s.label}</div>
-                      <a
-                        className={styles.socialLink}
-                        href={s.link.startsWith("http") ? s.link : `https://${s.link}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {s.link}
-                      </a>
-                    </div>
+                {activeLinks.map((link: string, idx: number) => (
+                  <div className={styles.socialRow} key={idx} style={{ padding: "8px 0" }}>
+                    <a
+                      className={styles.socialLink}
+                      href={link.startsWith("http") ? link : `https://${link}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ fontSize: "0.95rem", wordBreak: "break-all", color: "var(--primary-color, #2563eb)", textDecoration: "none" }}
+                    >
+                      {link}
+                    </a>
                   </div>
                 ))}
               </div>

@@ -971,7 +971,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
                                 if (jt === "part-time") return t("دوام جزئي");
                                 if (jt === "remote") return t("عن بعد");
                                 if (jt === "internship") return t("تدريب");
-                                if (jt === "contract") return t("عقد");
+                                if (jt === "contract") return t("خدمة لمرة واحدة");
                                 return t(jt);
                               })
                               .join(" / ");

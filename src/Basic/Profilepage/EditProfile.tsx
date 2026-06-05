@@ -81,12 +81,6 @@ export default function EditProfile() {
     gender: user?.gender || "",
     bio: user?.bio || "",
     accountType: user?.role === "company" ? "employer" : "job_seeker",
-    socialLinks: {
-      instagram: user?.socialLinks?.instagram || "",
-      twitter: user?.socialLinks?.twitter || "",
-      website: user?.socialLinks?.website || "",
-      linkedin: user?.socialLinks?.linkedin || "",
-    },
     location: user?.location || "",
     banner_url: user?.banner_url || "",
     role: user?.role || "user",
@@ -106,6 +100,9 @@ export default function EditProfile() {
   const [projectLinks, setProjectLinks] = useState<string[]>(user?.projectLinks || []);
   const [projectLinkInput, setProjectLinkInput] = useState("");
 
+  const [socialLinks, setSocialLinks] = useState<string[]>(Array.isArray(user?.socialLinks) ? user.socialLinks : []);
+  const [socialLinkInput, setSocialLinkInput] = useState("");
+
   const [skillInput, setSkillInput] = useState("");
 
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -123,6 +120,66 @@ export default function EditProfile() {
     new: "",
     confirm: "",
   });
+
+  const [deletionStatus, setDeletionStatus] = useState<{
+    scheduled: boolean;
+    daysLeft?: number;
+    permanentDeleteAt?: string;
+  }>({ scheduled: !!user?.deletionRequestedAt });
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  useEffect(() => {
+    const fetchDeletionStatus = async () => {
+      try {
+        const res = await apiFetch(`${API_BASE_URL}/users/me/deletion-status`);
+        if (res.ok) {
+          const data = await res.json();
+          setDeletionStatus(data);
+        }
+      } catch { /* ignore */ }
+    };
+    if (user?.deletionRequestedAt) {
+      fetchDeletionStatus();
+    }
+  }, [apiFetch, user?.deletionRequestedAt]);
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      const res = await apiFetch(`${API_BASE_URL}/users/me`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error(t("فشل في طلب حذف الحساب"));
+      const data = await res.json();
+      showToast(data.message || t("تم جدولة حذف الحساب خلال 15 يوما"), "success");
+      setDeletionStatus({ scheduled: true, daysLeft: 15 });
+      setShowDeleteConfirm(false);
+      window.dispatchEvent(new Event("auth-changed"));
+    } catch (err: any) {
+      showToast(err.message || "Error", "error");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleCancelDeletion = async () => {
+    setIsCancelling(true);
+    try {
+      const res = await apiFetch(`${API_BASE_URL}/users/me/cancel-deletion`, {
+        method: "PATCH",
+      });
+      if (!res.ok) throw new Error(t("فشل في إلغاء طلب الحذف"));
+      showToast(t("تم إلغاء طلب حذف الحساب بنجاح!"), "success");
+      setDeletionStatus({ scheduled: false });
+      window.dispatchEvent(new Event("auth-changed"));
+    } catch (err: any) {
+      showToast(err.message || "Error", "error");
+    } finally {
+      setIsCancelling(false);
+    }
+  };
   const [showPass, setShowPass] = useState(false);
 
   // Notifications State
@@ -141,13 +198,10 @@ export default function EditProfile() {
     setProfileData({ ...profileData, [e.target.name]: e.target.value });
   };
 
-  const handleSocialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const setProfileFieldValue = (name: string, value: any) => {
     setProfileData({
       ...profileData,
-      socialLinks: {
-        ...profileData.socialLinks,
-        [e.target.name]: e.target.value,
-      },
+      [name]: value,
     });
   };
 
@@ -209,16 +263,16 @@ export default function EditProfile() {
           dob: data.dob ? new Date(data.dob).toISOString().split("T")[0] : "",
           gender: data.gender || "",
           bio: data.bio || "",
+          accountType: data.role === "company" ? "employer" : "job_seeker",
+          location: data.location || "",
+          banner_url: data.banner_url || "",
           role: data.role || "user",
           classification: data.classification || "job_seeker",
-          socialLinks: {
-            instagram: data.socialLinks?.instagram || "",
-            twitter: data.socialLinks?.twitter || "",
-            website: data.socialLinks?.website || "",
-            linkedin: data.socialLinks?.linkedin || "",
-          },
-          location: data.location || "",
         });
+
+        if (Array.isArray(data.socialLinks)) {
+          setSocialLinks(data.socialLinks);
+        }
         setExperience(data.experiences || []);
         setEducation(data.educations || []);
         setSkills(data.skills || []);
@@ -333,7 +387,7 @@ export default function EditProfile() {
           dob: profileData.dob,
           gender: profileData.gender,
           bio: profileData.bio,
-          socialLinks: profileData.socialLinks,
+          socialLinks: socialLinks,
           experiences: experience,
           educations: education,
           skills: skills,
@@ -570,7 +624,7 @@ export default function EditProfile() {
                     </div>
                     <div className={styles.field}>
                       <label className={styles.label}>
-                        {t("الجنس")} <span>*</span>
+                        {t("النوع")} <span>*</span>
                       </label>
                       <select
                         name="gender"
@@ -594,7 +648,7 @@ export default function EditProfile() {
                         <option value="">{t("اختر المحافظة...")}</option>
                         {GOVERNORATES.map((gov) => (
                           <option key={gov} value={gov}>
-                            {gov}
+                            {t(gov)}
                           </option>
                         ))}
                       </select>
@@ -899,50 +953,51 @@ export default function EditProfile() {
                       {t("أضف روابط حساباتك على منصات التواصل الاجتماعي.")}
                     </p>
                   </div>
-                  <div className={styles.formGrid}>
-                    <div className={styles.field}>
-                      <label className={styles.label}>{t("إنستجرام")}</label>
+                  <div className={styles.fieldFull}>
+                    <div className={styles.skillInputWrapper}>
                       <input
                         type="text"
-                        name="instagram"
                         className={styles.input}
-                        placeholder="instagram.com/username"
-                        value={profileData.socialLinks.instagram}
-                        onChange={handleSocialChange}
+                        style={{ flex: 1 }}
+                        placeholder={t("أضف رابط واضغط Enter أو زر الـ +")}
+                        value={socialLinkInput}
+                        onChange={(e) => setSocialLinkInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && socialLinkInput.trim()) {
+                            e.preventDefault();
+                            if (!socialLinks.includes(socialLinkInput.trim())) {
+                              setSocialLinks([...socialLinks, socialLinkInput.trim()]);
+                            }
+                            setSocialLinkInput("");
+                          }
+                        }}
                       />
+                      <button 
+                        type="button"
+                        className={styles.addSkillBtn}
+                        onClick={() => {
+                          if (socialLinkInput.trim() && !socialLinks.includes(socialLinkInput.trim())) {
+                            setSocialLinks([...socialLinks, socialLinkInput.trim()]);
+                          }
+                          setSocialLinkInput("");
+                        }}
+                      >
+                        +
+                      </button>
                     </div>
-                    <div className={styles.field}>
-                      <label className={styles.label}>{t("تويتر")}</label>
-                      <input
-                        type="text"
-                        name="twitter"
-                        className={styles.input}
-                        placeholder="twitter.com/username"
-                        value={profileData.socialLinks.twitter}
-                        onChange={handleSocialChange}
-                      />
-                    </div>
-                    <div className={styles.field}>
-                      <label className={styles.label}>{t("الموقع الإلكتروني / معرض الأعمال")}</label>
-                      <input
-                        type="text"
-                        name="website"
-                        className={styles.input}
-                        placeholder="https://myportfolio.com"
-                        value={profileData.socialLinks.website}
-                        onChange={handleSocialChange}
-                      />
-                    </div>
-                    <div className={styles.field}>
-                      <label className={styles.label}>{t("لينكد إن")}</label>
-                      <input
-                        type="text"
-                        name="linkedin"
-                        className={styles.input}
-                        placeholder="linkedin.com/in/username"
-                        value={profileData.socialLinks.linkedin}
-                        onChange={handleSocialChange}
-                      />
+
+                    <div className={styles.tagContainer}>
+                      {socialLinks.map((link, i) => (
+                        <span key={i} className={styles.tag}>
+                          {link}
+                          <span
+                            className={styles.tagRemove}
+                            onClick={() => setSocialLinks(socialLinks.filter((_, idx) => idx !== i))}
+                          >
+                            ×
+                          </span>
+                        </span>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -962,77 +1017,45 @@ export default function EditProfile() {
                     </p>
                   </div>
                   <div className={styles.fieldFull}>
-                    <div className={styles.servicesRow}>
-                      {PREDEFINED_SERVICES.map((srv, idx) => (
-                        <button
-                          key={idx}
-                          className={`${styles.serviceSlot} ${services.includes(srv) ? styles.serviceSlotActive : ""}`}
-                          onClick={() => {
-                            if (services.includes(srv)) {
-                              setServices(services.filter((s) => s !== srv));
-                            } else {
-                              setServices([...services, srv]);
+                    <div className={styles.skillInputWrapper}>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        style={{ flex: 1 }}
+                        placeholder={t("أضف خدمة واضغط Enter أو زر الـ +")}
+                        value={newServiceInput}
+                        onChange={(e) => setNewServiceInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && newServiceInput.trim()) {
+                            e.preventDefault();
+                            if (!services.includes(newServiceInput.trim())) {
+                              setServices([...services, newServiceInput.trim()]);
                             }
-                          }}
-                        >
-                          {t(srv)}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className={styles.customServiceArea}>
-                      {isAddingService ? (
-                        <div className={styles.serviceInputGroup}>
-                          <input
-                            type="text"
-                            className={styles.input}
-                            placeholder={t("اسم الخدمة...")}
-                            value={newServiceInput}
-                            autoFocus
-                            onChange={(e) => setNewServiceInput(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" && newServiceInput.trim()) {
-                                e.preventDefault();
-                                if (!services.includes(newServiceInput.trim())) {
-                                  setServices([...services, newServiceInput.trim()]);
-                                }
-                                setNewServiceInput("");
-                                setIsAddingService(false);
-                              } else if (e.key === "Escape") {
-                                setIsAddingService(false);
-                              }
-                            }}
-                          />
-                          <button 
-                            className={styles.addBtnSmall}
-                            onClick={() => {
-                              if (newServiceInput.trim() && !services.includes(newServiceInput.trim())) {
-                                setServices([...services, newServiceInput.trim()]);
-                              }
-                              setNewServiceInput("");
-                              setIsAddingService(false);
-                            }}
-                          >
-                            {t("إضافة")}
-                          </button>
-                        </div>
-                      ) : (
-                        <button 
-                          className={styles.dashedAddBtn}
-                          onClick={() => setIsAddingService(true)}
-                        >
-                          {t("Add new Serves")}
-                        </button>
-                      )}
+                            setNewServiceInput("");
+                          }
+                        }}
+                      />
+                      <button 
+                        type="button"
+                        className={styles.addSkillBtn}
+                        onClick={() => {
+                          if (newServiceInput.trim() && !services.includes(newServiceInput.trim())) {
+                            setServices([...services, newServiceInput.trim()]);
+                          }
+                          setNewServiceInput("");
+                        }}
+                      >
+                        +
+                      </button>
                     </div>
 
                     <div className={styles.tagContainer}>
-                      {services.filter(s => !PREDEFINED_SERVICES.includes(s)).map((srv, i) => (
+                      {services.map((srv, i) => (
                         <span key={i} className={styles.tag}>
-                          {srv}
+                          {t(srv)}
                           <span
                             className={styles.tagRemove}
-                            onClick={() => setServices(services.filter((sItem) => sItem !== srv))}
+                            onClick={() => setServices(services.filter((_, idx) => idx !== i))}
                           >
                             ×
                           </span>
@@ -1164,6 +1187,68 @@ export default function EditProfile() {
                     />
                   </div>
                 </div>
+
+                <div className={styles.section} style={{ marginTop: "2.5rem", borderTop: "1px solid var(--border, #eee)", paddingTop: "2rem" }}>
+                  <h3 className={styles.sectionTitle} style={{ color: "#dc2626" }}>{t("حذف الحساب")}</h3>
+                  <p className={styles.sectionSub}>
+                    {deletionStatus.scheduled
+                      ? t("حسابك مجدول للحذف. يمكنك إلغاء هذا الإجراء قبل انتهاء المدة.")
+                      : t("بمجرد طلب الحذف، سيتم حذف حسابك نهائياً بعد 15 يوماً.")}
+                  </p>
+                  
+                  <div style={{ marginTop: "1rem" }}>
+                    {deletionStatus.scheduled ? (
+                      <div style={{ background: "rgba(220, 38, 38, 0.05)", padding: "1.5rem", borderRadius: "12px", border: "1px solid rgba(220, 38, 38, 0.2)" }}>
+                        <p style={{ color: "#dc2626", fontWeight: "bold", marginBottom: "1.5rem", fontSize: "1.05rem", display: "flex", alignItems: "center", gap: "8px" }}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                          {t("جاري حذف الحساب")} — {deletionStatus.daysLeft} {t("يوم متبقي")}
+                        </p>
+                        <button
+                          type="button"
+                          style={{ background: "#2563eb", color: "#fff", border: "none", padding: "0.75rem 1.5rem", borderRadius: "8px", cursor: "pointer", fontWeight: "600", transition: "all 0.2s" }}
+                          onClick={handleCancelDeletion}
+                          disabled={isCancelling}
+                        >
+                          {isCancelling ? t("جاري الإلغاء...") : t("إلغاء حذف الحساب")}
+                        </button>
+                      </div>
+                    ) : !showDeleteConfirm ? (
+                      <button
+                        type="button"
+                        style={{ background: "transparent", color: "#dc2626", border: "1px solid #dc2626", padding: "0.75rem 1.5rem", borderRadius: "8px", cursor: "pointer", fontWeight: "600", transition: "all 0.2s" }}
+                        onMouseOver={(e) => { e.currentTarget.style.background = "#dc2626"; e.currentTarget.style.color = "#fff"; }}
+                        onMouseOut={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#dc2626"; }}
+                        onClick={() => setShowDeleteConfirm(true)}
+                      >
+                        {t("حذف حسابي")}
+                      </button>
+                    ) : (
+                      <div style={{ background: "var(--bg-card, #fff)", padding: "1.5rem", borderRadius: "12px", border: "1px solid var(--border, #eee)" }}>
+                        <p style={{ marginBottom: "1.5rem", fontWeight: "600", color: "var(--text-primary, #111)" }}>
+                          {t("هل أنت متأكد؟ سيتم حذف حسابك نهائياً بعد 15 يوماً.")}
+                        </p>
+                        <div style={{ display: "flex", gap: "1rem" }}>
+                          <button
+                            type="button"
+                            style={{ background: "#dc2626", color: "#fff", border: "none", padding: "0.75rem 1.5rem", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}
+                            onClick={handleDeleteAccount}
+                            disabled={isDeleting}
+                          >
+                            {isDeleting ? t("جاري المعالجة...") : t("نعم، احذف حسابي")}
+                          </button>
+                          <button
+                            type="button"
+                            style={{ background: "transparent", color: "var(--text-secondary, #666)", border: "1px solid var(--border, #ccc)", padding: "0.75rem 1.5rem", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}
+                            onClick={() => setShowDeleteConfirm(false)}
+                          >
+                            {t("إلغاء")}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
               </div>
             </motion.div>
           )}

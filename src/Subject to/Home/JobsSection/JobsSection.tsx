@@ -80,7 +80,7 @@ const CompanyJobCard: React.FC<{ job: Job; variants: Variants }> = ({ job, varia
       if (lowerType === "part-time") return t("دوام جزئي");
       if (lowerType === "remote") return t("عن بعد");
       if (lowerType === "internship") return t("تدريب");
-      if (lowerType === "contract") return t("عقد");
+      if (lowerType === "contract") return t("خدمة لمرة واحدة");
       return t(type);
     }).join(" / ");
   })();

@@ -109,13 +109,13 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
         formData.append("entity_id", user?.id || "anonymous");
         formData.append("image_type", "gallery");
         
-        const uploadRes = await apiFetch(`${API_BASE_URL}/images/upload`, {
+        const uploadRes = await apiFetch(`${API_BASE_URL}/auth/upload-document`, {
           method: "POST",
           body: formData,
         });
         if (uploadRes.ok) {
           const uploadData = await uploadRes.json();
-          resumeUrl = uploadData.imageUrl;
+          resumeUrl = uploadData.url || uploadData.imageUrl;
         } else {
           throw new Error(t("فشل رفع السيرة الذاتية"));
         }

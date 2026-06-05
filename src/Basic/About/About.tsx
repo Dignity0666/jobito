@@ -53,7 +53,7 @@ const FEATURES = [
   },
   {
     title: "أدوات تطوير المسار المهني",
-    desc: "من بناء السيرة الذاتية بالذكاء الاصطناعي إلى التحضير للمقابلات، يوفر جوبيتو الأدوات التي تحتاجها للتميز في مسيرتك المهنية.",
+    desc: "من بناء السيرة الذاتية بالذكاء الاصطناعي إلى التحضير للمقابلات، يوفر Jobito الأدوات التي تحتاجها للتميز في مسيرتك المهنية.",
     icon: <Icon d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />,
     color: "var(--color-primary)",
     bg: "var(--color-primary-light)",
@@ -69,38 +69,11 @@ const SERVICES = [
     cb: "var(--color-accent-light)",
   },
   {
-    title: "بناء السيرة الذاتية الاحترافية",
-    desc: "أنشئ سيرة ذاتية متميزة في دقائق باستخدام قوالبنا المصممة خصيصاً لتجاوز أنظمة ATS الحديثة.",
-    icon: <Icon d="M16 7V5a2 2 0 0 0-2-2H10a2 2 0 0 0-2 2v2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z" />,
-    ca: "var(--color-primary)",
-    cb: "var(--color-primary-light)",
-  },
-  {
-    title: "البحث عن التنفيذيين",
-    desc: "خدمات توظيف مخصصة للإدارة العليا والأدوار القيادية التقنية المتخصصة.",
-    icon: (
-      <Icon>
-        <circle cx="12" cy="12" r="10" />
-        <circle cx="12" cy="12" r="6" />
-        <circle cx="12" cy="12" r="2" />
-      </Icon>
-    ),
-    ca: "var(--color-accent)",
-    cb: "var(--color-accent-light)",
-  },
-  {
     title: "الاستشارات المهنية",
     desc: "توجيهات خبيرة حول مفاوضات الرواتب، وتخطيط المسار المهني، والنجاح في الانتقالات الوظيفية.",
     icon: <Icon d="M3 18v-6a9 9 0 0 1 18 0v6 M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3 M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />,
     ca: "var(--color-muted)",
     cb: "var(--color-bg-secondary)",
-  },
-  {
-    title: "التحضير للمقابلات",
-    desc: "مقابلات تجريبية وأدلة للأسئلة الشائعة لمساعدتك في الحصول على الوظيفة في كبرى المنظمات.",
-    icon: <Icon d="M3 3v18h18 M18 17l-4-4-2 2-4-4" />,
-    ca: "var(--color-primary)",
-    cb: "var(--color-primary-light)",
   },
   {
     title: "رؤى سوق الشركات",
@@ -194,11 +167,11 @@ export function About() {
           <div className={styles.container}>
             <div className={styles["hero-grid"]}>
               <div ref={r("hero")} className={rv(vis, "hero", "l")}>
-                <div className={styles["hero-tag"]}>✦ {t("مرحباً بك في جوبيتو")}</div>
+                <div className={styles["hero-tag"]}>✦ {t("مرحباً بك في Jobito")}</div>
                 <h1 className={styles["hero-h1"]}>
                   <span style={{ display: "block" }}>{t("جد وظيفة أحلامك")}</span>
                   <span className={styles["co-t"]}>
-                    {t("في جوبيتو")}
+                    {t("في Jobito")}
                     <svg viewBox="0 0 280 12" fill="none" height="12">
                       <path
                         d="M4 9 Q70 2 140 9 T276 9"
@@ -211,7 +184,8 @@ export function About() {
                   </span>
                 </h1>
                 <p className={styles["hero-desc"]}>
-                  {t("يربط جوبيتو بين نخبة المواهب وأكثر الشركات ابتكاراً في العالم. رحلتك نحو مستقبل مهني أفضل تبدأ ببحث أذكى عن وظيفتك.")}
+                  <span style={{ display: "block", fontWeight: "bold", marginBottom: "8px" }}>{t("مرحباً بك في Jobito")} - {t("تمكين رحلتك المهنية")}</span>
+                  {t("Jobito هي منصة عالمية مصممة لربط المواهب الاستثنائية بالمنظمات الرائدة في جميع أنحاء العالم. مسارك نحو مسيرة مهنية أفضل يبدأ هنا، مدعوماً بتجربة بحث عن عمل ذكية وفعالة.")}
                 </p>
                 <div className={styles["hero-btns"]}>
                   <button className={styles["btn-pri"]} onClick={() => navigate("/user-information", { state: { showLogin: true } })}>{t("ابدأ رحلتك")} ←</button>
@@ -312,7 +286,7 @@ export function About() {
                 {t("الخدمات")} <span className={styles.acc}>{t("التي نوفرها")}</span>
               </h2>
               <p className={styles.lead}>
-                {t("يوفر جوبيتو حلول توظيف مخصصة لأعمالك بأكثر الطرق مرونة واعتماداً على القيمة.")}
+                {t("يوفر Jobito حلول توظيف مخصصة لأعمالك بأكثر الطرق مرونة واعتماداً على القيمة.")}
               </p>
             </div>
             <div className={styles["svc-grid"]}>
