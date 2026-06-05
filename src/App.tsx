@@ -202,19 +202,110 @@ function AppContent() {
               alignItems: "center",
               justifyContent: "center",
               flexDirection: "column",
-              padding: "50px 20px",
-              textAlign: "center"
+              padding: "60px 20px",
+              minHeight: "60vh",
             }}
           >
             {isMaintenance ? (
-               <div style={{ maxWidth: '600px', margin: '0 auto', background: '#fff', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                 <h2 style={{ fontSize: '28px', color: '#102A43', marginBottom: '20px' }}>الموقع تحت الصيانة حالياً 🛠️</h2>
-                 <p style={{ fontSize: '18px', color: '#486581', lineHeight: '1.6' }}>
-                   نعتذر عن الإزعاج، نقوم حالياً ببعض التحديثات والتحسينات الهامة على النظام لتقديم تجربة أفضل لكم. يرجى المحاولة مرة أخرى لاحقاً.
-                 </p>
-               </div>
+              <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                style={{
+                  maxWidth: "550px",
+                  width: "100%",
+                  margin: "0 auto",
+                  background: "linear-gradient(135deg, #f8f9fc 0%, #eef1f8 100%)",
+                  padding: "50px 40px",
+                  borderRadius: "20px",
+                  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)",
+                  textAlign: "center",
+                  direction: "rtl",
+                  border: "1px solid rgba(255,255,255,0.6)",
+                }}
+              >
+                {/* Animated Gear Icon */}
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+                  style={{
+                    width: "80px",
+                    height: "80px",
+                    margin: "0 auto 24px",
+                    borderRadius: "50%",
+                    background: "linear-gradient(135deg, #4F46E5, #7C3AED)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "36px",
+                    boxShadow: "0 4px 20px rgba(79, 70, 229, 0.3)",
+                  }}
+                >
+                  ⚙️
+                </motion.div>
+
+                <motion.h2
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3, duration: 0.5 }}
+                  style={{
+                    fontSize: "26px",
+                    fontWeight: "700",
+                    color: "#1E293B",
+                    marginBottom: "16px",
+                    lineHeight: "1.4",
+                  }}
+                >
+                  الموقع تحت الصيانة حالياً
+                </motion.h2>
+
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                  style={{
+                    fontSize: "16px",
+                    color: "#64748B",
+                    lineHeight: "1.8",
+                    marginBottom: "28px",
+                  }}
+                >
+                  نعتذر عن الإزعاج، نقوم حالياً ببعض التحديثات والتحسينات الهامة على النظام لتقديم تجربة أفضل لكم. يرجى المحاولة مرة أخرى لاحقاً.
+                </motion.p>
+
+                {/* Pulsing Status Indicator */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.7, duration: 0.5 }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "10px",
+                    padding: "12px 24px",
+                    background: "rgba(79, 70, 229, 0.08)",
+                    borderRadius: "12px",
+                    border: "1px solid rgba(79, 70, 229, 0.15)",
+                  }}
+                >
+                  <motion.div
+                    animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                    style={{
+                      width: "10px",
+                      height: "10px",
+                      borderRadius: "50%",
+                      background: "#4F46E5",
+                    }}
+                  />
+                  <span style={{ fontSize: "14px", color: "#4F46E5", fontWeight: "600" }}>
+                    جاري العمل على التحديثات...
+                  </span>
+                </motion.div>
+              </motion.div>
             ) : (
-               <NotFound />
+              <NotFound />
             )}
           </div>
           <Footer />
