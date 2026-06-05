@@ -467,7 +467,7 @@ export const SignUpPage: React.FC = () => {
                       onClick={() => setShowPassword(!showPassword)}
                       style={{
                         position: "absolute",
-                        insetInlineEnd: "14px",
+                        insetInlineStart: "14px",
                         background: "none",
                         border: "none",
                         cursor: "pointer",
@@ -508,7 +508,7 @@ export const SignUpPage: React.FC = () => {
                       }
                       style={{
                         position: "absolute",
-                        insetInlineEnd: "14px",
+                        insetInlineStart: "14px",
                         background: "none",
                         border: "none",
                         cursor: "pointer",

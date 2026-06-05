@@ -84,7 +84,7 @@
 }
 
 .relativeInput input {
-  padding-inline-end: 44px;
+  padding-inline-start: 44px;
 }
 
 .inputGroup input:focus,

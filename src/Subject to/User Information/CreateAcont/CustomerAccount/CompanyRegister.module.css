@@ -203,9 +203,13 @@
   align-items: center;
 }
 
+.passwordWrapper input {
+  padding-inline-start: 45px;
+}
+
 .eyeButton {
   position: absolute;
-  inset-inline-end: 14px;
+  inset-inline-start: 14px;
   background: none;
   border: none;
   color: var(--color-text-muted);
