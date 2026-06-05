@@ -396,43 +396,49 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
         {showDeletionModal && deletionStatus && (
           <div className={Style.modalOverlay}>
             <div className={Style.modalContent}>
-              <h2 style={{ color: "#ef4444" }}>{t("حسابك مجدول للحذف")}</h2>
-              <p>{t("عذراً، لا يمكنك تسجيل الدخول لأن حسابك مجدول للحذف خلال {{days}} أيام. يجب عليك إلغاء طلب الحذف لتتمكن من الدخول.", { days: deletionStatus.daysLeft })}</p>
-              <button
-                onClick={async () => {
-                  try {
-                    const cancelRes = await fetch(`${API_BASE_URL}/users/me/cancel-deletion`, {
-                      method: "PATCH",
-                      headers: { Authorization: `Bearer ${loginToken}` },
-                    });
-                    if (!cancelRes.ok) throw new Error("Cancel failed");
-                    alert(t("تم إلغاء طلب حذف الحساب بنجاح!"));
-                    setShowDeletionModal(false);
-                    // Now log them in because they cancelled
-                    if (loginToken) {
-                      contextLogin(loginToken);
-                      setShowLogin(false);
-                      navigate("/");
+              <span className={Style.modalIcon}>⚠️</span>
+              <h2 className={Style.modalTitle}>{t("حسابك مجدول للحذف")}</h2>
+              <p className={Style.modalText}>
+                {t("عذراً، لا يمكنك تسجيل الدخول لأن حسابك مجدول للحذف خلال {{days}} أيام. يجب عليك إلغاء طلب الحذف لتتمكن من الدخول.", { days: deletionStatus.daysLeft })}
+              </p>
+              
+              <div className={Style.modalActions}>
+                <button
+                  onClick={async () => {
+                    try {
+                      const cancelRes = await fetch(`${API_BASE_URL}/users/me/cancel-deletion`, {
+                        method: "PATCH",
+                        headers: { Authorization: `Bearer ${loginToken}` },
+                      });
+                      if (!cancelRes.ok) throw new Error("Cancel failed");
+                      alert(t("تم إلغاء طلب حذف الحساب بنجاح!"));
+                      setShowDeletionModal(false);
+                      // Now log them in because they cancelled
+                      if (loginToken) {
+                        contextLogin(loginToken);
+                        setShowLogin(false);
+                        navigate("/");
+                      }
+                    } catch (e) {
+                      console.error(e);
+                      alert(t("فشل إلغاء الحذف"));
                     }
-                  } catch (e) {
-                    console.error(e);
-                    alert(t("فشل إلغاء الحذف"));
-                  }
-                }}
-                style={{ padding: "8px 16px", background: "#ef4444", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", marginRight: "8px", marginBottom: "8px", display: "inline-block" }}
-              >
-                {t("إلغاء الحذف وتسجيل الدخول")}
-              </button>
-              <button
-                onClick={() => {
-                  setShowDeletionModal(false);
-                  setLoginToken(null);
-                  // DO NOT login. Just close modal.
-                }}
-                style={{ padding: "8px 16px", background: "#475569", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", display: "inline-block" }}
-              >
-                {t("تراجع (عدم الدخول)")}
-              </button>
+                  }}
+                  className={Style.cancelDeleteBtn}
+                >
+                  {t("إلغاء الحذف وتسجيل الدخول")}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowDeletionModal(false);
+                    setLoginToken(null);
+                    // DO NOT login. Just close modal.
+                  }}
+                  className={Style.goBackBtn}
+                >
+                  {t("تراجع (عدم الدخول)")}
+                </button>
+              </div>
             </div>
           </div>
         )}
