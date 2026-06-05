@@ -118,9 +118,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Google login failed");
+        
       await processLoginSuccess(data.access_token);
     } catch (err: unknown) {
-      showToast(err instanceof Error ? t(err.message) : t("حدث خطأ ما"), "error");
+      showToast(err instanceof Error ? t(err.message) : t("فشل تسجيل الدخول بجوجل"), "error");
     }
   };
 

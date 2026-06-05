@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./ProfileSettings.module.css";
 import { useJobitoAuth } from "../../context/LinkContxt";
@@ -340,6 +340,7 @@ export default function ProfileSettings() {
       alert(data.message || t("تم جدولة حذف الحساب خلال يومين"));
       setShowDeleteConfirm(false);
       logout(); // Logout immediately so they get the fresh flow next time
+      window.location.href = "/"; // Force redirect to home
     } catch (err: any) {
       alert(err.message || t("خطأ"));
     } finally {

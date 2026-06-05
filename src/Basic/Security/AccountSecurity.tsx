@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import styles from "./AccountSecurity.module.css";
 import { useJobitoAuth } from "../../context/LinkContxt";
@@ -98,6 +98,7 @@ export default function AccountSecurity() {
       showToast(data.message || "تم جدولة حذف الحساب خلال يومين", "success");
       setShowDeleteConfirm(false);
       logout(); // Force logout so they go through the proper flow next time
+      window.location.href = "/"; // Force redirect to home
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : "Error", "error");
     } finally {

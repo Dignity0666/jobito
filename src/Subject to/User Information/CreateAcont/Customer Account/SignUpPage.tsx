@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useTranslation } from "../../../../context/translation-context";
 import { useToast } from "../../../../context/ToastContext";
+import { useJobitoAuth } from "../../../../context/LinkContxt";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
@@ -47,6 +48,11 @@ export const SignUpPage: React.FC = () => {
     confirmPassword: "",
   });
 
+  const [deletionStatus, setDeletionStatus] = useState<{ scheduled: boolean; daysLeft?: number } | null>(null);
+  const [showDeletionModal, setShowDeletionModal] = useState(false);
+  const [loginToken, setLoginToken] = useState<string | null>(null);
+  const { login: contextLogin } = useJobitoAuth();
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("verified") === "true") setVerifiedStatus("success");
@@ -65,7 +71,25 @@ export const SignUpPage: React.FC = () => {
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Google signup failed");
 
+        setLoginToken(data.access_token);
+        try {
+          const statusRes = await fetch(`${API_BASE_URL}/users/me/deletion-status`, {
+            headers: { Authorization: `Bearer ${data.access_token}` },
+          });
+          if (statusRes.ok) {
+            const statusData = await statusRes.json();
+            if (statusData.scheduled) {
+              setDeletionStatus(statusData);
+              setShowDeletionModal(true);
+              return; // Wait for user decision, do not login yet
+            }
+          }
+        } catch (e) {
+          console.error("Failed to fetch deletion status", e);
+        }
+
         localStorage.setItem("token", data.access_token);
+        contextLogin?.(data.access_token);
         window.dispatchEvent(new Event("auth-changed"));
         navigate("/");
       } catch (err: unknown) {
@@ -553,6 +577,73 @@ export const SignUpPage: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Deletion Modal */}
+      {showDeletionModal && deletionStatus && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+          background: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999999
+        }}>
+          <div style={{
+            background: '#ffffff', borderRadius: '24px', padding: '40px 32px',
+            width: '90%', maxWidth: '440px', textAlign: 'center',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+          }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>⚠️</div>
+            <h2 style={{ color: '#ef4444', fontSize: '26px', fontWeight: 800, marginBottom: '14px' }}>
+              {t("حسابك مجدول للحذف")}
+            </h2>
+            <p style={{ color: '#334155', fontSize: '16px', lineHeight: 1.7, marginBottom: '32px' }}>
+              {t("عذراً، لا يمكنك تسجيل الدخول لأن حسابك مجدول للحذف. يجب عليك إلغاء طلب الحذف لتتمكن من الدخول.")}
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <button
+                onClick={async () => {
+                  try {
+                    const cancelRes = await fetch(`${API_BASE_URL}/users/me/cancel-deletion`, {
+                      method: 'PATCH',
+                      headers: { Authorization: `Bearer ${loginToken}` },
+                    });
+                    if (!cancelRes.ok) throw new Error('Cancel failed');
+                    alert(t("تم إلغاء طلب حذف الحساب بنجاح!"));
+                    setShowDeletionModal(false);
+                    if (loginToken) {
+                      localStorage.setItem('token', loginToken);
+                      contextLogin?.(loginToken);
+                      window.dispatchEvent(new Event('auth-changed'));
+                      navigate('/');
+                    }
+                  } catch (e) {
+                    console.error(e);
+                    alert(t("فشل إلغاء الحذف"));
+                  }
+                }}
+                style={{
+                  background: 'linear-gradient(135deg, #ef4444, #dc2626)', color: 'white',
+                  border: 'none', borderRadius: '14px', padding: '16px',
+                  fontSize: '16px', fontWeight: 700, cursor: 'pointer', width: '100%'
+                }}
+              >
+                {t("إلغاء الحذف وتسجيل الدخول")}
+              </button>
+              <button
+                onClick={() => {
+                  setShowDeletionModal(false);
+                  setLoginToken(null);
+                }}
+                style={{
+                  background: '#f1f5f9', color: '#475569', border: 'none',
+                  borderRadius: '14px', padding: '16px', fontSize: '16px',
+                  fontWeight: 600, cursor: 'pointer', width: '100%'
+                }}
+              >
+                {t("تراجع (عدم الدخول)")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
