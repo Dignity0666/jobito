@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import { API_BASE_URL } from '../services/api';
 import enTranslations from '../locales/en';
+import arTranslations from '../locales/ar';
 
 // --- TYPES & INTERFACES ---
 export interface TranslationContextType {
@@ -131,6 +132,8 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
       let text = '';
       if (language === 'en') {
         text = (enTranslations as Record<string, string>)[key] || '';
+      } else if (language === 'ar') {
+        text = (arTranslations as Record<string, string>)[key] || '';
       }
 
       // Priority 2: Explicit Fallback (if provided and not in dictionary)
