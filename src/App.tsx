@@ -168,6 +168,42 @@ function AppContent() {
 
   const mainLayoutRef = useRef<HTMLDivElement>(null);
 
+  // DevTools Protection (Blocks Right-Click, F12, and Shortcuts)
+  useEffect(() => {
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault(); // Block Right-Click
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent F12
+      if (e.key === "F12") {
+        e.preventDefault();
+      }
+      // Prevent Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+Shift+C
+      if (
+        e.ctrlKey &&
+        e.shiftKey &&
+        (e.key.toLowerCase() === "i" ||
+          e.key.toLowerCase() === "j" ||
+          e.key.toLowerCase() === "c")
+      ) {
+        e.preventDefault();
+      }
+      // Prevent Ctrl+U (View Source)
+      if (e.ctrlKey && e.key.toLowerCase() === "u") {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener("contextmenu", handleContextMenu);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("contextmenu", handleContextMenu);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   useEffect(() => {
     setShowHeader(!shouldHide);
   }, [shouldHide]);

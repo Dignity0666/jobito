@@ -152,6 +152,9 @@ const AllJobs: React.FC<AllJobsProps> = ({
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [facets, setFacets] = useState<any>({ jobType: {}, category: {}, level: {}, salary: {} });
   const jobsPerPage = 10;
 
   // Filter states
@@ -187,7 +190,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
   }, [searchParams, setSearchParams]);
 
   useEffect(() => {
-    const currentParams = JSON.stringify({ searchKeyword, location });
+    const currentParams = JSON.stringify({ searchKeyword, location, currentPage, selectedTypes, selectedCategories, selectedLevels, selectedSalaries });
     const abortController = new AbortController();
     const currentRender = renderCount.current;
 
@@ -206,91 +209,58 @@ const AllJobs: React.FC<AllJobsProps> = ({
       // 2. Track current fetch operation
       console.log(
         `🔍 [AllJobs] [Render ${currentRender}] Starting fetchData...`,
-        { searchKeyword, location },
+        { searchKeyword, location, currentPage },
       );
       fetchInProgress.current = true;
       lastFetchParams.current = currentParams;
 
       setLoading(true);
       try {
-        // Fetch Jobs: Use AI Smart Search when search keyword exists
         let jobsList: Job[] = [];
-
-        // Ensure location is a string to avoid [object Object]
         const safeLocation = typeof location === "string" ? location : "";
 
-        if (searchKeyword && searchKeyword.trim() !== "") {
-          // 🧠 AI Smart Search - uses role tagging, query expansion, and scoring
-          const smartParams = new URLSearchParams({ q: searchKeyword });
-          const isTradesman =
-            classification === "tradesman" || classification === "industrial";
-          if (safeLocation) smartParams.append("location", safeLocation);
+        const queryParams = new URLSearchParams({
+          limit: jobsPerPage.toString(),
+          page: currentPage.toString(),
+          ...(safeLocation && { location: safeLocation }),
+          ...(searchKeyword && { search: searchKeyword }),
+        });
 
-          const smartRes = await fetch(
-            `${API_BASE_URL}/ai/smart-search?${smartParams.toString()}`,
-            {
-              headers: {
-                "ngrok-skip-browser-warning": "69420",
-              },
-              signal: abortController.signal,
+        if (selectedTypes.length > 0) queryParams.append("jobType", selectedTypes.join(","));
+        if (selectedCategories.length > 0) queryParams.append("categoryId", selectedCategories.join(","));
+        if (selectedLevels.length > 0) queryParams.append("jobLevel", selectedLevels.join(","));
+        if (selectedSalaries.length > 0) queryParams.append("salaryRange", selectedSalaries.join(","));
+
+        const jobsRes = await fetch(
+          `${API_BASE_URL}/jobs?${queryParams.toString()}`,
+          {
+            headers: {
+              "ngrok-skip-browser-warning": "69420",
             },
+            signal: abortController.signal,
+          },
+        );
+
+        console.log(`🌐 [AllJobs] Jobs API Status: ${jobsRes.status}`);
+
+        if (!jobsRes.ok) {
+          const errorText = await jobsRes.text();
+          console.error(`❌ [AllJobs] Jobs API Error Detail:`, errorText);
+          throw new Error(
+            `Server returned ${jobsRes.status}: ${jobsRes.statusText}`,
           );
-
-          console.log(
-            `🧠 [AllJobs] Smart Search API Status: ${smartRes.status} for query: "${searchKeyword}"`,
-          );
-
-          if (!smartRes.ok) {
-            throw new Error(`Smart Search error: ${smartRes.status}`);
-          }
-
-          const smartData = await smartRes.json();
-          if (abortController.signal.aborted) return;
-
-          jobsList = smartData.data || [];
-          console.log(
-            `✅ [AllJobs] Smart Search returned ${jobsList.length} jobs. Expanded tags: ${(smartData.expandedTags || []).join(", ")}`,
-          );
-        } else {
-          // Regular fetch when no search keyword
-          const queryParams = new URLSearchParams({
-            limit: "100",
-            ...(location && { location: location }),
-          });
-
-          const jobsRes = await fetch(
-            `${API_BASE_URL}/jobs?${queryParams.toString()}`,
-            {
-              headers: {
-                "ngrok-skip-browser-warning": "69420",
-              },
-              signal: abortController.signal,
-            },
-          );
-
-          console.log(`🌐 [AllJobs] Jobs API Status: ${jobsRes.status}`);
-
-          if (!jobsRes.ok) {
-            const errorText = await jobsRes.text();
-            console.error(`❌ [AllJobs] Jobs API Error Detail:`, errorText);
-            throw new Error(
-              `Server returned ${jobsRes.status}: ${jobsRes.statusText}`,
-            );
-          }
-
-          const jobsData = await jobsRes.json();
-          if (abortController.signal.aborted) return;
-
-          jobsList =
-            jobsData && jobsData.data
-              ? jobsData.data
-              : Array.isArray(jobsData)
-                ? jobsData
-                : [];
         }
 
-        console.log(`✅ [AllJobs] Received ${jobsList.length} jobs.`);
+        const jobsData = await jobsRes.json();
+        if (abortController.signal.aborted) return;
+
+        jobsList = jobsData && jobsData.data ? jobsData.data : Array.isArray(jobsData) ? jobsData : [];
         setJobs(jobsList);
+        setTotalItems(jobsData.total || jobsList.length);
+        setTotalPages(jobsData.totalPages || 1);
+        if (jobsData.facets) setFacets(jobsData.facets);
+
+        console.log(`✅ [AllJobs] Received ${jobsList.length} jobs.`);
 
         // Fetch Favorites
         if (isAuthenticated) {
@@ -343,7 +313,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
       abortController.abort();
       fetchInProgress.current = false;
     };
-  }, [searchKeyword, location, isAuthenticated, apiFetch, classification]);
+  }, [searchKeyword, location, isAuthenticated, apiFetch, classification, currentPage, selectedTypes, selectedCategories, selectedLevels, selectedSalaries]);
 
   const toggleLike = async (
     e: React.MouseEvent,
@@ -453,110 +423,8 @@ const AllJobs: React.FC<AllJobsProps> = ({
     return null;
   };
 
-  const filteredJobs = jobs.filter((job, index) => {
-    const isTradesmanUser =
-      user?.classification === "tradesman" ||
-      user?.classification === "industrial";
-      
-    if (role === "user" && isTradesmanUser) {
-      // Tradesman sees ONLY company jobs that are classified as "services"
-      if (!job.company) return false;
-      if (getJobLevel(job) !== "services") return false;
-    }
-
-    const jobAddress = String(job.address || "").toLowerCase();
-    const compAddress = String(job.company?.address || "").toLowerCase();
-    const locLower = location.toLowerCase();
-    const map: Record<string, string[]> = {
-      cairo: ["القاهرة"], alexandria: ["الإسكندرية", "الاسكندرية"], giza: ["الجيزة"], qalyubia: ["القليوبية"],
-      "port said": ["بورسعيد"], suez: ["السويس"], gharbia: ["الغربية"], dakahlia: ["الدقهلية"],
-      ismailia: ["الإسماعيلية", "الاسماعيلية"], asyut: ["أسيوط", "اسيوط"], fayoum: ["الفيوم"],
-      minya: ["المنيا"], qena: ["قنا"], sohag: ["سوهاج"], "beni suef": ["بني سويف"],
-      aswan: ["أسوان", "اسوان"], "red sea": ["البحر الأحمر", "البحر الاحمر"],
-      "new valley": ["الوادي الجديد"], matrouh: ["مطروح"], "north sinai": ["شمال سيناء"],
-      "south sinai": ["جنوب سيناء"], "kafr el sheikh": ["كفر الشيخ"], beheira: ["البحيرة"],
-      damietta: ["دمياط"], sharqia: ["الشرقية"], monufia: ["المنوفية"], luxor: ["الأقصر", "الاقصر"]
-    };
-    const arNames = map[locLower] || [];
-    const isMatch = (addr: string) => addr ? (addr.includes(locLower) || arNames.some(name => addr.includes(name))) : false;
-    
-    const locationMatch = !location || isMatch(jobAddress) || isMatch(compAddress);
-
-    const keywordMatch = true;
-
-    const typeMatch =
-      selectedTypes.length === 0 ||
-      selectedTypes.some((t) => matchesType(job, t));
-
-    const categoryMatch =
-      selectedCategories.length === 0 ||
-      selectedCategories.some((cat) => {
-        const cn = (job.category?.name || "").toLowerCase();
-        if (cat === "تصميم")
-          return cn.includes("design") || job.categoryId === 16;
-        if (cat === "مبيعات")
-          return cn.includes("sales") || job.categoryId === 15;
-        if (cat === "تسويق")
-          return cn.includes("marketing") || job.categoryId === 14;
-        if (cat === "أعمال") return cn.includes("business");
-        if (cat === "موارد بشرية")
-          return cn.includes("hr") || job.categoryId === 3;
-        if (cat === "مالية")
-          return cn.includes("finance") || job.categoryId === 13;
-        if (cat === "هندسة")
-          return cn.includes("engineering") || job.categoryId === 11;
-        if (cat === "تكنولوجيا")
-          return cn.includes("technology") || job.categoryId === 12;
-        return cn.includes(cat.toLowerCase());
-      });
-
-    const levelMatch =
-      selectedLevels.length === 0 ||
-      selectedLevels.some((level) => {
-        const jobLevel = getJobLevel(job);
-        if (level === "Technical") return jobLevel === "تقني";
-        if (level === "Non-Technical") return jobLevel === "غير تقني";
-        if (level === "Services") return jobLevel === "services";
-        if (level === "Tradesman") return jobLevel === "tradesman";
-        return jobLevel.toLowerCase() === level.toLowerCase();
-      });
-
-    const salaryMatch =
-      selectedSalaries.length === 0 ||
-      selectedSalaries.includes(getSalaryRange(job) || "");
-
-    const result =
-      keywordMatch &&
-      locationMatch &&
-      typeMatch &&
-      categoryMatch &&
-      levelMatch &&
-      salaryMatch;
-    if (index === 0)
-      console.log(`🔍 [AllJobs] Filter Debug: Job[0] match=${result}`, {
-        keywordMatch,
-        locationMatch,
-        typeMatch,
-        categoryMatch,
-        levelMatch,
-        salaryMatch,
-      });
-    return result;
-  });
-
-  console.log(
-    `📊 [AllJobs] Displaying ${filteredJobs.length} jobs out of ${jobs.length} total.`,
-  );
-
-  const displayJobs = filteredJobs;
-  const totalItems = displayJobs.length;
-  const totalPages = Math.max(1, Math.ceil(totalItems / jobsPerPage));
-  const adjustedPage = Math.min(currentPage, totalPages);
-
-  const currentJobs = displayJobs.slice(
-    (adjustedPage - 1) * jobsPerPage,
-    adjustedPage * jobsPerPage,
-  );
+  // Jobs are already filtered and paginated from the backend
+  const currentJobs = jobs;
 
   useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) {
@@ -585,32 +453,32 @@ const AllJobs: React.FC<AllJobsProps> = ({
             items={[
               {
                 name: "Full-time",
-                count: jobs.filter((j) => matchesType(j, "Full-time")).length,
+                count: facets.jobType?.["Full-time"] || 0,
                 value: "Full-time",
               },
               {
                 name: "Part-time",
-                count: jobs.filter((j) => matchesType(j, "Part-time")).length,
+                count: facets.jobType?.["Part-time"] || 0,
                 value: "Part-time",
               },
               {
                 name: "Freelance",
-                count: jobs.filter((j) => matchesType(j, "Freelance")).length,
+                count: facets.jobType?.["Freelance"] || 0,
                 value: "Freelance",
               },
               {
                 name: "Internship",
-                count: jobs.filter((j) => matchesType(j, "Internship")).length,
+                count: facets.jobType?.["Internship"] || 0,
                 value: "Internship",
               },
               {
                 name: "One-time",
-                count: jobs.filter((j) => matchesType(j, "One-time")).length,
+                count: facets.jobType?.["One-time"] || 0,
                 value: "One-time",
               },
               {
                 name: "Remote",
-                count: jobs.filter((j) => matchesType(j, "Remote")).length,
+                count: facets.jobType?.["Remote"] || 0,
                 value: "Remote",
               },
             ]}
@@ -623,22 +491,22 @@ const AllJobs: React.FC<AllJobsProps> = ({
             items={[
               {
                 name: "Technical",
-                count: jobs.filter((j) => getJobLevel(j) === "تقني").length,
+                count: facets.level?.["Technical"] || 0,
                 value: "Technical",
               },
               {
                 name: "Non-Technical",
-                count: jobs.filter((j) => getJobLevel(j) === "غير تقني").length,
+                count: facets.level?.["Non-Technical"] || 0,
                 value: "Non-Technical",
               },
               {
                 name: "Services",
-                count: jobs.filter((j) => getJobLevel(j) === "services").length,
+                count: facets.level?.["Services"] || 0,
                 value: "Services",
               },
               {
                 name: "Tradesman",
-                count: jobs.filter((j) => getJobLevel(j) === "tradesman").length,
+                count: facets.level?.["Tradesman"] || 0,
                 value: "Tradesman",
               },
             ]}
@@ -652,22 +520,22 @@ const AllJobs: React.FC<AllJobsProps> = ({
             items={[
               {
                 name: "700$ - 1000$",
-                count: jobs.filter((j) => getSalaryRange(j) === "700-1000").length,
+                count: facets.salary?.["700-1000"] || 0,
                 value: "700-1000",
               },
               {
                 name: "1000$ - 1500$",
-                count: jobs.filter((j) => getSalaryRange(j) === "1000-1500").length,
+                count: facets.salary?.["1000-1500"] || 0,
                 value: "1000-1500",
               },
               {
                 name: "1500$ - 2000$",
-                count: jobs.filter((j) => getSalaryRange(j) === "1500-2000").length,
+                count: facets.salary?.["1500-2000"] || 0,
                 value: "1500-2000",
               },
               {
                 name: "3000$ or more",
-                count: jobs.filter((j) => getSalaryRange(j) === "3000+").length,
+                count: facets.salary?.["3000+"] || 0,
                 value: "3000+",
               },
             ]}
@@ -684,7 +552,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
           <div>
             <h2>{t("جميع الوظائف")}</h2>
             <p>
-              {t("عرض")} {filteredJobs.length} {t("نتائج")}
+              {t("عرض")} {totalItems} {t("نتائج")}
             </p>
           </div>
 

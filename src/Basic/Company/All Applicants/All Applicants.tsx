@@ -378,11 +378,15 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
                             if (!isValid || val.length < 4) {
                               showToast(`${t("قيمة تالفة:")} "${val}"`, "warning");
                             }
-                            const url = val.startsWith("http")
+                            let url = val.startsWith("http")
                               ? val
                               : val.includes("/") || val.startsWith(".")
                               ? `${API_BASE_URL}${val.startsWith("/") ? "" : "/"}${val}`
                               : `https://${val}`;
+                            
+                            if (url.includes('/images/data')) {
+                                url += url.includes('?') ? '&download=true' : '?download=true';
+                            }
                             window.open(url, "_blank", "noopener,noreferrer");
                           }}
                         >

@@ -30,24 +30,11 @@ const WorkListing = () => {
           const result = await response.json();
           let freshWorks = result.data || [];
           
-          // Fetch ratings for each job to calculate the average rating
-          freshWorks = await Promise.all(freshWorks.map(async (work: any) => {
-            try {
-              const ratingRes = await apiFetch(`${API_BASE_URL}/ratings/job/${work.jobId}`);
-              if (ratingRes.ok) {
-                const ratingsData = await ratingRes.json();
-                if (Array.isArray(ratingsData) && ratingsData.length > 0) {
-                  const avgRating = ratingsData.reduce((sum: number, r: any) => sum + r.ratingValue, 0) / ratingsData.length;
-                  work.rating = avgRating;
-                } else {
-                  work.rating = 0;
-                }
-              }
-            } catch (err) {
-              console.error(`Failed to fetch rating for job ${work.jobId}`, err);
-            }
+          // Use the pre-calculated jobRating from the backend
+          freshWorks = freshWorks.map((work: any) => {
+            work.rating = work.jobRating || 0;
             return work;
-          }));
+          });
 
           console.log("🔥 [WorkListing] Fresh Works with Ratings:", freshWorks);
           setWorks(freshWorks);

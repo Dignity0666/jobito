@@ -172,9 +172,13 @@ export default function ApplicantDetails() {
     if (e) e.stopPropagation();
     if (!app?.resumeUrl) return;
 
-    const url = app.resumeUrl.startsWith("http")
+    let url = app.resumeUrl.startsWith("http")
       ? app.resumeUrl
       : `${API_BASE_URL}${app.resumeUrl.startsWith("/") ? "" : "/"}${app.resumeUrl}`;
+
+    if (url.includes('/images/data')) {
+      url += url.includes('?') ? '&download=true' : '?download=true';
+    }
 
     try {
       const response = await fetch(url);
@@ -777,11 +781,15 @@ export default function ApplicantDetails() {
                           if (!isValid || val.length < 4) {
                             showToast(`${t("قيمة تالفة:")} "${val}"`, "warning");
                           }
-                          const url = val.startsWith("http")
+                          let url = val.startsWith("http")
                             ? val
                             : val.includes("/") || val.startsWith(".")
                             ? `${API_BASE_URL}${val.startsWith("/") ? "" : "/"}${val}`
                             : `https://${val}`;
+                            
+                          if (url.includes('/images/data')) {
+                              url += url.includes('?') ? '&download=true' : '?download=true';
+                          }
                           window.open(url, "_blank", "noopener,noreferrer");
                         }}
                         style={{
