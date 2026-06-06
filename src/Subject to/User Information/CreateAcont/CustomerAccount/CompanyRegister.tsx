@@ -52,12 +52,12 @@ export const CompanyRegister: React.FC = () => {
   const nextStep = () => {
     if (currentStep === 1) {
       if (!formData.companyName || !formData.companyEmail || !formData.companyPhone || !formData.companyAddress) {
-        showToast(t("يرجى ملء جميع بيانات الشركة"), "error");
+        showToast(t("يرجى ملء جميع بيانات الشركة", "Please fill all company details"), "error");
         return;
       }
     } else if (currentStep === 2) {
       if (!formData.taxNumber || !formData.commercialRegister || !formData.nationalId) {
-        showToast(t("يرجى رفع المستندات وإدخال الرقم القومي"), "error");
+        showToast(t("يرجى رفع المستندات وإدخال الرقم القومي", "Please upload documents and enter national ID"), "error");
         return;
       }
     }
@@ -78,7 +78,7 @@ export const CompanyRegister: React.FC = () => {
     } catch(e) {
       data = {};
     }
-    if (!res.ok) throw new Error(data.message || t("فشل في رفع المستند"));
+    if (!res.ok) throw new Error(data.message || t("فشل في رفع المستند", "Failed to upload document"));
     return data.url;
   };
 
@@ -87,7 +87,7 @@ export const CompanyRegister: React.FC = () => {
     setFormError("");
 
     if (formData.password !== formData.confirmPassword) {
-      setFormError(t("كلمات المرور غير متطابقة"));
+      setFormError(t("كلمات المرور غير متطابقة", "Passwords do not match"));
       return;
     }
 
@@ -96,10 +96,10 @@ export const CompanyRegister: React.FC = () => {
 
       // Upload documents in parallel for better speed
       if (!(formData.commercialRegister instanceof File)) {
-        throw new Error(t("مستند السجل التجاري مطلوب"));
+        throw new Error(t("مستند السجل التجاري مطلوب", "Commercial register document is required"));
       }
       if (!(formData.taxNumber instanceof File)) {
-        throw new Error(t("مستند البطاقة الضريبية مطلوب"));
+        throw new Error(t("مستند البطاقة الضريبية مطلوب", "Tax card document is required"));
       }
 
       const [crDocumentUrl, taxDocumentUrl] = await Promise.all([
@@ -127,7 +127,7 @@ export const CompanyRegister: React.FC = () => {
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || t("فشل التسجيل"));
+      if (!response.ok) throw new Error(data.message || t("فشل التسجيل", "Registration failed"));
       setSuccess(true);
     } catch (err: any) {
       setFormError(err.message);
@@ -153,7 +153,7 @@ export const CompanyRegister: React.FC = () => {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || t("فشل التفعيل"));
+      if (!res.ok) throw new Error(data.message || t("فشل التفعيل", "Activation failed"));
       setVerifiedStatus("success");
     } catch (err: any) {
       setFormError(err.message);
@@ -181,13 +181,13 @@ export const CompanyRegister: React.FC = () => {
                 <div style={{ color: '#10b981', marginBottom: '24px' }}>
                     <CheckCircleIcon size={80} />
                 </div>
-                <h2 className={styles.title}>{t("تم التحقق من البريد الإلكتروني!")}</h2>
-                <p className={styles.subtitle}>{t("حساب شركتك نشط الآن. يمكنك البدء في نشر الوظائف.")}</p>
+                <h2 className={styles.title}>{t("تم التحقق من البريد الإلكتروني!", "Email verified!")}</h2>
+                <p className={styles.subtitle}>{t("حساب شركتك نشط الآن. يمكنك البدء في نشر الوظائف.", "Your company account is now active. You can start posting jobs.")}</p>
                 <button 
                   className={styles.submitBtn} 
                   onClick={() => navigate("/user-information")}
                 >
-                    {t("الذهاب لتسجيل الدخول")} <ArrowRightIcon size={20} />
+                    {t("الذهاب لتسجيل الدخول", "Go to Login")} <ArrowRightIcon size={20} />
                 </button>
             </motion.div>
           ) : success ? (
@@ -203,9 +203,9 @@ export const CompanyRegister: React.FC = () => {
                   <div style={{ color: '#4f46e5', marginBottom: '24px' }}>
                     <ShieldCheckIcon size={64} style={{ margin: '0 auto' }} />
                   </div>
-                  <h2 className={styles.title}>{t("التحقق من حساب الشركة")}</h2>
+                  <h2 className={styles.title}>{t("التحقق من حساب الشركة", "Verify Company Account")}</h2>
                   <p className={styles.subtitle}>
-                    {t("لقد أرسلنا رمزاً إلى")} <b>{formData.companyEmail}</b>. {t("يرجى التحقق من صندوق الوارد الخاص بك.")}
+                    {t("لقد أرسلنا رمزاً إلى", "We have sent a code to")} <b>{formData.companyEmail}</b>. {t("يرجى التحقق من صندوق الوارد الخاص بك.", "Please check your inbox.")}
                   </p>
 
                   <div style={{ display: 'grid', gap: '16px', marginTop: '40px' }}>
@@ -214,15 +214,15 @@ export const CompanyRegister: React.FC = () => {
                       onClick={() => setVerifyMethod("code")}
                     >
                       <SmartphoneIcon size={20} />
-                      {t("إدخال رمز التحقق")}
+                      {t("إدخال رمز التحقق", "Enter verification code")}
                     </button>
                   </div>
                 </>
               ) : (
                 <div style={{ width: "100%" }}>
-                  <h2 className={styles.title}>{t("أدخل رمز التحقق (OTP)")}</h2>
+                  <h2 className={styles.title}>{t("أدخل رمز التحقق (OTP)", "Enter OTP verification code")}</h2>
                   <p className={styles.subtitle}>
-                    {t("أدخل الرمز المكون من 6 أرقام المرسل إلى بريد شركتك الإلكتروني.")}
+                    {t("أدخل الرمز المكون من 6 أرقام المرسل إلى بريد شركتك الإلكتروني.", "Enter the 6-digit code sent to your company email.")}
                   </p>
                   <form onSubmit={handleVerifyCode} style={{ marginTop: '40px' }}>
                     {formError && <div className={styles.errorBox}>{formError}</div>}
@@ -247,7 +247,7 @@ export const CompanyRegister: React.FC = () => {
                       type="submit"
                       disabled={isVerifying}
                     >
-                      {isVerifying ? <LoaderIcon className="animate-spin" /> : t("تحقق وتفعيل")}
+                      {isVerifying ? <LoaderIcon className="animate-spin" /> : t("تحقق وتفعيل", "Verify and Activate")}
                     </button>
                   </form>
                   <button
@@ -264,20 +264,20 @@ export const CompanyRegister: React.FC = () => {
                           body: JSON.stringify({ email: formData.companyEmail }),
                         });
                         const data = await res.json();
-                        if (!res.ok) throw new Error(data.message || t("فشل إرسال الرمز"));
-                        showToast(t("تم إعادة إرسال الرمز بنجاح"), "success");
+                        if (!res.ok) throw new Error(data.message || t("فشل إرسال الرمز", "Failed to send code"));
+                        showToast(t("تم إعادة إرسال الرمز بنجاح", "Code resent successfully"), "success");
                       } catch (err: any) {
                         showToast(err.message, "error");
                       }
                     }}
                   >
-                    {t("إعادة إرسال الرمز")}
+                    {t("إعادة إرسال الرمز", "Resend Code")}
                   </button>
                   <button
                     onClick={() => setVerifyMethod(null)}
                     style={{ background: 'none', border: 'none', color: '#64748b', marginTop: '24px', cursor: 'pointer', fontWeight: 600 }}
                   >
-                    ← {t("العودة للخيارات")}
+                    ← {t("العودة للخيارات", "Back to options")}
                   </button>
                 </div>
               )}
@@ -294,9 +294,9 @@ export const CompanyRegister: React.FC = () => {
                       <div className={styles.buildingIconBox}>
                           <Building2Icon size={32} />
                       </div>
-                      <h1 className={styles.title}>{t("تسجيل شركة")}</h1>
+                      <h1 className={styles.title}>{t("تسجيل شركة", "Register Company")}</h1>
                   </div>
-                  <p className={styles.subtitle}>{t("أنشئ حساب أعمال لتوظيف أفضل المواهب على Jobito")}</p>
+                  <p className={styles.subtitle}>{t("أنشئ حساب أعمال لتوظيف أفضل المواهب على Jobito", "Create a business account to hire the best talent on Jobito")}</p>
               </div>
 
               {/* Progress Indicator */}
@@ -322,11 +322,11 @@ export const CompanyRegister: React.FC = () => {
                     >
                       <div className={styles.formGrid2}>
                         <div className={styles.inputGroup}>
-                          <label>{t("اسم الشركة")}</label>
+                          <label>{t("اسم الشركة", "Company Name")}</label>
                           <input
                             className={styles.inputField}
                             type="text"
-                            placeholder={t("مثال: شركة الأمل")}
+                            placeholder={t("مثال: شركة الأمل", "Example: Al Amal Company")}
                             value={formData.companyName}
                             onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                             dir="auto"
@@ -334,7 +334,7 @@ export const CompanyRegister: React.FC = () => {
                           />
                         </div>
                         <div className={styles.inputGroup}>
-                          <label>{t("البريد الإلكتروني للشركة")}</label>
+                          <label>{t("البريد الإلكتروني للشركة", "Company Email")}</label>
                           <input
                             className={styles.inputField}
                             type="email"
@@ -349,7 +349,7 @@ export const CompanyRegister: React.FC = () => {
                       
                       <div className={styles.formGrid2}>
                         <div className={styles.inputGroup}>
-                          <label>{t("هاتف الشركة")}</label>
+                          <label>{t("هاتف الشركة", "Company Phone")}</label>
                           <input
                             className={styles.inputField}
                             type="tel"
@@ -361,7 +361,7 @@ export const CompanyRegister: React.FC = () => {
                           />
                         </div>
                         <div className={styles.inputGroup}>
-                          <label>{t("عنوان الشركة")}</label>
+                          <label>{t("عنوان الشركة", "Company Address")}</label>
                           <select
                             className={styles.inputField}
                             value={formData.companyAddress}
@@ -369,7 +369,7 @@ export const CompanyRegister: React.FC = () => {
                             dir="auto"
                             required
                           >
-                            <option value="" disabled>{t("اختر المحافظة")}</option>
+                            <option value="" disabled>{t("اختر المحافظة", "Select Governorate")}</option>
                             {[
                               "Cairo", "Alexandria", "Giza", "Qalyubia", "Port Said", "Suez", "Gharbia",
                               "Dakahlia", "Ismailia", "Asyut", "Fayoum", "Minya", "Qena", "Sohag",
@@ -383,7 +383,7 @@ export const CompanyRegister: React.FC = () => {
                       </div>
                       
                       <button type="button" className={styles.submitBtn} onClick={nextStep}>
-                        {t("الخطوة التالية")}
+                        {t("الخطوة التالية", "Next Step")}
                       </button>
                     </motion.div>
                   )}
@@ -398,7 +398,7 @@ export const CompanyRegister: React.FC = () => {
                     >
                       <div className={styles.formGrid2}>
                         <div className={styles.inputGroup}>
-                          <label>{t("البطاقة الضريبية (PDF)")}</label>
+                          <label>{t("البطاقة الضريبية (PDF)", "Tax Card (PDF)")}</label>
                           <input
                             className={styles.inputField}
                             type="file"
@@ -407,7 +407,7 @@ export const CompanyRegister: React.FC = () => {
                           />
                         </div>
                         <div className={styles.inputGroup}>
-                          <label>{t("السجل التجاري (PDF)")}</label>
+                          <label>{t("السجل التجاري (PDF)", "Commercial Register (PDF)")}</label>
                           <input
                             className={styles.inputField}
                             type="file"
@@ -418,7 +418,7 @@ export const CompanyRegister: React.FC = () => {
                       </div>
                       
                       <div className={styles.inputGroup}>
-                        <label>{t("الرقم القومي للمسؤول")}</label>
+                        <label>{t("الرقم القومي للمسؤول", "Manager's National ID")}</label>
                         <input
                           className={styles.inputField}
                           type="text"
@@ -431,8 +431,8 @@ export const CompanyRegister: React.FC = () => {
                       </div>
 
                       <div className={styles.buttonRow}>
-                        <button type="button" className={styles.backStepBtn} onClick={prevStep}>{t("السابق")}</button>
-                        <button type="button" className={styles.submitBtn} onClick={nextStep}>{t("الخطوة التالية")}</button>
+                        <button type="button" className={styles.backStepBtn} onClick={prevStep}>{t("السابق", "Previous")}</button>
+                        <button type="button" className={styles.submitBtn} onClick={nextStep}>{t("الخطوة التالية", "Next Step")}</button>
                       </div>
                     </motion.div>
                   )}
@@ -447,7 +447,7 @@ export const CompanyRegister: React.FC = () => {
                     >
                       <div className={styles.formGrid2}>
                         <div className={styles.inputGroup}>
-                          <label>{t("كلمة المرور")}</label>
+                          <label>{t("كلمة المرور", "Password")}</label>
                           <div className={styles.passwordWrapper}>
                             <input
                               className={styles.inputField}
@@ -464,7 +464,7 @@ export const CompanyRegister: React.FC = () => {
                           </div>
                         </div>
                         <div className={styles.inputGroup}>
-                          <label>{t("تأكيد كلمة المرور")}</label>
+                          <label>{t("تأكيد كلمة المرور", "Confirm Password")}</label>
                           <div className={styles.passwordWrapper}>
                             <input
                               className={styles.inputField}
@@ -483,9 +483,9 @@ export const CompanyRegister: React.FC = () => {
                       </div>
 
                       <div className={styles.buttonRow}>
-                        <button type="button" className={styles.backStepBtn} onClick={prevStep}>{t("السابق")}</button>
+                        <button type="button" className={styles.backStepBtn} onClick={prevStep}>{t("السابق", "Previous")}</button>
                         <button className={styles.submitBtn} type="submit" disabled={isCreating}>
-                          {isCreating ? <LoaderIcon className="animate-spin" /> : t("إنشاء حساب أعمال")}
+                          {isCreating ? <LoaderIcon className="animate-spin" /> : t("إنشاء حساب أعمال", "Create Business Account")}
                         </button>
                       </div>
                     </motion.div>

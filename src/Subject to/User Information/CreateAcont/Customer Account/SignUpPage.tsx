@@ -93,10 +93,10 @@ export const SignUpPage: React.FC = () => {
         window.dispatchEvent(new Event("auth-changed"));
         navigate("/");
       } catch (err: unknown) {
-        showToast(err instanceof Error ? t(err.message) : t("حدث خطأ ما"), "error");
+        showToast(err instanceof Error ? t(err.message) : t("حدث خطأ ما", "Something went wrong"), "error");
       }
     },
-    onError: () => showToast(t("فشل تسجيل الدخول بجوجل"), "error"),
+    onError: () => showToast(t("فشل تسجيل الدخول بجوجل", "Google login failed"), "error"),
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,7 +105,7 @@ export const SignUpPage: React.FC = () => {
     setFormError("");
 
     if (formData.password !== formData.confirmPassword) {
-      setFormError(t("كلمات المرور غير متطابقة"));
+      setFormError(t("كلمات المرور غير متطابقة", "Passwords do not match"));
       return;
     }
 
@@ -164,7 +164,7 @@ export const SignUpPage: React.FC = () => {
 
   const handleSendPhoneOtp = async () => {
     if (!formData.phone) {
-      showToast(t("الرجاء إدخال رقم الهاتف أولاً"), "error");
+      showToast(t("الرجاء إدخال رقم الهاتف أولاً", "Please enter phone number first"), "error");
       return;
     }
     try {
@@ -178,8 +178,8 @@ export const SignUpPage: React.FC = () => {
         body: JSON.stringify({ phone: formData.phone, email: formData.email }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || t("فشل إرسال الرمز"));
-      showToast(t("تم إرسال رمز التحقق إلى هاتفك!"), "success");
+      if (!res.ok) throw new Error(data.message || t("فشل إرسال الرمز", "Failed to send code"));
+      showToast(t("تم إرسال رمز التحقق إلى هاتفك!", "Verification code sent to your phone!"), "success");
     } catch (err: any) {
       showToast(err.message, "error");
     } finally {
@@ -225,15 +225,15 @@ export const SignUpPage: React.FC = () => {
             <div className={Style.successIcon}>
               <CheckCircleIcon size={64} />
             </div>
-            <h2 className={Style.title}>{t("تم تفعيل الحساب!")}</h2>
+            <h2 className={Style.title}>{t("تم تفعيل الحساب!", "Account activated!")}</h2>
             <p className={Style.subtitle}>
-              {t("أهلاً بك في Jobito. ملفك الشخصي مستخدم جاهز الآن.")}
+              {t("أهلاً بك في Jobito. ملفك الشخصي مستخدم جاهز الآن.", "Welcome to Jobito. Your profile is ready.")}
             </p>
             <button
               className={Style.authbtn}
               onClick={() => navigate("/user-information", { state: { showLogin: true } })}
             >
-              {t("الذهاب لتسجيل الدخول")}
+              {t("الذهاب لتسجيل الدخول", "Go to Login")}
             </button>
           </motion.div>
         ) : success ? (
@@ -248,9 +248,9 @@ export const SignUpPage: React.FC = () => {
                 <div className={Style.iconCircle}>
                   <MailIcon size={32} />
                 </div>
-                <h2 className={Style.title}>{t("تفعيل الحساب")}</h2>
+                <h2 className={Style.title}>{t("تفعيل الحساب", "Activate Account")}</h2>
                 <p className={Style.subtitle}>
-                  {t("اختر طريقة التفعيل لحسابك")}
+                  {t("اختر طريقة التفعيل لحسابك", "Choose activation method")}
                 </p>
 
                 <div className={Style.methodGrid}>
@@ -260,8 +260,8 @@ export const SignUpPage: React.FC = () => {
                   >
                     <MailIcon size={24} />
                     <div>
-                      <strong>{t("رمز عبر البريد")}</strong>
-                      <span>{t("أدخل الرمز المرسل لبريدك")}</span>
+                      <strong>{t("رمز عبر البريد", "Code via Email")}</strong>
+                      <span>{t("أدخل الرمز المرسل لبريدك", "Enter code sent to your email")}</span>
                     </div>
                   </button>
                 </div>
@@ -269,14 +269,14 @@ export const SignUpPage: React.FC = () => {
                   className={Style.backBtn}
                   onClick={() => setSuccess(false)}
                 >
-                  {t("العودة لإنشاء الحساب")}
+                  {t("العودة لإنشاء الحساب", "Back to Register")}
                 </button>
               </>
             ) : verifyMethod === "code" ? (
               <div style={{ width: "100%" }}>
-                <h2 className={Style.title}>{t("أدخل الرمز")}</h2>
+                <h2 className={Style.title}>{t("أدخل الرمز", "Enter Code")}</h2>
                 <p className={Style.subtitle}>
-                  {t("تم إرسال رمز من 6 أرقام إلى بريدك الإلكتروني")}
+                  {t("تم إرسال رمز من 6 أرقام إلى بريدك الإلكتروني", "A 6-digit code has been sent to your email")}
                 </p>
                 <form onSubmit={handleVerifyCode}>
                   <input
@@ -296,7 +296,7 @@ export const SignUpPage: React.FC = () => {
                     {isVerifying ? (
                       <LoaderIcon className="loader" />
                     ) : (
-                      t("تفعيل الحساب")
+                      t("تفعيل الحساب", "Activate Account")
                     )}
                   </button>
                 </form>
@@ -314,20 +314,20 @@ export const SignUpPage: React.FC = () => {
                         body: JSON.stringify({ email: formData.email }),
                       });
                       const data = await res.json();
-                      if (!res.ok) throw new Error(data.message || t("فشل إرسال الرمز"));
-                      showToast(t("تم إعادة إرسال الرمز بنجاح"), "success");
+                      if (!res.ok) throw new Error(data.message || t("فشل إرسال الرمز", "Failed to send code"));
+                      showToast(t("تم إعادة إرسال الرمز بنجاح", "Code resent successfully"), "success");
                     } catch (err: any) {
                       showToast(err.message, "error");
                     }
                   }}
                 >
-                  {t("إعادة إرسال الرمز")}
+                  {t("إعادة إرسال الرمز", "Resend Code")}
                 </button>
                 <button
                   className={Style.backBtn}
                   onClick={() => { setVerifyMethod(null); setVerificationCode(""); setFormError(""); }}
                 >
-                  {t("العودة للخيارات")}
+                  {t("العودة للخيارات", "Back to options")}
                 </button>
               </div>
             ) : verifyMethod === "phone" ? (
@@ -335,9 +335,9 @@ export const SignUpPage: React.FC = () => {
                 <div className={Style.iconCircle}>
                   <PhoneIcon size={32} />
                 </div>
-                <h2 className={Style.title}>{t("التحقق عبر الهاتف")}</h2>
+                <h2 className={Style.title}>{t("التحقق عبر الهاتف", "Phone Verification")}</h2>
                 <p className={Style.subtitle}>
-                  {t("أدخل رمز التحقق المرسل إلى")} <b>{formData.phone}</b>
+                  {t("أدخل رمز التحقق المرسل إلى", "Enter verification code sent to")} <b>{formData.phone}</b>
                 </p>
                 <form onSubmit={handleVerifyPhoneOtp}>
                   <input
@@ -357,7 +357,7 @@ export const SignUpPage: React.FC = () => {
                     {isVerifying ? (
                       <LoaderIcon className="loader" />
                     ) : (
-                      t("تفعيل الحساب")
+                      t("تفعيل الحساب", "Activate Account")
                     )}
                   </button>
                 </form>
@@ -367,27 +367,27 @@ export const SignUpPage: React.FC = () => {
                   onClick={handleSendPhoneOtp}
                   disabled={isSendingOtp}
                 >
-                  {isSendingOtp ? t("جاري الإرسال...") : t("إعادة إرسال الرمز")}
+                  {isSendingOtp ? t("جاري الإرسال...", "Sending...") : t("إعادة إرسال الرمز", "Resend Code")}
                 </button>
                 <button
                   className={Style.backBtn}
                   onClick={() => { setVerifyMethod(null); setVerificationCode(""); setFormError(""); }}
                 >
-                  {t("العودة للخيارات")}
+                  {t("العودة للخيارات", "Back to options")}
                 </button>
               </div>
             ) : (
               <div style={{ textAlign: "center" }}>
                 <div className={Style.waitingLoader}>⏳</div>
-                <h2 className={Style.title}>{t("بانتظار الرابط...")}</h2>
+                <h2 className={Style.title}>{t("بانتظار الرابط...", "Waiting for link...")}</h2>
                 <p className={Style.subtitle}>
-                  {t("يرجى الضغط على الرابط المرسل لبريدك الإلكتروني للتفعيل.")}
+                  {t("يرجى الضغط على الرابط المرسل لبريدك الإلكتروني للتفعيل.", "Please click the link sent to your email to activate.")}
                 </p>
                 <button
                   className={Style.backBtn}
                   onClick={() => setVerifyMethod(null)}
                 >
-                  {t("استخدم الرمز بدلاً من ذلك")}
+                  {t("استخدم الرمز بدلاً من ذلك", "Use code instead")}
                 </button>
               </div>
             )}
@@ -403,9 +403,9 @@ export const SignUpPage: React.FC = () => {
               <div className={Style.logoIcon}>
                 <UserPlusIcon size={32} />
               </div>
-              <h2 className={Style.title}>{t("إنشاء حساب جديد")}</h2>
+              <h2 className={Style.title}>{t("إنشاء حساب جديد", "Create a new account")}</h2>
               <p className={Style.subtitle}>
-                {t("ابدأ رحلتك المهنية مع Jobito")}
+                {t("ابدأ رحلتك المهنية مع Jobito", "Start your career journey with Jobito")}
               </p>
             </div>
 
@@ -429,10 +429,10 @@ export const SignUpPage: React.FC = () => {
               )}
 
               <div className={Style.inputGroup}>
-                <label>{t("الاسم بالكامل")}</label>
+                <label>{t("الاسم بالكامل", "Full Name")}</label>
                 <input
                   type="text"
-                  placeholder={t("أدخل اسمك بالكامل")}
+                  placeholder={t("أدخل اسمك بالكامل", "Enter your full name")}
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -444,7 +444,7 @@ export const SignUpPage: React.FC = () => {
 
               <div className={Style.row}>
                 <div className={Style.inputGroup}>
-                  <label>{t("البريد الإلكتروني")}</label>
+                  <label>{t("البريد الإلكتروني", "Email")}</label>
                   <input
                     type="email"
                     placeholder={t("name@domain.com")}
@@ -458,7 +458,7 @@ export const SignUpPage: React.FC = () => {
                 </div>
 
                 <div className={Style.inputGroup}>
-                  <label>{t("رقم الهاتف")}</label>
+                  <label>{t("رقم الهاتف", "Phone Number")}</label>
                   <input
                     type="tel"
                     placeholder={t("+20 1XX XXX XXXX")}
@@ -474,7 +474,7 @@ export const SignUpPage: React.FC = () => {
 
               <div className={Style.row}>
                 <div className={Style.inputGroup}>
-                  <label>{t("كلمة المرور")}</label>
+                  <label>{t("كلمة المرور", "Password")}</label>
                   <div className={Style.relativeInput}>
                     <input
                       type={showPassword ? "text" : "password"}
@@ -510,7 +510,7 @@ export const SignUpPage: React.FC = () => {
                   </div>
                 </div>
                 <div className={Style.inputGroup}>
-                  <label>{t("تأكيد كلمة المرور")}</label>
+                  <label>{t("تأكيد كلمة المرور", "Confirm Password")}</label>
                   <div className={Style.relativeInput}>
                     <input
                       type={showConfirmPassword ? "text" : "password"}
@@ -558,7 +558,7 @@ export const SignUpPage: React.FC = () => {
                 disabled={isSigningUp}
                 onClick={() => console.log("SignUpPage: Create account button clicked", formData)}
               >
-                {isSigningUp ? <LoaderIcon className="loader" /> : t("إنشاء حساب")}
+                {isSigningUp ? <LoaderIcon className="loader" /> : t("إنشاء حساب", "Create Account")}
               </button>
               <button
                 className={Style.googleFloatingBtn}
@@ -571,7 +571,7 @@ export const SignUpPage: React.FC = () => {
                   width="24"
                   height="24"
                 />
-                <span>{t("متابعة باستخدام Google")}</span>
+                <span>{t("متابعة باستخدام Google", "Continue with Google")}</span>
               </button>
             </form>
           </motion.div>
@@ -592,10 +592,10 @@ export const SignUpPage: React.FC = () => {
           }}>
             <div style={{ fontSize: '48px', marginBottom: '16px' }}>⚠️</div>
             <h2 style={{ color: '#ef4444', fontSize: '26px', fontWeight: 800, marginBottom: '14px' }}>
-              {t("حسابك مجدول للحذف")}
+              {t("حسابك مجدول للحذف", "Your account is scheduled for deletion")}
             </h2>
             <p style={{ color: '#334155', fontSize: '16px', lineHeight: 1.7, marginBottom: '32px' }}>
-              {t("حسابك مجدول للحذف. اضغط على 'استكمال الدخول' لإلغاء طلب الحذف والدخول لحسابك.")}
+              {t("حسابك مجدول للحذف. اضغط على 'استكمال الدخول' لإلغاء طلب الحذف والدخول لحسابك.", "Account scheduled for deletion. Click 'Continue Login' to cancel deletion.")}
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <button
@@ -606,7 +606,7 @@ export const SignUpPage: React.FC = () => {
                       headers: { Authorization: `Bearer ${loginToken}` },
                     });
                     if (!cancelRes.ok) throw new Error('Cancel failed');
-                    alert(t("تم إلغاء طلب حذف الحساب بنجاح!"));
+                    alert(t("تم إلغاء طلب حذف الحساب بنجاح!", "Account deletion cancelled successfully!"));
                     setShowDeletionModal(false);
                     if (loginToken) {
                       localStorage.setItem('token', loginToken);
@@ -616,7 +616,7 @@ export const SignUpPage: React.FC = () => {
                     }
                   } catch (e) {
                     console.error(e);
-                    alert(t("فشل إلغاء الحذف"));
+                    alert(t("فشل إلغاء الحذف", "Failed to cancel deletion"));
                   }
                 }}
                 style={{
@@ -625,7 +625,7 @@ export const SignUpPage: React.FC = () => {
                   fontSize: '16px', fontWeight: 700, cursor: 'pointer', width: '100%'
                 }}
               >
-                {t("استكمال الدخول")}
+                {t("استكمال الدخول", "Continue Login")}
               </button>
               <button
                 onClick={() => {
@@ -638,7 +638,7 @@ export const SignUpPage: React.FC = () => {
                   fontWeight: 600, cursor: 'pointer', width: '100%'
                 }}
               >
-                {t("تراجع (عدم الدخول)")}
+                {t("تراجع (عدم الدخول)", "Go Back")}
               </button>
             </div>
           </div>

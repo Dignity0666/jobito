@@ -1,12 +1,12 @@
-﻿import React, {
+import React, {
   createContext,
   useContext,
   useState,
   useEffect,
   useCallback,
-  useRef,
 } from 'react';
-import { API_BASE_URL, getCommonHeaders } from '../services/api';
+import { API_BASE_URL } from '../services/api';
+import enTranslations from '../locales/en';
 
 // --- TYPES & INTERFACES ---
 export interface TranslationContextType {
@@ -31,14 +31,7 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     return (localStorage.getItem('jobito_language') as 'ar' | 'en') || 'en';
   });
 
-  const [staticTranslations, setStaticTranslations] = useState<Record<string, string>>({});
-  const [dynamicTranslations, setDynamicTranslations] = useState<Record<string, string>>({});
-  const [pendingQueue] = useState<Set<string>>(new Set());
-  
-  const batchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const queueToFetchRef = useRef<Set<string>>(new Set());
-
-  // 1.5 Sync Language preference to backend (fire-and-forget)
+  // Sync Language preference to backend (fire-and-forget)
   const syncLanguageToBackend = useCallback((newLang: 'ar' | 'en') => {
     try {
       const token = localStorage.getItem('token');
@@ -95,25 +88,6 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     applyLanguageProps(language);
   }, [language, applyLanguageProps]);
 
-  // 3. Fetch Static Data from API
-  useEffect(() => {
-    const fetchStaticTranslations = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/translations?lang=${language}`, {
-          headers: getCommonHeaders(),
-        });
-        if (response.ok) {
-          const data = await response.json();
-        
-        setStaticTranslations(data);
-        }
-      } catch (err) {
-        console.warn('[Translation API]: Using fallback values.', err);
-      }
-    };
-    fetchStaticTranslations();
-  }, [language]);
-
   const setLanguage = useCallback((lang: 'ar' | 'en') => {
     console.log('[TranslationContext.tsx] setLanguage called with:', lang);
     setLanguageState(lang);
@@ -124,65 +98,7 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   }, [syncLanguageToBackend]);
 
-  // 4. Batch Processing for on-demand translations
-  const processBatch = useCallback(async () => {
-    if (queueToFetchRef.current.size === 0) return;
-
-    const textsToTranslate = Array.from(queueToFetchRef.current);
-    queueToFetchRef.current.clear();
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/translations/batch`, {
-        method: 'POST',
-        headers: getCommonHeaders({
-          'Content-Type': 'application/json'
-        }),
-        body: JSON.stringify({
-          texts: textsToTranslate,
-          target_lang: language,
-        })
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok || data.error) {
-        console.error('[Translation Batch API Error]:', data);
-        textsToTranslate.forEach(text => pendingQueue.delete(`${language}:${text}`));
-        return;
-      }
-      
-      if (data.translated_texts) {
-        setDynamicTranslations(prev => {
-          const newMap = { ...prev };
-          textsToTranslate.forEach((text, index) => {
-            const cacheKey = `${language}:${text}`;
-            newMap[cacheKey] = data.translated_texts[index];
-            pendingQueue.delete(cacheKey);
-          });
-          console.log("[DEBUG processBatch] new dynamicTranslations map:", newMap);
-          return newMap;
-        });
-      }
-    } catch (err) {
-      console.error('[Translation Batch Network Error]:', err);
-      textsToTranslate.forEach(text => pendingQueue.delete(`${language}:${text}`));
-    }
-  }, [language, pendingQueue]);
-
-  const queueTranslation = useCallback((text: string) => {
-    const cacheKey = `${language}:${text}`;
-    if (pendingQueue.has(cacheKey) || dynamicTranslations[cacheKey]) return;
-
-    pendingQueue.add(cacheKey);
-    queueToFetchRef.current.add(text);
-
-    if (batchTimeoutRef.current) clearTimeout(batchTimeoutRef.current);
-    batchTimeoutRef.current = setTimeout(() => {
-      processBatch();
-    }, 100); 
-  }, [language, dynamicTranslations, pendingQueue, processBatch]);
-
-  // 5. Main 't' function
+  // 3. Main 't' function (Local only, no backend API calls)
   const t = useCallback(
     (
       key: string,
@@ -211,16 +127,13 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
         actualOptions = fallbackOrOptions;
       }
 
-      // Priority 1: Static API translations (Postgres)
-      let text = staticTranslations[key];
-
-      // Priority 2: Dynamic translations cache (Redis/Python results)
-      if (!text && dynamicTranslations[`${language}:${key}`]) {
-        text = dynamicTranslations[`${language}:${key}`];
+      // Priority 1: Local Dictionary
+      let text = '';
+      if (language === 'en') {
+        text = (enTranslations as Record<string, string>)[key] || '';
       }
 
-      // Priority 3: Explicit Fallback (if provided and translation is missing)
-      // Only use fallback if we are NOT in Arabic mode or if the key is NOT already Arabic
+      // Priority 2: Explicit Fallback (if provided and not in dictionary)
       if (!text && fallbackText) {
         const arabicCharCount = (key.match(/[\u0600-\u06FF]/g) || []).length;
         const englishCharCount = (key.match(/[a-zA-Z]/g) || []).length;
@@ -233,26 +146,9 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
         }
       }
 
-      // If still no translation, use key itself
+      // If no text derived from fallback logic, use the key itself
       if (!text) {
         text = key;
-      }
-
-      // Priority 4: Dynamic on-demand translation logic (only if not found in static/cache)
-      if (typeof key === 'string' && !staticTranslations[key] && !dynamicTranslations[`${language}:${key}`]) {
-        const isTranslationKey = /^[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)+$/.test(key);
-        if (!isTranslationKey) {
-          const arabicCharCount = (key.match(/[\u0600-\u06FF]/g) || []).length;
-          const englishCharCount = (key.match(/[a-zA-Z]/g) || []).length;
-          
-          const isMostlyArabic = arabicCharCount >= englishCharCount;
-          
-          const needsTranslation = (language === 'en' && isMostlyArabic) || (language === 'ar' && !isMostlyArabic);
-          
-          if (needsTranslation) {
-            queueTranslation(key);
-          }
-        }
       }
 
       // Variable Replacement
@@ -263,7 +159,7 @@ export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ c
       }
       return text;
     },
-    [language, staticTranslations, dynamicTranslations, queueTranslation]
+    [language]
   );
 
   const contextValue = React.useMemo(() => ({
