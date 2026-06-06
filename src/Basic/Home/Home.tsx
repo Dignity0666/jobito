@@ -80,13 +80,13 @@ export const Home = () => {
         <div className={styles.container}>
           <motion.div className={styles.content} variants={containerVariants}>
             <motion.h1 className={styles.title} variants={itemVariants}>
-              {isTradesman ? t("اعرض خدماتك") : t("جد وظيفة")} <br />
+              {isTradesman ? t("اعرض خدماتك", "Offer your services") : t("جد وظيفة", "Find a job")} <br />
               <span className={styles.purpleText}>
-                {isTradesman ? t("لعملائك") : t("أحلامك")}
+                {isTradesman ? t("لعملائك", "to your clients") : t("أحلامك", "of your dreams")}
               </span>{" "}
               <br />
               <span className={styles.blueText}>
-                {isTradesman ? t("بسهولة") : t("اليوم")}
+                {isTradesman ? t("بسهولة", "easily") : t("اليوم", "today")}
                 <svg className={styles.underline} viewBox="0 0 300 20">
                   <motion.path
                     initial={{ pathLength: 0 }}
@@ -103,8 +103,8 @@ export const Home = () => {
 
             <motion.p className={styles.description} variants={itemVariants}>
               {isTradesman
-                ? t("سوق لمهاراتك وتواصل مع العملاء الذين يبحثون عن خبراتك.")
-                : t("نربط المحترفين الموهوبين بأفضل الفرص في الشرق الأوسط.")}
+                ? t("سوق لمهاراتك وتواصل مع العملاء الذين يبحثون عن خبراتك.", "Market your skills and connect with clients looking for your expertise.")
+                : t("نربط المحترفين الموهوبين بأفضل الفرص في الشرق الأوسط.", "We connect talented professionals with the best opportunities in the Middle East.")}
             </motion.p>
 
             <motion.div
@@ -149,7 +149,7 @@ export const Home = () => {
                   </defs>
                 </svg>
 
-                {t("احصل عليه من Google Play")}
+                {t("احصل عليه من Google Play", "Get it on Google Play")}
               </a>
             </motion.div>
 

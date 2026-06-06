@@ -35,7 +35,7 @@ export default function Testimonial() {
       .then((data: BackendTestimonial[]) => {
         const mapped = data.map((tItem) => ({
           img: tItem.user?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${tItem.user?.email || tItem.id}`,
-          name: tItem.user?.fullName || t("Anonymous"),
+          name: tItem.user?.fullName || t("مجهول"),
           username: tItem.user?.email || "",
           body: t(tItem.body),
         }));

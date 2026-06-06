@@ -51,11 +51,11 @@ const HiringBanner: React.FC = () => {
         {/* Left Side: Illustration & Text */}
         <div className={styles.leftContent}>
           <div className={styles.textStack}>
-            <motion.h2 className={styles.hiringTitle} variants={itemVariants}>{t("We are hiring!")}</motion.h2>
+            <motion.h2 className={styles.hiringTitle} variants={itemVariants}>{t("نحن نوظف!")}</motion.h2>
             <motion.p className={styles.description} variants={itemVariants}>
-              {t("All companies")}
-              <br />&{" "}
-              <span className={styles.mutedText}>{t("And explore opportunities")}</span>
+              {t("جميع الشركات")}
+              <br />و{" "}
+              <span className={styles.mutedText}>{t("واستكشف الفرص")}</span>
             </motion.p>
           </div>
         </div>

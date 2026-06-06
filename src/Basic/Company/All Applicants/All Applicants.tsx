@@ -436,9 +436,9 @@ export default function AllApplicants({ jobIdProp }: { jobIdProp?: string | numb
                         }}>
                           {(() => {
                             const hiredDate = new Date(app.updatedAt).getTime();
-                            const expiryDate = hiredDate + (7 * 24 * 60 * 60 * 1000);
+                            const expiryDate = hiredDate; // No wait time
                             const now = new Date().getTime();
-                            const diff = expiryDate - now;
+                            const diff = 0;
 
                             if (diff <= 0) {
                               return (

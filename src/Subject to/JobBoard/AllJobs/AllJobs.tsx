@@ -449,35 +449,35 @@ const AllJobs: React.FC<AllJobsProps> = ({
         >
           {/* Category Filter including Tradesman items */}
           <Filter
-            title={t("Employment Type")}
+            title={t("نوع التوظيف")}
             items={[
               {
-                name: "Full-time",
+                name: "دوام كامل",
                 count: facets.jobType?.["Full-time"] || 0,
                 value: "Full-time",
               },
               {
-                name: "Part-time",
+                name: "دوام جزئي",
                 count: facets.jobType?.["Part-time"] || 0,
                 value: "Part-time",
               },
               {
-                name: "Freelance",
+                name: "عمل حر",
                 count: facets.jobType?.["Freelance"] || 0,
                 value: "Freelance",
               },
               {
-                name: "Internship",
+                name: "تدريب",
                 count: facets.jobType?.["Internship"] || 0,
                 value: "Internship",
               },
               {
-                name: "One-time",
+                name: "عمل لمرة واحدة",
                 count: facets.jobType?.["One-time"] || 0,
                 value: "One-time",
               },
               {
-                name: "Remote",
+                name: "عن بعد",
                 count: facets.jobType?.["Remote"] || 0,
                 value: "Remote",
               },
@@ -487,25 +487,25 @@ const AllJobs: React.FC<AllJobsProps> = ({
           />
 
           <Filter
-            title={t("Job Category")}
+            title={t("فئة الوظيفة")}
             items={[
               {
-                name: "Technical",
+                name: "تقني",
                 count: facets.level?.["Technical"] || 0,
                 value: "Technical",
               },
               {
-                name: "Non-Technical",
+                name: "غير تقني",
                 count: facets.level?.["Non-Technical"] || 0,
                 value: "Non-Technical",
               },
               {
-                name: "Services",
+                name: "خدمات",
                 count: facets.level?.["Services"] || 0,
                 value: "Services",
               },
               {
-                name: "Tradesman",
+                name: "حرفي",
                 count: facets.level?.["Tradesman"] || 0,
                 value: "Tradesman",
               },
@@ -516,7 +516,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
 
 
           <Filter
-            title={t("Salary Range")}
+            title={t("نطاق الراتب")}
             items={[
               {
                 name: "700$ - 1000$",
@@ -534,7 +534,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
                 value: "1500-2000",
               },
               {
-                name: "3000$ or more",
+                name: "3000$ أو أكثر",
                 count: facets.salary?.["3000+"] || 0,
                 value: "3000+",
               },
@@ -558,7 +558,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
 
           <div className={styles.headerRight}>
             <div className={styles.sort}>
-              {t("Sort by", "ترتيب حسب")}:
+              {t("ترتيب حسب")}:
               <select
                 defaultValue="Newest"
                 onChange={(e) => {

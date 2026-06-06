@@ -126,7 +126,7 @@ const CompanyJobCard: React.FC<{ job: Job; variants: Variants }> = ({
                  : `${job.salaryMin} - ${job.salaryMax} ${t("جنيه مصري")}`}
            </span>
            <span className={styles.applyBtn}>
-             {t("Apply")}
+             {t("عمل حر")}
            </span>
         </div>
       </div>
@@ -141,7 +141,6 @@ export default function JobsDashboard() {
   const { t } = useTranslation();
   const { user } = useJobitoAuth();
   const classification = user?.classification;
-  const isTradesman = classification === "tradesman";
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -221,7 +220,7 @@ export default function JobsDashboard() {
             </h1>
           </div>
           <Link to="/Find Jobs" className={styles.showAllLink}>
-            {t("Show all jobs")} →
+            {t("عرض جميع الوظائف")} →
           </Link>
         </motion.div>
 

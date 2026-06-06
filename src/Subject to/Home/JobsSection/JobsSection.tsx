@@ -123,7 +123,7 @@ const CompanyJobCard: React.FC<{ job: Job; variants: Variants }> = ({ job, varia
             </span>
           )}
           {/* Mock extra tag to match image aesthetics if only one cat provided */}
-          {!job.category?.name && <span className={`${styles.pill} ${styles.defaultPill}`}>{t("General")}</span>}
+          {!job.category?.name && <span className={`${styles.pill} ${styles.defaultPill}`}>{t("عام")}</span>}
         </div>
       </div>
     </motion.div>
@@ -168,7 +168,7 @@ const TradesmanJobCard: React.FC<{ job: Job; variants: Variants }> = ({ job, var
             />
           </div>
           <div className={styles.jobTypeBadge}>
-            {t("Freelance")}
+            {t("عمل حر")}
           </div>
         </div>
 
@@ -270,10 +270,10 @@ const JobsSection = () => {
     >
       <motion.div className={styles.sectionHeader} variants={cardVariants}>
         <h2>
-          {t("Exceptional")} <span>{t("jobs")}</span>
+          {t("وظائف")} <span>{t("استثنائية")}</span>
         </h2>
         <Link to="/Find Jobs" className={styles.showAllLink}>
-          {t("Show all jobs")} →
+          {t("عرض جميع الوظائف")} ←
         </Link>
       </motion.div>
 

@@ -317,9 +317,7 @@ const CompanyRatings: React.FC = () => {
           ) : (
             hiredApplicants.map((app) => {
               const existingRating = givenRatings.find(r => r.targetUser?.userId === app.user.userId);
-              const unlockDurationInMs = user?.classification === "tradesman" 
-                ? 1 * 24 * 60 * 60 * 1000 // 1 day for tradesman
-                : 7 * 24 * 60 * 60 * 1000; // 7 days for company
+              const unlockDurationInMs = 0; // Immediate rating
               const hiringDate = new Date(app.appliedAt).getTime();
               const unlockDate = hiringDate + unlockDurationInMs;
               const isLocked = now < unlockDate;

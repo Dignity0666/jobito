@@ -52,12 +52,12 @@ export const CompanyRegister: React.FC = () => {
   const nextStep = () => {
     if (currentStep === 1) {
       if (!formData.companyName || !formData.companyEmail || !formData.companyPhone || !formData.companyAddress) {
-        showToast(t("Please fill all company details"), "error");
+        showToast(t("يرجى ملء جميع بيانات الشركة"), "error");
         return;
       }
     } else if (currentStep === 2) {
       if (!formData.taxNumber || !formData.commercialRegister || !formData.nationalId) {
-        showToast(t("Please upload documents and enter National ID"), "error");
+        showToast(t("يرجى رفع المستندات وإدخال الرقم القومي"), "error");
         return;
       }
     }
@@ -78,7 +78,7 @@ export const CompanyRegister: React.FC = () => {
     } catch(e) {
       data = {};
     }
-    if (!res.ok) throw new Error(data.message || t("Failed to upload document"));
+    if (!res.ok) throw new Error(data.message || t("فشل في رفع المستند"));
     return data.url;
   };
 
@@ -87,7 +87,7 @@ export const CompanyRegister: React.FC = () => {
     setFormError("");
 
     if (formData.password !== formData.confirmPassword) {
-      setFormError(t("Passwords do not match"));
+      setFormError(t("كلمات المرور غير متطابقة"));
       return;
     }
 
@@ -96,10 +96,10 @@ export const CompanyRegister: React.FC = () => {
 
       // Upload documents in parallel for better speed
       if (!(formData.commercialRegister instanceof File)) {
-        throw new Error(t("Commercial register document is required"));
+        throw new Error(t("مستند السجل التجاري مطلوب"));
       }
       if (!(formData.taxNumber instanceof File)) {
-        throw new Error(t("Tax register document is required"));
+        throw new Error(t("مستند البطاقة الضريبية مطلوب"));
       }
 
       const [crDocumentUrl, taxDocumentUrl] = await Promise.all([
@@ -127,7 +127,7 @@ export const CompanyRegister: React.FC = () => {
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || t("Registration failed"));
+      if (!response.ok) throw new Error(data.message || t("فشل التسجيل"));
       setSuccess(true);
     } catch (err: any) {
       setFormError(err.message);
@@ -153,7 +153,7 @@ export const CompanyRegister: React.FC = () => {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || t("Failed to activate"));
+      if (!res.ok) throw new Error(data.message || t("فشل التفعيل"));
       setVerifiedStatus("success");
     } catch (err: any) {
       setFormError(err.message);
@@ -181,13 +181,13 @@ export const CompanyRegister: React.FC = () => {
                 <div style={{ color: '#10b981', marginBottom: '24px' }}>
                     <CheckCircleIcon size={80} />
                 </div>
-                <h2 className={styles.title}>{t("Email Verified!")}</h2>
-                <p className={styles.subtitle}>{t("Your company account is now active. You can start posting jobs.")}</p>
+                <h2 className={styles.title}>{t("تم التحقق من البريد الإلكتروني!")}</h2>
+                <p className={styles.subtitle}>{t("حساب شركتك نشط الآن. يمكنك البدء في نشر الوظائف.")}</p>
                 <button 
                   className={styles.submitBtn} 
                   onClick={() => navigate("/user-information")}
                 >
-                    {t("Go to Login")} <ArrowRightIcon size={20} />
+                    {t("الذهاب لتسجيل الدخول")} <ArrowRightIcon size={20} />
                 </button>
             </motion.div>
           ) : success ? (
@@ -203,9 +203,9 @@ export const CompanyRegister: React.FC = () => {
                   <div style={{ color: '#4f46e5', marginBottom: '24px' }}>
                     <ShieldCheckIcon size={64} style={{ margin: '0 auto' }} />
                   </div>
-                  <h2 className={styles.title}>{t("Verify Company Account")}</h2>
+                  <h2 className={styles.title}>{t("التحقق من حساب الشركة")}</h2>
                   <p className={styles.subtitle}>
-                    {t("We sent a code to")} <b>{formData.companyEmail}</b>. {t("Please check your inbox.")}
+                    {t("لقد أرسلنا رمزاً إلى")} <b>{formData.companyEmail}</b>. {t("يرجى التحقق من صندوق الوارد الخاص بك.")}
                   </p>
 
                   <div style={{ display: 'grid', gap: '16px', marginTop: '40px' }}>
@@ -214,15 +214,15 @@ export const CompanyRegister: React.FC = () => {
                       onClick={() => setVerifyMethod("code")}
                     >
                       <SmartphoneIcon size={20} />
-                      {t("Enter Verification Code")}
+                      {t("إدخال رمز التحقق")}
                     </button>
                   </div>
                 </>
               ) : (
                 <div style={{ width: "100%" }}>
-                  <h2 className={styles.title}>{t("Enter OTP Code")}</h2>
+                  <h2 className={styles.title}>{t("أدخل رمز التحقق (OTP)")}</h2>
                   <p className={styles.subtitle}>
-                    {t("Type the 6-digit code from your company email.")}
+                    {t("أدخل الرمز المكون من 6 أرقام المرسل إلى بريد شركتك الإلكتروني.")}
                   </p>
                   <form onSubmit={handleVerifyCode} style={{ marginTop: '40px' }}>
                     {formError && <div className={styles.errorBox}>{formError}</div>}
@@ -247,7 +247,7 @@ export const CompanyRegister: React.FC = () => {
                       type="submit"
                       disabled={isVerifying}
                     >
-                      {isVerifying ? <LoaderIcon className="animate-spin" /> : t("Verify & Activate")}
+                      {isVerifying ? <LoaderIcon className="animate-spin" /> : t("تحقق وتفعيل")}
                     </button>
                   </form>
                   <button
@@ -277,7 +277,7 @@ export const CompanyRegister: React.FC = () => {
                     onClick={() => setVerifyMethod(null)}
                     style={{ background: 'none', border: 'none', color: '#64748b', marginTop: '24px', cursor: 'pointer', fontWeight: 600 }}
                   >
-                    ← {t("Back to options")}
+                    ← {t("العودة للخيارات")}
                   </button>
                 </div>
               )}
@@ -294,9 +294,9 @@ export const CompanyRegister: React.FC = () => {
                       <div className={styles.buildingIconBox}>
                           <Building2Icon size={32} />
                       </div>
-                      <h1 className={styles.title}>{t("Company registration")}</h1>
+                      <h1 className={styles.title}>{t("تسجيل شركة")}</h1>
                   </div>
-                  <p className={styles.subtitle}>{t("Create a business account to hire top talent on Jobito")}</p>
+                  <p className={styles.subtitle}>{t("أنشئ حساب أعمال لتوظيف أفضل المواهب على Jobito")}</p>
               </div>
 
               {/* Progress Indicator */}
@@ -322,11 +322,11 @@ export const CompanyRegister: React.FC = () => {
                     >
                       <div className={styles.formGrid2}>
                         <div className={styles.inputGroup}>
-                          <label>{t("Company Name")}</label>
+                          <label>{t("اسم الشركة")}</label>
                           <input
                             className={styles.inputField}
                             type="text"
-                            placeholder={t("Example: Akem")}
+                            placeholder={t("مثال: شركة الأمل")}
                             value={formData.companyName}
                             onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                             dir="auto"
@@ -334,7 +334,7 @@ export const CompanyRegister: React.FC = () => {
                           />
                         </div>
                         <div className={styles.inputGroup}>
-                          <label>{t("Company Email")}</label>
+                          <label>{t("البريد الإلكتروني للشركة")}</label>
                           <input
                             className={styles.inputField}
                             type="email"
@@ -349,7 +349,7 @@ export const CompanyRegister: React.FC = () => {
                       
                       <div className={styles.formGrid2}>
                         <div className={styles.inputGroup}>
-                          <label>{t("Company Phone")}</label>
+                          <label>{t("هاتف الشركة")}</label>
                           <input
                             className={styles.inputField}
                             type="tel"
@@ -361,7 +361,7 @@ export const CompanyRegister: React.FC = () => {
                           />
                         </div>
                         <div className={styles.inputGroup}>
-                          <label>{t("Company Address")}</label>
+                          <label>{t("عنوان الشركة")}</label>
                           <select
                             className={styles.inputField}
                             value={formData.companyAddress}
@@ -369,7 +369,7 @@ export const CompanyRegister: React.FC = () => {
                             dir="auto"
                             required
                           >
-                            <option value="" disabled>{t("Select Governorate")}</option>
+                            <option value="" disabled>{t("اختر المحافظة")}</option>
                             {[
                               "Cairo", "Alexandria", "Giza", "Qalyubia", "Port Said", "Suez", "Gharbia",
                               "Dakahlia", "Ismailia", "Asyut", "Fayoum", "Minya", "Qena", "Sohag",
@@ -383,7 +383,7 @@ export const CompanyRegister: React.FC = () => {
                       </div>
                       
                       <button type="button" className={styles.submitBtn} onClick={nextStep}>
-                        {t("Next Step")}
+                        {t("الخطوة التالية")}
                       </button>
                     </motion.div>
                   )}
@@ -398,7 +398,7 @@ export const CompanyRegister: React.FC = () => {
                     >
                       <div className={styles.formGrid2}>
                         <div className={styles.inputGroup}>
-                          <label>{t("Tax Register (PDF)")}</label>
+                          <label>{t("البطاقة الضريبية (PDF)")}</label>
                           <input
                             className={styles.inputField}
                             type="file"
@@ -407,7 +407,7 @@ export const CompanyRegister: React.FC = () => {
                           />
                         </div>
                         <div className={styles.inputGroup}>
-                          <label>{t("Commercial Register (PDF)")}</label>
+                          <label>{t("السجل التجاري (PDF)")}</label>
                           <input
                             className={styles.inputField}
                             type="file"
@@ -418,11 +418,11 @@ export const CompanyRegister: React.FC = () => {
                       </div>
                       
                       <div className={styles.inputGroup}>
-                        <label>{t("National ID of the official")}</label>
+                        <label>{t("الرقم القومي للمسؤول")}</label>
                         <input
                           className={styles.inputField}
                           type="text"
-                          placeholder="Example: 29901011234567"
+                          placeholder="مثال: 29901011234567"
                           value={formData.nationalId}
                           onChange={(e) => setFormData({ ...formData, nationalId: e.target.value })}
                           dir="auto"
@@ -431,8 +431,8 @@ export const CompanyRegister: React.FC = () => {
                       </div>
 
                       <div className={styles.buttonRow}>
-                        <button type="button" className={styles.backStepBtn} onClick={prevStep}>{t("Back")}</button>
-                        <button type="button" className={styles.submitBtn} onClick={nextStep}>{t("Next Step")}</button>
+                        <button type="button" className={styles.backStepBtn} onClick={prevStep}>{t("السابق")}</button>
+                        <button type="button" className={styles.submitBtn} onClick={nextStep}>{t("الخطوة التالية")}</button>
                       </div>
                     </motion.div>
                   )}
@@ -447,7 +447,7 @@ export const CompanyRegister: React.FC = () => {
                     >
                       <div className={styles.formGrid2}>
                         <div className={styles.inputGroup}>
-                          <label>{t("Password")}</label>
+                          <label>{t("كلمة المرور")}</label>
                           <div className={styles.passwordWrapper}>
                             <input
                               className={styles.inputField}
@@ -464,7 +464,7 @@ export const CompanyRegister: React.FC = () => {
                           </div>
                         </div>
                         <div className={styles.inputGroup}>
-                          <label>{t("Confirm password")}</label>
+                          <label>{t("تأكيد كلمة المرور")}</label>
                           <div className={styles.passwordWrapper}>
                             <input
                               className={styles.inputField}
@@ -483,9 +483,9 @@ export const CompanyRegister: React.FC = () => {
                       </div>
 
                       <div className={styles.buttonRow}>
-                        <button type="button" className={styles.backStepBtn} onClick={prevStep}>{t("Back")}</button>
+                        <button type="button" className={styles.backStepBtn} onClick={prevStep}>{t("السابق")}</button>
                         <button className={styles.submitBtn} type="submit" disabled={isCreating}>
-                          {isCreating ? <LoaderIcon className="animate-spin" /> : t("Create a business account")}
+                          {isCreating ? <LoaderIcon className="animate-spin" /> : t("إنشاء حساب أعمال")}
                         </button>
                       </div>
                     </motion.div>

@@ -121,7 +121,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
         
       await processLoginSuccess(data.access_token);
     } catch (err: unknown) {
-      showToast(err instanceof Error ? t(err.message) : t("فشل تسجيل الدخول بجوجل"), "error");
+      showToast(err instanceof Error ? t(err.message, err.message) : t("فشل تسجيل الدخول بجوجل", "Google login failed"), "error");
     }
   };
 
@@ -136,11 +136,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
         body: JSON.stringify({ email: resetEmail }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || t("فشل إرسال الرمز"));
-      showToast(t("تم إرسال رمز التحقق إلى بريدك الإلكتروني!"), "success");
+      if (!res.ok) throw new Error(data.message || t("فشل إرسال الرمز", "Failed to send code"));
+      showToast(t("تم إرسال رمز التحقق إلى بريدك الإلكتروني!", "OTP sent to your email!"), "success");
       setResetStep(2);
     } catch (err: unknown) {
-      showToast(err instanceof Error ? t(err.message) : t("حدث خطأ ما"), "error");
+      showToast(err instanceof Error ? t(err.message, err.message) : t("حدث خطأ ما", "An error occurred"), "error");
     } finally {
       setIsSendingCode(false);
     }
@@ -149,7 +149,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
-      showToast(t("كلمات المرور غير متطابقة!"), "error");
+      showToast(t("كلمات المرور غير متطابقة!", "Passwords do not match!"), "error");
       return;
     }
     try {
@@ -170,11 +170,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
       }
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Reset failed");
-      showToast(t("Password reset success!"), "success");
+      showToast(t("تم إعادة تعيين كلمة المرور بنجاح!", "Password reset successful!"), "success");
       setIsResetMode(false);
       setResetStep(1);
     } catch (err: unknown) {
-      showToast(err instanceof Error ? t(err.message) : t("فشل إعادة تعيين كلمة المرور"), "error");
+      showToast(err instanceof Error ? t(err.message, err.message) : t("فشل إعادة تعيين كلمة المرور", "Failed to reset password"), "error");
     } finally {
       setIsResetting(false);
     }
@@ -195,7 +195,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
       await processLoginSuccess(data.access_token);
 
     } catch (err: unknown) {
-      showToast(err instanceof Error ? t(err.message) : t("حدث خطأ ما"), "error");
+      showToast(err instanceof Error ? t(err.message, err.message) : t("حدث خطأ ما", "An error occurred"), "error");
     } finally {
       setIsLoggingIn(false);
     }
@@ -212,11 +212,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
       <div className={Style.centeredBox}>
         <div className={Style.header}>
           <h2 className={Style.title}>
-            {isResetMode ? t("Reset Password") : t("Agent Login")}
+            {isResetMode ? t("إعادة تعيين كلمة المرور", "Reset Password") : t("تسجيل الدخول", "Login")}
           </h2>
           {!isResetMode && (
             <p className={Style.subtitle}>
-              {t("Hey, Enter your details to get sign in to your account")}
+              {t("مرحباً، أدخل بياناتك لتسجيل الدخول إلى حسابك", "Welcome, enter your details to login")}
             </p>
           )}
         </div>
@@ -236,7 +236,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder={t("Enter Email / Phone No")}
+                    placeholder={t("أدخل البريد الإلكتروني أو رقم الهاتف", "Enter email or phone number")}
                     required
                   />
                 </div>
@@ -248,7 +248,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder={t("Passcode")}
+                    placeholder={t("كلمة المرور", "Password")}
                     dir="ltr"
                     required
                   />
@@ -258,7 +258,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
                 </div>
                 <div className={Style.troubleLink}>
                   <button type="button" onClick={() => setIsResetMode(true)}>
-                    {t("Having trouble in sign in?")}
+                    {t("هل تواجه مشكلة في تسجيل الدخول؟", "Trouble logging in?")}
                   </button>
                 </div>
               </div>
@@ -268,11 +268,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
                 type="submit"
                 disabled={isLoggingIn}
               >
-                {isLoggingIn ? <LoaderIcon className="loader" /> : t("Sign in")}
+                {isLoggingIn ? <LoaderIcon className="loader" /> : t("تسجيل الدخول", "Login")}
               </button>
 
               <div className={Style.divider}>
-                <span>{t("Or Sign in with")}</span>
+                <span>{t("أو سجل الدخول عبر", "Or login via")}</span>
               </div>
 
               <div className={Style.googleWrapper}>
@@ -295,33 +295,33 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
               exit={{ opacity: 0, y: -10 }}
             >
               <button onClick={resetState} className={Style.backBtn}>
-                <ArrowLeftIcon size={16} /> {t("العودة لتسجيل الدخول")}
+                <ArrowLeftIcon size={16} /> {t("العودة لتسجيل الدخول", "Back to Login")}
               </button>
 
               {resetStep === 1 && !resetMethod ? (
                 <div className={Style.methodGrid}>
-                  <p className={Style.subtitle}>{t("اختر طريقة استعادة كلمة المرور")}</p>
+                  <p className={Style.subtitle}>{t("اختر طريقة استعادة كلمة المرور", "Choose password recovery method")}</p>
                   <button 
                     className={`${Style.methodBtn} ${Style.googleBtn}`}
                     onClick={() => setResetMethod("google")}
                   >
-                    <GoogleIcon /> {t("استعادة عبر Google")}
+                    <GoogleIcon /> {t("استعادة عبر Google", "Recover via Google")}
                   </button>
                   <button 
                     className={`${Style.methodBtn} ${Style.emailBtn}`}
                     onClick={() => setResetMethod("email")}
                   >
-                    <MailIcon size={20} /> {t("استعادة عبر البريد الإلكتروني")}
+                    <MailIcon size={20} /> {t("استعادة عبر البريد الإلكتروني", "Recover via Email")}
                   </button>
                 </div>
               ) : resetStep === 1 && resetMethod === "google" ? (
                 <>
-                  <p className={Style.subtitle}>{t("يرجى تسجيل الدخول بحساب Google المرتبط لتغيير كلمة المرور")}</p>
+                  <p className={Style.subtitle}>{t("يرجى تسجيل الدخول بحساب Google المرتبط لتغيير كلمة المرور", "Please sign in with linked Google account to change password")}</p>
                   <div className={Style.googleWrapper}>
                     <GoogleOAuthProvider clientId={googleClientId}>
                       <MyLoginPage
                         onSuccess={handleGoogleLogin}
-                        onError={() => showToast(t("فشل التحقق من Google"), "error")}
+                        onError={() => showToast(t("فشل التحقق من Google", "Google verification failed"), "error")}
                       />
                     </GoogleOAuthProvider>
                   </div>
@@ -329,7 +329,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
               ) : resetStep === 1 && resetMethod === "email" ? (
                 <>
                   <div className={Style.inputGroup}>
-                    <label>{t("البريد الإلكتروني لاستعادة الحساب")}</label>
+                    <label>{t("البريد الإلكتروني لاستعادة الحساب", "Recovery Email")}</label>
                     <input
                       type="email"
                       value={resetEmail}
@@ -343,13 +343,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
                     onClick={handleRequestOtp}
                     disabled={isSendingCode}
                   >
-                    {isSendingCode ? <LoaderIcon className="loader" /> : t("إرسال رمز التحقق")}
+                    {isSendingCode ? <LoaderIcon className="loader" /> : t("إرسال رمز التحقق", "Send OTP")}
                   </button>
                 </>
               ) : (
                 <>
                   <div className={Style.inputGroup}>
-                    <label>{t("رمز التحقق (OTP)")}</label>
+                    <label>{t("رمز التحقق (OTP)", "OTP Code")}</label>
                     <input
                       type="text"
                       maxLength={6}
@@ -361,7 +361,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
                     />
                   </div>
                   <div className={Style.inputGroup}>
-                    <label>{t("كلمة المرور الجديدة")}</label>
+                    <label>{t("كلمة المرور الجديدة", "New Password")}</label>
                     <input
                       type="password"
                       value={newPassword}
@@ -371,7 +371,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
                     />
                   </div>
                   <div className={Style.inputGroup}>
-                    <label>{t("تأكيد كلمة المرور")}</label>
+                    <label>{t("تأكيد كلمة المرور", "Confirm Password")}</label>
                     <input
                       type="password"
                       value={confirmPassword}
@@ -385,7 +385,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
                     onClick={handleResetPassword}
                     disabled={isResetting}
                   >
-                    {isResetting ? <LoaderIcon className="loader" /> : t("تعيين كلمة المرور الجديدة")}
+                    {isResetting ? <LoaderIcon className="loader" /> : t("تعيين كلمة المرور الجديدة", "Set New Password")}
                   </button>
                 </>
               )}
@@ -398,9 +398,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
           <div className={Style.modalOverlay}>
             <div className={Style.modalContent}>
               <span className={Style.modalIcon}>⚠️</span>
-              <h2 className={Style.modalTitle}>{t("حسابك مجدول للحذف")}</h2>
+              <h2 className={Style.modalTitle}>{t("حسابك مجدول للحذف", "Account Scheduled for Deletion")}</h2>
               <p className={Style.modalText}>
-                {t("حسابك مجدول للحذف خلال {{days}} أيام. اضغط على 'استكمال الدخول' لإلغاء طلب الحذف والدخول لحسابك.", { days: deletionStatus.daysLeft })}
+                {t("حسابك مجدول للحذف خلال {{days}} أيام. اضغط على 'استكمال الدخول' لإلغاء طلب الحذف والدخول لحسابك.", "Your account is scheduled for deletion in {{days}} days. Click 'Continue Login' to cancel deletion.", { days: deletionStatus.daysLeft })}
               </p>
               
               <div className={Style.modalActions}>
@@ -412,7 +412,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
                         headers: { Authorization: `Bearer ${loginToken}` },
                       });
                       if (!cancelRes.ok) throw new Error("Cancel failed");
-                      alert(t("تم إلغاء طلب حذف الحساب بنجاح!"));
+                      alert(t("تم إلغاء طلب حذف الحساب بنجاح!", "Account deletion cancelled successfully!"));
                       setShowDeletionModal(false);
                       // Now log them in because they cancelled
                       if (loginToken) {
@@ -422,12 +422,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
                       }
                     } catch (e) {
                       console.error(e);
-                      alert(t("فشل إلغاء الحذف"));
+                      alert(t("فشل إلغاء الحذف", "Failed to cancel deletion"));
                     }
                   }}
                   className={Style.cancelDeleteBtn}
                 >
-                  {t("استكمال الدخول")}
+                  {t("استكمال الدخول", "Continue Login")}
                 </button>
                 <button
                   onClick={() => {
@@ -437,7 +437,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
                   }}
                   className={Style.goBackBtn}
                 >
-                  {t("تراجع (عدم الدخول)")}
+                  {t("تراجع (عدم الدخول)", "Go Back")}
                 </button>
               </div>
             </div>

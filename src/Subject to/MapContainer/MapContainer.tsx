@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
+import { useTranslation } from "../../context/translation-context";
 import "./MapContainer.module.css";
 interface MapProps {
   lat?: number;
@@ -12,6 +13,7 @@ const center = {
 };
 
 const MapComponent: React.FC<MapProps> = ({ lat, lng }) => {
+  const { t } = useTranslation();
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
@@ -38,7 +40,7 @@ const MapComponent: React.FC<MapProps> = ({ lat, lng }) => {
     lng: lng ?? center.lng,
   };
 
-  if (!isLoaded) return <div>Loading...</div>;
+  if (!isLoaded) return <div>{t("جاري التحميل...")}</div>;
 
   return (
     <div className="w-full max-w-[1000px] h-[400px] rounded-xl overflow-hidden">

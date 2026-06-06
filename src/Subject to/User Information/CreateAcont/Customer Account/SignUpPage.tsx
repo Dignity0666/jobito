@@ -93,10 +93,10 @@ export const SignUpPage: React.FC = () => {
         window.dispatchEvent(new Event("auth-changed"));
         navigate("/");
       } catch (err: unknown) {
-        showToast(err instanceof Error ? t(err.message) : t("Something went wrong"), "error");
+        showToast(err instanceof Error ? t(err.message) : t("حدث خطأ ما"), "error");
       }
     },
-    onError: () => showToast(t("Google login failed"), "error"),
+    onError: () => showToast(t("فشل تسجيل الدخول بجوجل"), "error"),
   });
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -66,18 +66,19 @@ export const UserInformation: React.FC = () => {
         <div className={styles.blobTop}></div>
 
         <div className={styles.brandContent}> 
-          <div className={styles.logoMark}>JOBITO</div>
-          <h1 className={styles.welcomeTitle}>{t("WELCOME")}</h1>
-          <p className={styles.welcomeSub}>{t("YOUR HEADLINE NAME")}</p>
+          <div className={styles.logoMark}>{t("JOBITO", "JOBITO")}</div>
+          <h1 className={styles.welcomeTitle}>{t("مرحباً بك", "Welcome")}</h1>
+          <p className={styles.welcomeSub}>{t("في منصة جوبيتو", "to Jobito Platform")}</p>
           <p className={styles.welcomeDesc}>
             {t(
-              "Join thousands of professionals and companies. Create your account to find opportunities, connect with employers, and grow your career.",
+              "انضم إلى آلاف المحترفين والشركات. أنشئ حسابك لاكتشاف الفرص، والتواصل مع أصحاب العمل، وتطوير مسيرتك المهنية.",
+              "Join thousands of professionals and companies. Create your account to discover opportunities, connect with employers, and advance your career."
             )}
           </p>
         </div>
 
         <footer className={styles.leftFooter}>
-          © {t("Jobito 2026")} · {t("Privacy Policy")}
+          © {t("جوبيتو 2026", "Jobito 2026")} · {t("سياسة الخصوصية", "Privacy Policy")}
         </footer>
       </div>
 
@@ -88,7 +89,7 @@ export const UserInformation: React.FC = () => {
             whileTap={{ scale: 0.9 }}
             className={styles.roundActionBtn}
             onClick={() => navigate("/")}
-            title={t("Back to Home")}
+            title={t("العودة للرئيسية", "Back to Home")}
           >
             <ArrowLeft size={20} />
           </motion.button>
@@ -98,7 +99,7 @@ export const UserInformation: React.FC = () => {
             whileTap={{ scale: 0.9 }}
             className={styles.roundActionBtn}
             onClick={toggleTheme}
-            title={isDark ? t("Light Mode") : t("Dark Mode")}
+            title={isDark ? t("الوضع الفاتح", "Light Mode") : t("الوضع الداكن", "Dark Mode")}
           >
             {isDark ? <Sun size={20} /> : <Moon size={20} />}
           </motion.button>
@@ -122,11 +123,11 @@ export const UserInformation: React.FC = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              {isCustomer ? t("صاحب عمل؟") : t("مستخدم؟")}
+              {isCustomer ? t("صاحب عمل؟", "Employer?") : t("مستخدم؟", "User?")}
             </motion.button>
           )}
           <button className={styles.toggleBtn} onClick={toggleLogin}>
-            {showLogin ? t("Sign up") : t("Sign in")}
+            {showLogin ? t("إنشاء حساب", "Create Account") : t("تسجيل الدخول", "Login")}
           </button>
         </div>
 
