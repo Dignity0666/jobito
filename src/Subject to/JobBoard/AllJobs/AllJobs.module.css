@@ -522,7 +522,7 @@
 }
 
 .ratingValueText {
-  color: #ffffff;
+  color: var(--color-text);
   font-weight: 600;
   font-size: 16px;
 }
