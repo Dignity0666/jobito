@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "../../../context/translation-context";
 import { useJobitoAuth } from "../../../context/LinkContxt";
 import styles from "./CompanyRatings.module.css";
-import { Star, CheckCircle } from "lucide-react";
+import { Star, CheckCircle, Clock, Unlock } from "lucide-react";
 import { useToast } from "../../../context/ToastContext";
 import { Link } from "react-router-dom";
 
@@ -39,6 +39,7 @@ interface Application {
   applicationId: number;
   status: string;
   appliedAt: string;
+  ratingClosed?: boolean;
   job: {
     jobId: number;
     title: string;
@@ -317,10 +318,11 @@ const CompanyRatings: React.FC = () => {
           ) : (
             hiredApplicants.map((app) => {
               const existingRating = givenRatings.find(r => r.targetUser?.userId === app.user.userId);
-              const unlockDurationInMs = 0; // Immediate rating
+              const isUnlocked = app.ratingClosed;
+              const unlockDurationInMs = 7 * 24 * 60 * 60 * 1000; // 7 days rating
               const hiringDate = new Date(app.appliedAt).getTime();
               const unlockDate = hiringDate + unlockDurationInMs;
-              const isLocked = now < unlockDate;
+              const isLocked = !isUnlocked && now < unlockDate;
               
               const timeLeftToUnlock = (() => {
                 if (!isLocked) return null;
@@ -352,11 +354,12 @@ const CompanyRatings: React.FC = () => {
                     <div className={styles.phoneText}>{app.user.phone || "—"}</div>
                   </div>
 
-                  <div className={styles.ratingInputSection}>
+                  <div className={styles.ratingInputSection} style={isLocked && !existingRating ? { background: 'rgba(245, 158, 11, 0.05)', border: '1px dashed rgba(245, 158, 11, 0.3)' } : {}}>
                     {isLocked && !existingRating ? (
-                      <div className={styles.lockedMessage}>
-                        <span>{t("التقييم متاح خلال:", "Rating available in:")}</span>
-                        <span className={styles.compactTimer}>
+                      <div className={styles.lockedMessage} style={{ color: '#d97706' }}>
+                        <Clock size={16} />
+                        <span style={{ fontWeight: 600 }}>{t("التقييم متاح خلال:", "Rating available in:")}</span>
+                        <span className={styles.compactTimer} style={{ color: '#d97706', fontSize: '13px', background: 'rgba(245, 158, 11, 0.15)', padding: '2px 8px', borderRadius: '6px' }}>
                           {timeLeftToUnlock?.days}{t("ي", "d")} {timeLeftToUnlock?.hours}{t("س", "h")}
                         </span>
                       </div>
@@ -393,8 +396,45 @@ const CompanyRatings: React.FC = () => {
                         <span>{t("تم التقييم", "Rated")}</span>
                       </div>
                     ) : isLocked ? (
-                      <div className={styles.statusWait}>
-                        <span className={styles.badgeWait}>{t("انتظار", "Waiting")}</span>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
+                        <span className={styles.badgeWait} style={{ alignSelf: 'stretch', textAlign: 'center' }}>{t("انتظار", "Waiting")}</span>
+                        <button 
+                          className={styles.compactSubmitBtn}
+                          style={{ 
+                            backgroundColor: 'transparent', 
+                            border: '1px solid #3b82f6',
+                            color: '#3b82f6',
+                            fontSize: '12px', 
+                            padding: '4px 12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            transition: 'all 0.2s',
+                            boxShadow: 'none'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }}
+                          onClick={async () => {
+                            try {
+                              const res = await apiFetch(`${API}/applications/${app.applicationId}/unlock-rating`, { method: "PATCH" });
+                              if (res.ok) {
+                                showToast(t("تم فتح التقييم بنجاح", "Rating unlocked successfully"), "success");
+                                setHiredApplicants(prev => prev.map(a => a.applicationId === app.applicationId ? { ...a, ratingClosed: true } : a));
+                              } else {
+                                showToast(t("حدث خطأ", "An error occurred"), "error");
+                              }
+                            } catch (e) {
+                              showToast(t("حدث خطأ", "An error occurred"), "error");
+                            }
+                          }}
+                        >
+                          <Unlock size={14} />
+                          {t("تقييم الآن", "Rate Now")}
+                        </button>
                       </div>
                     ) : (
                       <button 

@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import styles from "./CompleteProfile.module.css";
@@ -441,7 +441,7 @@ export default function CompleteProfile() {
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      const res = await apiFetch(`${API_BASE_URL}/users/me`, {
+      const res = await apiFetch(`${API_BASE_URL}/users/me?permanent=true`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       });
@@ -1443,7 +1443,7 @@ export default function CompleteProfile() {
                 </svg>
               </button>
               <h2>{t("تأكيد حذف الحساب")}</h2>
-              <p>{t("بمجرد طلب الحذف، سيتم حذف حسابك نهائياً بعد يومين. يمكنك إلغاء الإجراء خلال هذه الفترة.")}</p>
+              <p>{t("بمجرد تأكيد الحذف، سيتم حذف حسابك وجميع بياناتك نهائياً فوراً ولا يمكن استرجاعها.")}</p>
               <div className={styles.modalFooter}>
                 <button className={styles.cancelButton} onClick={() => setShowDeleteModal(false)}>{t("إلغاء")}</button>
                 <button className={styles.submitButton} onClick={handleDelete} disabled={isDeleting}>

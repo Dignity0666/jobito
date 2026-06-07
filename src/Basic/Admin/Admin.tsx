@@ -112,7 +112,6 @@ const Admin: React.FC = () => {
         <div className={styles.headerContent}>
           {/* Left Actions */}
           <div className={styles.headerLeft}>
-              
             <div className={styles.iconActions}>
               <button className={styles.iconBtn} onClick={toggleLanguage} style={{ fontSize: '13px', fontWeight: 'bold' }}>
                 {language === 'ar' ? 'EN' : 'عربي'}
