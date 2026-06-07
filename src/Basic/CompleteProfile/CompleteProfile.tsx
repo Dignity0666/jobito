@@ -412,7 +412,17 @@ export default function CompleteProfile() {
 
       const result = await res.json();
 
-      // Save token and proceed
+      // Check if backend requested a logout (e.g. pending admin approval)
+      if (result.requiresLogout) {
+        showToast(t("تم تقديم طلبك بنجاح! حسابك قيد المراجعة الآن، وسيتم تسجيل خروجك لحين موافقة الإدارة."), "success");
+        setTimeout(() => {
+          logout();
+          navigate("/");
+        }, 3000);
+        return;
+      }
+
+      // Job seeker flow: save token and proceed
       if (result.access_token) {
         localStorage.setItem("token", result.access_token);
         window.dispatchEvent(new Event("auth-changed"));
