@@ -490,8 +490,14 @@ function AppContent() {
                       </PageWrapper>
                     }
                   />
-                  {/* <Route path="/Help" element={<PageWrapper><HelpCenter /></PageWrapper>} /> */}
-
+                  <Route
+                    path="/Applicants"
+                    element={
+                      <PageWrapper>
+                        <ApplicantDetails />
+                      </PageWrapper>
+                    }
+                  />
                   <Route
                     path="/Profile"
                     element={
