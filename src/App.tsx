@@ -56,6 +56,8 @@ import { ToastProvider } from "./context/ToastContext";
 import CompanyRatings from "./Basic/Company/CompanyRatings/CompanyRatings";
 
 
+import TermsAndConditions from "./Basic/TermsAndConditions/TermsAndConditions";
+
 const pageVariants = {
   initial: {
     opacity: 0,
@@ -542,6 +544,22 @@ function AppContent() {
                     element={
                       <PageWrapper>
                         <EditProfile />
+                      </PageWrapper>
+                    }
+                  />
+                  <Route
+                    path="/privacy-policy"
+                    element={
+                      <PageWrapper>
+                        <PrivacyPolicy />
+                      </PageWrapper>
+                    }
+                  />
+                  <Route
+                    path="/terms-and-conditions"
+                    element={
+                      <PageWrapper>
+                        <TermsAndConditions />
                       </PageWrapper>
                     }
                   />

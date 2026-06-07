@@ -77,7 +77,7 @@ const Footer: FC = () => {
               <li><Link to="/about" style={{color: 'inherit', textDecoration: 'none'}}>{t("من نحن")}</Link></li>
               <li><Link to="/contact" style={{color: 'inherit', textDecoration: 'none'}}>{t("تواصل معنا")}</Link></li>
               <li><Link to="/ai-chat" style={{color: 'inherit', textDecoration: 'none'}}>{t("الأسئلة الشائعة")}</Link></li>
-              <li>{t("الشروط والأحكام")}</li>
+              <li><Link to="/terms-and-conditions" style={{color: 'inherit', textDecoration: 'none'}}>{t("الشروط والأحكام")}</Link></li>
               <li><Link to="/privacy-policy" style={{color: 'inherit', textDecoration: 'none'}}>{t("سياسة الخصوصية")}</Link></li>
             </ul>
           </div>
