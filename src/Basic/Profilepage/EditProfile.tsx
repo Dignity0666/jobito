@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styles from "./EditProfile.module.css";
 import { useJobitoAuth } from "../../context/LinkContxt";
 import { motion, AnimatePresence } from "framer-motion";
@@ -53,7 +53,7 @@ interface Education {
   desc: string;
 }
 
-type Tab = "profile" | "login" | "notifications";
+type Tab = "profile" | "login";
 
 const getAvatarUrl = (path: string | undefined | null) => {
   if (!path) return null;
@@ -181,14 +181,6 @@ export default function EditProfile() {
     }
   };
   const [showPass, setShowPass] = useState(false);
-
-  // Notifications State
-  const [notifications, setNotifications] = useState({
-    email: true,
-    jobAlerts: true,
-    applications: false,
-    marketing: false,
-  });
 
   const handleProfileChange = (
     e: React.ChangeEvent<
@@ -458,12 +450,6 @@ export default function EditProfile() {
             onClick={() => setActiveTab("login")}
           >
             {t("بيانات الدخول")}
-          </button>
-          <button
-            className={`${styles.tabBtn} ${activeTab === "notifications" ? styles.activeTab : ""}`}
-            onClick={() => setActiveTab("notifications")}
-          >
-            {t("الإشعارات")}
           </button>
         </div>
       </div>
@@ -1249,84 +1235,6 @@ export default function EditProfile() {
                   </div>
                 </div>
 
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === "notifications" && (
-            <motion.div
-              key="notifications"
-              initial={{ opacity: 0, x: 10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
-            >
-              <div className={styles.section}>
-                <h3 className={styles.sectionTitle}>{t("إعدادات الإشعارات")}</h3>
-                <p className={styles.sectionSub}>
-                  {t("اختر كيف ومتى تود استلام الإشعارات منا.")}
-                </p>
-
-                <div className={styles.toggleRow}>
-                  <div className={styles.toggleLabel}>
-                    <span className={styles.radioTitle}>
-                      {t("إشعارات البريد الإلكتروني")}
-                    </span>
-                    <span className={styles.radioDesc}>
-                      {t("استلم ملخصاً أسبوعياً للوظائف والمقالات")}
-                    </span>
-                  </div>
-                  <div
-                    className={`${styles.toggleSwitch} ${notifications.email ? styles.active : ""}`}
-                    onClick={() =>
-                      setNotifications({
-                        ...notifications,
-                        email: !notifications.email,
-                      })
-                    }
-                  >
-                    <div className={styles.toggleSlider} />
-                  </div>
-                </div>
-
-                <div className={styles.toggleRow}>
-                  <div className={styles.toggleLabel}>
-                    <span className={styles.radioTitle}>{t("تنبيهات الوظائف")}</span>
-                    <span className={styles.radioDesc}>
-                      {t("عند نشر وظيفة جديدة تناسب مهاراتك")}
-                    </span>
-                  </div>
-                  <div
-                    className={`${styles.toggleSwitch} ${notifications.jobAlerts ? styles.active : ""}`}
-                    onClick={() =>
-                      setNotifications({
-                        ...notifications,
-                        jobAlerts: !notifications.jobAlerts,
-                      })
-                    }
-                  >
-                    <div className={styles.toggleSlider} />
-                  </div>
-                </div>
-
-                <div className={styles.toggleRow}>
-                  <div className={styles.toggleLabel}>
-                    <span className={styles.radioTitle}>{t("تحديثات الطلبات")}</span>
-                    <span className={styles.radioDesc}>
-                      {t("عند تغيير حالة طلبات التوظيف الخاصة بك")}
-                    </span>
-                  </div>
-                  <div
-                    className={`${styles.toggleSwitch} ${notifications.applications ? styles.active : ""}`}
-                    onClick={() =>
-                      setNotifications({
-                        ...notifications,
-                        applications: !notifications.applications,
-                      })
-                    }
-                  >
-                    <div className={styles.toggleSlider} />
-                  </div>
-                </div>
               </div>
             </motion.div>
           )}
