@@ -624,7 +624,28 @@ export const enTranslations: Record<string, string> = {
   "يجب عليك تسجيل الدخول لتتمكن من نشر وظيفة.": "You must log in to be able to post a job.",
   "🏢 حساب شركة مطلوب": "🏢 Company Account Required",
   "يمكن لحسابات الشركات فقط نشر الوظائف. أنت مسجل دخول حالياً كحساب": "Only company accounts can post jobs. You are currently logged in as",
-  "يرجى تسجيل حساب شركة أو التبديل إليه لنشر الوظائف.": "Please register a company account or switch to it to post jobs."
+  "يرجى تسجيل حساب شركة أو التبديل إليه لنشر الوظائف.": "Please register a company account or switch to it to post jobs.",
+  "تم إرسال البلاغ بنجاح وسيتم مراجعته من قبل الإدارة.": "Report submitted successfully and will be reviewed by administration.",
+  "حدث خطأ أثناء إرسال البلاغ.": "Error occurred while submitting report.",
+  "اسم المستخدم": "Username",
+  "الموقع غير محدد": "Location not specified",
+  "تم الإبلاغ": "Reported",
+  "إبلاغ": "Report",
+  "ما هو سبب الإبلاغ؟": "What is the reason for reporting?",
+  "إرسال البلاغ": "Submit Report",
+  "حساب شركة": "Company Account",
+  "صنايعي": "Tradesman",
+  "تعديل الملف الشخصي": "Edit Profile",
+  "متاح للفرص": "Open to Opportunities",
+  "عرض أقل ↑": "Show less ↑",
+  "عرض المزيد ↓": "Show more ↓",
+  "المعرض": "Portfolio",
+  "تقييمات الشركات والعملاء": "Company and Client Ratings",
+  "مستخدم غير معروف": "Unknown user",
+  "لا توجد تقييمات من الشركات حتى الآن.": "No ratings from companies yet.",
+  "تفاصيل إضافية": "Additional Details",
+  "الهاتف": "Phone",
+  "Serves": "Serves"
 };
 
 export default enTranslations;
