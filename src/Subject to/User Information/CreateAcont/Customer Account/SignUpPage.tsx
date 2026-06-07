@@ -65,7 +65,7 @@ export const SignUpPage: React.FC = () => {
         const res = await fetch(`${API_BASE_URL}/auth/google-login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token: tokenResponse.access_token }),
+          body: JSON.stringify({ token: tokenResponse.access_token, mode: 'register' }),
         });
 
         const data = await res.json();

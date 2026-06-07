@@ -114,7 +114,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
           "Content-Type": "application/json",
           "ngrok-skip-browser-warning": "69420",
         },
-        body: JSON.stringify({ token: response.credential }),
+        body: JSON.stringify({ token: response.credential, mode: 'login' }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Google login failed");
