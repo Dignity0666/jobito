@@ -13,6 +13,12 @@
   mix-blend-mode: multiply;
 }
 
+/* 🌙 إعدادات الوضع المظلم للشعار */
+:global([data-theme="dark"]) .img {
+  filter: invert(1);
+  mix-blend-mode: screen; 
+}
+
 @media (max-width: 768px) {
   .img {
     height: 34px;
