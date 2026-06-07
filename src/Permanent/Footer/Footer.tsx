@@ -56,11 +56,9 @@ const Footer: FC = () => {
           <div className="footer-column">
             <h3 className="footer-heading">{t("للمرشحين")}</h3>
             <ul className="footer-links">
-              <li>{t("تصفح الوظائف")}</li>
-              <li>{t("دليل الشركات")}</li>
-              <li>{t("إنشاء سيرة ذاتية")}</li>
-              <li>{t("نصائح مهنية")}</li>
-              <li>{t("حاسبة الرواتب")}</li>
+              <li><Link to="/ai-chat" style={{color: 'inherit', textDecoration: 'none'}}>{t("نصائح مهنية")}</Link></li>
+              <li><Link to="/Find Jobs" style={{color: 'inherit', textDecoration: 'none'}}>{t("تصفح الوظائف")}</Link></li>
+              <li><Link to="/Browse Companies" style={{color: 'inherit', textDecoration: 'none'}}>{t("دليل الشركات")}</Link></li>
             </ul>
           </div>
 
@@ -68,20 +66,17 @@ const Footer: FC = () => {
           <div className="footer-column">
             <h3 className="footer-heading">{t("لأصحاب العمل")}</h3>
             <ul className="footer-links">
-              <li>{t("نشر وظيفة جديدة")}</li>
-              <li>{t("البحث عن مرشحين")}</li>
-              <li>{t("باقات التوظيف")}</li>
-              <li>{t("إدارة المتقدمين")}</li>
+              <li><Link to="/user-information" state={{ showLogin: false, isCustomer: false }} style={{color: 'inherit', textDecoration: 'none'}}>{t("نشر وظيفة جديدة")}</Link></li>
+              <li><Link to="/Find Jobs?category=Tradesman" style={{color: 'inherit', textDecoration: 'none'}}>{t("البحث عن مقدمي الخدمة")}</Link></li>
             </ul>
           </div>
 
-          {/* Column 4: Support & Legal / المنصة والدعم */}
           <div className="footer-column">
             <h3 className="footer-heading">{t("عن المنصة والمساعدة")}</h3>
             <ul className="footer-links">
-              <li>{t("من نحن")}</li>
-              <li>{t("تواصل معنا")}</li>
-              <li>{t("الأسئلة الشائعة")}</li>
+              <li><Link to="/about" style={{color: 'inherit', textDecoration: 'none'}}>{t("من نحن")}</Link></li>
+              <li><Link to="/contact" style={{color: 'inherit', textDecoration: 'none'}}>{t("تواصل معنا")}</Link></li>
+              <li><Link to="/ai-chat" style={{color: 'inherit', textDecoration: 'none'}}>{t("الأسئلة الشائعة")}</Link></li>
               <li>{t("الشروط والأحكام")}</li>
               <li><Link to="/privacy-policy" style={{color: 'inherit', textDecoration: 'none'}}>{t("سياسة الخصوصية")}</Link></li>
             </ul>
