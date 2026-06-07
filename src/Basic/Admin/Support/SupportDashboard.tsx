@@ -358,7 +358,9 @@ const SupportDashboard: React.FC<SupportDashboardProps> = ({ preselectedUser }) 
               </div>
             ))}
 
-            {sidebarTab === 'users' && recentChats.map((chat) => (
+            {sidebarTab === 'users' && recentChats
+              .filter(chat => !admins.some(a => a.adminId === chat.oderId))
+              .map((chat) => (
               <div 
                 key={chat.oderId} 
                 className={`${styles.ticketItem} ${selectedUser?.userId === chat.oderId ? styles.activeTicket : ''}`}
