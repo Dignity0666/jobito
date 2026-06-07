@@ -25,7 +25,15 @@ const PostWork = () => {
   const editJob = location.state?.editJob;
   const isEditMode = !!editJob;
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string;
+    description: string;
+    address: string;
+    skills: string[];
+    workTime: string[];
+    images: string[];
+    slotsAvailable: number | string;
+  }>({
     title: editJob?.title || "",
     description: editJob?.description || "",
     address: editJob?.address || "",
@@ -158,10 +166,13 @@ const PostWork = () => {
         alert(isEditMode ? t("تم تعديل العمل بنجاح") : t("تم نشر العمل بنجاح"));
         navigate("/JobListing");
       } else {
-        alert(t("حدث خطأ أثناء الحفظ"));
+        const errorData = await response.json().catch(() => null);
+        const errorMessage = errorData?.message || errorData?.error || response.statusText;
+        alert(`${t("حدث خطأ أثناء الحفظ")}: ${errorMessage}`);
       }
     } catch (error) {
-      console.error("Error posting work:", error);
+      console.error("Error submitting job:", error);
+      alert(t("حدث خطأ أثناء الاتصال بالخادم"));
     } finally {
       setIsSubmitting(false);
     }
@@ -211,9 +222,10 @@ const PostWork = () => {
             min="1"
             className={styles.textInput}
             value={formData.slotsAvailable}
-            onChange={(e) =>
-              setFormData({ ...formData, slotsAvailable: parseInt(e.target.value) || 1 })
-            }
+            onChange={(e) => {
+              const val = e.target.value;
+              setFormData({ ...formData, slotsAvailable: val === "" ? "" : parseInt(val) });
+            }}
           />
         </div>
       </div>
