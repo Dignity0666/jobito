@@ -14,11 +14,12 @@ import { useTranslation } from "../../context/translation-context";
 import { useTheme } from "../../context/ThemeContext";
 
 export const Home = () => {
-  const { user, isAuthenticated } = useJobitoAuth();
+  const { user, isAuthenticated, role } = useJobitoAuth();
   const { t, language } = useTranslation();
   const { isDark } = useTheme();
   const isRTL = language === "ar";
   const isTradesman = user?.classification === "tradesman";
+  const isCompany = role === "company";
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -80,13 +81,13 @@ export const Home = () => {
         <div className={styles.container}>
           <motion.div className={styles.content} variants={containerVariants}>
             <motion.h1 className={styles.title} variants={itemVariants}>
-              {isTradesman ? t("اعرض خدماتك", "Offer your services") : t("جد وظيفة", "Find a job")} <br />
+              {isCompany ? t("وظف أفضل الكفاءات", "Hire the best talents") : isTradesman ? t("اعرض خدماتك", "Offer your services") : t("جد وظيفة", "Find a job")} <br />
               <span className={styles.purpleText}>
-                {isTradesman ? t("لعملائك", "to your clients") : t("أحلامك", "of your dreams")}
+                {isCompany ? t("لشركتك", "for your company") : isTradesman ? t("لعملائك", "to your clients") : t("أحلامك", "of your dreams")}
               </span>{" "}
               <br />
               <span className={styles.blueText}>
-                {isTradesman ? t("بسهولة", "easily") : t("اليوم", "today")}
+                {isCompany ? t("بسهولة", "easily") : isTradesman ? t("بسهولة", "easily") : t("اليوم", "today")}
                 <svg className={styles.underline} viewBox="0 0 300 20">
                   <motion.path
                     initial={{ pathLength: 0 }}
@@ -102,7 +103,9 @@ export const Home = () => {
             </motion.h1>
 
             <motion.p className={styles.description} variants={itemVariants}>
-              {isTradesman
+              {isCompany
+                ? t("انشر وظائفك واجذب أفضل المواهب لبناء فريق عمل ناجح.", "Post your jobs and attract the best talents to build a successful team.")
+                : isTradesman
                 ? t("سوق لمهاراتك وتواصل مع العملاء الذين يبحثون عن خبراتك.", "Market your skills and connect with clients looking for your expertise.")
                 : t("نربط المحترفين الموهوبين بأفضل الفرص في الشرق الأوسط.", "We connect talented professionals with the best opportunities in the Middle East.")}
             </motion.p>

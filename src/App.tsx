@@ -23,7 +23,6 @@ import { JobDetailsPage } from "./Basic/JobDetailsPage/JobDetailsPage";
 import ApplicationsHistory from "./Basic/ApplicationsHistory/ApplicationsHistory";
 import JobDashboard from "./Basic/DoughnutChart/DoughnutChart";
 import ProfilePage from "./Basic/Profilepage/Profilepage";
-import Applicants from "./Basic/Social Media Assistant applicant/Social Media As";
 import AllApplicants from "./Basic/Company/All Applicants/All Applicants";
 import CVViewer from "./Basic/Company/All Applicants/CVViewer";
 import PostJobStep3 from "./Basic/Company/Perks & Benefits/Perks&Benefits";
@@ -50,6 +49,7 @@ import ChatBotWidget from "./Shared/ChatBotWidget/ChatBotWidget";
 import AIChatBot from "./Basic/AIChatBot/AIChatBot";
 import Admin from "./Basic/Admin/Admin";
 import TradesmanReviewStatus from "./Basic/Tradesman/ReviewStatus/TradesmanReviewStatus";
+import PrivacyPolicy from "./Basic/PrivacyPolicy/PrivacyPolicy";
 
 import WorkDetails from "./Basic/Tradesman/WorkListing/Details/WorkDetails";
 import { ToastProvider } from "./context/ToastContext";
@@ -689,6 +689,14 @@ function AppContent() {
                 element={
                   <PageWrapper>
                     <AIChatBot />
+                  </PageWrapper>
+                }
+              />
+              <Route
+                path="/privacy-policy"
+                element={
+                  <PageWrapper>
+                    <PrivacyPolicy />
                   </PageWrapper>
                 }
               />

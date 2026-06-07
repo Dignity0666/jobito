@@ -4,6 +4,7 @@ import {
   FaWhatsapp,
 } from "react-icons/fa";
 import type { FC } from "react";
+import { Link } from "react-router-dom";
 import "./Footer.css";
 import { useTranslation } from "../../context/translation-context";
 
@@ -82,7 +83,7 @@ const Footer: FC = () => {
               <li>{t("تواصل معنا")}</li>
               <li>{t("الأسئلة الشائعة")}</li>
               <li>{t("الشروط والأحكام")}</li>
-              <li>{t("سياسة الخصوصية")}</li>
+              <li><Link to="/privacy-policy" style={{color: 'inherit', textDecoration: 'none'}}>{t("سياسة الخصوصية")}</Link></li>
             </ul>
           </div>
         </div>
