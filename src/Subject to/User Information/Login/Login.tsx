@@ -58,6 +58,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
+  const [isPending2FA, setIsPending2FA] = useState(false);
+  const [pending2FAEmail, setPending2FAEmail] = useState("");
+  const [admin2faCode, setAdmin2faCode] = useState("");
+  const [isVerifying2FA, setIsVerifying2FA] = useState(false);
+
   const [isResetMode, setIsResetMode] = useState(false);
   const [resetMethod, setResetMethod] = useState<"google" | "email" | null>(
     null,
@@ -192,12 +197,44 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Login failed");
+      
+      if (data.requires2FA) {
+        setIsPending2FA(true);
+        setPending2FAEmail(data.email);
+        showToast(t("تم إرسال رمز التحقق إلى بريدك الإلكتروني", "2FA code sent to your email"), "success");
+        return;
+      }
+
       await processLoginSuccess(data.access_token);
 
     } catch (err: unknown) {
       showToast(err instanceof Error ? t(err.message, err.message) : t("حدث خطأ ما", "An error occurred"), "error");
     } finally {
       setIsLoggingIn(false);
+    }
+  };
+
+  const handleVerifyAdmin2FA = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!admin2faCode) return;
+    try {
+      setIsVerifying2FA(true);
+      const response = await fetch(`${API_BASE_URL}/auth/verify-admin-2fa`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "69420" },
+        body: JSON.stringify({ email: pending2FAEmail, code: admin2faCode }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "2FA verification failed");
+      
+      setIsPending2FA(false);
+      setAdmin2faCode("");
+      setPending2FAEmail("");
+      await processLoginSuccess(data.access_token);
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? t(err.message, err.message) : t("فشل التحقق من الرمز", "Failed to verify code"), "error");
+    } finally {
+      setIsVerifying2FA(false);
     }
   };
 
@@ -221,7 +258,47 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
           )}
         </div>
 
-        {!isResetMode ? (
+        {isPending2FA ? (
+          <AnimatePresence mode="wait">
+            <motion.form
+              key="2fa-form"
+              className={Style.form}
+              onSubmit={handleVerifyAdmin2FA}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              <button type="button" onClick={() => { setIsPending2FA(false); setAdmin2faCode(""); }} className={Style.backBtn}>
+                <ArrowLeftIcon size={16} /> {t("العودة لتسجيل الدخول", "Back to Login")}
+              </button>
+              
+              <p className={Style.subtitle} style={{ marginBottom: '20px', textAlign: 'center', direction: 'rtl' }}>
+                {t("لقد أرسلنا رمز التحقق إلى", "We sent a verification code to")} <b dir="ltr">{pending2FAEmail}</b>
+              </p>
+
+              <div className={Style.inputGroup}>
+                <label>{t("رمز التحقق (OTP)", "OTP Code")}</label>
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={admin2faCode}
+                  onChange={(e) => setAdmin2faCode(e.target.value)}
+                  placeholder="000000"
+                  className={Style.otpInput}
+                  required
+                />
+              </div>
+
+              <button
+                className={Style.authbtn}
+                type="submit"
+                disabled={isVerifying2FA}
+              >
+                {isVerifying2FA ? <LoaderIcon className="loader" /> : t("تحقق ودخول", "Verify and Login")}
+              </button>
+            </motion.form>
+          </AnimatePresence>
+        ) : !isResetMode ? (
           <AnimatePresence mode="wait">
             <motion.form
               key="login-form"
