@@ -183,7 +183,26 @@ export const arTranslations: Record<string, string> = {
   "حذف الوظيفة وإرسال إنذار للشركة": "حذف الوظيفة وإرسال إنذار للشركة",
   "حذف بإنذار": "حذف بإنذار",
   "رفض": "رفض",
-  "عرض": "عرض"
+  "عرض": "عرض",
+  "Job List": "قائمة الوظائف",
+  "Live": "مباشر",
+  "Closed": "مغلق",
+  "Fulltime": "دوام كامل",
+  "Part-Time": "دوام جزئي",
+  "Freelance": "عمل حر",
+  "Remote": "عن بعد",
+  "Roles": "الأدوار",
+  "Status": "الحالة",
+  "Date Posted": "تاريخ النشر",
+  "Due Date": "تاريخ الانتهاء",
+  "Job Type": "نوع الوظيفة",
+  "Applicants": "المتقدمين",
+  "Needs": "المطلوب",
+  "Procedures": "الإجراءات",
+  "Edit": "تعديل",
+  "Close": "إغلاق",
+  "Open": "فتح",
+  "Delete": "حذف"
 };
 
 export default arTranslations;

@@ -133,7 +133,6 @@ const CompanyHome = () => {
   const { user, apiFetch } = useJobitoAuth();
   const { t, language } = useTranslation();
   const navigate = useNavigate();
-  const userName = user?.name || t("عضو");
 
   const [dashboardData, setDashboardData] = useState({
     newCandidates: 0,
@@ -145,6 +144,8 @@ const CompanyHome = () => {
   const [companyId, setCompanyId] = useState<number | null>(null);
   const [companyData, setCompanyData] = useState<AuthUser | null>(null);
   const [dateRange] = useState(getCurrentWeekRange(t));
+
+  const userName = companyData?.name || user?.name || t("عضو");
 
   const isInitialized = React.useRef(false);
 
@@ -339,7 +340,7 @@ const CompanyHome = () => {
                     key={job.jobId}
                     jobId={job.jobId}
                     title={job.title}
-                    company={user?.name || t("الشركة")}
+                    company={companyData?.name || user?.name || t("الشركة")}
                     location={job.address || t("عن بُعد")}
                     type={job.jobType || t("دوام كامل")}
                     applicantsCount={job.applications?.length || 0}

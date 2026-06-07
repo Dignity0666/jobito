@@ -123,6 +123,10 @@ export default function CompleteProfile() {
   // Deletion modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Tradesman modal state
+  const [showTradesmanModal, setShowTradesmanModal] = useState(false);
+
   
   // ─── Upload helper with retry ─────────────────
   const uploadWithRetry = async (
@@ -537,7 +541,12 @@ export default function CompleteProfile() {
 
         <motion.button
           className={`${styles.roleBtn} ${role === "tradesman" ? styles.roleBtnAccent : ""}`}
-          onClick={() => setRole("tradesman")}
+          onClick={() => {
+            setRole("tradesman");
+            if (selectedServices.length === 0 || (!selectedCriminalRecord && !criminalRecordPreview)) {
+              setShowTradesmanModal(true);
+            }
+          }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -795,91 +804,7 @@ export default function CompleteProfile() {
         {/* ═══════════════════════════════════════════
             ─── Service (Tradesman Only) ──────────────
             ═══════════════════════════════════════════ */}
-        {role === "tradesman" && (
-          <motion.div
-            className={styles.section}
-            custom={2.5}
-            variants={sectionVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-          >
-            <div className={styles.sectionRow}>
-              <div className={styles.sectionLabel}>
-                <h3>{t("الخدمة")} <span>*</span></h3>
-                <p>{t("اختر الخدمات التي تقدمها لعملائك.")}</p>
-              </div>
-              <div className={styles.sectionContent}>
-                <div className={styles.servicesGrid}>
-                  <div className={styles.serviceTagGroup}>
-                    {PREDEFINED_SERVICES.map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        className={`${styles.serviceItem} ${
-                          selectedServices.includes(s) ? styles.serviceItemActive : ""
-                        }`}
-                        onClick={() => {
-                          if (selectedServices.includes(s)) {
-                            setSelectedServices(selectedServices.filter((item) => item !== s));
-                          } else {
-                            setSelectedServices([...selectedServices, s]);
-                            if (formErrors.services) {
-                              setFormErrors((prev) => {
-                                const newErrs = { ...prev };
-                                delete newErrs.services;
-                                return newErrs;
-                              });
-                            }
-                          }
-                        }}
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-
-                  {showServiceInput ? (
-                    <div className={styles.customServiceInputRow}>
-                      <input
-                        type="text"
-                        className={styles.input}
-                        placeholder={t("اكتب الخدمة هنا...")}
-                        value={customService}
-                        onChange={(e) => setCustomService(e.target.value)}
-                        autoFocus
-                      />
-                      <button
-                        type="button"
-                        className={styles.addBtnSmall}
-                        onClick={() => {
-                          if (customService.trim()) {
-                            setSelectedServices([...selectedServices, customService.trim()]);
-                            setCustomService("");
-                            setShowServiceInput(false);
-                          }
-                        }}
-                      >
-                        {t("إضافة")}
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      className={styles.addServiceBtn}
-                      onClick={() => setShowServiceInput(true)}
-                    >
-                      <i className="fas fa-plus" /> {t("Add new Serves")}
-                    </button>
-                  )}
-                </div>
-                {formErrors.services && (
-                  <div className={styles.errorMessage}>{t("يجب اختيار خدمة واحدة على الأقل")}</div>
-                )}
-              </div>
-            </div>
-          </motion.div>
-        )}
+        {/* Services input has been moved to Tradesman Modal at the bottom */}
 
         {/* ═══════════════════════════════════════════
             ─── Section 4: About Me ───────────────────
@@ -1262,69 +1187,7 @@ export default function CompleteProfile() {
         {/* ═══════════════════════════════════════════
             ─── Criminal Record Check (Tradesman) ─────
             ═══════════════════════════════════════════ */}
-        {role === "tradesman" && (
-          <motion.div
-            className={styles.section}
-            custom={7.5}
-            variants={sectionVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-          >
-            <div className={styles.sectionRow}>
-              <div className={styles.sectionLabel}>
-                <h3>{t("Criminal Record Check")} <span>*</span></h3>
-                <p>
-                  {t(
-                    "Is An Official Document That Shows A Person's Criminal History."
-                  )}
-                </p>
-              </div>
-              <div className={styles.sectionContent}>
-                <div
-                  className={`${styles.criminalRecordZone} ${formErrors.criminalRecord ? styles.inputError : ''}`}
-                  onClick={() => criminalRecordInputRef.current?.click()}
-                >
-                  {criminalRecordPreview ? (
-                    <div className={styles.previewContainer}>
-                      <img
-                        src={criminalRecordPreview}
-                        alt="Criminal Record"
-                        className={styles.previewImg}
-                      />
-                      <div className={styles.previewOverlay}>
-                        {t("تغيير الملف")}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className={styles.placeholderBox}>
-                      <UploadIcon />
-                      <p className={styles.uploadText}>
-                        <span className={styles.uploadLink}>
-                          {t("Click to replace")}
-                        </span>{" "}
-                        {t("or drag and drop")}
-                      </p>
-                      <p className={styles.uploadHint}>
-                        SVG, PNG, JPG or GIF (max. 400 x 400px)
-                      </p>
-                    </div>
-                  )}
-                  <input
-                    type="file"
-                    ref={criminalRecordInputRef}
-                    style={{ display: "none" }}
-                    accept="image/*"
-                    onChange={handleCriminalRecordUpload}
-                  />
-                </div>
-                {formErrors.criminalRecord && (
-                  <div className={styles.errorMessage}>{t("يجب رفع صورة الفيش الجنائي")}</div>
-                )}
-              </div>
-            </div>
-          </motion.div>
-        )}
+        {/* Criminal Record input has been moved to Tradesman Modal at the bottom */}
 
         {/* ═══════════════════════════════════════════
             ─── Section 9: Work Images ────────────────
@@ -1431,6 +1294,158 @@ export default function CompleteProfile() {
             {t("حذف الحساب نهائيًا")}
           </motion.button>
         </motion.div>
+
+        {/* Tradesman Requirements Modal */}
+        {showTradesmanModal && (
+          <div className={styles.modalOverlay} onClick={() => setShowTradesmanModal(false)}>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+              <button className={styles.closeButton} onClick={() => setShowTradesmanModal(false)}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+              <div className={styles.modalHeader}>
+                <h2>{t("بيانات الحرفي الإلزامية")}</h2>
+              </div>
+              <p>{t("يجب استكمال الفيش الجنائي واختيار خدمة واحدة على الأقل للاستمرار كحرفي.")}</p>
+              
+              {/* Service Selection */}
+              <div className={styles.sectionRow} style={{ marginTop: '20px', marginBottom: '20px' }}>
+                <div className={styles.sectionLabel} style={{ width: '100%', marginBottom: '10px' }}>
+                  <h3 style={{ fontSize: '16px' }}>{t("الخدمة")} <span>*</span></h3>
+                </div>
+                <div className={styles.sectionContent} style={{ width: '100%' }}>
+                  <div className={styles.servicesGrid}>
+                    <div className={styles.serviceTagGroup}>
+                      {PREDEFINED_SERVICES.map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          className={`${styles.serviceItem} ${
+                            selectedServices.includes(s) ? styles.serviceItemActive : ""
+                          }`}
+                          onClick={() => {
+                            if (selectedServices.includes(s)) {
+                              setSelectedServices(selectedServices.filter((item) => item !== s));
+                            } else {
+                              setSelectedServices([...selectedServices, s]);
+                              if (formErrors.services) {
+                                setFormErrors((prev) => {
+                                  const newErrs = { ...prev };
+                                  delete newErrs.services;
+                                  return newErrs;
+                                });
+                              }
+                            }
+                          }}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+
+                    {showServiceInput ? (
+                      <div className={styles.customServiceInputRow}>
+                        <input
+                          type="text"
+                          className={styles.input}
+                          placeholder={t("اكتب الخدمة هنا...")}
+                          value={customService}
+                          onChange={(e) => setCustomService(e.target.value)}
+                          autoFocus
+                        />
+                        <button
+                          type="button"
+                          className={styles.addBtnSmall}
+                          onClick={() => {
+                            if (customService.trim()) {
+                              setSelectedServices([...selectedServices, customService.trim()]);
+                              setCustomService("");
+                              setShowServiceInput(false);
+                            }
+                          }}
+                        >
+                          {t("إضافة")}
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        className={styles.addServiceBtn}
+                        onClick={() => setShowServiceInput(true)}
+                      >
+                        <i className="fas fa-plus" /> {t("Add new Serves")}
+                      </button>
+                    )}
+                  </div>
+                  {formErrors.services && selectedServices.length === 0 && (
+                    <div className={styles.errorMessage}>{t("يجب اختيار خدمة واحدة على الأقل")}</div>
+                  )}
+                </div>
+              </div>
+
+              {/* Criminal Record */}
+              <div className={styles.sectionRow} style={{ marginTop: '20px' }}>
+                <div className={styles.sectionLabel} style={{ width: '100%', marginBottom: '10px' }}>
+                  <h3 style={{ fontSize: '16px' }}>{t("Criminal Record Check")} <span>*</span></h3>
+                </div>
+                <div className={styles.sectionContent} style={{ width: '100%' }}>
+                  <div
+                    className={`${styles.criminalRecordZone} ${formErrors.criminalRecord && (!selectedCriminalRecord && !criminalRecordPreview) ? styles.inputError : ''}`}
+                    onClick={() => criminalRecordInputRef.current?.click()}
+                  >
+                    {criminalRecordPreview ? (
+                      <div className={styles.previewContainer}>
+                        <img
+                          src={criminalRecordPreview}
+                          alt="Criminal Record"
+                          className={styles.previewImg}
+                        />
+                        <div className={styles.previewOverlay}>
+                          {t("تغيير الملف")}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className={styles.placeholderBox}>
+                        <UploadIcon />
+                        <p className={styles.uploadText}>
+                          <span className={styles.uploadLink}>
+                            {t("Click to replace")}
+                          </span>{" "}
+                          {t("or drag and drop")}
+                        </p>
+                        <p className={styles.uploadHint}>
+                          SVG, PNG, JPG or GIF (max. 400 x 400px)
+                        </p>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      ref={criminalRecordInputRef}
+                      style={{ display: "none" }}
+                      accept="image/*"
+                      onChange={handleCriminalRecordUpload}
+                    />
+                  </div>
+                  {formErrors.criminalRecord && (!selectedCriminalRecord && !criminalRecordPreview) && (
+                    <div className={styles.errorMessage}>{t("يجب رفع صورة الفيش الجنائي")}</div>
+                  )}
+                </div>
+              </div>
+
+              <div className={styles.modalFooter}>
+                <button 
+                  className={styles.submitButton} 
+                  onClick={() => setShowTradesmanModal(false)}
+                  disabled={selectedServices.length === 0 || (!selectedCriminalRecord && !criminalRecordPreview)}
+                >
+                  {t("تأكيد وحفظ مؤقت")}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Delete Confirmation Modal */}
         {showDeleteModal && (
