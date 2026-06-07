@@ -21,6 +21,7 @@ import {
   Plus,
   ChevronDown
 } from 'lucide-react';
+import { io } from 'socket.io-client';
 
 /**
  * Main Admin Entry Point
@@ -79,6 +80,34 @@ const Admin: React.FC = () => {
       navigate('/');
     }
   }, [shouldRedirect, navigate]);
+
+  // WebSocket Connection for Real-time Updates
+  React.useEffect(() => {
+    if (!shouldRedirect && isAuthenticated) {
+      // Remove '/api' from the base URL to connect to the WebSocket server
+      const socketUrl = API_BASE_URL.replace('/api', '');
+      const socket = io(socketUrl);
+
+      socket.on('connect', () => {
+        socket.emit('join_admin');
+      });
+
+      socket.on('admin_data_updated', (payload) => {
+        let entityName = payload.entity;
+        if (entityName === 'users') entityName = t('المستخدمين') || 'Users';
+        if (entityName === 'jobs') entityName = t('الوظائف') || 'Jobs';
+        if (entityName === 'companies') entityName = t('الشركات') || 'Companies';
+        
+        showToast(`${t("تم تحديث بيانات")} ${entityName} 🔄`);
+        // Dispatch a global event so that child components (like UserManagement) can refetch data
+        window.dispatchEvent(new CustomEvent('admin_refresh', { detail: payload }));
+      });
+
+      return () => {
+        socket.disconnect();
+      };
+    }
+  }, [shouldRedirect, isAuthenticated, t, showToast]);
 
   // Show loading while initializing or while context catches up with a valid admin token
   if (isInitialLoading || (!isAuthenticated && !shouldRedirect)) {

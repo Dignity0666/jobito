@@ -413,32 +413,57 @@
 .modalFooter { padding: 14px 24px 20px; display: flex; justify-content: flex-end; gap: 10px; }
 
 .btnCancel {
-  padding: 9px 20px;
+  padding: 10px 24px;
   border-radius: var(--radius-sm);
   border: 1.5px solid var(--border);
-  background: white;
+  background: transparent;
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnCancel:hover {
+  background: var(--bg);
+  border-color: var(--text-muted);
 }
 
 .btnConfirm {
-  padding: 9px 20px;
+  padding: 10px 24px;
   border-radius: var(--radius-sm);
   border: none;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 14px;
   cursor: pointer;
   color: white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.btnConfirm.cobalt { background: var(--cobalt); }
-.btnConfirm.orange { background: var(--orange); }
-.btnConfirm.warning { background: var(--warning); }
-.btnConfirm.danger { background: var(--danger); }
+.btnConfirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  filter: brightness(1.1);
+}
+
+.btnConfirm:active {
+  transform: translateY(0);
+}
+
+.cobalt { background: var(--cobalt); color: white; }
+.orange { background: var(--orange); color: white; }
+.warning { background: #F59E0B; color: white; }
+.danger { background: #EF4444; color: white; }
 
 .accentBar { height: 4px; width: 100%; }
 .accentCobalt { background: var(--cobalt); }
 .accentOrange { background: var(--orange); }
-.accentWarning { background: var(--warning); }
-.accentDanger { background: var(--danger); }
+.accentWarning { background: #F59E0B; }
+.accentDanger { background: #EF4444; }
 
 /* ── Demo Switcher ── */
 .demoBar {

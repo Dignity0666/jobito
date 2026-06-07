@@ -151,6 +151,16 @@ const UserManagement: React.FC<UserManagementProps> = ({ onGoToSupport }) => {
 
   useEffect(() => {
     fetchUsers();
+
+    const handleAdminRefresh = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      if (customEvent.detail?.entity === 'users') {
+        fetchUsers();
+      }
+    };
+
+    window.addEventListener('admin_refresh', handleAdminRefresh);
+    return () => window.removeEventListener('admin_refresh', handleAdminRefresh);
   }, [apiFetch, language]);
 
   const executeAction = async (targetUserId: string, actionType: string, reason: string) => {
