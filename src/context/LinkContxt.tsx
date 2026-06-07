@@ -7,6 +7,7 @@ import React, {
   useCallback,
 } from "react";
 import { jwtDecode } from "jwt-decode";
+import { io } from "socket.io-client";
 
 import { API_BASE_URL } from "../services/api.js";
 
@@ -432,6 +433,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       window.removeEventListener("storage", handleAuthChange);
     };
   }, []); // Empty deps — runs once, uses ref for latest checkAuth
+
+  // --- Force Logout Socket Listener ---
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id) return;
+
+    // Connect to WebSocket server
+    const socketURL = API_BASE_URL.replace("/api/v1", "");
+    const socket = io(socketURL, { transports: ["websocket"] });
+
+    socket.on("connect", () => {
+      // Join user specific room
+      socket.emit("join_user", { userId: user.id });
+    });
+
+    socket.on("force_logout", (data) => {
+      console.warn("⚠️ Received force_logout signal from server:", data?.reason);
+      alert(data?.reason || "لقد تم إيقاف حسابك من قبل الإدارة، جاري تسجيل الخروج...");
+      logout();
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [isAuthenticated, user?.id, logout]);
 
   const login = useCallback((token: string) => {
     localStorage.setItem("token", token);
