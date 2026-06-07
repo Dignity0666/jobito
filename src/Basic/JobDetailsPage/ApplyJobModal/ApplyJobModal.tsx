@@ -42,6 +42,9 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [existingApplication, setExistingApplication] = useState<any>(null);
+  const [step, setStep] = useState(1);
+
+  const totalSteps = isTradesman ? 2 : 3;
 
   useEffect(() => {
     if (isOpen && jobId) {
@@ -188,9 +191,12 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
                   </div>
                 )}
                 <div className={styles.headerTitles}>
-                  <h2>{t("التقديم على وظيفة")} {jobTitle}</h2>
+                  <h2>
+                    <span className={styles.applyForText}>{t("التقديم على وظيفة")}</span>
+                    <span className={styles.jobTitleText}>{jobTitle}</span>
+                  </h2>
                   {companyName && (
-                    <p>
+                    <p className={styles.companyInfoText}>
                       {companyName} {location && <span className={styles.dot}>•</span>} {location}
                     </p>
                   )}
@@ -201,89 +207,126 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
             <hr className={styles.divider} />
 
             <form onSubmit={handleSubmit} className={styles.applyForm}>
-              {isTradesman ? (
-                <>
-                  <div className={styles.formGroup} style={{ marginBottom: '20px' }}>
-                    <label style={{ fontSize: '14px', fontWeight: 'bold', color: '#1a1a1a', marginBottom: '8px', display: 'block' }}>{t("Address")}</label>
-                    <input 
-                      type="text" 
-                      value={address} 
-                      onChange={(e) => setAddress(e.target.value)} 
-                      required
-                      style={{ width: '100%', padding: '12px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#0B223F', color: '#fff' }}
-                    />
-                  </div>
+              {/* Progress Bar */}
+              <div className={styles.progressContainer}>
+                <div className={styles.progressBar}>
+                  <div className={styles.progressFill} style={{ width: `${(step / totalSteps) * 100}%` }}></div>
+                </div>
+                <span className={styles.stepIndicator}>{t("الخطوة")} {step} {t("من")} {totalSteps}</span>
+              </div>
 
-                  <div className={styles.formGroup} style={{ marginBottom: '24px' }}>
-                    <label style={{ fontSize: '14px', fontWeight: 'bold', color: '#1a1a1a', marginBottom: '8px', display: 'block' }}>{t("issue Descriptions")}</label>
-                    <div className={styles.textareaWrapper}>
-                      <textarea 
-                        value={issueDescription} 
-                        onChange={(e) => setIssueDescription(e.target.value)} 
-                        required
-                        style={{ width: '100%', minHeight: '120px', padding: '12px', border: '1px solid #ccc', borderRadius: '24px', backgroundColor: '#0B223F', color: '#fff' }}
-                      />
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  {user?.classification !== "tradesman" && (
-                    <div className={styles.formGroup} style={{ marginBottom: '20px' }}>
-                      <label>{t("رابط الأعمال (Portfolio)")} <span className={styles.optionalText}>({t("اختياري")})</span></label>
-                      <input 
-                        type="text" 
-                        value={portfolioUrl} 
-                        onChange={(e) => setPortfolioUrl(e.target.value)} 
-                        placeholder="https://..."
-                      />
-                    </div>
-                  )}
-
-                  <div className={styles.formGroup} style={{ marginBottom: '24px' }}>
-                    <label>{t("رسالة التغطية")} <span className={styles.optionalText}>({t("اختياري")})</span></label>
-                    <div className={styles.textareaWrapper}>
-                      <textarea 
-                        value={coverLetter} 
-                        onChange={(e) => setCoverLetter(e.target.value)} 
-                        placeholder={t("لماذا أنت مناسب لهذه الوظيفة؟ تحدث عن خبراتك ومهاراتك...")}
-                      />
-                    </div>
-                  </div>
-
-                  {user?.classification !== "tradesman" && (
-                    <div className={styles.formGroupResume} style={{ marginBottom: '32px' }}>
-                      <div className={styles.resumeTop}>
-                        <span className={styles.resumeLabel}>{t("السيرة الذاتية (PDF)")} <span className={styles.optionalText}>({t("اختياري")})</span></span>
-                        <label className={styles.uploadButton}>
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="17 8 12 3 7 8"></polyline>
-                            <line x1="12" y1="3" x2="12" y2="15"></line>
-                          </svg>
-                          {resumeFile ? resumeFile.name : t("اختر ملف")}
-                          <input 
-                            type="file" 
-                            accept=".pdf" 
-                            onChange={(e) => setResumeFile(e.target.files?.[0] || null)} 
-                            style={{ display: 'none' }}
-                          />
-                        </label>
+              <div className={styles.stepContent}>
+                {isTradesman ? (
+                  <>
+                    {step === 1 && (
+                      <div className={styles.formGroup} style={{ marginBottom: '20px' }}>
+                        <label style={{ fontSize: '14px', fontWeight: 'bold', color: '#1a1a1a', marginBottom: '8px', display: 'block' }}>{t("Address")}</label>
+                        <input 
+                          type="text" 
+                          value={address} 
+                          onChange={(e) => setAddress(e.target.value)} 
+                          required
+                          style={{ width: '100%', padding: '12px', border: '1px solid #ccc', borderRadius: '8px', backgroundColor: '#0B223F', color: '#fff' }}
+                        />
                       </div>
-                    </div>
-                  )}
-                </>
-              )}
+                    )}
+
+                    {step === 2 && (
+                      <div className={styles.formGroup} style={{ marginBottom: '24px' }}>
+                        <label style={{ fontSize: '14px', fontWeight: 'bold', color: '#1a1a1a', marginBottom: '8px', display: 'block' }}>{t("issue Descriptions")}</label>
+                        <div className={styles.textareaWrapper}>
+                          <textarea 
+                            value={issueDescription} 
+                            onChange={(e) => setIssueDescription(e.target.value)} 
+                            required
+                            style={{ width: '100%', minHeight: '120px', padding: '12px', border: '1px solid #ccc', borderRadius: '16px', backgroundColor: '#0B223F', color: '#fff' }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {step === 1 && (
+                      <div className={styles.formGroup} style={{ marginBottom: '20px' }}>
+                        <label>{t("رابط الأعمال (Portfolio)")} <span className={styles.optionalText}>({t("اختياري")})</span></label>
+                        <input 
+                          type="text" 
+                          value={portfolioUrl} 
+                          onChange={(e) => setPortfolioUrl(e.target.value)} 
+                          placeholder="https://..."
+                        />
+                      </div>
+                    )}
+
+                    {step === 2 && (
+                      <div className={styles.formGroup} style={{ marginBottom: '24px' }}>
+                        <label>{t("رسالة التغطية")} <span className={styles.optionalText}>({t("اختياري")})</span></label>
+                        <div className={styles.textareaWrapper}>
+                          <textarea 
+                            value={coverLetter} 
+                            onChange={(e) => setCoverLetter(e.target.value)} 
+                            placeholder={t("لماذا أنت مناسب لهذه الوظيفة؟ تحدث عن خبراتك ومهاراتك...")}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {step === 3 && (
+                      <div className={styles.formGroupResume} style={{ marginBottom: '32px' }}>
+                        <div className={styles.resumeTop}>
+                          <span className={styles.resumeLabel}>{t("السيرة الذاتية (PDF)")} <span className={styles.optionalText}>({t("اختياري")})</span></span>
+                          <label className={styles.uploadButton}>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                              <polyline points="17 8 12 3 7 8"></polyline>
+                              <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            {resumeFile ? resumeFile.name : t("اختر ملف")}
+                            <input 
+                              type="file" 
+                              accept=".pdf" 
+                              onChange={(e) => setResumeFile(e.target.files?.[0] || null)} 
+                              style={{ display: 'none' }}
+                            />
+                          </label>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
 
               <div className={styles.submitSection}>
-                <button 
-                  type="submit" 
-                  className={styles.submitButton} 
-                  disabled={isSubmitting}
-                  style={isTradesman ? { backgroundColor: '#5888bd', width: '100%', padding: '12px', borderRadius: '18px', color: '#1a1a1a', fontWeight: 'bold' } : undefined}
-                >
-                  {isSubmitting ? (isTradesman ? t("Submitting...") : t("جاري الإرسال...")) : (isTradesman ? t("Submit Application") : t("إرسال الطلب"))}
-                </button>
+                {step > 1 && (
+                  <button 
+                    type="button" 
+                    className={styles.backButton} 
+                    onClick={() => setStep(step - 1)}
+                    disabled={isSubmitting}
+                  >
+                    {t("السابق")}
+                  </button>
+                )}
+                
+                {step < totalSteps ? (
+                  <button 
+                    type="button" 
+                    className={styles.nextButton} 
+                    onClick={() => setStep(step + 1)}
+                  >
+                    {t("التالي")}
+                  </button>
+                ) : (
+                  <button 
+                    type="submit" 
+                    className={styles.submitButton} 
+                    disabled={isSubmitting}
+                    style={isTradesman ? { backgroundColor: '#5888bd', flex: 1, padding: '12px', borderRadius: '18px', color: '#1a1a1a', fontWeight: 'bold' } : undefined}
+                  >
+                    {isSubmitting ? (isTradesman ? t("Submitting...") : t("جاري الإرسال...")) : (isTradesman ? t("Submit Application") : t("إرسال الطلب"))}
+                  </button>
+                )}
               </div>
             </form>
           </>

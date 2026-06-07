@@ -21,6 +21,7 @@ const ModeSwitcherBar: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [criminalRecordFile, setCriminalRecordFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string>("");
   const [uploading, setUploading] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -44,10 +45,12 @@ const ModeSwitcherBar: React.FC = () => {
     // Switching back to job_seeker → always allow immediately
     if (newType === "job_seeker") {
       setIsSwitching(true);
-      await performSwitch(newType);
+      const success = await performSwitch(newType);
       setIsSwitching(false);
-      showToast(t("تم العودة إلى وضع باحث عن عمل بنجاح!"));
-      navigate("/");
+      if (success) {
+        showToast(t("تم العودة إلى وضع باحث عن عمل بنجاح!"));
+        navigate("/");
+      }
       return;
     }
 
@@ -55,10 +58,12 @@ const ModeSwitcherBar: React.FC = () => {
     if (isProfileComplete) {
       // All data exists → switch immediately, no modal needed
       setIsSwitching(true);
-      await performSwitch(newType);
+      const success = await performSwitch(newType);
       setIsSwitching(false);
-      showToast(t("تم تفعيل الوضع الحرفي بنجاح!"));
-      navigate("/");
+      if (success) {
+        showToast(t("تم تفعيل الوضع الحرفي بنجاح!"));
+        navigate("/");
+      }
       return;
     }
 
@@ -74,7 +79,7 @@ const ModeSwitcherBar: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const performSwitch = async (newType: string, extraPayload: any = {}) => {
+  const performSwitch = async (newType: string, extraPayload: any = {}): Promise<boolean> => {
     try {
       const payload = {
         role: "user",
@@ -96,7 +101,7 @@ const ModeSwitcherBar: React.FC = () => {
             logout();
             navigate("/login");
           }, 3000);
-          return;
+          return true;
         }
 
         const data = await response.json();
@@ -105,9 +110,12 @@ const ModeSwitcherBar: React.FC = () => {
         }
         updateUser({ classification: newType, ...extraPayload });
         setIsModalOpen(false);
+        return true;
       }
+      return false;
     } catch (error) {
       console.error("Failed to toggle mode", error);
+      return false;
     }
   };
 
@@ -184,9 +192,11 @@ const ModeSwitcherBar: React.FC = () => {
         extraPayload.services = selectedServices;
       }
 
-      await performSwitch("tradesman", extraPayload);
-      showToast(t("تم تفعيل الوضع الحرفي بنجاح!"));
-      navigate("/");
+      const success = await performSwitch("tradesman", extraPayload);
+      if (success && !extraPayload.criminalRecordUrl) {
+        showToast(t("تم تفعيل الوضع الحرفي بنجاح!"));
+        navigate("/");
+      }
 
     } catch (err) {
       console.error(err);

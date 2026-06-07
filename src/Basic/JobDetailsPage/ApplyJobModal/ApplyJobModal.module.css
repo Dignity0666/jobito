@@ -94,14 +94,15 @@
 
 .closeButton {
   position: absolute;
-  top: 24px;
-  right: 24px;
+  top: 16px;
+  right: 16px;
   background: none;
   border: none;
   color: var(--color-text-secondary);
   cursor: pointer;
-  padding: 4px;
+  padding: 8px;
   display: flex;
+
   align-items: center;
   justify-content: center;
   transition: opacity 0.2s;
@@ -132,18 +133,40 @@
   justify-content: center;
 }
 
-.headerTitles h2 {
-  font-family: "Epilogue", sans-serif;
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--color-text);
-  margin: 0 0 8px 0;
+.headerTitles {
+  flex: 1;
 }
 
-.headerTitles p {
-  font-size: 15px;
+.headerTitles h2 {
+  margin: 0 0 12px 0;
+}
+
+.applyForText {
+  display: block;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  margin-bottom: 6px;
+  font-family: "Inter", sans-serif;
+}
+
+.jobTitleText {
+  display: block;
+  font-size: 20px;
+  line-height: 1.4;
+  color: var(--color-text);
+  font-family: "Epilogue", sans-serif;
+  font-weight: 800;
+}
+
+.companyInfoText {
+  font-size: 14px;
   color: var(--color-text-secondary);
   margin: 0;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .dot {
@@ -362,11 +385,12 @@
 
 .submitSection {
   display: flex;
-  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
 }
 
-.submitButton {
-  width: 100%;
+.submitButton, .nextButton {
+  flex: 1;
   padding: 14px;
   background-color: #5b8def;
   color: white;
@@ -376,8 +400,61 @@
   font-weight: 600;
   font-family: "Epilogue", sans-serif;
   cursor: pointer;
-  margin-bottom: 20px;
   transition: background-color 0.2s;
+}
+
+.submitButton:hover, .nextButton:hover {
+  background-color: #4a7acc;
+}
+
+.backButton {
+  flex: 1;
+  padding: 14px;
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: "Epilogue", sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.backButton:hover {
+  background-color: var(--color-border);
+}
+
+.progressContainer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.progressBar {
+  flex: 1;
+  height: 6px;
+  background-color: var(--color-bg-secondary);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: #5b8def;
+  transition: width 0.3s ease;
+}
+
+.stepIndicator {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.stepContent {
+  min-height: 150px;
 }
 
 .submitButton:hover {
