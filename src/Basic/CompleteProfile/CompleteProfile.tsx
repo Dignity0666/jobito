@@ -770,7 +770,7 @@ export default function CompleteProfile() {
                     <option value="">{t("اختر المحافظة...")}</option>
                     {GOVERNORATES.map((gov) => (
                       <option key={gov} value={gov}>
-                        {gov}
+                        {t(gov)}
                       </option>
                     ))}
                   </select>
