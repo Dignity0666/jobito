@@ -7,10 +7,12 @@
 }
 
 .img {
-  height: 44px;
+  height: 65px;
   width: auto;
   object-fit: contain;
   mix-blend-mode: multiply;
+  margin-top: -10px;
+  margin-bottom: -10px;
 }
 
 /* 🌙 إعدادات الوضع المظلم للشعار */
@@ -21,7 +23,9 @@
 
 @media (max-width: 768px) {
   .img {
-    height: 34px;
+    height: 50px;
+    margin-top: -5px;
+    margin-bottom: -5px;
   }
 }
 
