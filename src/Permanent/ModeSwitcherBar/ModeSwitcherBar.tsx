@@ -24,6 +24,8 @@ const ModeSwitcherBar: React.FC = () => {
   const [fileError, setFileError] = useState<string>("");
   const [uploading, setUploading] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [customService, setCustomService] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isIndividual = role === "user" || role === "student" || (user?.role as string) === "student";
@@ -222,6 +224,14 @@ const ModeSwitcherBar: React.FC = () => {
     );
   };
 
+  const handleAddCustomService = () => {
+    if (customService.trim() && !selectedServices.includes(customService.trim())) {
+      setSelectedServices(prev => [...prev, customService.trim()]);
+    }
+    setCustomService("");
+    setShowCustomInput(false);
+  };
+
   if (!isAuthenticated || !isIndividual) {
     return null;
   }
@@ -255,7 +265,7 @@ const ModeSwitcherBar: React.FC = () => {
             <button className={styles.closeBtn} onClick={() => !uploading && setIsModalOpen(false)}>
               <X size={20} />
             </button>
-            <h2 className={styles.modalTitle}>{t("أكمل الملف الصناعي")}</h2>
+            <h2 className={styles.modalTitle}>{t("أكمل الملف الحرفي")}</h2>
             
             {/* Info banner showing what's missing */}
             <div className={styles.missingInfoBanner}>
@@ -328,6 +338,42 @@ const ModeSwitcherBar: React.FC = () => {
                       {t(srv)}
                     </button>
                   ))}
+                  
+                  {/* Display user's custom added services */}
+                  {selectedServices.filter(s => !AVAILABLE_SERVICES.includes(s)).map(srv => (
+                    <button 
+                      key={srv}
+                      className={`${styles.serviceBtn} ${styles.activeService}`}
+                      onClick={() => toggleService(srv)}
+                    >
+                      {srv}
+                    </button>
+                  ))}
+
+                  {!showCustomInput ? (
+                    <button 
+                      className={`${styles.serviceBtn}`}
+                      style={{ borderStyle: 'dashed' }}
+                      onClick={() => setShowCustomInput(true)}
+                    >
+                      + {t("أخرى")}
+                    </button>
+                  ) : (
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <input 
+                        type="text" 
+                        value={customService} 
+                        onChange={(e) => setCustomService(e.target.value)} 
+                        style={{ padding: '8px 12px', borderRadius: '20px', border: '1px solid #2d3748', background: 'transparent', color: '#fff', outline: 'none' }}
+                        placeholder={t("اسم الخدمة")}
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleAddCustomService();
+                        }}
+                      />
+                      <button className={styles.serviceBtn} onClick={handleAddCustomService}>{t("إضافة")}</button>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (

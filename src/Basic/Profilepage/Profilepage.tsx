@@ -358,7 +358,7 @@ export default function ProfilePage() {
                 {profileUser?.role === "company"
                   ? t("حساب شركة")
                   : profileUser?.classification === "tradesman"
-                  ? t("صنايعي")
+                  ? t("حرفي")
                   : t("باحث عن عمل")}
               </div>
               <div className={styles.heroLoc}>

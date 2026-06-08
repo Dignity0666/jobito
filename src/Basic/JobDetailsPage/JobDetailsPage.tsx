@@ -1113,7 +1113,7 @@ export const JobDetailsPage = () => {
         isOpen={isRateModalOpen}
         onClose={() => setIsRateModalOpen(false)}
         targetUserId={job?.user?.userId || job?.user?.id || ""}
-        tradesmanName={job?.user?.fullName || "الصنايعي"}
+        tradesmanName={job?.user?.fullName || "الحرفي"}
       />
       <ReportJobModal
         isOpen={isReportModalOpen}

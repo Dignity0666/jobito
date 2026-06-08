@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./About.module.css";
 import { useTranslation } from "../../context/translation-context";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 import careerImg from "../../assets/Img/Gemini_Generated_Image_lk4biqlk4biqlk4b.png";
 import projectLogo from "../../assets/412ec68f361b4f49b52fb8d584c317ccf197a403.png";
 import advisorImg from "../../assets/Img/Gemini_Generated_Image_vzjw8dvzjw8dvzjw.png";
@@ -158,6 +160,28 @@ export function About() {
     t("التخطيط الاستراتيجي"),
   ];
 
+  const [realStats, setRealStats] = useState({
+    clients: "500+",
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const compRes = await fetch(`${API_BASE_URL}/companies?limit=1`);
+        if (compRes.ok) {
+          const compData = await compRes.json();
+          const totalCompanies = compData.total || (Array.isArray(compData.data) ? compData.data.length : (Array.isArray(compData) ? compData.length : null));
+          if (totalCompanies) {
+            setRealStats((prev) => ({ ...prev, clients: `${totalCompanies}+` }));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch real stats", err);
+      }
+    };
+    fetchStats();
+  }, []);
+
   return (
     <>
       <div>
@@ -216,12 +240,12 @@ export function About() {
                       </div>
                       <div className={styles["hv-mini-grid"]}>
                         {[
-                          ["500+", t("عميل")],
+                          [realStats.clients, t("عميل")],
                           ["10+", t("سنوات")],
                           ["24/7", t("دعم")],
                           ["100%", t("التزام")],
                         ].map(([n, l]) => (
-                          <div key={l} className={styles["hv-mini"]}>
+                          <div key={l as string} className={styles["hv-mini"]}>
                             <div className={styles["hv-mini-n"]}>{n}</div>
                             <div className={styles["hv-mini-l"]}>{l}</div>
                           </div>

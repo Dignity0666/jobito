@@ -70,7 +70,7 @@ export const RateTradesmanModal: React.FC<RateTradesmanModalProps> = ({
         <button onClick={onClose} style={{ position: "absolute", top: "16px", right: "16px", background: "none", border: "none", color: "#a0aabf", cursor: "pointer" }}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
-        <h2 style={{ fontSize: "1.5rem", marginBottom: "8px", fontWeight: "bold" }}>{t("تقييم الصنايعي")}</h2>
+        <h2 style={{ fontSize: "1.5rem", marginBottom: "8px", fontWeight: "bold" }}>{t("تقييم الحرفي")}</h2>
         <p style={{ color: "#a0aabf", marginBottom: "24px" }}>{t("ما هو تقييمك لخدمة")} {t(tradesmanName)}؟</p>
         
         <form onSubmit={handleSubmit}>

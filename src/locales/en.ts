@@ -511,7 +511,7 @@ export const enTranslations: Record<string, string> = {
   "جاري التحميل...": "Loading...",
   "جاري التبديل...": "Switching...",
   "العودة إلى باحث عن عمل": "Back to Job Seeker",
-  "التبديل إلى الوضع الحرفي": "التبديل إلى صنايعي",
+  "التبديل إلى الوضع الحرفي": "Switch to Tradesman Mode",
   "الوضع الحالي:": "Current Mode:",
   "الحرفي": "Tradesman",
   "باحث عن عمل": "Job Seeker",
@@ -634,7 +634,7 @@ export const enTranslations: Record<string, string> = {
   "ما هو سبب الإبلاغ؟": "What is the reason for reporting?",
   "إرسال البلاغ": "Submit Report",
   "حساب شركة": "Company Account",
-  "صنايعي": "Tradesman",
+  "حرفي": "Tradesman",
   "تعديل الملف الشخصي": "Edit Profile",
   "متاح للفرص": "Open to Opportunities",
   "عرض أقل ↑": "Show less ↑",
@@ -741,7 +741,7 @@ export const enTranslations: Record<string, string> = {
   "عالمي": "Global",
   "لا توجد وظائف مشابهة متاحة.": "No similar jobs available.",
   "شركة": "Company",
-  "الصنايعي": "Tradesman",
+  "الحرفي": "Tradesman",
   "وظف أفضل الكفاءات": "Hire the best talents",
   "لشركتك": "for your company",
   "انشر وظائفك واجذب أفضل المواهب لبناء فريق عمل ناجح.": "Post your jobs and attract the best talents to build a successful team.",
@@ -774,7 +774,8 @@ export const enTranslations: Record<string, string> = {
   "مايو": "May",
   "يوليو": "July",
   "سبتمبر": "September",
-  "نوفمبر": "November"
+  "نوفمبر": "November",
+  "المحافظات": "Governorates"
 };
 
 export default enTranslations;
