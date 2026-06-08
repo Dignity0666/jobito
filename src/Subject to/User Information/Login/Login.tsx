@@ -500,17 +500,19 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
                         headers: { Authorization: `Bearer ${loginToken}` },
                       });
                       if (!cancelRes.ok) throw new Error("Cancel failed");
-                      alert(t("تم إلغاء طلب حذف الحساب بنجاح!", "Account deletion cancelled successfully!"));
+                      const cancelData = await cancelRes.json();
+                      showToast(t("تم إلغاء طلب حذف الحساب بنجاح!", "Account deletion cancelled successfully!"), "success");
                       setShowDeletionModal(false);
-                      // Now log them in because they cancelled
-                      if (loginToken) {
-                        contextLogin(loginToken);
+                      // Use the fresh token from cancel-deletion (has deletionRequestedAt cleared)
+                      const freshToken = cancelData.access_token || loginToken;
+                      if (freshToken) {
+                        contextLogin(freshToken);
                         setShowLogin(false);
                         navigate("/");
                       }
                     } catch (e) {
                       console.error(e);
-                      alert(t("فشل إلغاء الحذف", "Failed to cancel deletion"));
+                      showToast(t("فشل إلغاء الحذف", "Failed to cancel deletion"), "error");
                     }
                   }}
                   className={Style.cancelDeleteBtn}

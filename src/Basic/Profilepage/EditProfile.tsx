@@ -64,7 +64,7 @@ const getAvatarUrl = (path: string | undefined | null) => {
 
 export default function EditProfile() {
   const { t } = useTranslation();
-  const { user, apiFetch } = useJobitoAuth();
+  const { user, apiFetch, logout } = useJobitoAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>("profile");
