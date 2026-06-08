@@ -44,7 +44,15 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
   const [existingApplication, setExistingApplication] = useState<any>(null);
   const [step, setStep] = useState(1);
 
-  const totalSteps = isTradesman ? 2 : 3;
+  const isApplyingToTradesmanJob = isTradesman; // The prop means the job is owned by a tradesman
+  const isApplicantTradesman = user?.classification === "tradesman" || user?.classification === "industrial";
+
+  let totalSteps = 3;
+  if (isApplyingToTradesmanJob) {
+    totalSteps = 2; // Address, Issue Description
+  } else if (isApplicantTradesman) {
+    totalSteps = 1; // Cover Letter only
+  }
 
   useEffect(() => {
     if (isOpen && jobId) {
@@ -90,8 +98,8 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
 
     // CV upload is now optional, so we removed the enforcement block.
 
-    // Validate Portfolio URL if filled
-    if (!isTradesman && portfolioUrl.trim()) {
+    // Validate Portfolio URL if filled (only for non-tradesman applicants applying to company jobs)
+    if (!isApplyingToTradesmanJob && !isApplicantTradesman && portfolioUrl.trim()) {
       const trimmedPort = portfolioUrl.trim();
       const isUrlValid = trimmedPort.startsWith("http://") || trimmedPort.startsWith("https://") || (trimmedPort.includes(".") && !trimmedPort.includes(" "));
       if (!isUrlValid || trimmedPort.length < 5) {
@@ -125,7 +133,7 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
       }
 
       // 2. Submit Application
-      const finalCoverLetter = isTradesman 
+      const finalCoverLetter = isApplyingToTradesmanJob 
         ? `Address: ${address}\n\nIssue Description: ${issueDescription}` 
         : coverLetter;
 
@@ -216,7 +224,7 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
               </div>
 
               <div className={styles.stepContent}>
-                {isTradesman ? (
+                {isApplyingToTradesmanJob ? (
                   <>
                     {step === 1 && (
                       <div className={styles.formGroup} style={{ marginBottom: '20px' }}>
@@ -240,6 +248,22 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
                             onChange={(e) => setIssueDescription(e.target.value)} 
                             required
                             style={{ width: '100%', minHeight: '120px', padding: '12px', border: '1px solid #ccc', borderRadius: '16px', backgroundColor: '#0B223F', color: '#fff' }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : isApplicantTradesman ? (
+                  <>
+                    {step === 1 && (
+                      <div className={styles.formGroup} style={{ marginBottom: '24px' }}>
+                        <label>{t("رسالة التغطية (النبذة)")} <span className={styles.optionalText}>({t("مطلوب")})</span></label>
+                        <div className={styles.textareaWrapper}>
+                          <textarea 
+                            value={coverLetter} 
+                            onChange={(e) => setCoverLetter(e.target.value)} 
+                            placeholder={t("تحدث عن خبراتك ومهاراتك في هذا المجال...")}
+                            required
                           />
                         </div>
                       </div>
@@ -322,9 +346,9 @@ export const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
                     type="submit" 
                     className={styles.submitButton} 
                     disabled={isSubmitting}
-                    style={isTradesman ? { backgroundColor: '#5888bd', flex: 1, padding: '12px', borderRadius: '18px', color: '#1a1a1a', fontWeight: 'bold' } : undefined}
+                    style={isApplyingToTradesmanJob ? { backgroundColor: '#5888bd', flex: 1, padding: '12px', borderRadius: '18px', color: '#1a1a1a', fontWeight: 'bold' } : undefined}
                   >
-                    {isSubmitting ? (isTradesman ? t("Submitting...") : t("جاري الإرسال...")) : (isTradesman ? t("Submit Application") : t("إرسال الطلب"))}
+                    {isSubmitting ? (isApplyingToTradesmanJob ? t("Submitting...") : t("جاري الإرسال...")) : (isApplyingToTradesmanJob ? t("Submit Application") : t("إرسال الطلب"))}
                   </button>
                 )}
               </div>
