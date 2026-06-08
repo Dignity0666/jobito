@@ -231,6 +231,11 @@ const AllJobs: React.FC<AllJobsProps> = ({
         if (selectedLevels.length > 0) queryParams.append("jobLevel", selectedLevels.join(","));
         if (selectedSalaries.length > 0) queryParams.append("salaryRange", selectedSalaries.join(","));
 
+        // Tradesman shouldn't see other tradesmen jobs in the job search by default
+        if (classification === "tradesman") {
+          queryParams.append("ownerType", "company");
+        }
+
         const jobsRes = await fetch(
           `${API_BASE_URL}/jobs?${queryParams.toString()}`,
           {
