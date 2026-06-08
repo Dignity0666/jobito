@@ -231,9 +231,10 @@ const AllJobs: React.FC<AllJobsProps> = ({
         if (selectedLevels.length > 0) queryParams.append("jobLevel", selectedLevels.join(","));
         if (selectedSalaries.length > 0) queryParams.append("salaryRange", selectedSalaries.join(","));
 
-        // Tradesman shouldn't see other tradesmen jobs in the job search by default
+        // Tradesman should ONLY see company services in the job search
         if (classification === "tradesman") {
-          queryParams.append("ownerType", "company");
+          queryParams.set("ownerType", "company");
+          queryParams.set("jobLevel", "خدمات");
         }
 
         const jobsRes = await fetch(
@@ -260,6 +261,7 @@ const AllJobs: React.FC<AllJobsProps> = ({
         if (abortController.signal.aborted) return;
 
         jobsList = jobsData && jobsData.data ? jobsData.data : Array.isArray(jobsData) ? jobsData : [];
+
         setJobs(jobsList);
         setTotalItems(jobsData.total || jobsList.length);
         setTotalPages(jobsData.totalPages || 1);
@@ -494,16 +496,18 @@ const AllJobs: React.FC<AllJobsProps> = ({
           <Filter
             title={t("فئة الوظيفة")}
             items={[
-              {
-                name: "تقني",
-                count: facets.level?.["Technical"] || 0,
-                value: "Technical",
-              },
-              {
-                name: "غير تقني",
-                count: facets.level?.["Non-Technical"] || 0,
-                value: "Non-Technical",
-              },
+              ...(classification === "tradesman" || classification === "industrial" ? [] : [
+                {
+                  name: "تقني",
+                  count: facets.level?.["Technical"] || 0,
+                  value: "Technical",
+                },
+                {
+                  name: "غير تقني",
+                  count: facets.level?.["Non-Technical"] || 0,
+                  value: "Non-Technical",
+                }
+              ]),
               {
                 name: "خدمات",
                 count: facets.level?.["Services"] || 0,
