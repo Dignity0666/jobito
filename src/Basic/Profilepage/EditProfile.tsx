@@ -1185,18 +1185,10 @@ export default function EditProfile() {
                   <div style={{ marginTop: "1rem" }}>
                     {deletionStatus.scheduled ? (
                       <div style={{ background: "rgba(220, 38, 38, 0.05)", padding: "1.5rem", borderRadius: "12px", border: "1px solid rgba(220, 38, 38, 0.2)" }}>
-                        <p style={{ color: "#dc2626", fontWeight: "bold", marginBottom: "1.5rem", fontSize: "1.05rem", display: "flex", alignItems: "center", gap: "8px" }}>
+                        <p style={{ color: "#dc2626", fontWeight: "bold", margin: 0, fontSize: "1.05rem", display: "flex", alignItems: "center", gap: "8px" }}>
                           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                           {t("جاري حذف الحساب")} — {deletionStatus.daysLeft} {t("يوم متبقي")}
                         </p>
-                        <button
-                          type="button"
-                          style={{ background: "#2563eb", color: "#fff", border: "none", padding: "0.75rem 1.5rem", borderRadius: "8px", cursor: "pointer", fontWeight: "600", transition: "all 0.2s" }}
-                          onClick={handleCancelDeletion}
-                          disabled={isCancelling}
-                        >
-                          {isCancelling ? t("جاري الإلغاء...") : t("إلغاء حذف الحساب")}
-                        </button>
                       </div>
                     ) : !showDeleteConfirm ? (
                       <button
