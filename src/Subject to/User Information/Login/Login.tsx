@@ -296,6 +296,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setShowLogin }) => {
               >
                 {isVerifying2FA ? <LoaderIcon className="loader" /> : t("تحقق ودخول", "Verify and Login")}
               </button>
+
+              <div style={{ textAlign: "center", marginTop: "15px" }}>
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={isLoggingIn}
+                  style={{ background: 'none', border: 'none', color: '#ff7b00', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold', textDecoration: 'underline' }}
+                >
+                  {isLoggingIn ? t("جاري الإرسال...", "Sending...") : t("إعادة إرسال الرمز", "Resend Code")}
+                </button>
+              </div>
             </motion.form>
           </AnimatePresence>
         ) : !isResetMode ? (
