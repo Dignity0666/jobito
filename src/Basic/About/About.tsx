@@ -273,7 +273,7 @@ export function About() {
                       </div>
                       <div>
                         <div className={styles["fl-val"]}>{t("الأعلى تقييماً")}</div>
-                        <div className={styles["fl-sub"]}>{t("منذ 2014")}</div>
+                        <div className={styles["fl-sub"]}>{t("منذ 2026")}</div>
                       </div>
                     </div>
                   </div>
