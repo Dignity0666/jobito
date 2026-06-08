@@ -488,30 +488,33 @@ const SuperAdminDashboard: React.FC = () => {
               )}
             </div>
 
-            <div className={styles.controlsCard}>
-              <div className={styles.controlsHeader}>
-                <Settings size={18} color="#94a3b8" />
-                <h3>{t("Quick Controls")}</h3>
-              </div>
-              <p className={styles.controlsSub}>{t("Quick Access To Critical Functions")}</p>
-              
-              <div className={styles.controlItem}>
-                <div className={styles.controlInfo}>
-                  <h4>{t("Maintenance Mode")}</h4>
-                  <p>{t("Disable External User Access")}</p>
+            {user?.adminRole === 'super_admin' && (
+              <div className={styles.controlsCard}>
+                <div className={styles.controlsHeader}>
+                  <Settings size={18} color="#94a3b8" />
+                  <h3>{t("Quick Controls")}</h3>
                 </div>
-                <div 
-                  className={`${styles.toggle} ${maintenanceOn ? styles.toggleOn : ''}`}
-                  onClick={handleToggleMaintenance}
-                >
-                  <div className={styles.toggleCircle}></div>
+                <p className={styles.controlsSub}>{t("Quick Access To Critical Functions")}</p>
+                
+                <div className={styles.controlItem}>
+                  <div className={styles.controlInfo}>
+                    <h4>{t("Maintenance Mode")}</h4>
+                    <p>{t("Disable External User Access")}</p>
+                  </div>
+                  <div 
+                    className={`${styles.toggle} ${maintenanceOn ? styles.toggleOn : ''}`}
+                    onClick={handleToggleMaintenance}
+                  >
+                    <div className={styles.toggleCircle}></div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
         {/* Bottom Form */}
+        {user?.adminRole === 'super_admin' && (
         <div className={styles.adminFormCard}>
           <div className={styles.formHeaderRow}>
             <div>
@@ -573,6 +576,7 @@ const SuperAdminDashboard: React.FC = () => {
             </button>
           </div>
         </div>
+        )}
 
       </main>
     </div>
