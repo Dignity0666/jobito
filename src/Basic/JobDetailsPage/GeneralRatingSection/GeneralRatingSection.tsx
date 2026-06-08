@@ -172,72 +172,81 @@ export const GeneralRatingSection: React.FC<GeneralRatingSectionProps> = ({
         </div>
       ) : !isOwner && (
         <div className={styles.card}>
-          {isTradesmanJob && (() => {
-            const requiredDays = companyId ? 7 : 2;
-            const daysPassed = applicationDate
-              ? (new Date().getTime() - new Date(applicationDate).getTime()) / (1000 * 60 * 60 * 24)
-              : 0;
-            const notEligible = !hasApplied || !applicationDate || daysPassed < requiredDays;
-            return notEligible ? (
-              <div className={styles.loginPrompt} style={{ padding: '20px 0' }}>
-                <p style={{ color: 'var(--color-text)' }}>
-                  {!hasApplied
-                    ? t("لا يمكنك تقييم هذا العمل إلا بعد التقديم عليه.")
-                    : t(`لا يمكنك التقييم إلا بعد مرور ${requiredDays} ${requiredDays === 7 ? "أيام" : "يومين"} على الأقل من تاريخ التقديم.`)}
+          {(() => {
+            if (isTradesmanJob) {
+              const requiredDays = companyId ? 7 : 2;
+              const daysPassed = applicationDate
+                ? (new Date().getTime() - new Date(applicationDate).getTime()) / (1000 * 60 * 60 * 24)
+                : 0;
+              const notEligible = !hasApplied || !applicationDate || daysPassed < requiredDays;
+              if (notEligible) {
+                return (
+                  <div className={styles.loginPrompt} style={{ padding: '20px 0' }}>
+                    <p style={{ color: 'var(--color-text)' }}>
+                      {!hasApplied
+                        ? t("لا يمكنك تقييم هذا العمل إلا بعد التقديم عليه.")
+                        : t(`لا يمكنك التقييم إلا بعد مرور ${requiredDays} ${requiredDays === 7 ? "أيام" : "يومين"} على الأقل من تاريخ التقديم.`)}
+                    </p>
+                  </div>
+                );
+              }
+            }
+
+            if (hasRated) {
+              return (
+                <div className={styles.alreadyRatedBox}>
+                  <div className={styles.checkCircle}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                  <span className={styles.alreadyRatedText}>
+                    {companyId 
+                      ? t("لقد قمت بتقييم هذه الشركة مسبقاً") 
+                      : t("لقد قمت بتقييم هذا المعلن مسبقاً")}
+                  </span>
+                </div>
+              );
+            }
+
+            return (
+              <>
+                <h3 className={styles.cardTitle}>{t("أضف تقييمك")}</h3>
+                <p className={styles.cardSubtitle}>
+                  {t("شاركنا تجربتك مع")} {targetName}
                 </p>
-              </div>
-            ) : null;
-          })() ?? false}
-          ) : hasRated ? (
-            <div className={styles.alreadyRatedBox}>
-              <div className={styles.checkCircle}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </div>
-              <span className={styles.alreadyRatedText}>
-                {companyId 
-                  ? t("لقد قمت بتقييم هذه الشركة مسبقاً") 
-                  : t("لقد قمت بتقييم هذا المعلن مسبقاً")}
-              </span>
-            </div>
-          ) : (
-            <>
-              <h3 className={styles.cardTitle}>{t("أضف تقييمك")}</h3>
-              <p className={styles.cardSubtitle}>
-                {t("شاركنا تجربتك مع")} {targetName}
-              </p>
 
-              <div className={styles.starsContainer}>
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    className={`${styles.star} ${(hoveredRating || rating) >= star ? styles.starFilled : ""}`}
-                    onClick={() => setRating(star)}
-                    onMouseEnter={() => setHoveredRating(star)}
-                    onMouseLeave={() => setHoveredRating(0)}
-                    fill={(hoveredRating || rating) >= star ? "currentColor" : "none"}
-                    size={32}
-                  />
-                ))}
-              </div>
+                <div className={styles.starsContainer}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`${styles.star} ${(hoveredRating || rating) >= star ? styles.starFilled : ""}`}
+                      onClick={() => setRating(star)}
+                      onMouseEnter={() => setHoveredRating(star)}
+                      onMouseLeave={() => setHoveredRating(0)}
+                      fill={(hoveredRating || rating) >= star ? "currentColor" : "none"}
+                      size={32}
+                    />
+                  ))}
+                </div>
 
-              <textarea
-                className={styles.textarea}
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder={t("اكتب رأيك هنا...")}
-              />
+                <textarea
+                  className={styles.textarea}
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder={t("اكتب رأيك هنا...")}
+                />
 
-              <button
-                className={styles.submitBtn}
-                onClick={handleSubmit}
-                disabled={isSubmitting || !rating}
-              >
-                {isSubmitting ? t("جاري الإرسال...") : t("إرسال التقييم")}
-              </button>
-            </>
-          )}
+                <button
+                  className={styles.submitBtn}
+                  onClick={handleSubmit}
+                  disabled={isSubmitting || !rating}
+                >
+                  {isSubmitting ? t("جاري الإرسال...") : t("إرسال التقييم")}
+                </button>
+              </>
+            );
+          })()}
         </div>
       )}
 
