@@ -352,7 +352,16 @@ export const arTranslations: Record<string, string> = {
   "مايو": "مايو",
   "يوليو": "يوليو",
   "سبتمبر": "سبتمبر",
-  "نوفمبر": "نوفمبر"
+  "نوفمبر": "نوفمبر",
+  "Sunday": "الأحد",
+  "Monday": "الاثنين",
+  "Tuesday": "الثلاثاء",
+  "Wednesday": "الأربعاء",
+  "Thursday": "الخميس",
+  "Friday": "الجمعة",
+  "Saturday": "السبت",
+  "One-Time": "لمرة واحدة",
+  "One-Time Service": "خدمة لمرة واحدة"
 };
 
 export default arTranslations;
