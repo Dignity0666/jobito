@@ -337,6 +337,8 @@ export default function ProfileSettings() {
       keepalive: true,
     }).catch(err => console.error("Failed to schedule account deletion:", err));
 
+    alert(t("تم وضع حسابك في جدول الحذف وسيتم الحذف نهائياً بعد يومين. تم إرسال رسالة لبريدك الإلكتروني."));
+
     // Immediately close the modal, logout, and redirect
     setShowDeleteConfirm(false);
     logout();
@@ -350,9 +352,16 @@ export default function ProfileSettings() {
         method: "PATCH",
       });
       if (!res.ok) throw new Error(t("فشل في إلغاء طلب الحذف"));
+      
+      const data = await res.json();
+      if (data.access_token) {
+        localStorage.setItem("token", data.access_token);
+      }
+
       alert(t("تم إلغاء طلب حذف الحساب بنجاح!"));
       setDeletionStatus({ scheduled: false });
       window.dispatchEvent(new Event("auth-changed"));
+      window.location.reload();
     } catch (err: any) {
       alert(err.message || t("خطأ"));
     } finally {

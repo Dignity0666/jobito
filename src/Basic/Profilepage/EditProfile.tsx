@@ -145,23 +145,19 @@ export default function EditProfile() {
     }
   }, [apiFetch, user?.deletionRequestedAt]);
 
-  const handleDeleteAccount = async () => {
+  const handleDeleteAccount = () => {
     setIsDeleting(true);
-    try {
-      const res = await apiFetch(`${API_BASE_URL}/users/me`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error(t("فشل في طلب حذف الحساب"));
-      const data = await res.json();
-      showToast(data.message || t("تم جدولة حذف الحساب خلال يومين"), "success");
-      setDeletionStatus({ scheduled: true, daysLeft: 2 });
-      setShowDeleteConfirm(false);
-      window.dispatchEvent(new Event("auth-changed"));
-    } catch (err: any) {
-      showToast(err.message || "Error", "error");
-    } finally {
-      setIsDeleting(false);
-    }
+    
+    // Send the request in the background (fire and forget)
+    apiFetch(`${API_BASE_URL}/users/me`, {
+      method: "DELETE",
+      keepalive: true,
+    }).catch(err => console.error("Failed to delete account:", err));
+
+    showToast(t("تم وضع حسابك في جدول الحذف وسيتم الحذف نهائياً بعد يومين. تم إرسال رسالة لبريدك الإلكتروني."), "success");
+    setShowDeleteConfirm(false);
+    logout();
+    window.location.href = "/";
   };
 
   const handleCancelDeletion = async () => {
@@ -171,15 +167,23 @@ export default function EditProfile() {
         method: "PATCH",
       });
       if (!res.ok) throw new Error(t("فشل في إلغاء طلب الحذف"));
+      
+      const data = await res.json();
+      if (data.access_token) {
+        localStorage.setItem("token", data.access_token);
+      }
+
       showToast(t("تم إلغاء طلب حذف الحساب بنجاح!"), "success");
       setDeletionStatus({ scheduled: false });
       window.dispatchEvent(new Event("auth-changed"));
+      window.location.reload();
     } catch (err: any) {
-      showToast(err.message || "Error", "error");
+      showToast(err.message || t("خطأ"), "error");
     } finally {
       setIsCancelling(false);
     }
   };
+
   const [showPass, setShowPass] = useState(false);
 
   const handleProfileChange = (
@@ -433,8 +437,15 @@ export default function EditProfile() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
           <h1 className={styles.title}>{t("تعديل الملف الشخصي")}</h1>
           {user?.deletionRequestedAt && (
-            <div className={styles.deletionNotice}>
-              ⚠️ {t("حسابك مجدول للحذف. تم إيقاف التعديلات.")}
+            <div className={styles.deletionNotice} style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <span>⚠️ {t("حسابك مجدول للحذف. تم إيقاف التعديلات.")}</span>
+              <button 
+                onClick={handleCancelDeletion} 
+                disabled={isCancelling}
+                style={{ background: "#ff4d4f", color: "white", border: "none", padding: "5px 10px", borderRadius: "4px", cursor: "pointer" }}
+              >
+                {isCancelling ? t("جاري الإلغاء...") : t("إلغاء الحذف")}
+              </button>
             </div>
           )}
         </div>
@@ -1174,12 +1185,10 @@ export default function EditProfile() {
                   </div>
                 </div>
 
-                <div className={styles.section} style={{ marginTop: "2.5rem", borderTop: "1px solid var(--border, #eee)", paddingTop: "2rem" }}>
-                  <h3 className={styles.sectionTitle} style={{ color: "#dc2626" }}>{t("حذف الحساب")}</h3>
-                  <p className={styles.sectionSub}>
-                    {deletionStatus.scheduled
-                      ? t("حسابك مجدول للحذف. يمكنك إلغاء هذا الإجراء قبل انتهاء المدة.")
-                      : t("بمجرد طلب الحذف، سيتم حذف حسابك نهائياً بعد يومين.")}
+                <div style={{ padding: "1.5rem", borderTop: "1px solid var(--border, #eee)", marginTop: "2rem" }}>
+                  <h3 style={{ color: "#dc2626", marginBottom: "0.5rem", fontSize: "1.1rem" }}>{t("حذف الحساب")}</h3>
+                  <p style={{ color: "var(--text-secondary, #666)", marginBottom: "1.5rem", fontSize: "0.95rem" }}>
+                    {t("حذف حسابك نهائي ولا يمكن التراجع عنه.")}
                   </p>
                   
                   <div style={{ marginTop: "1rem" }}>
@@ -1210,7 +1219,7 @@ export default function EditProfile() {
                     ) : (
                       <div style={{ background: "var(--bg-card, #fff)", padding: "1.5rem", borderRadius: "12px", border: "1px solid var(--border, #eee)" }}>
                         <p style={{ marginBottom: "1.5rem", fontWeight: "600", color: "var(--text-primary, #111)" }}>
-                          {t("هل أنت متأكد؟ سيتم حذف حسابك نهائياً بعد يومين.")}
+                          {t("هل أنت متأكد؟ سيتم حذف حسابك نهائياً الآن.")}
                         </p>
                         <div style={{ display: "flex", gap: "1rem" }}>
                           <button

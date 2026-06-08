@@ -87,39 +87,19 @@ export default function AccountSecurity() {
     }
   };
 
-  const handleDeleteAccount = async () => {
+  const handleDeleteAccount = () => {
     setIsDeleting(true);
-    try {
-      const res = await apiFetch(`${API_BASE_URL}/users/me`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error("فشل في طلب حذف الحساب");
-      const data = await res.json();
-      showToast(data.message || "تم جدولة حذف الحساب خلال يومين", "success");
-      setShowDeleteConfirm(false);
-      logout(); // Force logout so they go through the proper flow next time
-      window.location.href = "/"; // Force redirect to home
-    } catch (err: unknown) {
-      showToast(err instanceof Error ? err.message : "Error", "error");
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+    
+    // Send the request in the background (fire and forget)
+    apiFetch(`${API_BASE_URL}/users/me`, {
+      method: "DELETE",
+      keepalive: true,
+    }).catch(err => console.error("Failed to delete account:", err));
 
-  const handleCancelDeletion = async () => {
-    setIsCancelling(true);
-    try {
-      const res = await apiFetch(`${API_BASE_URL}/users/me/cancel-deletion`, {
-        method: "PATCH",
-      });
-      if (!res.ok) throw new Error("فشل في إلغاء طلب الحذف");
-      showToast("تم إلغاء طلب حذف الحساب بنجاح!", "success");
-      setDeletionStatus({ scheduled: false });
-    } catch (err: unknown) {
-      showToast(err instanceof Error ? err.message : "Error", "error");
-    } finally {
-      setIsCancelling(false);
-    }
+    showToast("تم وضع حسابك في جدول الحذف وسيتم الحذف نهائياً بعد يومين. تم إرسال رسالة لبريدك الإلكتروني.", "success");
+    setShowDeleteConfirm(false);
+    logout(); // Force logout so they go through the proper flow next time
+    window.location.href = "/"; // Force redirect to home
   };
 
   return (
@@ -232,20 +212,11 @@ export default function AccountSecurity() {
           <div className={styles.sectionInfo}>
             <h2 className={styles.dangerTitle}>Delete Account</h2>
             <p>
-              {deletionStatus.scheduled
-                ? `Your account is scheduled for permanent deletion in ${deletionStatus.daysLeft ?? "?"} days. You can cancel this anytime before then.`
-                : "Once you request deletion, your account will be permanently deleted after 2 days. This action can be cancelled within that period."}
+              حذف حسابك نهائي ولا يمكن التراجع عنه.
             </p>
           </div>
           <div className={styles.form}>
-            {deletionStatus.scheduled ? (
-            <div className={styles.deletionWarningBox}>
-              <div className={styles.warningIcon}>⚠️</div>
-              <p className={styles.warningText}>
-                Account deletion in progress — <strong>{deletionStatus.daysLeft} days remaining</strong>
-              </p>
-            </div>
-            ) : !showDeleteConfirm ? (
+            {!showDeleteConfirm ? (
               <div className={styles.formFooter}>
                 <motion.button
                   type="button"
@@ -260,7 +231,7 @@ export default function AccountSecurity() {
             ) : (
               <div className={styles.confirmDeleteBox}>
                 <p className={styles.confirmText}>
-                  Are you sure? Your account will be permanently deleted after 2 days.
+                  Are you sure? This action is permanent.
                 </p>
                 <div className={styles.confirmActions}>
                   <motion.button
