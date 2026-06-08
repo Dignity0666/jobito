@@ -13,6 +13,7 @@ interface GeneralRatingSectionProps {
   targetName: string;
   jobId?: string | number;
   hasApplied?: boolean;
+  applicationDate?: string | Date;
   isTradesmanJob?: boolean;
 }
 
@@ -22,6 +23,7 @@ export const GeneralRatingSection: React.FC<GeneralRatingSectionProps> = ({
   targetName,
   jobId,
   hasApplied,
+  applicationDate,
   isTradesmanJob,
 }) => {
   const { t } = useTranslation();
