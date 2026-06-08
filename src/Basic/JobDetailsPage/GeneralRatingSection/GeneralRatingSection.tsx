@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../../../context/translation-context";
 import { useJobitoAuth } from "../../../context/LinkContxt";
 import { useToast } from "../../../context/ToastContext";
@@ -29,6 +30,7 @@ export const GeneralRatingSection: React.FC<GeneralRatingSectionProps> = ({
   const { t } = useTranslation();
   const { apiFetch, user } = useJobitoAuth();
   const { showToast } = useToast();
+  const navigate = useNavigate();
 
   const [reviews, setReviews] = useState<any[]>([]);
   const [rating, setRating] = useState<number>(0);
@@ -166,7 +168,7 @@ export const GeneralRatingSection: React.FC<GeneralRatingSectionProps> = ({
       {!user ? (
         <div className={styles.loginPrompt}>
           <p>{t("يرجى تسجيل الدخول لتتمكن من إضافة تقييمك.")}</p>
-          <button onClick={() => window.location.href = "/user-information"} className={styles.loginBtn}>
+          <button onClick={() => navigate("/user-information")} className={styles.loginBtn}>
             {t("تسجيل الدخول")}
           </button>
         </div>

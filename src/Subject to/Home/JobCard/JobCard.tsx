@@ -126,7 +126,22 @@ const CompanyJobCard: React.FC<{ job: Job; variants: Variants }> = ({
                  : `${job.salaryMin} - ${job.salaryMax} ${t("جنيه مصري")}`}
            </span>
            <span className={styles.applyBtn}>
-             {t("عمل حر")}
+             {(() => {
+               const types = Array.isArray(job.jobType) ? job.jobType : [job.jobType].filter(Boolean);
+               if (types.length === 0) return "دوام كامل";
+               return types.map(type => {
+                 const lowerType = String(type).toLowerCase();
+                 if (lowerType === "full-time") return "دوام كامل";
+                 if (lowerType === "part-time") return "دوام جزئي";
+                 if (lowerType === "remote") return "عن بعد";
+                 if (lowerType === "freelance") return "عمل حر";
+                 if (lowerType === "internship") return "تدريب";
+                 if (lowerType === "contract") return "عقد";
+                 if (lowerType === "one-time") return "خدمة لمرة واحدة";
+                 if (lowerType === "event") return "حدث";
+                 return type;
+               }).join(" / ");
+             })()}
            </span>
         </div>
       </div>
