@@ -745,7 +745,7 @@ export const enTranslations: Record<string, string> = {
   "اكتب رأيك هنا...": "Write your review here...",
   "جاري الإرسال...": "Submitting...",
   "إرسال التقييم": "Submit Rating",
-  "لا توجد تقييمات بعد.": "No ratings yet."
+  "لا توجد تقييمات بعد.": "No ratings yet.",
   "جنيه مصري": "EGP",
   "مجال العمل": "Field of Work",
   "المزايا والفوائد": "Perks and Benefits",
