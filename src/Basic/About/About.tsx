@@ -161,19 +161,19 @@ export function About() {
   ];
 
   const [realStats, setRealStats] = useState({
-    clients: "500+",
+    usersCount: 0,
+    jobsCount: 0,
+    companiesCount: 0,
+    hiredCount: 0,
   });
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const compRes = await fetch(`${API_BASE_URL}/companies?limit=1`);
-        if (compRes.ok) {
-          const compData = await compRes.json();
-          const totalCompanies = compData.total || (Array.isArray(compData.data) ? compData.data.length : (Array.isArray(compData) ? compData.length : null));
-          if (totalCompanies) {
-            setRealStats((prev) => ({ ...prev, clients: `${totalCompanies}+` }));
-          }
+        const res = await fetch(`${API_BASE_URL}/public-stats`);
+        if (res.ok) {
+          const data = await res.json();
+          setRealStats(data);
         }
       } catch (err) {
         console.error("Failed to fetch real stats", err);
@@ -231,19 +231,19 @@ export function About() {
                           <rect x="12" y="7" width="4" height="14" />
                           <rect x="6" y="15" width="4" height="6" />
                         </Icon>
-                        {t("نظرة عامة على الأداء")}
+                        {t("نظرة عامة على المنصة", "Platform Overview")}
                       </div>
-                      <div className={styles["hv-num"]}>98%</div>
-                      <div className={styles["hv-lbl"]}>{t("نسبة رضا العملاء")}</div>
+                      <div className={styles["hv-num"]}>{realStats.usersCount}+</div>
+                      <div className={styles["hv-lbl"]}>{t("مستخدم مسجل", "Registered User")}</div>
                       <div className={styles["hv-bar"]}>
                         <div className={styles["hv-fill"]} style={{ width: "98%" }} />
                       </div>
                       <div className={styles["hv-mini-grid"]}>
                         {[
-                          [realStats.clients, t("عميل")],
-                          ["10+", t("سنوات")],
-                          ["24/7", t("دعم")],
-                          ["100%", t("التزام")],
+                          [realStats.jobsCount, t("وظيفة", "jobs")],
+                          [realStats.companiesCount, t("شركة", "companies")],
+                          [realStats.hiredCount, t("توظيف", "hired")],
+                          ["24/7", t("دعم", "support")],
                         ].map(([n, l]) => (
                           <div key={l as string} className={styles["hv-mini"]}>
                             <div className={styles["hv-mini-n"]}>{n}</div>

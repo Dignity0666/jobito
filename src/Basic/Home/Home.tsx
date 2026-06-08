@@ -12,9 +12,10 @@ import { motion } from "framer-motion";
 import { useJobitoAuth } from "../../context/LinkContxt";
 import { useTranslation } from "../../context/translation-context";
 import { useTheme } from "../../context/ThemeContext";
+import { useState, useEffect } from "react";
 
 export const Home = () => {
-  const { user, isAuthenticated, role } = useJobitoAuth();
+  const { user, isAuthenticated, role, apiFetch } = useJobitoAuth();
   const { t, language } = useTranslation();
   const { isDark } = useTheme();
   const isRTL = language === "ar";
