@@ -239,21 +239,12 @@ export default function AccountSecurity() {
           </div>
           <div className={styles.form}>
             {deletionStatus.scheduled ? (
-              <div className={styles.deletionWarningBox}>
-                <div className={styles.warningIcon}>⚠️</div>
-                <p className={styles.warningText}>
-                  Account deletion in progress — <strong>{deletionStatus.daysLeft} days remaining</strong>
-                </p>
-                <motion.button
-                  className={styles.cancelDeleteBtn}
-                  onClick={handleCancelDeletion}
-                  disabled={isCancelling}
-                  whileHover={{ y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  {isCancelling ? "Cancelling..." : "Cancel Deletion"}
-                </motion.button>
-              </div>
+            <div className={styles.deletionWarningBox}>
+              <div className={styles.warningIcon}>⚠️</div>
+              <p className={styles.warningText}>
+                Account deletion in progress — <strong>{deletionStatus.daysLeft} days remaining</strong>
+              </p>
+            </div>
             ) : !showDeleteConfirm ? (
               <div className={styles.formFooter}>
                 <motion.button

@@ -172,14 +172,22 @@ export const GeneralRatingSection: React.FC<GeneralRatingSectionProps> = ({
         </div>
       ) : !isOwner && (
         <div className={styles.card}>
-          {isTradesmanJob && (!hasApplied || !applicationDate || (new Date().getTime() - new Date(applicationDate).getTime()) / (1000 * 60 * 60 * 24) < 1) ? (
-            <div className={styles.loginPrompt} style={{ padding: '20px 0' }}>
-              <p style={{ color: 'var(--color-text)' }}>
-                {!hasApplied 
-                  ? t("لا يمكنك تقييم هذا العمل إلا بعد التقديم عليه.")
-                  : t("لا يمكنك التقييم إلا بعد مرور يوم واحد على الأقل من تاريخ التقديم.")}
-              </p>
-            </div>
+          {isTradesmanJob && (() => {
+            const requiredDays = companyId ? 7 : 2;
+            const daysPassed = applicationDate
+              ? (new Date().getTime() - new Date(applicationDate).getTime()) / (1000 * 60 * 60 * 24)
+              : 0;
+            const notEligible = !hasApplied || !applicationDate || daysPassed < requiredDays;
+            return notEligible ? (
+              <div className={styles.loginPrompt} style={{ padding: '20px 0' }}>
+                <p style={{ color: 'var(--color-text)' }}>
+                  {!hasApplied
+                    ? t("لا يمكنك تقييم هذا العمل إلا بعد التقديم عليه.")
+                    : t(`لا يمكنك التقييم إلا بعد مرور ${requiredDays} ${requiredDays === 7 ? "أيام" : "يومين"} على الأقل من تاريخ التقديم.`)}
+                </p>
+              </div>
+            ) : null;
+          })() ?? false}
           ) : hasRated ? (
             <div className={styles.alreadyRatedBox}>
               <div className={styles.checkCircle}>
